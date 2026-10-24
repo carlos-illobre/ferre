@@ -91,7 +91,7 @@ describe("el celular deja entrar a la computadora", () => {
   it("el código leído desde la entrada lleva solo a lo que Ferrebress muestra para el celular", () => {
     expect(destinoDelCodigo("https://ejemplo.test/ferre/#/entrar-compu?codigo=abc-DEF_123")).toBe("#/entrar-compu?codigo=abc-DEF_123");
     expect(destinoDelCodigo("https://ejemplo.test/#/vincular-celular?codigo=XY12")).toBe("#/vincular-celular?codigo=XY12");
-    expect(destinoDelCodigo("https://ejemplo.test/#/foto?codigo=5d1f0a52-93a1")).toBe("#/foto?codigo=5d1f0a52-93a1");
+    expect(destinoDelCodigo("https://ejemplo.test/#/foto?codigo=5d1f0a52-93a1")).toBeNull(); // la foto ya no se pide con un código (specs/023)
     expect(destinoDelCodigo("7790250000358")).toBeNull();
     expect(destinoDelCodigo("https://otro-sitio.test/#/mas/usuarios")).toBeNull();
   });

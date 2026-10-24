@@ -12,7 +12,7 @@ import { olvidarAjustesVistos } from "../negocio/sistema/ajustes";
 import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
 
-const AJUSTES = { sesion_segundos: 60, celular_segundos: 60, vinculo_dias: 30, tramos: { sesion_segundos: [0, 30, 60, 300, 600], celular_segundos: [5, 30, 60, 300, 600] } };
+const AJUSTES = { sesion_segundos: 60, vinculo_dias: 30, tramos: { sesion_segundos: [0, 30, 60, 300, 600] } };
 const puts = () => apiFalsa.mock.calls.filter((c) => c[1]?.method === "PUT").map((c) => JSON.parse(c[1].body));
 const elegido = (grupo: string) => within(screen.getByTestId(grupo)).getAllByRole("radio").find((b) => b.getAttribute("aria-checked") === "true")?.textContent;
 
@@ -23,19 +23,18 @@ beforeEach(() => {
 afterEach(() => { vi.useRealTimers(); });
 
 describe("Más → Sistema", () => {
-  it("020-E12: los tres renglones con su valor y su línea; los mismos tramos en el celular y la computadora, con el texto largo o resumido", async () => {
+  it("020-E12 023-E33: los dos renglones con su valor y su línea (el del celular emparejado ya no está); los mismos tramos en el celular y la computadora, con el texto largo o resumido", async () => {
     const { unmount } = render(<Sistema />);
     await waitFor(() => expect(elegido("sis-sesion")).toBe("1 min"));
     expect(within(screen.getByTestId("sis-sesion")).getAllByRole("radio").map((b) => b.textContent)).toEqual(["No", "30 s", "1 min", "5 min", "10 min"]);
-    expect(within(screen.getByTestId("sis-celular")).getAllByRole("radio").map((b) => b.textContent)).toEqual(["5 s", "30 s", "1 min", "5 min", "10 min"]);
-    expect(elegido("sis-celular")).toBe("1 min");
+    expect(screen.queryByTestId("sis-celular")).toBeNull();
     expect((screen.getByTestId("sis-vinculo") as HTMLInputElement).value).toBe("30");
     const largo = screen.getByTestId("sistema").textContent!;
     expect(largo).toContain("un cambio hecho directamente en la base tarda hasta este tiempo");
     unmount();
     render(<Sistema celular />);
     await waitFor(() => expect(elegido("sis-sesion")).toBe("1 min"));
-    expect(within(screen.getByTestId("sis-celular")).getAllByRole("radio").map((b) => b.textContent)).toEqual(["5 s", "30 s", "1 min", "5 min", "10 min"]);
+    expect(screen.queryByTestId("sis-celular")).toBeNull();
     expect(screen.getByTestId("sistema").textContent!.length).toBeLessThan(largo.length);
   });
 
@@ -45,11 +44,9 @@ describe("Más → Sistema", () => {
     fireEvent.click(screen.getByTestId("sis-sesion-300"));
     expect(elegido("sis-sesion")).toBe("5 min");
     await waitFor(() => expect(screen.getByTestId("sistema-nota").textContent).toContain("Guardado para todos: la sesión se recuerda 5 minutos."));
-    fireEvent.click(screen.getByTestId("sis-celular-5"));
-    await waitFor(() => expect(screen.getByTestId("sistema-nota").textContent).toContain("el celular emparejado pregunta cada 5 segundos"));
     fireEvent.click(screen.getByTestId("sis-sesion-0"));
     await waitFor(() => expect(screen.getByTestId("sistema-nota").textContent).toContain("la sesión no se recuerda"));
-    expect(puts()).toEqual([{ sesion_segundos: 300 }, { celular_segundos: 5 }, { sesion_segundos: 0 }]);
+    expect(puts()).toEqual([{ sesion_segundos: 300 }, { sesion_segundos: 0 }]);
   });
 
   it("020-E14 020-E15: los días se guardan con − y + (juntos) o escritos; fuera de 1 a 365 no se guardan y lo dice", async () => {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { escucharPuesto, EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../puesto";
+import { EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../puesto";
+import { escucharPuesto } from "../../../../codigos-del-celular";
 import { usePuede } from "../../../permisos";
 import { esMargenBoton, MARGENES } from "../../../../negocio/precios/vista-previa";
 import { esperarBusqueda, quienTieneElCodigo, traerPorCodigo, useCatalogo, useListaDeProductos, useMarcas } from "../../../../negocio/catalogo";
@@ -70,7 +71,7 @@ export function Productos() {
   const escuchando = esCelular ? !abiertoId : !cargandoCodigo;
   useEffect(() => {
     if (!emparejado || !escuchando) return;
-    return escucharPuesto(emparejado, (codigo) => alEscanear.current(codigo), undefined, true);
+    return escucharPuesto(emparejado, (codigo) => alEscanear.current(codigo));
   }, [escuchando, emparejado]);
   // Lo encontrado llega del servidor de a 50, ya filtrado; al llegar al final, los siguientes
   // (specs/018). Las marcas para elegir son las de lo encontrado (015-E29).

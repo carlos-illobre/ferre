@@ -384,20 +384,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/Lector.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/MisCelulares.tsx",
     "to": "src/datos/credenciales/index.ts",
     "unresolvedTo": "../../datos/credenciales",
@@ -1098,63 +1084,7 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/FotoParaLaCompu.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/Pedidos.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/PedidosDeLaCompu.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/PedidosDeLaCompu.tsx",
-    "to": "src/datos/sesion/index.ts",
-    "unresolvedTo": "../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/PedirFoto.tsx",
     "to": "src/datos/conexion/index.ts",
     "unresolvedTo": "../datos/conexion",
     "dependencyTypes": [
@@ -1472,20 +1402,6 @@
     "rule": {
       "severity": "error",
       "name": "por-la-puerta-de-entrada"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/espejo.ts",
-    "to": "src/plataforma/tiempo-real/flujo-de-eventos.ts",
-    "unresolvedTo": "./plataforma/tiempo-real/flujo-de-eventos",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
     }
   },
   {

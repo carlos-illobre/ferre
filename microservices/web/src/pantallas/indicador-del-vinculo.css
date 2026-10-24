@@ -1,0 +1,37 @@
+/* El indicador de la conexión entre el celular y la computadora (specs/023, variante A; colores en
+   docs/lenguaje-mostrador, «El puntito del vínculo»). */
+.iv { position: relative; display: flex; flex-direction: column; gap: 8px; font-family: "Manrope Variable", system-ui, sans-serif; }
+.iv-boton { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 14px; border-radius: 12px; border: 1.5px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font: inherit; text-align: left; cursor: pointer; }
+.iv-boton:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
+.iv-textos { display: flex; flex-direction: column; min-width: 0; }
+.iv-textos b { font-size: 1rem; font-weight: 700; }
+.iv-textos small { font-size: 0.875rem; font-weight: 500; color: var(--p-texto-2); }
+.iv-celu .iv-boton { min-height: 44px; padding: 0 14px; border-radius: 999px; gap: 8px; white-space: nowrap; }
+.iv-celu .iv-textos b { font-size: 0.9375rem; }
+
+/* El puntito: lleno (con halo) cuando anda o falla; hueco cuando espera. */
+.iv-punto { flex: none; width: 12px; height: 12px; border-radius: 50%; box-sizing: border-box; }
+.iv-punto.directa { background: var(--p-logro); box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-logro) 20%, transparent); }
+.iv-punto.servidor { background: var(--p-urgente); box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-urgente) 20%, transparent); }
+.iv-punto.sin-conexion { background: var(--p-error); box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-error) 20%, transparent); }
+.iv-punto.conectando { border: 2.5px solid var(--p-texto-3); }
+.iv-punto.solo { border: 2.5px solid var(--p-borde-fuerte); }
+.iv-punto.pausa { border: 2.5px solid var(--p-verde); }
+
+.iv-aviso { padding: 6px 10px; border-radius: 10px; background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); font-weight: 700; font-size: 0.9375rem; }
+
+/* El detalle: encima del botón en la computadora; una hoja desde abajo en el celular. */
+.iv-detalle { position: relative; width: 420px; max-width: calc(100vw - 32px); padding: 18px 20px; border-radius: 16px; border: 1px solid var(--p-borde); background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 12px 32px rgb(26 29 27 / 0.18); font-size: 1rem; line-height: 1.4; }
+.iv-detalle h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 1.25rem; font-weight: 750; }
+.iv-detalle dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin: 0; }
+.iv-detalle dt { color: var(--p-texto-2); font-size: 0.875rem; font-weight: 650; }
+.iv-detalle dd { margin: 0; font-size: 0.9375rem; }
+.iv-por { margin: 14px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--p-urgente-suave); color: var(--p-urgente-texto); font-size: 0.9375rem; font-weight: 600; }
+.iv-botones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.iv-botones button { min-height: 44px; padding: 0 16px; border-radius: 12px; font: inherit; font-size: 0.9375rem; font-weight: 700; cursor: pointer; }
+.iv-probar { border: 0; background: var(--p-verde); color: #fff; }
+.iv-comun { border: 1.5px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); }
+.iv-botones button:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; }
+.iv-velo { position: fixed; inset: 0; z-index: 999; background: rgb(26 29 27 / 0.35); }
+.iv-celu .iv-detalle { position: fixed; z-index: 1000; left: 0; right: 0; bottom: 0; width: auto; max-width: none; border-radius: 20px 20px 0 0; padding: 22px 20px calc(28px + env(safe-area-inset-bottom)); }
+.iv-celu .iv-botones button { flex: 1 1 100%; min-height: 52px; }

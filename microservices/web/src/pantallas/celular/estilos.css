@@ -103,6 +103,7 @@ code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-siz
 .vincular-lugar { position: relative; width: 100%; max-width: 760px; margin: 0 auto; height: 0; z-index: 5; }
 /* El botón del vínculo, la pastilla de la v2 (decisión 140): verde con el vínculo, blanca sin él. */
 .vincular-boton { position: absolute; top: 10px; right: 20px; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #CEC8BA; background: #fff; color: #12382F; font-size: 15px; font-weight: 700; }
+.vincular-lugar .iv-celu { position: absolute; top: 10px; right: 20px; }
 .vincular-boton.vinculado { border-color: #1E9E62; color: #11764A; background: #E2F4EA; }
 /* Desconectado un rato o con la computadora cerrada: blanco con el borde verde, nunca gris (decisión 143). */
 .vincular-boton.apagado { border-color: #1E9E62; color: #11764A; background: #fff; }

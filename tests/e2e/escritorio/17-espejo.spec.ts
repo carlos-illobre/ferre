@@ -20,6 +20,7 @@ const hash = (t: string) => createHash("sha256").update(t).digest("hex");
 
 test.beforeAll(() => {
   const deEstos = `(SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email IN ('${EMAIL}', '${EMAIL_OTRA}')))`;
+  // La tabla de códigos quedó sin uso (specs/023), pero tiene filas viejas que apuntan a los puestos.
   psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN ${deEstos} OR celular_sesion_id IN ${deEstos})`);
   psql(`DELETE FROM puesto WHERE sesion_id IN ${deEstos} OR celular_sesion_id IN ${deEstos}`);
   // El pedido borrador que deja la prueba apunta al usuario: se borra antes que él.
@@ -50,7 +51,7 @@ test.beforeAll(() => {
 
 test.afterEach(cerrarLasOtrasVentanas);
 
-test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y desvincular", async ({ browser }) => {
+test("023-E16 023-E19: emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y desvincular", async ({ browser }) => {
   // Es un recorrido largo, con tres ventanas: necesita más que los 30 segundos de siempre.
   test.setTimeout(90_000);
   const abrir = async (ancho: number, alto: number, token: string, ruta: string) => {
@@ -66,11 +67,12 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   const otra = await abrir(1366, 768, TOKEN_OTRA, "/#/productos");
 
   // Al abrirse el celular, los dos lo dicen, y el celular va a donde está la computadora.
-  await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
-  await expect(celular.getByTestId("desconectar-arriba")).toHaveClass(/vinculado/);
+  await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
+  // 023-E01: en la red de la prueba se conectan directo, y lo dicen los dos.
+  await expect(celular.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa");
   await expect(celular.getByTestId("menu-vender")).toHaveAttribute("aria-current", "page");
-  // Vinculado, el único botón del encabezado del celular es «Desconectar»; el de vincular no está (decisión 73).
-  await expect(celular.getByTestId("desconectar-arriba")).toBeVisible();
+  // Vinculado, en el encabezado del celular está el estado de la conexión; el de vincular no está (decisión 73, specs/023).
+  await expect(celular.getByTestId("indicador-vinculo")).toBeVisible();
   await expect(celular.getByTestId("vincular-arriba")).toHaveCount(0);
 
   // La venta es una sola: lo que se agrega en la computadora aparece en el celular…
@@ -129,13 +131,13 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
     await new Promise((r) => setTimeout(r, 700));
     await ruta.fetch().then((r) => ruta.fulfill({ response: r })).catch(() => undefined).finally(() => { avisosEnVuelo--; });
   };
-  await compu.route("**/puestos/*/espejo", lenta);
+  await compu.route("**/puestos/*/enlace", lenta);
   await celular.getByTestId("menu-deposito").click();
   await celular.waitForTimeout(450); // el segundo toque, antes de que llegue la respuesta del primero
   await celular.getByTestId("menu-mas").click();
   // Que la computadora termine de contestar los dos toques (lo que ella avisa va por el servidor al celular).
   await expect.poll(() => avisosEnVuelo).toBe(0);
-  await compu.unroute("**/puestos/*/espejo", lenta);
+  await compu.unroute("**/puestos/*/enlace", lenta);
   await expect(celular.getByTestId("menu-mas")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("mas")).toBeVisible();
   await celular.getByTestId("menu-deposito").click();
@@ -184,23 +186,28 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   // Dónde se está parado lo decide la computadora (decisión 71): si se la abre de nuevo en otra
   // pantalla con el celular ya abierto, el celular va a ella y no al revés.
   await compu.goto("/?de-nuevo=1#/productos");
-  await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
+  await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
   await expect(celular.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("pestana-productos")).toHaveAttribute("aria-current", "page");
   await compu.getByTestId("menu-deposito").click();
   await expect(celular.getByRole("tab", { name: "Stock" })).toHaveAttribute("aria-selected", "true");
 
   // «Desconectar» hace que cada uno vaya por su lado: el celular se mueve y la computadora no. Al «Reconectar» manda la computadora.
+  // Están en el detalle del indicador (specs/023).
+  await celular.getByTestId("indicador-vinculo").click();
   await celular.getByTestId("desconectar-arriba").click();
-  await expect(compu.getByTestId("espejo-estado")).toContainText("Desconectados");
+  await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "pausa");
+  await celular.getByTestId("cerrar-detalle").click();
   await celular.getByTestId("menu-catalogo").click();
   await expect(celular.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
+  await celular.getByTestId("indicador-vinculo").click();
   await celular.getByTestId("reconectar-arriba").click();
+  await celular.getByTestId("cerrar-detalle").click();
   // Al reconectar manda la computadora: si se hubiera ido a Catálogo, el celular quedaría ahí.
   await expect(celular.getByRole("tab", { name: "Stock" })).toHaveAttribute("aria-selected", "true");
   await expect(compu.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");
-  await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
+  await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
 
   // El vínculo es de los dispositivos y del usuario (decisión 73): si la persona sale de la
   // computadora y vuelve a entrar ahí, sigue vinculada sin escanear nada.
@@ -210,7 +217,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   psql(`UPDATE puesto SET usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}'), compu_dispositivo = '${dispositivo}' WHERE codigo_hash = 'e2e-espejo'`);
   await compu.context().close();
   psql(`UPDATE sesion SET revocada_en = now() WHERE token_hash = '${hash(TOKEN_COMPU)}'`);
-  await expect(celular.getByTestId("desconectar-arriba")).toHaveClass(/apagado/);
+  await expect(celular.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "solo", { timeout: 15000 });
   const TOKEN_COMPU_2 = `${TOKEN_COMPU}-de-nuevo`;
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(TOKEN_COMPU_2)}', 'e2e compu de nuevo', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   const enEsteDispositivo = async (token: string) => {
@@ -226,7 +233,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await expect(intrusa.getByTestId("espejo")).toHaveCount(0);
   await intrusa.context().close();
   compu = await enEsteDispositivo(TOKEN_COMPU_2);
-  await expect(compu.getByTestId("espejo-estado")).toContainText("Conectado con el celular");
+  await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
   await expect(celular.getByRole("tab", { name: "Stock" })).toHaveAttribute("aria-selected", "true");
 
   // Desvincular es el corte definitivo y está solo en Más → Configuración (decisiones 74 y 99): los dos quedan sueltos y la computadora ofrece vincular.
@@ -239,7 +246,7 @@ test("emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y
   await compu.getByTestId("desvincular-vinculo").click();
   await expect(compu.getByTestId("espejo")).toHaveCount(0);
   await expect(compu.getByTestId("emparejar-celular")).toBeVisible();
-  await expect(celular.getByTestId("desconectar-arriba")).toHaveCount(0);
+  await expect(celular.getByTestId("indicador-vinculo")).toHaveCount(0);
   // El servidor ya no tiene el vínculo activo: lo que haga el celular no le llega a la computadora.
   await expect.poll(() => psql(`SELECT count(*) FROM puesto WHERE expira_en > now() AND (sesion_id IN (SELECT id FROM sesion WHERE usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')) OR celular_sesion_id IN (SELECT id FROM sesion WHERE usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')))`)).toBe("0");
   await celular.getByTestId("menu-vender").click();

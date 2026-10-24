@@ -5,14 +5,14 @@ import { diasDeVinculo } from "../acceso/vinculo.js";
 import { olvidarSesiones } from "../acceso/sesiones.js";
 import { guardarDiasDeVinculo } from "../acceso/datos.js";
 import { guardarTiempos, tiempos } from "./ajustes.js";
-import { TRAMOS_DE_SESION, TRAMOS_DEL_CELULAR, type cambiosDeAjustes } from "./esquemas.js";
+import { TRAMOS_DE_SESION, type cambiosDeAjustes } from "./esquemas.js";
 import type { AjustesDelSistema, ValoresDelSistema } from "../contratos/sistema.js";
 
 // Más → Sistema (specs/020, RF-135): lo que vale para todos los dispositivos. Lo ve y lo cambia
 // quien tiene «Administrar el sistema» (la ruta lo pide). Cada cambio queda en «Quién hizo qué»,
 // con lo de antes y lo nuevo.
 const valores = async (): Promise<ValoresDelSistema> => ({ ...tiempos(), vinculo_dias: await diasDeVinculo(pool) });
-const conTramos = (v: ValoresDelSistema): AjustesDelSistema => ({ ...v, tramos: { sesion_segundos: [...TRAMOS_DE_SESION], celular_segundos: [...TRAMOS_DEL_CELULAR] } });
+const conTramos = (v: ValoresDelSistema): AjustesDelSistema => ({ ...v, tramos: { sesion_segundos: [...TRAMOS_DE_SESION] } });
 
 export const ajustes = async (): Promise<AjustesDelSistema> => conTramos(await valores());
 

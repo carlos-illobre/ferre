@@ -2,7 +2,8 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEven
 import { abrirConteo, crearSector, ordenarSectores, useConteo, useSectores, type Cierre, type Contado, type Conteo, type Sector } from "../../../../negocio/deposito/conteo";
 import { cantidadContada } from "../../../../negocio/deposito/inventario";
 import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../../../negocio/catalogo";
-import { escucharPuesto, EVENTO_EMPAREJAMIENTO, pedirLector, puestoLocal } from "../../../../puesto";
+import { EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../../../puesto";
+import { escucharPuesto, pedirLector } from "../../../../codigos-del-celular";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { urlDeFoto } from "../../../../datos/conexion";
 import { fecha } from "../../../../formato";
@@ -239,7 +240,7 @@ function ConteoDeSector({ conteo, alActualizar, alCerrado, alOtro }: { conteo: C
   useEffect(() => { const mirar = () => setEmparejado(puestoLocal()?.id ?? null); window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar); return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); }, []);
   const lector = useRef(alDetectar);
   useEffect(() => { lector.current = alDetectar; }, [alDetectar]);
-  useEffect(() => { if (!emparejado || resultado) return; return escucharPuesto(emparejado, (codigo) => lector.current(codigo), undefined, true); }, [emparejado, resultado]);
+  useEffect(() => { if (!emparejado || resultado) return; return escucharPuesto(emparejado, (codigo) => lector.current(codigo)); }, [emparejado, resultado]);
   const [lectorPedido, setLectorPedido] = useState<boolean | null>(null);
   const pedirAlCelular = useCallback(() => { void pedirLector().then(setLectorPedido); }, []);
 

@@ -21,7 +21,8 @@ import { busquedaAlDia, esperarBusqueda, useCatalogo, type Cliente } from "../..
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { nombreDeProducto, pesos } from "../../formato";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
-import { enviarCodigoAlPuesto, escucharPuesto, EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, pedirLector, puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../puesto";
+import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../puesto";
+import { enviarCodigoAlPuesto, escucharPuesto, pedirLector } from "../../codigos-del-celular";
 import type { Producto } from "../celular/pantallas/Productos";
 import { describirDispositivo } from "./base/dispositivo";
 import { useEsCelular } from "./base/vista";
@@ -106,7 +107,7 @@ export function Vender() {
   const alDetectar = useCallback((codigo: string) => {
     const conocido = manejarCodigo.current(codigo);
     setUltimoEscaneo(conocido ? `${codigo}: agregado` : `${codigo}: no está en el catálogo`);
-    if (puestoRemoto()) enviarCodigoAlPuesto(codigo).then((ok) => { if (ok) setUltimoEscaneo((u) => `${u ?? codigo}. Enviado a la computadora.`); });
+    if (puestoRemoto()) enviarCodigoAlPuesto(codigo).then((r) => { if (r === "llego") setUltimoEscaneo((u) => `${u ?? codigo}. Enviado a la computadora.`); });
   }, []);
 
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {

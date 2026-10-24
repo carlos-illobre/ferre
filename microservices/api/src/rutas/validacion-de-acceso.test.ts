@@ -17,10 +17,9 @@ describe("lo que llega al entrar y al vincular", () => {
     expect(await rechazo(await pedir(app, "POST", "/sesiones/vinculaciones/v1/estado", { rol: null, cuerpo: {} }))).toEqual([400, "Falta la clave"]);
   });
 
-  it("los días del vínculo van de 1 a 365, enteros; un código escaneado no puede venir vacío", async () => {
+  it("los días del vínculo van de 1 a 365, enteros", async () => {
     for (const dias of [0, 366, 2.5, "30"]) {
       expect(await rechazo(await pedir(app, "PUT", "/puestos/configuracion", { cuerpo: { dias } }))).toEqual([400, "Los días tienen que ser un número entero entre 1 y 365"]);
     }
-    expect(await rechazo(await pedir(app, "POST", "/puestos/p1/codigos", { cuerpo: { codigo: "   " } }))).toEqual([400, "Falta el código"]);
   });
 });

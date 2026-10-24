@@ -1,31 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { readFileSync } from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a), reducirImagen: async (f: File) => f }));
-vi.mock("qrcode", () => ({ default: { toDataURL: async (texto: string) => `data:qr,${texto}` } }));
+
+const falso = vi.hoisted(() => ({ enlace: null as unknown as ReturnType<typeof import("../pruebas/enlace-falso")["crearEnlaceFalso"]> }));
+vi.mock("../enlace", async () => { const { crearEnlaceFalso } = await import("../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
 
 import { FotoDeFactura } from "./FotoDeFactura";
 import { FotoParaLaCompu } from "./FotoParaLaCompu";
+import { PedidosDeLaCompu } from "./PedidosDeLaCompu";
 
 const FOTO = "5d1f0a52-93a1-4f0e-8c1b-7a2e6d4c9b10.jpg";
 
 // La foto del comprobante reemplaza al número (RF-50) y, en la computadora, llega desde el
-// celular con un código QR (decisiones 32, 41 y 42).
+// celular emparejado por la conexión entre los dos (decisiones 32, 41 y 152).
 describe("foto de la factura", () => {
-  let lista: boolean;
   const subidas: FormData[] = [];
   beforeEach(() => {
-    lista = false; subidas.length = 0;
+    subidas.length = 0; falso.enlace.olvidar();
     apiFalsa.mockReset();
     apiFalsa.mockImplementation(async (ruta: string, opciones?: RequestInit) => {
       if (ruta === "/compras/fotos") { subidas.push(opciones!.body as FormData); return { foto: FOTO }; }
-      if (ruta === "/pedidos-de-foto" && opciones?.method === "POST") return { codigo: "cod-1", expiraEnSegundos: 600 };
-      if (ruta === "/pedidos-de-foto/cod-1") return { para: "la foto de la factura", lista };
-      if (ruta === "/pedidos-de-foto/cod-1/foto") { lista = true; return { ok: true }; }
-      if (ruta === "/pedidos-de-foto/vencido") throw Object.assign(new Error("venció"), { estado: 404 });
       return {};
     });
     globalThis.fetch = vi.fn(async () => ({ ok: true, blob: async () => new Blob(["imagen"], { type: "image/jpeg" }) })) as never;
@@ -51,43 +48,49 @@ describe("foto de la factura", () => {
     expect(alCambiar).toHaveBeenCalledWith(null);
   });
 
-  it("en la computadora: pide la foto, muestra el código QR y la recibe sola cuando el celular la manda", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    try {
-      const alCambiar = vi.fn();
-      render(<FotoDeFactura foto={null} alCambiar={alCambiar} conCelular nombre="factura" />);
-      fireEvent.click(screen.getByTestId("foto-con-celular"));
-      const qr = await waitFor(() => screen.getByAltText("Código para sacar la foto con el celular") as HTMLImageElement);
-      expect(qr.src).toContain("#/foto?codigo=cod-1");
-      await vi.advanceTimersByTimeAsync(2100);
-      expect(alCambiar).not.toHaveBeenCalled(); // todavía no llegó
-      lista = true;
-      await vi.advanceTimersByTimeAsync(2100);
-      await waitFor(() => expect(alCambiar).toHaveBeenCalledWith(FOTO));
-      expect(subidas).toHaveLength(1); // la computadora la sube como si la hubiera elegido de un archivo
-    } finally { vi.useRealTimers(); }
-  });
-
-  it("el celular que lee el código saca la foto y la manda con ese código", async () => {
-    render(<FotoParaLaCompu codigo="cod-1" />);
-    expect((await screen.findByTestId("sacar-comprobante")).textContent).toBe("Sacar la foto");
-    expect(screen.getByTestId("foto-para-la-compu").textContent).toContain("la foto de la factura");
-    fireEvent.change(screen.getByTestId("archivo-para-la-compu"), { target: { files: [new File(["x"], "f.jpg", { type: "image/jpeg" })] } });
-    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("ya está en la computadora"));
-    expect(apiFalsa).toHaveBeenCalledWith("/pedidos-de-foto/cod-1/foto", expect.objectContaining({ method: "POST" }));
-  });
-
-  it("002-T012: el código QR tiene su tamaño fijo aunque esté dentro de la foto grande del producto, que estira sus imágenes", async () => {
-    const estilos = readFileSync(`${process.cwd()}/src/pantallas/foto-de-factura.css`, "utf8");
-    expect(estilos).toMatch(/\.ff-pedido img\.ff-qr \{ width: 150px; height: 150px; aspect-ratio: auto;/);
-    render(<FotoDeFactura foto={null} alCambiar={vi.fn()} nombre="factura" conCelular />);
+  it("023-E17: en la computadora, con el celular emparejado, pide la foto sin código QR y la recibe sola cuando el celular la manda", async () => {
+    localStorage.setItem("ferre.puesto", JSON.stringify({ id: "p1", expira_en: "2099-01-01T00:00:00Z" }));
+    const alCambiar = vi.fn();
+    render(<FotoDeFactura foto={null} alCambiar={alCambiar} conCelular nombre="factura" />);
     fireEvent.click(screen.getByTestId("foto-con-celular"));
-    expect((await screen.findByRole("img", { name: "Código para sacar la foto con el celular" })).className).toBe("ff-qr");
+    expect(screen.getByTestId("pedida-al-celular")).toBeTruthy();
+    expect(screen.queryByRole("img")).toBeNull();
+    const pedido = falso.enlace.mandados.find((m) => m.tipo === "pedir-foto") as { id: string; para: string };
+    expect(pedido.para).toBe("la foto de la factura");
+    expect(alCambiar).not.toHaveBeenCalled(); // todavía no llegó
+    falso.enlace.llega({ tipo: "foto", id: "otro", imagen: "data:image/jpeg;base64,eA==" }); // de otro pedido: no es esta
+    falso.enlace.llega({ tipo: "foto", id: pedido.id, imagen: "data:text/html;base64,eA==" }); // no es una imagen: no se toma
+    expect(alCambiar).not.toHaveBeenCalled();
+    falso.enlace.llega({ tipo: "foto", id: pedido.id, imagen: "data:image/jpeg;base64,eA==" });
+    await waitFor(() => expect(alCambiar).toHaveBeenCalledWith(FOTO));
+    expect(subidas).toHaveLength(1); // la computadora la sube como si la hubiera elegido de un archivo
+    localStorage.removeItem("ferre.puesto");
   });
 
-  it("un código vencido se dice con claridad y no deja sacar la foto", async () => {
+  it("023-E24: sin celular emparejado, no hay código QR: dice que se elija un archivo o se vincule el celular", () => {
+    render(<FotoDeFactura foto={null} alCambiar={vi.fn()} conCelular nombre="factura" />);
+    fireEvent.click(screen.getByTestId("foto-con-celular"));
+    expect(screen.getByTestId("foto-sin-celular").textContent).toContain("Vincular el celular");
+    expect(screen.queryByRole("img")).toBeNull();
+    expect(falso.enlace.mandados).toEqual([]);
+  });
+
+  it("023-E30: el celular saca la foto del pedido y la manda entera a la computadora", async () => {
+    // En el celular, el aviso de la computadora ya está escuchando cuando llega el pedido.
+    render(<PedidosDeLaCompu alSacar={() => {}} alLeer={() => {}} />);
+    act(() => falso.enlace.llega({ tipo: "pedir-foto", id: "f1", para: "la foto de la factura" }));
+    render(<FotoParaLaCompu codigo="f1" />);
+    expect(screen.getByTestId("foto-para-la-compu").textContent).toContain("la foto de la factura");
+    fireEvent.change(screen.getByTestId("archivo-para-la-compu"), { target: { files: [new File(["imagen"], "f.jpg", { type: "image/jpeg" })] } });
+    await waitFor(() => expect(screen.getByRole("status").textContent).toContain("ya está en la computadora"));
+    const foto = falso.enlace.mandados.find((m) => m.tipo === "foto") as { id: string; imagen: string };
+    expect(foto.id).toBe("f1");
+    expect(atob(foto.imagen.split(",")[1]!)).toBe("imagen");
+  });
+
+  it("un pedido que ya no está se dice con claridad y no deja sacar la foto", () => {
     render(<FotoParaLaCompu codigo="vencido" />);
-    expect((await screen.findByRole("alert")).textContent).toContain("El código venció");
+    expect(screen.getByRole("alert").textContent).toContain("Este pedido ya no está");
     expect(screen.queryByTestId("sacar-comprobante")).toBeNull();
   });
 });

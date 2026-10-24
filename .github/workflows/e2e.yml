@@ -84,6 +84,9 @@ jobs:
       - name: "19 · Para revisar lo apartado"
         if: always()
         run: PLAYWRIGHT_JSON=/tmp/e2e-19.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 19-para-revisar.spec.ts
+      - name: "20 · Conexión entre el celular y la computadora"
+        if: always()
+        run: PLAYWRIGHT_JSON=/tmp/e2e-20.json tests/e2e.sh --escenario ${{ matrix.interfaz }} 20-conexion.spec.ts
       - name: Resumen
         if: always()
         run: |

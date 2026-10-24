@@ -7,6 +7,8 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY microservices/api/package.json microservices/api/
+# La conexión entre dispositivos es un paquete del workspace que se compila al instalar (ADR-027).
+COPY microservices/conexion microservices/conexion
 RUN pnpm install --frozen-lockfile --filter gestion-del-local...
 
 FROM deps AS build

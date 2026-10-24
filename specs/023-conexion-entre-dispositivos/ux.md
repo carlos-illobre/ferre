@@ -23,14 +23,20 @@ Maquetas aprobadas por Carlos el 2026-10-24: la variante A (`maquetas/*-variante
 
 - **Al tocarlo** (en la computadora también con Enter o espacio, porque es un botón) se abre el
   detalle: en la computadora, encima del botón; en el celular, una hoja desde abajo. Tiene:
-  - el título con el puntito: el estado y con quién («Por el servidor con el celular»);
-  - Con (el nombre del otro dispositivo), Camino (directa por el wifi, o por el servidor), Demora
+  - el título con el puntito y el estado;
+  - Con («Tu celular» en la computadora, que no sabe su nombre; el nombre de la computadora en el
+    celular), Camino (directa por el wifi, o por el servidor), Demora
     (ida y vuelta del último mensaje, o «—» si todavía no hubo), Desde (cuándo empezó este estado);
   - si va por el servidor, el motivo en un recuadro ámbar: «La red del local no deja conectar
     directo el celular y la computadora» o «Este navegador no permite la conexión directa», con
-    la hora en que se probó;
-  - «Probar conexión directa» (solo si va por el servidor) y «Cerrar». Escape también cierra.
-  - Mientras se prueba, el botón dice «Probando…» y no se puede tocar de nuevo.
+    la hora en que se probó; si va por el servidor porque la directa que andaba se cortó, dice
+    que se vuelve a armar la próxima vez que se encuentren;
+  - «Probar conexión directa» (solo si va por el servidor), «Desconectar» o «Reconectar» (que
+    estaban en el encabezado del celular y en el menú de la computadora, y ahora viven acá, donde
+    está el vínculo) y «Cerrar». Escape también cierra.
+  - Mientras se prueba, el puntito pasa a «Conectando…» y el botón de probar no está.
+- **Al cerrar la página** el enlace se cierra, y el otro pasa a «El otro no está abierto» en el
+  momento. Si la sesión deja de valer, el enlace deja de escuchar hasta que se vuelva a entrar.
 - **Textos:** largos en la computadora, cortos en el celular, en `textos` (decisión 47).
 
 ## El pedido de foto (historia 4, E24)

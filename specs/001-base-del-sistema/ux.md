@@ -320,8 +320,9 @@ Lo que Carlos pidió al elegir la interfaz y al usarla. Cada punto tiene su deci
   flechas.
 - **Vender:** «lo último que se vendió» son cuatro tarjetas del mismo tamaño, con foto, que
   siguen a la vista con la venta empezada.
-- **La computadora no tiene cámara:** donde haga falta una foto hay un botón que muestra un
-  código QR para sacarla con el celular; elegir un archivo siempre queda (decisiones 41 y 42).
+- **La computadora no tiene cámara:** donde haga falta una foto hay un botón que se la pide al
+  celular emparejado; elegir un archivo siempre queda (decisiones 41, 42 y 152; antes, con un
+  código QR para cualquier celular).
 - **La primera vez en un dispositivo** el catálogo no se espera entero: se ve una primera
   tanda y el resto baja atrás.
 

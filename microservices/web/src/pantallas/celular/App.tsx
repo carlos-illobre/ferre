@@ -4,12 +4,13 @@ import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { PedidosDeLaCompu } from "../PedidosDeLaCompu";
 import { Lector } from "./Lector";
-import { TEXTOS_DEL_VINCULO } from "../EspejoEstado";
+import { TEXTOS_DEL_VINCULO } from "../textos";
+import { IndicadorDelVinculo } from "../IndicadorDelVinculo";
 import { useCatalogo } from "../../negocio/catalogo";
 import { ConfiguracionCelu } from "./pantallas/Configuracion";
 import { PantallaDeProcesos } from "../Procesos";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
-import { alAvisoDelEspejo, pausarEspejo, useEspejar, useEspejo } from "../../espejo";
+import { alAvisoDelEspejo, useEspejar, useEspejo } from "../../espejo";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
@@ -125,7 +126,7 @@ function Pantallas() {
   useEspejar<string | null>("ir", parteEnEspejo, (parte) => { if (parte && sesion.estado === "con-sesion") irA(parte); }, parteEnEspejo !== null);
   // Vincular con la computadora sin salir de la aplicación: la cámara se abre acá adentro y lee
   // el código que la computadora muestra en «Vincular el celular» (o en su entrada).
-  const { emparejado, pausado, enEspejo } = useEspejo();
+  const { emparejado } = useEspejo();
   const [escaneando, setEscaneando] = useState(false);
   const [errorDeCodigo, setErrorDeCodigo] = useState<string | null>(null);
   const alLeerCodigo = useCallback((leido: string) => {
@@ -191,8 +192,9 @@ function Pantallas() {
           termina en la computadora, un momento. El estado del vínculo lo dice el color del botón. */}
       <div className="linea-de-arriba"><EstadoDeConexion testId="conexion-celular" /><BuscandoEnElServidor /><AvisoDeLaCompu /></div>
 
-      {/* Un solo botón a la derecha del encabezado de cualquier pantalla (decisiones 70 y 73):
-          sin vínculo, «Vincular»; con vínculo, «Desconectar» o «Reconectar». Desvincular está en Más → Usuarios, pestaña Sesiones. */}
+      {/* A la derecha del encabezado de cualquier pantalla (decisiones 70 y 73): sin vínculo,
+          «Vincular»; con vínculo, el estado de la conexión con la computadora (specs/023), que al
+          tocarlo muestra el detalle con «Desconectar» o «Reconectar». Desvincular está en Más. */}
       {(emparejado || hayCamara()) && (
         <div className="vincular-lugar">
           {!emparejado ? (
@@ -201,19 +203,7 @@ function Pantallas() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4M12 7v6M9 10h6" /></svg>
               <span>{TEXTOS_DEL_VINCULO.vincular}</span>
             </button>
-          ) : pausado ? (
-            <button type="button" className="vincular-boton apagado" data-testid="reconectar-arriba" aria-label="Reconectar con la computadora: volver a trabajar juntos" title="Volver a trabajar junto con la computadora"
-              onClick={() => pausarEspejo(false)}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12h6M21 12h-6M7 8l4 4-4 4M17 8l-4 4 4 4" /></svg>
-              <span>{TEXTOS_DEL_VINCULO.juntar}</span>
-            </button>
-          ) : (
-            <button type="button" className={`vincular-boton ${enEspejo ? "vinculado" : "apagado"}`} data-testid="desconectar-arriba" aria-label={enEspejo ? "Desconectar de la computadora: cada uno por su lado un rato" : "Vinculado, pero la computadora no está abierta"} title={enEspejo ? "Trabajar por separado un rato" : "La computadora no está abierta"}
-              onClick={() => pausarEspejo(true)}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 12H3M14 12h7M7 8l-4 4 4 4M17 8l4 4-4 4" /></svg>
-              <span>{TEXTOS_DEL_VINCULO.separar}</span>
-            </button>
-          )}
+          ) : <IndicadorDelVinculo celular />}
         </div>
       )}
       {escaneando && <Escaner alDetectar={alLeerCodigo} alCerrar={() => setEscaneando(false)} />}

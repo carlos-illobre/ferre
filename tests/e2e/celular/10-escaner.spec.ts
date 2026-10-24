@@ -4,7 +4,7 @@ import { stack } from "../comun/stack";
 import { cerrarLasOtrasVentanas, otraVentana } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql } = stack("celular");
+const { psql } = stack("celular");
 
 // Celular que escanea, laptop que muestra (issue #52): la laptop muestra el QR, el celular
 // lo abre y queda vinculado, y cada código que "escanea" (acá, tipeado en el escáner)
@@ -18,6 +18,7 @@ const ID_PROD = "00000000-0000-0000-0000-00000000e2f3";
 const ID_PROD2 = "00000000-0000-0000-0000-00000000e2f4";
 
 test.beforeAll(() => {
+  // La tabla de códigos quedó sin uso (specs/023), pero tiene filas viejas que apuntan a los puestos.
   psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')))`);
   psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')) OR celular_sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -42,7 +43,7 @@ test.beforeAll(() => {
 
 test.afterEach(cerrarLasOtrasVentanas);
 
-test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ browser }) => {
+test("023-E15: vincular el celular y que lo escaneado aparezca en la laptop", async ({ browser }) => {
   const laptop = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
   await laptop.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_LAPTOP);
   await laptop.goto("/#/vender");
@@ -60,21 +61,23 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   await expect(celular.getByTestId("vinculacion-ok")).toContainText("quedó vinculado");
   await expect(laptop.getByTestId("celular-vinculado")).toBeVisible({ timeout: 10000 });
 
-  // El celular manda un código conocido: la laptop lo agrega a la venta.
-  await celular.getByRole("button", { name: "Ir a vender" }).click();
-  await expect(celular.getByTestId("abrir-busqueda")).toBeVisible();
-  // Se manda el código por la misma API que usa el escáner del celular.
-  const puestoRemoto = await celular.evaluate(() => JSON.parse(localStorage.getItem("ferre.puesto-remoto") ?? "null") as { id: string } | null);
-  expect(puestoRemoto).not.toBeNull();
-  const mandar = (codigo: string) => celular.evaluate(async ([id, codigo, token, API]) => {
-    const r = await fetch(`${API}/puestos/${id}/codigos`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ codigo }) });
-    return r.status;
-  }, [puestoRemoto!.id, codigo, TOKEN_CELULAR, API] as const);
-  expect(await mandar("7790001112223")).toBe(201);
+  // El celular, como lector de la computadora (decisión 59), manda un código conocido: la laptop
+  // lo agrega a la venta. Viaja por la conexión directa entre los dos (specs/023).
+  await expect(laptop.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
+  await celular.goto("/#/lector");
+  // En el navegador de prueba no hay cámara: el código se tipea en el escáner, como la alternativa de la regla.
+  const mandar = async (codigo: string) => {
+    if (await celular.getByTestId("leer-otro").isVisible()) await celular.getByTestId("leer-otro").click();
+    const escaner = celular.getByTestId("escaner");
+    await escaner.getByTestId("codigo-manual").fill(codigo);
+    await escaner.getByTestId("codigo-manual").press("Enter");
+    await expect(celular.getByTestId("lector-resultado")).toHaveText("Ya está en la computadora", { timeout: 10000 });
+  };
+  await mandar("7790001112223");
   await expect(laptop.getByTestId("item").filter({ hasText: "CINTA ESCANER" })).toBeVisible({ timeout: 10000 });
 
   // Un código desconocido: la laptop pide asociarlo; se busca el producto, Enter, y queda asociado.
-  expect(await mandar("7790009998887")).toBe(201);
+  await mandar("7790009998887");
   await expect(laptop.getByTestId("codigo-desconocido")).toContainText("7790009998887", { timeout: 10000 });
   await laptop.getByTestId("busqueda").fill("e2e guantes escaner");
   await laptop.getByTestId("busqueda").press("Enter");
@@ -82,9 +85,8 @@ test("vincular el celular y que lo escaneado aparezca en la laptop", async ({ br
   await expect.poll(() => psql(`SELECT codigo_barras FROM producto WHERE id = '${ID_PROD2}'`)).toBe("7790009998887");
 
   // La segunda vez, el mismo código entra directo (cantidad 2).
-  expect(await mandar("7790009998887")).toBe(201);
+  await mandar("7790009998887");
   await expect(laptop.getByTestId("item").filter({ hasText: "GUANTES ESCANER" }).getByTestId("cantidad")).toHaveValue("2", { timeout: 10000 });
-  await expect.poll(() => psql(`SELECT count(*) FROM codigo_escaneado WHERE entregado_en IS NOT NULL AND puesto_id = '${puestoRemoto!.id}'`)).toBe("3");
   // Se cierran los dos: si quedaran abiertos y emparejados, la prueba que sigue (con la misma
   // sesión de computadora) entraría en espejo con este celular y se iría a su pantalla.
   await laptop.context().close();

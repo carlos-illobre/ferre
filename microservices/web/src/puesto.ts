@@ -1,8 +1,9 @@
-import { api, leerToken, urlApi } from "./datos/conexion";
-import type { CodigoEscaneado, CodigoEscaneadoEntrada, VinculoDeLaSesion, VinculosDeLaSesion } from "@servidor/puestos";
+import { api } from "./datos/conexion";
+import type { VinculoDeLaSesion, VinculosDeLaSesion } from "@servidor/puestos";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). La computadora es un "puesto";
-// el celular emparejado le manda cada código escaneado y recibe sus pedidos de foto. Nace solo
+// el celular emparejado le manda cada código escaneado y recibe sus pedidos de foto, por el
+// enlace entre los dos (`enlace.ts` y `codigos-del-celular.ts`, specs/023). Nace solo
 // cuando el celular deja entrar a la computadora, o leyendo el código de Vender. Ambos guardan
 // su lado en el dispositivo y lo ponen al día con el servidor al abrir la aplicación.
 export type PuestoLocal = Pick<VinculoDeLaSesion, "id" | "expira_en">; // en la laptop
@@ -56,71 +57,4 @@ export async function soltarEmparejamiento(): Promise<void> {
   const id = puestoLocal()?.id ?? puestoRemoto()?.id;
   if (id) await api(`/puestos/${id}`, { method: "DELETE" }).catch(() => undefined);
   guardarPuestoLocal(null); guardarPuestoRemoto(null);
-}
-
-// La computadora le pide a su celular emparejado que haga de lector (decisión 59).
-export async function pedirLector(): Promise<boolean> {
-  const p = puestoLocal();
-  if (!p) return false;
-  try { await api(`/puestos/${p.id}/lector`, { method: "POST" }); return true; }
-  catch (e) { if ((e as { estado?: number }).estado === 404) guardarPuestoLocal(null); return false; }
-}
-
-// El celular manda un código a la laptop vinculada (si hay). Sin red, no se encola: el
-// celular ya muestra el producto en su pantalla y el código pierde sentido después.
-export async function enviarCodigoAlPuesto(codigo: string): Promise<boolean> {
-  const p = puestoRemoto();
-  if (!p) return false;
-  try {
-    await api(`/puestos/${p.id}/codigos`, { method: "POST", body: JSON.stringify({ codigo } satisfies CodigoEscaneadoEntrada) });
-    return true;
-  } catch (e) {
-    if ((e as { estado?: number }).estado === 403) guardarPuestoRemoto(null);
-    return false;
-  }
-}
-
-// La laptop escucha los códigos de su puesto por un flujo de eventos que se reconecta
-// solo. Se lee con fetch (no EventSource) para mandar el token en la cabecera.
-// `soloNuevos`: no recibir lo que se escaneó antes de empezar a escuchar (para quien espera
-// un código en particular, no para la venta, que sí recupera lo que se perdió en un corte).
-export function escucharPuesto(puestoId: string, alRecibir: (codigo: string) => void, alCambiarEstado?: (conectado: boolean) => void, soloNuevos = false): () => void {
-  let activo = true;
-  let control: AbortController | null = null;
-  (async () => {
-    while (activo) {
-      control = new AbortController();
-      try {
-        const r = await fetch(urlApi(`/puestos/${puestoId}/eventos${soloNuevos ? "?nuevos=1" : ""}`), { headers: { Authorization: `Bearer ${leerToken() ?? ""}` }, signal: control.signal });
-        if (r.status === 404 || r.status === 401) { guardarPuestoLocal(null); alCambiarEstado?.(false); return; }
-        if (!r.ok || !r.body) throw new Error(`eventos ${r.status}`);
-        alCambiarEstado?.(true);
-        const lector = r.body.getReader();
-        const decodificador = new TextDecoder();
-        let resto = "";
-        while (activo) {
-          const { value, done } = await lector.read();
-          if (done) break;
-          resto += decodificador.decode(value, { stream: true });
-          const bloques = resto.split("\n\n");
-          resto = bloques.pop() ?? "";
-          for (const bloque of bloques) {
-            const lineas = bloque.split("\n");
-            const evento = lineas.find((l) => l.startsWith("event:"))?.slice(6).trim();
-            const datos = lineas.filter((l) => l.startsWith("data:")).map((l) => l.slice(5).trim()).join("\n");
-            if (evento === "codigo" && datos) {
-              const c = JSON.parse(datos) as CodigoEscaneado;
-              alRecibir(c.codigo);
-              api(`/puestos/${puestoId}/codigos/${c.id}/recibido`, { method: "POST" }).catch(() => undefined);
-            }
-          }
-        }
-      } catch {
-        /* se reconecta abajo */
-      }
-      alCambiarEstado?.(false);
-      if (activo) await new Promise((r) => setTimeout(r, 3000));
-    }
-  })();
-  return () => { activo = false; control?.abort(); };
 }

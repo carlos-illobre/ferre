@@ -20,7 +20,7 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [013](ADR-013-despliegue-por-aviso-y-gateway-compartido.md) | La máquina se despliega sola al recibir un aviso; Caddy compartido como puerta de entrada | Aceptado | 2026-09-13 |
 | [014](ADR-014-dos-interfaces-celular-y-escritorio.md) | Dos interfaces sobre la misma app: tarjetas para el celular, tablas y teclado para la computadora; se elige por el ancho | Aceptado | 2026-10-09 |
 | [015](ADR-015-la-interfaz-elegida-es-la-version-5.md) | La interfaz elegida es la versión 5: celular sobre las pantallas de la versión 1, computadora sobre las de la 2, lo nuevo compartido; solo ella tiene pruebas | Aceptado | 2026-10-11 |
-| [016](ADR-016-pedido-de-foto-con-codigo-qr.md) | La computadora pide las fotos al celular con un código QR; el servidor solo pasa la imagen | Aceptado | 2026-10-11 |
+| [016](ADR-016-pedido-de-foto-con-codigo-qr.md) | La computadora pide las fotos al celular con un código QR; el servidor solo pasa la imagen (enmienda: solo al celular emparejado, por ADR-027) | Aceptado | 2026-10-11 |
 | [017](ADR-017-permisos-fijos-y-roles-armados-por-el-negocio.md) | Permisos fijos en el código y roles armados por el negocio, varios por usuario | Aceptado | 2026-10-11 |
 | [018](ADR-018-servicios-y-capas.md) | El código se organiza en servicios bajo `microservices/` y en capas; un solo front; sin librerías compartidas; precios en el servidor |
 | [019](ADR-019-procesos-como-modulo-que-se-lleva.md) | Procesos es un módulo aparte que se puede llevar a otro proyecto: servicio propio, esquema propio en la misma base, `bpmn-js` y pantallas como paquete de React | Aceptado | 2026-10-14 |
@@ -31,4 +31,5 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [024](ADR-024-la-venta-corregida-guarda-su-historia.md) | La venta corregida guarda una foto de antes y después; un cambio es un registro propio; la plata de las diferencias va en movimientos de dinero del día | Aceptado | 2026-10-20 |
 | [025](ADR-025-sin-orm-todo-por-kysely.md) | Sin ORM: la capa de datos usa solo Kysely, migraciones SQL con su migrador y tipos generados desde la base | Aceptado | 2026-10-24 |
 | [026](ADR-026-una-base-por-servicio-en-la-maquina.md) | La base corre en la máquina, una instancia por ambiente y una base por servicio; sale de Supabase | Aceptado | 2026-10-24 |
+| [027](ADR-027-conexion-directa-entre-dispositivos.md) | El celular y la computadora se hablan directo (WebRTC), con el servidor de respaldo; módulo propio sin dependencias | Aceptado | 2026-10-24 |
 | [028](ADR-028-el-front-por-capas-y-en-piezas-chicas.md) | El front en seis capas (app, plataforma, datos, ui, negocio, pantallas), con reglas de dependencia, límites de complejidad, tamaño y duplicación medidos en cada subida, y estilos con CSS Modules | Aceptado | 2026-10-24 |

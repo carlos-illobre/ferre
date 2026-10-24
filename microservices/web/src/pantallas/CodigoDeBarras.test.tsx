@@ -11,7 +11,8 @@ vi.mock("../plataforma/camara/Escaner", () => ({
   ),
 }));
 const puesto = vi.hoisted(() => ({ local: null as { id: string; expira_en: string } | null, alRecibir: null as ((c: string) => void) | null, parar: vi.fn() }));
-vi.mock("../puesto", () => ({ puestoLocal: () => puesto.local, escucharPuesto: (_id: string, alRecibir: (c: string) => void) => { puesto.alRecibir = alRecibir; return puesto.parar; } }));
+vi.mock("../puesto", () => ({ puestoLocal: () => puesto.local }));
+vi.mock("../codigos-del-celular", () => ({ escucharPuesto: (_id: string, alRecibir: (c: string) => void) => { puesto.alRecibir = alRecibir; return puesto.parar; } }));
 
 import { CodigoDeBarras } from "./CodigoDeBarras";
 

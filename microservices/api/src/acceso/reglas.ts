@@ -8,10 +8,11 @@ import { pool } from "../db.js";
 import { registrarEvento } from "../eventos.js";
 import * as datos from "./datos.js";
 import { crearSesion, generarToken, revocarSesion, usuarioConPermisos, type SesionActiva } from "./sesiones.js";
-import { adoptarVinculos, anotarDispositivo, computadorasDe, cortarVinculosDe, diasDeVinculo, emparejar, sellarVinculo, soltarAnteriores } from "./vinculo.js";
+import { adoptarVinculos, anotarDispositivo, cortarVinculosDe, diasDeVinculo, emparejar, sellarVinculo, soltarAnteriores, vinculosDelUsuario } from "./vinculo.js";
+import { central, cerrarAlVencer, cerrarSalas } from "./salas.js";
 import type { CodigoAprobado, CodigoDeEntrada, EstadoDelCodigo, SesionAbierta, SesionNueva } from "../contratos/sesiones.js";
 import type { Enviable } from "../enviable.js";
-import type { CodigoEscaneado, DiasDelVinculo, EstadoDelPuesto, PuestoParaVincular, Vinculado, VinculosDeLaSesion } from "../contratos/puestos.js";
+import type { DiasDelVinculo, EstadoDelPuesto, PuestoParaVincular, Vinculado, VinculosDeLaSesion } from "../contratos/puestos.js";
 import type { CelularDeOtro, Credencial as CredencialDelContrato, DesafioDeHuella, HuellaVinculada, SesionConHuella } from "../contratos/credenciales.js";
 
 // Acceso, en sus reglas (ADR-018): entrar (con Google, con la huella o con el celular), las
@@ -65,7 +66,9 @@ export async function estadoDelCodigo(id: string, clave: string, dispositivoId: 
   await datos.anotarSesionDeVinculacion(id, sesion.id);
   await anotarDispositivo(pool, sesion.id, dispositivoId);
   await registrarEvento(pool, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo: aprobada.dispositivo, medio: "celular" } });
-  const puesto = aprobada.celular_sesion_id ? await emparejar(pool, sesion.id, aprobada.celular_sesion_id, aprobada.dispositivo).catch(() => null) : null;
+  const emparejado = aprobada.celular_sesion_id ? await emparejar(pool, sesion.id, aprobada.celular_sesion_id, aprobada.dispositivo).catch(() => null) : null;
+  const puesto = emparejado && { id: emparejado.id, expira_en: emparejado.expira_en };
+  if (emparejado) cerrarSalas(emparejado.soltados);
   if (puesto) await registrarEvento(pool, { tipo: "puesto.vinculado", usuarioId: usuario.id, contenido: { puestoId: puesto.id, medio: "entrada" } });
   return bien({ estado: "aprobada", token: sesion.token, usuario, puesto });
 }
@@ -80,7 +83,7 @@ export const sesionesAbiertas = (salvo: string): Promise<Enviable<SesionAbierta>
 // Cerrar a distancia la sesión de un dispositivo corta también su vínculo (decisión 73).
 export async function cerrarSesion(sesionId: string, actorId: string) {
   await revocarSesion(pool, sesionId);
-  await cortarVinculosDe(pool, sesionId);
+  cerrarSalas(await cortarVinculosDe(pool, sesionId));
   await registrarEvento(pool, { tipo: "sesion.revocada", usuarioId: actorId, contenido: { sesionId } });
 }
 
@@ -192,7 +195,7 @@ export async function vincular(sesion: SesionActiva, codigo: string, dispositivo
   const dias = await diasDeVinculo(pool);
   const puesto = await datos.vincularPorCodigo(codigo, sesion.id, dias);
   if (!puesto) return mal(404, "El código venció o ya se usó. Generá otro en la computadora.");
-  await soltarAnteriores(pool, puesto.sesion_id, sesion.id, puesto.id);
+  cerrarSalas(await soltarAnteriores(pool, puesto.sesion_id, sesion.id, puesto.id));
   await sellarVinculo(pool, puesto.id);
   await registrarEvento(pool, { tipo: "puesto.vinculado", usuarioId: sesion.usuario.id, contenido: { puestoId: puesto.id, medio: "codigo" } });
   return bien({ id: puesto.id, nombre: puesto.nombre, expira_en: puesto.expira_en, dias });
@@ -216,33 +219,28 @@ export async function cambiarDiasDelVinculo(dias: number, actorId: string): Prom
   return bien({ dias });
 }
 
-export const computadorasDelCelular = (sesionId: string) => computadorasDe(pool, sesionId);
-export const esComputadoraVinculada = datos.esComputadoraVinculada;
-export const puestosDeLaComputadora = datos.puestosDeLaComputadora;
 export const ladoEnElPuesto = datos.ladoEnElPuesto;
-
-export async function soltar(puestoId: string, sesion: SesionActiva): Promise<boolean> {
-  if (!(await datos.soltarPuesto(puestoId, sesion.id))) return false;
-  await registrarEvento(pool, { tipo: "puesto.desvinculado", usuarioId: sesion.usuario.id, contenido: { puestoId } });
-  return true;
-}
-
-export async function mandarCodigo(puestoId: string, sesionId: string, codigo: string): Promise<Resultado<CodigoEscaneado>> {
-  if (!(await datos.esCelularDelPuesto(puestoId, sesionId))) return mal(403, "Este celular no está vinculado a esa computadora, o la vinculación venció");
-  return bien(await datos.guardarCodigo(puestoId, codigo), 201);
-}
-export const codigoRecibido = datos.codigoRecibido;
+export const vinculoEnElPuesto = datos.vinculoEnElPuesto;
 
 export async function estadoDelPuesto(puestoId: string, sesionId: string): Promise<EstadoDelPuesto | null> {
   const p = await datos.puestoDe(puestoId, sesionId);
   return p ? { ...p, vigente: new Date(p.expira_en).getTime() > Date.now() } : null;
 }
 
-// Lo pendiente para la computadora que abre el flujo de códigos. Con `soloNuevos`, quiere solo
-// lo que se escanee de acá en más: lo que había quedado sin entregar se da por entregado.
-export const SEGUNDOS_PENDIENTE = 120; // un código que la computadora no recibió a tiempo ya no sirve
-export async function abrirFlujoDeCodigos(puestoId: string, sesionId: string, soloNuevos: boolean) {
-  if (!(await datos.esComputadoraDelPuesto(puestoId, sesionId))) return null;
-  if (soloNuevos) await datos.darPorEntregados(puestoId);
-  return { pendientes: () => (soloNuevos ? Promise.resolve([]) : datos.codigosPendientes(puestoId, SEGUNDOS_PENDIENTE)) };
+export async function soltar(puestoId: string, sesion: SesionActiva): Promise<boolean> {
+  if (!(await datos.soltarPuesto(puestoId, sesion.id))) return false;
+  central.cerrar(puestoId);
+  await registrarEvento(pool, { tipo: "puesto.desvinculado", usuarioId: sesion.usuario.id, contenido: { puestoId } });
+  return true;
 }
+
+// Al desactivar a una persona se cierran las salas de sus vínculos (ADR-027).
+export const cerrarSalasDelUsuario = async (usuarioId: string) => cerrarSalas(await vinculosDelUsuario(pool, usuarioId));
+
+// La conexión entre los dos dispositivos de un vínculo: escuchar la sala y mandar por ella.
+// Escuchar la sala cierra la sala sola cuando vence el vínculo (023-E26).
+export function escucharSala(puestoId: string, lado: string, expiraEn: Date) {
+  cerrarAlVencer(puestoId, expiraEn);
+  return central.escuchar(puestoId, lado);
+}
+export const mandarPorLaSala = (puestoId: string, lado: string, cuerpo: string) => central.recibir(puestoId, lado, cuerpo);

@@ -37,13 +37,6 @@ export const vinculacion = z.object({ dispositivo_id: dispositivoId });
 const DIAS = "Los días tienen que ser un número entero entre 1 y 365";
 export const diasDelVinculo = z.object({ dias: z.number(DIAS).int(DIAS).min(1, DIAS).max(365, DIAS) }, DIAS);
 
-// POST /puestos/:id/espejo: un cambio para el otro lado. Qué tipos hay y cuánto pueden pesar lo
-// decide el espejo.
-export const cambioEnEspejo = z.object({ tipo: z.string("No se entiende el cambio").optional(), datos: z.unknown() });
-
-// POST /puestos/:id/codigos: un código que el celular escaneó, para la computadora.
-export const codigoEscaneado = z.object({ codigo: z.string("Falta el código").trim().min(1, "Falta el código") }, "Falta el código");
-
 // ---------- La huella (passkeys) ----------
 
 // POST /credenciales/registro y POST /credenciales/login: el desafío que dio el servidor y la

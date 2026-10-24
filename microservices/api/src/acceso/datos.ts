@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import type pg from "pg";
 import { pool } from "../db.js";
 import { hashear } from "./sesiones.js";
@@ -100,57 +99,23 @@ export const vinculosDeLaSesion = (sesionId: string) => pool.query<{ id: string;
 export const guardarDiasDeVinculo = (dias: number) => pool.query(
   "INSERT INTO configuracion (clave, valor) VALUES ('vinculo.dias', $1) ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor, actualizado_en = now()", [String(dias)]);
 
-// Los emparejamientos vigentes de una computadora (por su sesión).
-export async function puestosDeLaComputadora(sesionId: string): Promise<string[]> {
-  const { rows } = await pool.query<{ id: string }>("SELECT id FROM puesto WHERE sesion_id = $1 AND vinculado_en IS NOT NULL AND expira_en > now()", [sesionId]);
-  return rows.map((r) => r.id);
+// De qué lado de un vínculo vigente está esta sesión, y hasta cuándo vale el vínculo.
+export async function vinculoEnElPuesto(puestoId: string, sesionId: string): Promise<{ lado: "computadora" | "celular"; expira_en: Date } | null> {
+  const { rows } = await pool.query<{ sesion_id: string; celular_sesion_id: string | null; expira_en: Date }>(
+    "SELECT sesion_id, celular_sesion_id, expira_en FROM puesto WHERE id = $1 AND vinculado_en IS NOT NULL AND expira_en > now() AND (sesion_id = $2 OR celular_sesion_id = $2)", [puestoId, sesionId]);
+  return rows[0] ? { lado: rows[0].sesion_id === sesionId ? "computadora" : "celular", expira_en: new Date(rows[0].expira_en) } : null;
 }
-
-export async function esComputadoraVinculada(puestoId: string, sesionId: string): Promise<boolean> {
-  const { rows } = await pool.query("SELECT id FROM puesto WHERE id = $1 AND sesion_id = $2 AND vinculado_en IS NOT NULL AND expira_en > now()", [puestoId, sesionId]);
-  return Boolean(rows[0]);
-}
-
-export async function ladoEnElPuesto(puestoId: string, sesionId: string): Promise<"computadora" | "celular" | null> {
-  const { rows } = await pool.query<{ sesion_id: string; celular_sesion_id: string | null }>(
-    "SELECT sesion_id, celular_sesion_id FROM puesto WHERE id = $1 AND vinculado_en IS NOT NULL AND expira_en > now() AND (sesion_id = $2 OR celular_sesion_id = $2)", [puestoId, sesionId]);
-  return !rows[0] ? null : rows[0].sesion_id === sesionId ? "computadora" : "celular";
-}
+export const ladoEnElPuesto = async (puestoId: string, sesionId: string) => (await vinculoEnElPuesto(puestoId, sesionId))?.lado ?? null;
 
 export async function soltarPuesto(puestoId: string, sesionId: string): Promise<boolean> {
   const { rowCount } = await pool.query("UPDATE puesto SET expira_en = now() WHERE id = $1 AND (sesion_id = $2 OR celular_sesion_id = $2) AND expira_en > now()", [puestoId, sesionId]);
   return Boolean(rowCount);
 }
 
-export async function esCelularDelPuesto(puestoId: string, sesionId: string): Promise<boolean> {
-  const { rows } = await pool.query("SELECT id FROM puesto WHERE id = $1 AND celular_sesion_id = $2 AND expira_en > now()", [puestoId, sesionId]);
-  return Boolean(rows[0]);
-}
-
-export async function guardarCodigo(puestoId: string, codigo: string): Promise<{ id: string; codigo: string; creado_en: string }> {
-  const id = randomUUID();
-  const creado_en = new Date().toISOString();
-  await pool.query("INSERT INTO codigo_escaneado (id, puesto_id, codigo, creado_en) VALUES ($1, $2, $3, $4)", [id, puestoId, codigo, creado_en]);
-  return { id, codigo, creado_en };
-}
-
-export const codigoRecibido = (puestoId: string, codigoId: string, sesionId: string) => pool.query(
-  "UPDATE codigo_escaneado SET entregado_en = now() WHERE id = $2 AND puesto_id = $1 AND EXISTS (SELECT 1 FROM puesto WHERE id = $1 AND sesion_id = $3)", [puestoId, codigoId, sesionId]);
-
 export async function puestoDe(puestoId: string, sesionId: string) {
   const { rows } = await pool.query<{ id: string; nombre: string | null; vinculado_en: string | null; expira_en: string }>(
     "SELECT id, nombre, vinculado_en, expira_en FROM puesto WHERE id = $1 AND (sesion_id = $2 OR celular_sesion_id = $2)", [puestoId, sesionId]);
   return rows[0] ?? null;
 }
-
-export async function esComputadoraDelPuesto(puestoId: string, sesionId: string): Promise<boolean> {
-  const { rows } = await pool.query("SELECT id FROM puesto WHERE id = $1 AND sesion_id = $2 AND expira_en > now()", [puestoId, sesionId]);
-  return Boolean(rows[0]);
-}
-export const darPorEntregados = (puestoId: string) => pool.query("UPDATE codigo_escaneado SET entregado_en = now() WHERE puesto_id = $1 AND entregado_en IS NULL", [puestoId]);
-// Lo que no llegó «hace un momento» ya no se entrega: aparecería en una venta que no es.
-export const codigosPendientes = (puestoId: string, segundos: number) => pool.query<{ id: string; codigo: string; creado_en: string }>(
-  "SELECT id, codigo, creado_en FROM codigo_escaneado WHERE puesto_id = $1 AND entregado_en IS NULL AND creado_en > now() - ($2 || ' seconds')::interval ORDER BY creado_en",
-  [puestoId, String(segundos)]).then((r) => r.rows);
 
 export type { Db };

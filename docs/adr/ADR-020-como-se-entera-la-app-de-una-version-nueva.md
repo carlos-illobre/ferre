@@ -138,3 +138,10 @@ El tiempo del timer lo elige cada dispositivo en Configuración: 5 min, 15 min, 
 horas, y una llave que lo apaga (decisión 92, RF-96). Arranca en 15 min, no en 30. Con la
 llave apagada, la aplicación no busca nada mientras está abierta (ni 2 ni 4): queda solo 1, que
 hace el navegador al abrirla y no se puede apagar. La pantalla lo dice.
+
+## Enmienda (2026-10-24): ya no hay flujos de eventos del espejo
+
+Lo que este ADR cuenta en «Lo que ya había para hacerlo con eventos» cambió con ADR-027: el
+espejo y los códigos ya no van por dos flujos de eventos con el servidor, sino por la conexión
+entre los dos dispositivos, con un solo flujo por dispositivo emparejado para presentarlos y de
+respaldo. La decisión sobre la versión nueva no cambia.

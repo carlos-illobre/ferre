@@ -214,7 +214,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-131 | Los totales del día suman lo cobrado y restan lo devuelto por correcciones y cambios | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
 | RF-132 | «Ventas de hoy» como la v2, con «Corregir», «Cambio» y «Anular» en la venta, en el celular y en la computadora | [019-corregir-y-cambiar](019-corregir-y-cambiar/spec.md) |
 | RF-133 | El servidor recuerda cada sesión el tiempo que fija quien administra (no, 30 s, 1, 5 o 10 minutos) y en ese tiempo no la busca en la base; lo cambiado desde la aplicación vale en el pedido siguiente | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
-| RF-134 | El celular emparejado se entera de los pedidos de la computadora en el momento; la pregunta de respaldo va cada el tiempo que fija quien administra (5 o 30 s, 1, 5 o 10 minutos) | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
+| RF-134 | Reemplazado por RF-138: el celular emparejado ya no pregunta; los pedidos llegan por la conexión entre los dos | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
 | RF-135 | Los ajustes que valen para todos los dispositivos se fijan en Más → Sistema, con el permiso «Administrar el sistema», y quedan en «Quién hizo qué» | [020-ajustes-del-sistema](020-ajustes-del-sistema/spec.md) |
 | RF-136 | El celular y la computadora emparejados se hablan directo, sin pasar por el servidor, cuando los dispositivos y la red lo permiten | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
 | RF-137 | Si no se puede directo, los mensajes pasan solos por el servidor; por los dos caminos llegan una vez y en orden | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |

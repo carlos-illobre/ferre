@@ -17,7 +17,9 @@ export default defineConfig({
     : [["list"]],
   // Sin video: los clips del manual de uso se graban aparte (tests/capturas/tutorial/), para que estas
   // pruebas no se hagan más lentas (ADR-004, pedido de Carlos del 2026-10-16).
-  use: { baseURL: process.env.BASE_URL ?? "http://localhost:4173", trace: "retain-on-failure", video: "off", browserName: "chromium" },
+  // Chromium oculta las direcciones locales detrás de nombres mDNS, que en el contenedor de las pruebas
+  // no se resuelven: sin esto, la conexión directa entre dos ventanas no se podría armar (specs/023).
+  use: { baseURL: process.env.BASE_URL ?? "http://localhost:4173", trace: "retain-on-failure", video: "off", browserName: "chromium", launchOptions: { args: ["--disable-features=WebRtcHideLocalIpsWithMdns"] } },
   projects: [
     { name: "escritorio", testDir: "./escritorio", workers: 1, use: { viewport: { width: 1366, height: 768 } } },
     // El celular se reconoce por el aparato, no por el ancho (RF-84): la prueba se presenta como un teléfono.

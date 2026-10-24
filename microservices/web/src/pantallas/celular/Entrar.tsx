@@ -20,9 +20,10 @@ const PARA_QUE: { icono: NombreDeIcono; titulo: string; detalle: string }[] = [
 ];
 
 // A dónde lleva un código de Ferrebress leído con la cámara: solo los que la aplicación
-// muestra para el celular (entrar a la computadora, vincularla, mandarle una foto).
+// muestra para el celular (entrar a la computadora o vincularla). La foto ya no se pide con un
+// código: le llega al celular emparejado (specs/023).
 export function destinoDelCodigo(leido: string): string | null {
-  const m = /#\/(entrar-compu|vincular-celular|foto)\?codigo=[\w.~%-]+$/.exec(leido.trim());
+  const m = /#\/(entrar-compu|vincular-celular)\?codigo=[\w.~%-]+$/.exec(leido.trim());
   return m ? m[0] : null;
 }
 

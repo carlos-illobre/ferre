@@ -5,7 +5,8 @@ import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { ErrorApi } from "../../datos/conexion";
 import { useCatalogo } from "../../negocio/catalogo";
-import { escucharPuesto, EVENTO_EMPAREJAMIENTO, pedirLector, puestoLocal } from "../../puesto";
+import { EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../puesto";
+import { escucharPuesto, pedirLector } from "../../codigos-del-celular";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { cantidadContada, nombreDeMovimiento, productosConStock, useCorregirStock, useMovimientos, useStock, type Movimiento, type StockFila } from "../../negocio/deposito/inventario";
 import { fecha, pesos } from "../../formato";
@@ -60,7 +61,7 @@ export function Inventario() {
   // Lo que lee el celular vinculado queda escrito en la búsqueda (decisión 59).
   const [emparejado, setEmparejado] = useState(() => puestoLocal()?.id ?? null);
   useEffect(() => { const mirar = () => setEmparejado(puestoLocal()?.id ?? null); window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar); return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); }, []);
-  useEffect(() => { if (!emparejado || esCelular) return; return escucharPuesto(emparejado, (codigo) => setConsulta(codigo), undefined, true); }, [emparejado, esCelular]);
+  useEffect(() => { if (!emparejado || esCelular) return; return escucharPuesto(emparejado, (codigo) => setConsulta(codigo)); }, [emparejado, esCelular]);
   const [lectorPedido, setLectorPedido] = useState<boolean | null>(null);
   useEffect(() => { if (lectorPedido === null) return; const x = setTimeout(() => setLectorPedido(null), 20000); return () => clearTimeout(x); }, [lectorPedido]);
 

@@ -157,7 +157,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   // Quedan emparejados (decisión 58): sin leer más códigos, la computadora ya tiene su celular…
   await expect.poll(() => psql(`SELECT count(*) FROM puesto WHERE vinculado_en IS NOT NULL AND expira_en > now() + interval '29 days' AND celular_sesion_id = (SELECT id FROM sesion WHERE token_hash = '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}')`), { timeout: 15000 }).toBe("1");
   // …y se espejan enseguida, sin recargar la computadora (antes quedaba «Conectando con el celular…», 007-T020).
-  await expect(compu.getByTestId("espejo")).toHaveClass(/activo/, { timeout: 15000 });
+  await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
   await compu.goto("/#/vender");
   await expect(compu.getByTestId("celular-vinculado")).toBeVisible();
   // La computadora le pide que haga de lector (decisión 59): al celular le aparece el aviso,
@@ -170,7 +170,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   await celular.getByTestId("codigo-manual").press("Enter");
   // Leído el código, la cámara se cierra sola y el celular dice que llegó.
   await expect(celular.getByTestId("escaner")).toHaveCount(0);
-  await expect(celular.getByTestId("lector-resultado")).toContainText("Ya está en la computadora");
+  await expect(celular.getByTestId("lector-resultado")).toContainText("Ya está en la computadora", { timeout: 10000 });
   await expect(compu.getByTestId("codigo-desconocido")).toContainText("7790000000011", { timeout: 10000 });
   await celular.getByRole("button", { name: "Listo" }).click();
   // …y la foto de una factura se la pide sin código: al celular le aparece el aviso.

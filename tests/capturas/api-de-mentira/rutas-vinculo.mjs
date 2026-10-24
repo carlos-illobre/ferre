@@ -8,7 +8,6 @@ export default {
   "GET /puestos/mio": ({ query }) => String(query.get("dispositivo") ?? "").startsWith("con-celular")
     ? { comoComputadora: { id: "pu-1", nombre: "computadora del mostrador", expira_en: vence }, comoCelular: null }
     : { comoComputadora: null, comoCelular: null },
-  // Los flujos de avisos del vínculo: la API de mentira no avisa nada, pero el puesto existe.
-  "GET /puestos/:id/eventos": () => "",
-  "GET /puestos/:id/espejo": () => "",
+  // La sala del vínculo: la API de mentira no avisa nada, pero el puesto existe (rutas-w-espejo la pisa).
+  "GET /puestos/:id/enlace": () => "",
 };

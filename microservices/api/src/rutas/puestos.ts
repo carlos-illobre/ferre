@@ -1,16 +1,16 @@
 import { Hono } from "hono";
-import { streamSSE } from "hono/streaming";
+import { bodyLimit } from "hono/body-limit";
+import { MAXIMO_POR_TANDA } from "conexion-entre-dispositivos/servidor";
 import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import * as reglas from "../acceso/reglas.js";
-import * as espejo from "../acceso/espejo.js";
-import { fotosQueEsperan } from "./pedidos-de-foto.js";
 import { responder } from "./sesiones.js";
-import { cambioEnEspejo, codigoEscaneado, diasDelVinculo, puestoNuevo, vinculacion } from "../acceso/esquemas.js";
-import type { AvisosParaElCelular, CodigoMandado, DiasDelVinculo } from "../contratos/puestos.js";
+import { diasDelVinculo, puestoNuevo, vinculacion } from "../acceso/esquemas.js";
+import type { DiasDelVinculo } from "../contratos/puestos.js";
 import { leerCuerpo } from "../validar.js";
 
 // Vínculo computadora–celular (issue #52, decisiones 58, 60 y 73). La ruta solo traduce
-// (ADR-018); las reglas están en `acceso/reglas.ts`, el espejo en `acceso/espejo.ts`.
+// (ADR-018); las reglas están en `acceso/reglas.ts`. Lo que se mandan los dos va por su sala
+// (`/:id/enlace`, ADR-027).
 export const puestos = new Hono();
 puestos.use("/*", exigirSesion);
 
@@ -39,94 +39,28 @@ puestos.put("/configuracion", exigirPermiso("admin.sistema"), async (c) => {
   return responder(c, await reglas.cambiarDiasDelVinculo(cuerpo.datos.dias, c.get("sesion").usuario.id));
 });
 
-// La computadora le pide a su celular que haga de lector (decisión 59).
-puestos.post("/:id/lector", async (c) => {
-  const sesionId = c.get("sesion").id;
-  if (!(await reglas.esComputadoraVinculada(c.req.param("id"), sesionId))) return c.json({ error: "Esta computadora no tiene un celular emparejado" }, 404);
-  espejo.pedirLector(sesionId);
-  espejo.avisarPedidoAlCelular(c.req.param("id"));
-  return c.body(null, 204);
+// ---------- La conexión entre los dos (ADR-027) ----------
+// Solo los dos dispositivos del vínculo escuchan su sala y mandan por ella (023-E25). Lo que
+// pasa por acá es el respaldo cuando no pueden hablarse directo; el servidor no lo guarda.
+const NO_EMPAREJADO = "Este dispositivo no está emparejado";
+puestos.get("/:id/enlace", async (c) => {
+  const vinculo = await reglas.vinculoEnElPuesto(c.req.param("id"), c.get("sesion").id);
+  return vinculo ? reglas.escucharSala(c.req.param("id"), vinculo.lado, vinculo.expira_en) : c.json({ error: NO_EMPAREJADO }, 404);
 });
-
-// Lo que la computadora emparejada espera de este celular: que haga de lector, o alguna foto.
-puestos.get("/avisos", async (c) => {
-  const computadoras = await reglas.computadorasDelCelular(c.get("sesion").id);
-  return c.json({ lector: espejo.esperanLector(computadoras), fotos: fotosQueEsperan(computadoras) } satisfies AvisosParaElCelular);
-});
-puestos.delete("/avisos/lector", async (c) => {
-  espejo.lectorAtendido(await reglas.computadorasDelCelular(c.get("sesion").id));
-  return c.body(null, 204);
-});
-
-// ---------- El espejo ----------
-puestos.post("/:id/espejo", async (c) => {
+// El cuerpo se corta antes de leerlo entero: la central acepta hasta 1 MB por tanda (023-E27).
+puestos.post("/:id/enlace", bodyLimit({ maxSize: MAXIMO_POR_TANDA * 4, onError: (c) => c.body(null, 413) }), async (c) => {
   const lado = await reglas.ladoEnElPuesto(c.req.param("id"), c.get("sesion").id);
-  if (!lado) return c.json({ error: "Este dispositivo no está emparejado" }, 404);
-  const cuerpo = await leerCuerpo(c, cambioEnEspejo);
-  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
-  const error = espejo.cambio(c.req.param("id"), lado, cuerpo.datos.tipo, cuerpo.datos.datos);
-  return error ? c.json({ error: error.error }, error.estado) : c.body(null, 204);
-});
-
-// Cada lado escucha al otro. Latido cada 25 s para que el proxy no corte la conexión.
-puestos.get("/:id/espejo", async (c) => {
-  const puestoId = c.req.param("id");
-  const lado = await reglas.ladoEnElPuesto(puestoId, c.get("sesion").id);
-  if (!lado) return c.json({ error: "Este dispositivo no está emparejado" }, 404);
-  return streamSSE(c, async (flujo) => {
-    let abierto = true;
-    const oyente = (evento: string, datos: unknown) => { flujo.writeSSE({ event: evento, data: JSON.stringify(datos ?? null) }).catch(() => undefined); };
-    const { estado, avisarPresencia, dejar } = espejo.escuchar(puestoId, lado, oyente);
-    await flujo.writeSSE({ event: "estado", data: JSON.stringify(estado) });
-    avisarPresencia();
-    flujo.onAbort(() => { abierto = false; dejar(); });
-    while (abierto) {
-      await flujo.writeSSE({ event: "latido", data: String(Date.now()) }).catch(() => { abierto = false; });
-      await flujo.sleep(25_000);
-    }
-  });
+  if (!lado) return c.json({ error: NO_EMPAREJADO }, 404);
+  return c.body(null, reglas.mandarPorLaSala(c.req.param("id"), lado, await c.req.text()));
 });
 
 // Soltar el emparejamiento, desde cualquiera de los dos.
 puestos.delete("/:id", async (c) => {
-  if (await reglas.soltar(c.req.param("id"), c.get("sesion"))) espejo.cerrar(c.req.param("id"));
-  return c.body(null, 204);
-});
-
-// El celular manda un código escaneado; la computadora lo recibe por su flujo.
-puestos.post("/:id/codigos", async (c) => {
-  const cuerpo = await leerCuerpo(c, codigoEscaneado);
-  if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
-  const r = await reglas.mandarCodigo(c.req.param("id"), c.get("sesion").id, cuerpo.datos.codigo);
-  if (!r.ok) return c.json({ error: r.error }, r.estado);
-  espejo.avisarCodigo(c.req.param("id"), r.cuerpo!);
-  return c.json({ id: r.cuerpo!.id } satisfies CodigoMandado, 201);
-});
-
-puestos.post("/:id/codigos/:codigoId/recibido", async (c) => {
-  await reglas.codigoRecibido(c.req.param("id"), c.req.param("codigoId"), c.get("sesion").id);
+  await reglas.soltar(c.req.param("id"), c.get("sesion"));
   return c.body(null, 204);
 });
 
 puestos.get("/:id", async (c) => {
   const p = await reglas.estadoDelPuesto(c.req.param("id"), c.get("sesion").id);
   return p ? c.json(p) : c.json({ error: "No existe ese puesto" }, 404);
-});
-
-// Flujo de códigos hacia la laptop: primero lo pendiente, después lo que vaya llegando.
-// `nuevos=1`: solo lo que se escanee de acá en más.
-puestos.get("/:id/eventos", async (c) => {
-  const puestoId = c.req.param("id");
-  const flujoDeCodigos = await reglas.abrirFlujoDeCodigos(puestoId, c.get("sesion").id, c.req.query("nuevos") === "1");
-  if (!flujoDeCodigos) return c.json({ error: "No existe ese puesto o venció" }, 404);
-  return streamSSE(c, async (flujo) => {
-    for (const p of await flujoDeCodigos.pendientes()) await flujo.writeSSE({ event: "codigo", data: JSON.stringify(p), id: p.id });
-    let abierto = true;
-    const dejar = espejo.escucharCodigos(puestoId, (codigo) => { flujo.writeSSE({ event: "codigo", data: JSON.stringify(codigo), id: codigo.id }).catch(() => undefined); });
-    flujo.onAbort(() => { abierto = false; dejar(); });
-    while (abierto) {
-      await flujo.writeSSE({ event: "latido", data: String(Date.now()) }).catch(() => { abierto = false; });
-      await flujo.sleep(25_000);
-    }
-  });
 });

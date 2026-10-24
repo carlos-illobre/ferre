@@ -30,12 +30,6 @@ export function Sistema({ celular = false }: { celular?: boolean }) {
             alElegir={(s) => void cambiar({ sesion_segundos: s })} testId="sis-sesion" />
         </li>
         <li className="cfg-fila cfg-sistema">
-          <span className="cfg-nombre" id="sis-celular">{x(t.celular)}</span>
-          <span className="cfg-detalle">{x(t.celularDetalle)}</span>
-          <Tramos etiqueta="sis-celular" tramos={ajustes?.tramos.celular_segundos ?? []} elegido={ajustes?.celular_segundos} apagado={apagado}
-            alElegir={(s) => void cambiar({ celular_segundos: s })} testId="sis-celular" />
-        </li>
-        <li className="cfg-fila cfg-sistema">
           <span className="cfg-nombre" id="sis-vinculo">{x(t.vinculo)}</span>
           <span className="cfg-detalle">{x(t.vinculoDetalle)}</span>
           <Dias guardados={ajustes?.vinculo_dias} apagado={apagado} alGuardar={(d) => void cambiar({ vinculo_dias: d })} />

@@ -1,136 +1,117 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
-import { api, leerToken, urlApi } from "./datos/conexion";
-import { escucharFlujo } from "./plataforma/tiempo-real/flujo-de-eventos";
-import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, guardarPuestoRemoto, puestoLocal, puestoRemoto } from "./puesto";
-import { EVENTO_SESION_ABIERTA } from "./datos/sesion";
-import type { CambioEnEspejo } from "@servidor/puestos";
+import { alCambiarElVinculo, alMensajeDelOtro, arrancarEnlace, elOtroEsta, estadoDelVinculo, mandarAlOtro, type Lado } from "./enlace";
 
 // El espejo entre el celular y la computadora emparejados (decisión 60). Con la aplicación
 // abierta en los dos, están en la misma parte y comparten el trabajo en curso (la venta).
-// Acá vive el canal: una conexión que escucha al otro lado y se reconecta sola, y el aviso de
-// lo que cambia de este lado. Qué se espeja lo decide cada pantalla (la navegación, la venta).
+// Viaja por el enlace entre los dos (specs/023, `enlace.ts`); acá vive qué significa cada cosa.
+// Qué se espeja lo decide cada pantalla (la navegación, la venta).
 //
 // Reglas:
 //  - Se espeja solo con el otro presente y sin pausa. Si el otro no está, este lado trabaja
-//    solo, pero sigue avisando: el servidor guarda lo último y el que llega después, con este
-//    lado todavía abierto, lo toma.
+//    solo y guarda lo suyo; al encontrarse, cada uno le cuenta al otro lo que tiene.
+//  - Al encontrarse: la parte es la de la computadora (decisión 71). De cada trabajo en curso
+//    queda el que cambió último (el que acaba de abrir no cambió nada); si empatan, el de la
+//    computadora. Si uno estaba en pausa, quedan en pausa.
 //  - «Pausar» los separa sin desemparejarlos. Al reanudar manda la computadora, que es la
 //    herramienta principal: vuelve a avisar dónde está y cómo tiene la venta.
 //  - Lo que llega del otro lado no se vuelve a avisar (si no, rebotaría para siempre).
-export type Lado = "computadora" | "celular";
+export type { Lado };
 export type EstadoDelEspejo = { emparejado: boolean; lado: Lado | null; conectado: boolean; otroPresente: boolean; pausado: boolean };
 // Lo que se espeja: la parte en la que están y cada trabajo en curso.
 type Tipo = "ir" | "venta" | "ingreso" | "pedido" | "pedido-renglones";
 const DOCUMENTOS: Tipo[] = ["venta", "ingreso", "pedido", "pedido-renglones"];
+const TIPOS: Tipo[] = ["ir", ...DOCUMENTOS];
 
+let pausado = false;
 let estado: EstadoDelEspejo = { emparejado: false, lado: null, conectado: false, otroPresente: false, pausado: false };
 const oyentesDeEstado = new Set<() => void>();
-function poner(cambios: Partial<EstadoDelEspejo>) { estado = { ...estado, ...cambios }; oyentesDeEstado.forEach((o) => o()); }
 
 const suscriptos: Record<Tipo, Set<(datos: unknown) => void>> = { ir: new Set(), venta: new Set(), ingreso: new Set(), pedido: new Set(), "pedido-renglones": new Set() };
 // Los avisos de algo que terminó del otro lado («venta cobrada»): pasan y no se guardan.
 const oyentesDeAvisos = new Set<(texto: string) => void>();
-// En el celular: la computadora le pidió que haga de lector o una foto, y hay que preguntar qué es.
-const oyentesDePedidos = new Set<() => void>();
 // Cada pantalla que espeja algo sabe contarlo; devuelve si tenía algo para contar.
 const alReanudar = new Map<() => boolean, Tipo>();
 const reanudar = (solo?: Tipo) => { let conto = false; alReanudar.forEach((tipo, f) => { if (!solo || tipo === solo) conto = f() || conto; }); return conto; };
-const acordado: Partial<Record<Tipo, unknown>> = {}; // lo último avisado o recibido de cada cosa: en qué quedaron los dos
-let puestoId: string | null = null;
-let irSinContar = false; // la computadora se conectó antes de tener pantalla: le debe al celular dónde está
-let cortar: (() => void) | null = null;
+// Lo último avisado o recibido de cada cosa, y cuándo: en qué quedaron los dos.
+const acordado: Partial<Record<Tipo, unknown>> = {};
+const acordadoEn: Partial<Record<Tipo, number>> = {};
+const acordar = (tipo: Tipo, datos: unknown) => { acordado[tipo] = datos; acordadoEn[tipo] = Date.now(); };
+let irSinContar = false; // la computadora se encontró antes de tener pantalla: le debe al celular dónde está
+let sala: string | null = null;
 
-const enEspejo = () => estado.conectado && estado.otroPresente && !estado.pausado;
+const enEspejo = () => estado.otroPresente && !estado.pausado;
 function entregar(tipo: Tipo, datos: unknown) {
   if (datos === null || datos === undefined) return;
-  acordado[tipo] = datos;
+  acordar(tipo, datos);
   if (!estado.pausado) suscriptos[tipo].forEach((s) => s(datos));
 }
 
-function conectar() {
-  const lado: Lado | null = puestoLocal() ? "computadora" : puestoRemoto() ? "celular" : null;
-  const id = puestoLocal()?.id ?? puestoRemoto()?.id ?? null;
-  if (id === puestoId && (id === null || cortar)) return;
-  cortar?.(); cortar = null; puestoId = id; irSinContar = false;
-  for (const t of ["ir", ...DOCUMENTOS] as Tipo[]) delete acordado[t];
-  if (!id || !lado) { poner({ emparejado: false, lado: null, conectado: false, otroPresente: false, pausado: false }); return; }
-  poner({ emparejado: true, lado, conectado: false, otroPresente: false });
-  const presencia = (p: { computadora: boolean; celular: boolean }) => poner({ otroPresente: lado === "computadora" ? p.celular : p.computadora });
-  // La conexión (escuchar el flujo y reconectar) es tecnología de la plataforma; acá va qué
-  // significa cada evento del espejo.
-  cortar = escucharFlujo({
-    url: urlApi(`/puestos/${id}/espejo`),
-    cabeceras: () => ({ Authorization: `Bearer ${leerToken() ?? ""}` }),
-    ignorar: ["latido"],
-    // El vínculo ya no existe (404) o la sesión no vale (401): no se insiste. Con 401 se vuelve
-    // a intentar cuando se abra una sesión: si no, quedaría «Conectando…» para siempre.
-    alResponder: (codigo) => {
-      if (codigo !== 404 && codigo !== 401) return;
-      if (codigo === 404) { guardarPuestoLocal(null); guardarPuestoRemoto(null); }
-      else { cortar = null; puestoId = null; poner({ conectado: false, otroPresente: false }); }
-      return "cortar";
-    },
-    alDesconectar: () => poner({ conectado: false, otroPresente: false }),
-    alEvento: (evento, datos) => {
-      if (evento === "estado") {
-        const e = datos as { parte: string | null; docs: Record<string, unknown>; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
-        const hayAlgo = e.parte !== null || DOCUMENTOS.some((d) => (e.docs?.[d] ?? null) !== null);
-        poner({ conectado: true, pausado: e.pausado });
-        presencia(e.presentes);
-        // El que llega con el otro ya trabajando se suma a lo que el otro tiene. Si el otro no
-        // está (o no hay nada todavía), este lado sigue con lo suyo y lo cuenta: lo guardado
-        // puede ser de hace horas, y no tiene que mover a quien acaba de abrir la aplicación.
-        const elOtroEsta = lado === "computadora" ? e.presentes.celular : e.presentes.computadora;
-        // La excepción es dónde se está parado: ahí manda siempre la computadora (decisión 71).
-        // La computadora cuenta su pantalla y el celular va a ella, nunca al revés al conectarse.
-        if (elOtroEsta && hayAlgo) {
-          // Si la computadora todavía está abriendo (sin pantalla que contar), la cuenta apenas la tenga.
-          if (lado !== "computadora") entregar("ir", e.parte);
-          else if (!reanudar("ir")) irSinContar = true;
-          for (const d of DOCUMENTOS) entregar(d, e.docs?.[d]);
-        }
-        // Con los dos recién llegados y nada acordado todavía, cuenta lo suyo solo la
-        // computadora, que es la principal: si contaran los dos, se cruzarían.
-        else if (!elOtroEsta || lado === "computadora") reanudar();
-      } else if (evento === "presencia") presencia(datos as { computadora: boolean; celular: boolean });
-      else if (evento === "pausa") {
-        const pausado = Boolean(datos);
-        const reanuda = estado.pausado && !pausado;
-        poner({ pausado });
-        if (reanuda && lado === "computadora") reanudar();
-      } else if (evento === "desvinculado") { guardarPuestoLocal(null); guardarPuestoRemoto(null); return "cortar"; }
-      else if (evento === "aviso") { if (!estado.pausado) oyentesDeAvisos.forEach((o) => o(String(datos ?? ""))); }
-      // La computadora le pidió algo a este celular (decisión 112): con o sin pausa, porque no es trabajo espejado.
-      else if (evento === "pedidos") oyentesDePedidos.forEach((o) => o());
-      else if (evento === "ir" || DOCUMENTOS.includes(evento as Tipo)) entregar(evento as Tipo, datos);
-      return;
-    },
-  });
+// El estado del espejo sale del enlace y de la pausa.
+function ponerEstado() {
+  const v = estadoDelVinculo();
+  const antes = estado;
+  estado = {
+    emparejado: v !== null, lado: v?.lado ?? null, pausado,
+    conectado: v !== null && v.conexion !== "sin-conexion" && v.conexion !== "conectando",
+    otroPresente: elOtroEsta(),
+  };
+  // Otro vínculo: se empieza de cero.
+  const id = v?.sala ?? null;
+  if (id !== sala) { sala = id; for (const t of TIPOS) { delete acordado[t]; delete acordadoEn[t]; } }
+  oyentesDeEstado.forEach((o) => o());
+  if (estado.otroPresente && !antes.otroPresente) seEncontraron();
+}
+
+// Al encontrarse, cada uno le cuenta al otro lo que tiene (antes lo guardaba el servidor).
+function seEncontraron() {
+  const ahora = Date.now();
+  const docs = Object.fromEntries(DOCUMENTOS.filter((d) => acordado[d] !== undefined).map((d) => [d, { datos: acordado[d], haceMs: ahora - acordadoEn[d]! }]));
+  void mandarAlOtro({ tipo: "estado", docs, pausado });
+  // La parte la cuenta la computadora; si todavía está abriendo, la cuenta apenas la tenga.
+  if (estado.lado === "computadora" && !reanudar("ir")) irSinContar = true;
+}
+function alEstadoDelOtro(docs: Record<string, { datos: unknown; haceMs: number }>, pausadoAlla: boolean) {
+  const ahora = Date.now();
+  if (pausadoAlla && !pausado) { pausado = true; ponerEstado(); }
+  for (const d of DOCUMENTOS) {
+    const suyo = docs[d];
+    if (!suyo) continue;
+    const mioHace = acordadoEn[d] === undefined ? Infinity : ahora - acordadoEn[d]!;
+    if (suyo.haceMs < mioHace || (suyo.haceMs === mioHace && estado.lado === "celular")) entregar(d, suyo.datos);
+  }
+}
+
+function alMensaje(m: Parameters<Parameters<typeof alMensajeDelOtro>[0]>[0]) {
+  if (m.tipo === "espejo" && TIPOS.includes(m.cambio as Tipo)) entregar(m.cambio as Tipo, m.datos);
+  else if (m.tipo === "estado" && typeof m.docs === "object" && m.docs !== null) alEstadoDelOtro(m.docs, m.pausado === true);
+  else if (m.tipo === "pausa") {
+    const reanuda = pausado && !m.pausado;
+    pausado = m.pausado === true;
+    ponerEstado();
+    if (reanuda && estado.lado === "computadora") reanudar();
+  } else if (m.tipo === "aviso" && typeof m.texto === "string" && !pausado) oyentesDeAvisos.forEach((o) => o(m.texto.slice(0, 300)));
 }
 
 let arrancado = false;
 function arrancar() {
   if (arrancado || typeof window === "undefined") return;
   arrancado = true;
-  window.addEventListener(EVENTO_EMPAREJAMIENTO, conectar);
-  window.addEventListener(EVENTO_SESION_ABIERTA, conectar);
-  conectar();
+  arrancarEnlace();
+  alCambiarElVinculo(ponerEstado);
+  alMensajeDelOtro(alMensaje);
+  ponerEstado();
 }
 
-// Avisar un cambio de este lado. En pausa no se avisa nada.
+// Avisar un cambio de este lado. Se guarda siempre (para contarlo al encontrarse); se manda
+// solo con el otro presente y sin pausa.
 export function avisarAlEspejo(tipo: Tipo, datos: unknown): void {
-  if (!puestoId || !estado.conectado || estado.pausado) return;
-  acordado[tipo] = datos;
-  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo, datos } satisfies CambioEnEspejo) }).catch(() => undefined);
+  if (pausado) return;
+  acordar(tipo, datos);
+  if (enEspejo()) void mandarAlOtro({ tipo: "espejo", cambio: tipo, datos });
 }
 // Contarle al otro lado algo que terminó acá: se le muestra un momento y no se guarda.
 export function contarAlEspejo(texto: string): void {
-  if (!puestoId || !enEspejo()) return;
-  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo: "aviso", datos: texto } satisfies CambioEnEspejo) }).catch(() => undefined);
-}
-export function alPedidoDeLaCompu(oyente: () => void): () => void {
-  oyentesDePedidos.add(oyente);
-  return () => { oyentesDePedidos.delete(oyente); };
+  if (enEspejo()) void mandarAlOtro({ tipo: "aviso", texto });
 }
 
 export function alAvisoDelEspejo(oyente: (texto: string) => void): () => void {
@@ -148,15 +129,16 @@ export function avisarEnEsteDispositivo(texto: string): void {
   avisoPendiente = { texto, hasta: Date.now() + 5000 };
 }
 export function pausarEspejo(pausar: boolean): void {
-  if (!puestoId) return;
-  poner({ pausado: pausar });
-  api(`/puestos/${puestoId}/espejo`, { method: "POST", body: JSON.stringify({ tipo: "pausa", datos: pausar } satisfies CambioEnEspejo) }).catch(() => undefined);
+  if (!estado.emparejado) return;
+  pausado = pausar;
+  ponerEstado();
+  void mandarAlOtro({ tipo: "pausa", pausado: pausar });
 }
 
 export function useEspejo(): EstadoDelEspejo & { enEspejo: boolean } {
   useEffect(arrancar, []);
   const e = useSyncExternalStore((o) => { oyentesDeEstado.add(o); return () => { oyentesDeEstado.delete(o); }; }, () => estado);
-  return { ...e, enEspejo: e.conectado && e.otroPresente && !e.pausado };
+  return { ...e, enEspejo: e.otroPresente && !e.pausado };
 }
 
 // Espejar un valor de la pantalla: `valor` es lo de este lado y `aplicar` pone lo que llega del
@@ -202,8 +184,8 @@ export function useEspejar<T>(tipo: Tipo, valor: T, aplicar: (v: T) => void, lis
 
   const texto = JSON.stringify(valor);
   useEffect(() => {
-    // La computadora que se conectó sin pantalla todavía cuenta dónde está apenas lo sabe.
-    if (tipo === "ir" && irSinContar && texto !== "null" && estado.conectado && !estado.pausado) {
+    // La computadora que se encontró sin pantalla todavía cuenta dónde está apenas lo sabe.
+    if (tipo === "ir" && irSinContar && texto !== "null" && enEspejo()) {
       irSinContar = false; primera.current = false; eraNada.current = false; visto.current = texto;
       avisarAlEspejo(tipo, JSON.parse(texto));
       return;
@@ -222,10 +204,11 @@ export function useEspejar<T>(tipo: Tipo, valor: T, aplicar: (v: T) => void, lis
       return;
     }
     visto.current = texto;
-    // Solo se avisa lo que cambia con el espejo ya conectado. Lo que cambia antes (la pantalla
-    // con la que abre la aplicación, mientras todavía se está conectando) no es una decisión
-    // de la persona: si se avisara, arrastraría al otro. Al conectar se decide quién sigue a quién.
-    if (!estado.conectado || estado.pausado) return;
+    // Lo que cambia mientras el vínculo todavía se está conectando (la pantalla con la que abre
+    // la aplicación) no es una decisión de la persona: si se avisara, arrastraría al otro. Al
+    // encontrarse se decide quién sigue a quién.
+    if (pausado) return;
+    if (!estado.conectado) { acordar(tipo, JSON.parse(texto)); return; }
     const t = setTimeout(() => avisarAlEspejo(tipo, JSON.parse(texto)), 150);
     return () => clearTimeout(t);
   }, [texto, tipo]);

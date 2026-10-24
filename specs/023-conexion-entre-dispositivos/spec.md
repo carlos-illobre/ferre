@@ -260,7 +260,8 @@ en la sala del otro; desvincular con los dos abiertos; recargar un lado con mens
   computadora en menos de 200 ms.
 - **SC-002**: Con la conexión por el servidor, en menos de 1 segundo con buena conexión.
 - **SC-003**: Un celular y una computadora emparejados, abiertos 8 horas sin usar, no generan
-  ninguna consulta a la base (hoy, cientos por día).
+  ninguna consulta a la base por el vínculo (hoy, cientos por día). El control de la sesión, que
+  es aparte (RF-74, RF-133), sigue.
 - **SC-004**: En una red que no permite la directa, en 5 segundos o menos ya se hablan por el
   servidor.
 - **SC-005**: Ningún mensaje se pierde ni se repite al pasar de un camino al otro o al

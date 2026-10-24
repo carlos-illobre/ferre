@@ -1,0 +1,32 @@
+{
+  "name": "conexion-entre-dispositivos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./navegador": {
+      "types": "./dist/navegador/index.d.ts",
+      "default": "./dist/navegador/index.js"
+    },
+    "./servidor": {
+      "types": "./dist/servidor/index.d.ts",
+      "default": "./dist/servidor/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepare": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit && pnpm capas",
+    "capas": "depcruise src --config .dependency-cruiser.cjs",
+    "test": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "2.1.9",
+    "dependency-cruiser": "18.6.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

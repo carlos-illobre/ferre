@@ -13,7 +13,6 @@ export const nombreDelTramo = (s: number): string => (s === 0 ? "No" : s < 60 ? 
 const largo = (s: number): string => (s < 60 ? `${s} segundos` : s === 60 ? "1 minuto" : `${s / 60} minutos`);
 export function queQuedo(cambios: CambiosDeAjustes): string {
   if (cambios.sesion_segundos !== undefined) return cambios.sesion_segundos === 0 ? "la sesión no se recuerda" : `la sesión se recuerda ${largo(cambios.sesion_segundos)}`;
-  if (cambios.celular_segundos !== undefined) return `el celular emparejado pregunta cada ${largo(cambios.celular_segundos)}`;
   return `el vínculo dura ${cambios.vinculo_dias} ${cambios.vinculo_dias === 1 ? "día" : "días"}`;
 }
 export const diasValidos = (texto: string): number | null => {

@@ -7,7 +7,7 @@ import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";
 import { Pedidos } from "../Pedidos";
 import { sincronizarEmparejamiento } from "../../puesto";
 import { useEspejar, useEspejo } from "../../espejo";
-import { EspejoEstado } from "../EspejoEstado";
+import { IndicadorDelVinculo } from "../IndicadorDelVinculo";
 import { irAlPrimerItem, useFlechas, type DisposicionParaFlechas } from "../../plataforma/teclado/flechas";
 import { useAtajos } from "../../plataforma/teclado/atajos";
 import { zonasConTeclasPropias } from "../../plataforma/teclado/teclas";
@@ -444,7 +444,7 @@ function Pantallas() {
           })}
         </nav>
         <div className="lateral-pie">
-          <EspejoEstado />
+          <IndicadorDelVinculo />
           {!emparejado && <div className="lateral-vincular"><VincularParaEscanear vinculado={false} alVincular={() => undefined} /></div>}
           <EstadoDeConexion />
           <CuentaDelUsuario nombre={sesion.usuario.nombre} rol={sesion.usuario.roles?.join(", ") ?? ""} detalle={`${sesion.usuario.email} · versión ${import.meta.env.VITE_VERSION ?? "local"}`} alSalir={salir} />

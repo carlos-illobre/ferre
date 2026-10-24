@@ -15,6 +15,7 @@
   "dependencies": {
     "@hono/node-server": "^1.13.0",
     "@simplewebauthn/server": "^13.3.3",
+    "conexion-entre-dispositivos": "workspace:*",
     "google-auth-library": "^11.0.2",
     "hono": "^4.6.0",
     "kysely": "0.29.6",

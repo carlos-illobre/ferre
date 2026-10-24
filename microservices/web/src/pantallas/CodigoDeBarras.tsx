@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Producto } from "./celular/pantallas/Productos";
-import { escucharPuesto, puestoLocal } from "../puesto";
+import { puestoLocal } from "../puesto";
+import { escucharPuesto } from "../codigos-del-celular";
 import { Escaner, hayCamara } from "../plataforma/camara/Escaner";
 import { copiarTexto } from "../plataforma/portapapeles/copiar";
 import { ultimaLectura } from "../negocio/catalogo/ficha";
@@ -67,7 +68,7 @@ export function CodigoDeBarras({ producto: p, celular = false, alGuardar, quienL
   // El escáner reinicia la cámara si le cambia la función: se le da siempre la misma.
   const alDetectar = useCallback((codigo: string) => void alLlegar.current(codigo), []);
   const puestoId = abierto && puesto ? puesto.id : null;
-  useEffect(() => { if (puestoId) return escucharPuesto(puestoId, (codigo) => void alLlegar.current(codigo), undefined, true); }, [puestoId]);
+  useEffect(() => { if (puestoId) return escucharPuesto(puestoId, (codigo) => void alLlegar.current(codigo)); }, [puestoId]);
 
   const etiqueta = conCamara ? texto(t.escanear) : puesto ? t.escanear.largo : p.codigo_barras ? t.cambiar.largo : t.cargar.largo;
   // Como la v2 (decisión 145): la caja lleva las barras dibujadas, el número y copiar; «Escanear»

@@ -82,7 +82,12 @@ ni al revés. Se compila a `dist/` con `tsc` (`prepare` y `build`).
   Recuerda en `localStorage` («ferre.enlace.<sala>»). Los mensajes de Ferrebress son
   `{ tipo, ... }`: `codigo`, `pedir-lector`, `pedir-foto`, `foto`, `espejo` (un cambio), `estado`
   (lo que tiene cada lado al encontrarse), `pausa` y `aviso`. Si la central cierra la sala, se
-  borra el emparejamiento de este lado, como hoy al desvincular.
+  borra el emparejamiento de este lado, como hoy al desvincular. Al cerrar la página (`pagehide`) se cierra el enlace,
+  para que el otro se entere en el momento; si vuelve del caché del navegador, se conecta de nuevo.
+  Si el servidor contesta 401 (la sesión no vale), el enlace deja de escuchar hasta que se abra una
+  sesión; con 404 (el vínculo no existe), se borra el emparejamiento de este lado.
+- **El vencimiento:** al escuchar la sala, el servidor pone un reloj hasta que vence el vínculo y
+  entonces la cierra (E26).
 - **`espejo.ts`** conserva lo que usan las pantallas (`useEspejo`, `useEspejar`, `avisarAlEspejo`,
   `contarAlEspejo`, `pausarEspejo`, `alAvisoDelEspejo`, `alPedidoDeLaCompu`) y cambia por dentro:
   - «conectado» es que el enlace no está «sin conexión» ni «conectando»; «el otro presente», que

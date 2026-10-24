@@ -126,12 +126,11 @@ celular emparejado, sin tocar nada, pasa a preguntar cada 2 minutos.
   ese tiempo no la vuelve a buscar en la base. Lo que cambia una sesión o sus permisos desde la
   aplicación vale en el pedido siguiente; una sesión vencida nunca pasa; lo que no es una sesión
   no se recuerda.
-- **RF-134**: El celular emparejado se entera de los pedidos de la computadora en el momento, por
-  la conexión entre los dos. Además pregunta al empezar, al volver a la aplicación, al volver la
-  conexión y cada el tiempo que fija quien administra (5 o 30 segundos, 1, 5 o 10 minutos; 1
-  minuto de arranque).
-- **RF-135**: Los ajustes que valen para todos los dispositivos (los dos tiempos de RF-133 y
-  RF-134, y los días del vínculo, specs/007) se fijan en Más → Sistema, en el celular y en la
+- **RF-134**: Reemplazado por RF-138 (specs/023, 2026-10-24): el celular emparejado se entera de
+  los pedidos de la computadora por la conexión entre los dos y ya no pregunta nada; su tiempo
+  salió de Más → Sistema.
+- **RF-135**: Los ajustes que valen para todos los dispositivos (el tiempo de RF-133 y los
+  días del vínculo, specs/007; el de RF-134 se sacó con specs/023) se fijan en Más → Sistema, en el celular y en la
   computadora, solo con el permiso «Administrar el sistema». Cada cambio queda en «Quién hizo
   qué». Ninguna persona los cambia para su propio dispositivo.
 

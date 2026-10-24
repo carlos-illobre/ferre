@@ -68,48 +68,11 @@ describe("emparejamiento", () => {
     expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE vinculado_en IS NOT NULL/)[0]!.params).toEqual(["sesion-admin", "sesion-mostrador", "p2"]);
   });
 
-  it("cualquiera de los dos lo suelta; un código que la computadora no recibió a tiempo ya no se entrega", async () => {
+  it("cualquiera de los dos lo suelta", async () => {
     base.actual.programar(/UPDATE puesto SET expira_en = now\(\) WHERE id = \$1/, { rowCount: 1 });
     expect((await pedir(app, "DELETE", "/puestos/p1", { rol: "mostrador" })).status).toBe(204);
     expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE id = \$1/)[0]!.params).toEqual(["p1", "sesion-mostrador"]);
     expect(JSON.stringify(base.actual.sqlDe(/INSERT INTO evento/).at(-1)!.params)).toContain("puesto.desvinculado");
-    // Quien pide solo lo nuevo no recibe lo atrasado: se da por entregado.
-    base.actual.programar(/SELECT id FROM puesto WHERE id = \$1 AND sesion_id = \$2/, { rows: [{ id: "p1" }] });
-    const flujo = await pedir(app, "GET", "/puestos/p1/eventos?nuevos=1", { rol: "admin" });
-    await flujo.body?.cancel();
-    expect(base.actual.sqlDe(/UPDATE codigo_escaneado SET entregado_en = now\(\) WHERE puesto_id = \$1 AND entregado_en IS NULL/)[0]!.params).toEqual(["p1"]);
-    expect(base.actual.sqlDe(/FROM codigo_escaneado WHERE puesto_id = \$1 AND entregado_en IS NULL AND creado_en/)).toHaveLength(0);
-  });
-
-  // Decisión 59: la computadora le pide a su celular que haga de lector.
-  it("la computadora pide el lector y su celular emparejado se entera; al abrirlo, el pedido queda atendido", async () => {
-    expect((await pedir(app, "POST", "/puestos/p1/lector", { rol: "admin" })).status).toBe(404); // sin celular emparejado
-    base.actual.programar(/SELECT id FROM puesto WHERE id = \$1 AND sesion_id = \$2 AND vinculado_en IS NOT NULL/, { rows: [{ id: "p1" }] });
-    base.actual.programar(/SELECT sesion_id FROM puesto WHERE celular_sesion_id/, (params) => ({ rows: params[0] === "sesion-mostrador" ? [{ sesion_id: "sesion-admin" }] : [] }));
-    expect(await (await pedir(app, "GET", "/puestos/avisos", { rol: "mostrador" })).json()).toEqual({ lector: false, fotos: [] });
-    expect((await pedir(app, "POST", "/puestos/p1/lector", { rol: "admin" })).status).toBe(204);
-    expect(await (await pedir(app, "GET", "/puestos/avisos", { rol: "mostrador" })).json()).toEqual({ lector: true, fotos: [] });
-    expect(((await (await pedir(app, "GET", "/puestos/avisos", { rol: "soloVende" })).json()) as { lector: boolean }).lector).toBe(false);
-    expect((await pedir(app, "DELETE", "/puestos/avisos/lector", { rol: "mostrador" })).status).toBe(204);
-    expect(((await (await pedir(app, "GET", "/puestos/avisos", { rol: "mostrador" })).json()) as { lector: boolean }).lector).toBe(false);
-  });
-
-  // Decisión 112: lo que la computadora pide le aparece al celular en el momento, por su espejo.
-  it("002-E18d al pedir el lector o una foto, al celular emparejado le llega «pedidos» por el espejo", async () => {
-    base.actual.programar(/SELECT sesion_id, celular_sesion_id FROM puesto WHERE id = \$1/, (params) => ({ rows: params[1] === "sesion-admin" || params[1] === "sesion-mostrador" ? [{ sesion_id: "sesion-admin", celular_sesion_id: "sesion-mostrador" }] : [] }));
-    base.actual.programar(/SELECT id FROM puesto WHERE id = \$1 AND sesion_id = \$2 AND vinculado_en IS NOT NULL/, { rows: [{ id: "espejo-2" }] });
-    base.actual.programar(/SELECT id FROM puesto WHERE sesion_id = \$1 AND vinculado_en IS NOT NULL/, (params) => ({ rows: params[0] === "sesion-admin" ? [{ id: "espejo-2" }] : [] }));
-    const flujo = await pedir(app, "GET", "/puestos/espejo-2/espejo", { rol: "mostrador" });
-    const lector = flujo.body!.getReader();
-    let recibido = "";
-    const hasta = async (texto: string) => { for (let i = 0; i < 6 && !recibido.includes(texto); i++) recibido += new TextDecoder().decode((await lector.read()).value); return recibido; };
-    await hasta("event: estado");
-    expect((await pedir(app, "POST", "/puestos/espejo-2/lector", { rol: "admin" })).status).toBe(204);
-    expect(await hasta("event: pedidos")).toContain("event: pedidos");
-    recibido = "";
-    expect((await pedir(app, "POST", "/pedidos-de-foto", { rol: "admin", cuerpo: { para: "la factura del ingreso" } })).status).toBe(201);
-    expect(await hasta("event: pedidos")).toContain("event: pedidos");
-    await lector.cancel();
   });
 
   // Decisión 60: el espejo.
@@ -121,38 +84,64 @@ describe("emparejamiento", () => {
     expect(base.actual.sqlDe(/UPDATE puesto SET vinculado_en = now\(\)/)).toHaveLength(0);
   });
 
-  it("cada lado avisa sus cambios y el otro los recibe; el que llega después toma lo último; quien no es del emparejamiento, nada", async () => {
-    const delPuesto = (compu: string, celular: string) => base.actual.programar(/SELECT sesion_id, celular_sesion_id FROM puesto WHERE id = \$1/, (params) => ({ rows: params[1] === compu || params[1] === celular ? [{ sesion_id: compu, celular_sesion_id: celular }] : [] }));
-    delPuesto("sesion-admin", "sesion-mostrador");
-    const avisar = (rol: "admin" | "mostrador" | "soloVende", tipo: string, datos: unknown) => pedir(app, "POST", "/puestos/espejo-1/espejo", { rol, cuerpo: { tipo, datos } });
-    expect((await avisar("soloVende", "ir", "vender")).status).toBe(404);
-    expect((await pedir(app, "GET", "/puestos/espejo-1/espejo", { rol: "soloVende" })).status).toBe(404);
-    expect((await avisar("admin", "cualquiera", 1)).status).toBe(400);
-    // La computadora avisa a dónde fue y cómo está la venta, antes de que el celular llegue.
-    expect((await avisar("admin", "ir", "vender")).status).toBe(204);
-    expect((await avisar("admin", "venta", { items: [{ productoId: "p1", cantidad: 2 }], medio: "efectivo", clienteId: "" })).status).toBe(204);
-    expect((await avisar("admin", "ingreso", { proveedorId: "prov1", renglones: [] })).status).toBe(204);
-    expect((await avisar("admin", "aviso", "x".repeat(400))).status).toBe(413);
-    // El celular se conecta: recibe cómo está todo y quién está.
-    const flujo = await pedir(app, "GET", "/puestos/espejo-1/espejo", { rol: "mostrador" });
-    const lector = flujo.body!.getReader();
-    const leer = async () => new TextDecoder().decode((await lector.read()).value);
-    const primero = await leer();
-    expect(primero).toContain("event: estado");
-    const estado = JSON.parse(primero.split("data: ")[1]!.split("\n")[0]!) as { lado: string; parte: string; docs: { venta: { items: unknown[] }; ingreso: { proveedorId: string } }; pausado: boolean; presentes: { computadora: boolean; celular: boolean } };
-    expect(estado).toMatchObject({ lado: "celular", parte: "vender", pausado: false, presentes: { computadora: false, celular: true } });
-    expect(estado.docs.venta.items).toHaveLength(1);
-    expect(estado.docs.ingreso.proveedorId).toBe("prov1"); // cada trabajo en curso se guarda aparte
-    // Lo que la computadora cambia después le llega; la pausa les llega a los dos.
+  // La conexión entre los dos (specs/023, ADR-027): la sala de cada vínculo.
+  const delPuesto = (compu: string, celular: string) => base.actual.programar(/SELECT sesion_id, celular_sesion_id, expira_en FROM puesto WHERE id = \$1/, (params) => ({ rows: params[1] === compu || params[1] === celular ? [{ sesion_id: compu, celular_sesion_id: celular, expira_en: new Date(Date.now() + 86_400_000) }] : [] }));
+  // Lee lo que va llegando por un flujo hasta que aparece un texto.
+  const lectorDe = async (respuesta: Response) => {
+    const lector = respuesta.body!.getReader();
     let recibido = "";
-    const hasta = async (texto: string) => { for (let i = 0; i < 6 && !recibido.includes(texto); i++) recibido += await leer(); return recibido; };
-    await avisar("admin", "ir", "deposito/ingreso");
-    expect(await hasta("deposito/ingreso")).toContain("event: ir");
-    // Un aviso de algo que terminó le llega al otro y no queda guardado.
-    await avisar("admin", "aviso", "Venta de $3.000 cobrada");
-    expect(await hasta("event: aviso")).toContain("Venta de $3.000 cobrada");
-    await avisar("mostrador", "pausa", true);
-    expect(await hasta("event: pausa")).toContain("data: true");
-    await lector.cancel();
+    return {
+      hasta: async (texto: string) => { for (let i = 0; i < 6 && !recibido.includes(texto); i++) { const r = await lector.read(); if (r.done) break; recibido += new TextDecoder().decode(r.value); } return recibido; },
+      terminado: async () => (await lector.read()).done,
+      cancelar: () => lector.cancel(),
+    };
+  };
+
+  it("023-E25: solo los dos del vínculo escuchan su sala y mandan por ella; el otro recibe lo que manda uno, sin que se guarde", async () => {
+    delPuesto("sesion-admin", "sesion-mostrador");
+    expect((await pedir(app, "GET", "/puestos/p1/enlace", { rol: "soloVende" })).status).toBe(404);
+    expect((await pedir(app, "POST", "/puestos/p1/enlace", { rol: "soloVende", cuerpo: ["hola"] })).status).toBe(404);
+    expect((await pedir(app, "GET", "/puestos/p1/enlace", { rol: null })).status).toBe(401);
+    const compu = await lectorDe(await pedir(app, "GET", "/puestos/p1/enlace", { rol: "admin" }));
+    expect(await compu.hasta('{"p":false}')).toContain('data: {"p":false}');
+    const celular = await lectorDe(await pedir(app, "GET", "/puestos/p1/enlace", { rol: "mostrador" }));
+    expect(await celular.hasta('{"p":true}')).toContain('data: {"p":true}');
+    expect((await pedir(app, "POST", "/puestos/p1/enlace", { rol: "mostrador", cuerpo: ["hola"] })).status).toBe(204);
+    expect(await compu.hasta('"m"')).toContain('data: {"m":"hola"}');
+    // 023-E27: lo que no es una tanda no pasa, y lo demasiado grande se corta antes de leerlo.
+    expect((await pedir(app, "POST", "/puestos/p1/enlace", { rol: "mostrador", cuerpo: ["x".repeat(5_000_000)] })).status).toBe(413);
+    expect((await pedir(app, "POST", "/puestos/p1/enlace", { rol: "mostrador", cuerpo: { m: "x" } })).status).toBe(400);
+    expect(base.actual.sqlDe(/INSERT/).filter((c) => /hola/.test(JSON.stringify(c.params)))).toHaveLength(0);
+    await compu.cancelar(); await celular.cancelar();
+  });
+
+  it("023-E26: desvincular, cerrar a distancia una sesión, desactivar a la persona o vencer el vínculo cierra la sala en el momento", async () => {
+    delPuesto("sesion-admin", "sesion-mostrador");
+    const abrir = async () => lectorDe(await pedir(app, "GET", "/puestos/p1/enlace", { rol: "mostrador" }));
+    // Desvincular.
+    let celular = await abrir();
+    base.actual.programar(/UPDATE puesto SET expira_en = now\(\) WHERE id = \$1/, { rowCount: 1 });
+    await pedir(app, "DELETE", "/puestos/p1", { rol: "admin" });
+    expect(await celular.hasta('"c"')).toContain('data: {"c":true}');
+    expect(await celular.terminado()).toBe(true);
+    // Cerrar a distancia la sesión de uno de los dos.
+    celular = await abrir();
+    base.actual.programar(/UPDATE puesto SET expira_en = now\(\) WHERE vinculado_en IS NOT NULL AND expira_en > now\(\) AND \(sesion_id = \$1 OR celular_sesion_id = \$1\) RETURNING id/, { rows: [{ id: "p1" }] });
+    await pedir(app, "DELETE", "/sesiones/sesion-admin", { rol: "admin" });
+    expect(await celular.hasta('"c"')).toContain('data: {"c":true}');
+    // Desactivar a la persona.
+    celular = await abrir();
+    base.actual.programar(/SELECT id FROM puesto WHERE usuario_id = \$1/, { rows: [{ id: "p1" }] });
+    base.actual.programar(/UPDATE usuario SET activo/, { rowCount: 1 });
+    base.actual.programar(/FROM usuario u\s+WHERE u\.activo AND \(SELECT count\(DISTINCT rp\.permiso\)/, { rows: [{ id: "u-admin" }, { id: "u-dueño" }] });
+    const r = await pedir(app, "PATCH", "/usuarios/0b0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c11", { rol: "admin", cuerpo: { activo: false } });
+    expect(r.status, await r.clone().text()).toBeLessThan(300);
+    expect(await celular.hasta('"c"')).toContain('data: {"c":true}');
+    // Vencer el vínculo: la sala se cierra sola a la hora en que vence, con los dos abiertos.
+    base.actual.programar(/SELECT sesion_id, celular_sesion_id, expira_en FROM puesto WHERE id = \$1/, (params) => ({ rows: params[1] === "sesion-admin" || params[1] === "sesion-mostrador" ? [{ sesion_id: "sesion-admin", celular_sesion_id: "sesion-mostrador", expira_en: new Date(Date.now() + 80) }] : [] }));
+    celular = await abrir();
+    expect(await celular.hasta('"p"')).toContain('"p"');
+    await new Promise((ok) => setTimeout(ok, 150));
+    expect(await celular.hasta('"c"')).toContain('data: {"c":true}');
   });
 });

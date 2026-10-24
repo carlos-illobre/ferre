@@ -70,9 +70,7 @@ celular de ese puesto.
 | POST | `/puestos` | Con sesión | La computadora pide un puesto: devuelve el código para el QR, que vence a los 5 minutos |
 | POST | `/puestos/:codigo/vincular` | Con sesión | El celular lee el QR y queda vinculado 12 horas. 404 si el código venció o ya se usó |
 | GET | `/puestos/:id` | Con sesión | Estado del puesto (si ya se vinculó y si sigue vigente); solo para las dos sesiones del puesto |
-| POST | `/puestos/:id/codigos` | Con sesión | El celular manda un código escaneado. 403 si ese celular no está vinculado a ese puesto o el vínculo venció |
-| GET | `/puestos/:id/eventos` | Con sesión | Flujo de eventos (SSE) hacia la computadora: primero los códigos pendientes, después los que llegan; latido cada 25 segundos |
-| POST | `/puestos/:id/codigos/:codigoId/recibido` | Con sesión | La computadora confirma que recibió un código |
+| GET y POST | `/puestos/:id/enlace` | Con sesión, de uno de los dos lados del vínculo | La conexión entre los dos (specs/023): los códigos que lee el celular viajan por acá cuando no pueden hablarse directo (ver `specs/007-usuarios-y-acceso/contracts/api.md`) |
 
 ## Servicio interno `listas-de-proveedores`
 

@@ -40,3 +40,11 @@ mismo mecanismo que se usa para vincular el celular, con un código QR (decision
 - Si algún día hay más de un proceso del servidor, los pedidos tienen que pasar a la base.
 - Cualquier usuario con sesión que tenga el código puede mandar la foto; el código es largo,
   al azar y dura diez minutos.
+
+## Enmienda (2026-10-24): la foto se le pide al celular emparejado, sin código QR
+
+Carlos decidió (decisión 152) que la foto se le pide solo al celular emparejado: el pedido y la
+foto viajan por la conexión entre los dos (ADR-027), directa o por el servidor, y el servidor no
+la guarda ni pregunta nada. Se sacan el pedido con código QR para cualquier celular, sus rutas
+(`/pedidos-de-foto`) y las preguntas cada 2 segundos. Sin celular emparejado, en la computadora se
+elige un archivo o se vincula el celular (`specs/023-conexion-entre-dispositivos/`, E24).

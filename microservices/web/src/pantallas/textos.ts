@@ -228,14 +228,29 @@ export const TEXTOS = {
     // Más → Configuración: las preferencias del dispositivo y lo propio (decisión 99).
     queHay: { largo: "Cómo se comporta la aplicación en esta computadora, y tus celulares con huella y tu vínculo", corto: "Este celular, tus huellas y tu vínculo" },
   },
+  conexion: {
+    // El indicador de la conexión entre el celular y la computadora (specs/023, ux.md).
+    directa: igual("Directa"),
+    servidor: igual("Por el servidor"),
+    conectando: igual("Conectando…"),
+    soloEnLaCompu: igual("El celular no está abierto"),
+    soloEnElCelular: igual("La compu no está abierta"),
+    pausa: igual("En pausa"),
+    sinConexion: igual("Sin conexión"),
+    caminoDirecto: { largo: "Directa, por el wifi del local", corto: "Directa, por el wifi" },
+    caminoServidor: igual("Por el servidor de Ferrebress"),
+    porLaRed: { largo: "La red del local no deja conectar directo el celular y la computadora.", corto: "El wifi no deja conectar directo con la compu." },
+    porElNavegador: igual("Este navegador no permite la conexión directa."),
+    seCorto: { largo: "La conexión directa se cortó. Se vuelve a armar la próxima vez que se encuentren los dos.", corto: "La directa se cortó. Se vuelve a armar al encontrarse." },
+    probar: igual("Probar conexión directa"),
+    cerrar: igual("Cerrar"),
+  },
   sistema: {
     // Más → Sistema (specs/020): lo que vale para todos los dispositivos.
-    queHay: { largo: "Lo que vale para todos los dispositivos: la sesión, el celular emparejado y el vínculo", corto: "Lo que vale para todos los dispositivos" },
+    queHay: { largo: "Lo que vale para todos los dispositivos: la sesión y el vínculo", corto: "Lo que vale para todos los dispositivos" },
     bajada: { largo: "Cómo se comporta el sistema en todos los dispositivos. Lo cambia solo quien tiene «Administrar el sistema»; nadie lo cambia para el suyo.", corto: "Vale para todos los dispositivos. Lo cambia quien administra el sistema." },
     sesion: igual("Cuánto recuerda la sesión el servidor"),
     sesionDetalle: { largo: "Mientras la recuerda, no le vuelve a preguntar a la base quién es cada persona ni qué puede hacer. Más tiempo gasta menos datos de la base. Lo que se cambia desde la aplicación (desactivar a alguien, sus permisos) vale en el momento; un cambio hecho directamente en la base tarda hasta este tiempo.", corto: "Mientras la recuerda, no le pregunta a la base quién sos. Más tiempo, menos datos de la base." },
-    celular: igual("Cada cuánto pregunta el celular emparejado"),
-    celularDetalle: { largo: "Lo que la computadora le pide al celular (una foto, que haga de lector) le llega al instante. Esta pregunta es el respaldo por si se corta la conexión entre los dos: más seguido se entera antes y gasta más datos de la base.", corto: "Lo que pide la computadora llega al instante. Esto es el respaldo, por si se corta la conexión entre los dos." },
     vinculo: igual("Cuántos días dura el vínculo"),
     vinculoDetalle: { largo: "Cuánto dura el vínculo entre un celular y una computadora sin volver a vincularlos. Los vínculos nuevos y los que se renuevan duran esto.", corto: "Cuánto dura el vínculo entre un celular y una computadora sin volver a vincularlos." },
     nota: { largo: "Vale para todos los dispositivos y llega a los que están abiertos en menos de un minuto. Cada cambio queda en «Quién hizo qué».", corto: "Vale para todos. Cada cambio queda en «Quién hizo qué»." },
@@ -615,3 +630,7 @@ export const TEXTOS = {
 
 // «1 producto», «1.250 productos»: igual en las dos interfaces.
 export const cuantosProductos = (n: number) => `${n.toLocaleString("es-AR")} ${n === 1 ? "producto" : "productos"}`;
+
+// Los botones del vínculo (decisiones 73 y 75): «Desconectar» para que cada uno trabaje por su lado
+// un rato y «Reconectar» para volver a trabajar en espejo; «Desvincular», el corte definitivo.
+export const TEXTOS_DEL_VINCULO = { separar: "Desconectar", juntar: "Reconectar", vincular: "Vincular", desvincular: "Desvincular" };

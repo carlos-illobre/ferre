@@ -40,3 +40,7 @@ tests/capturas/salida/
 
 # Qué tarea tiene empezada cada sesión: lo usa la compuerta del flujo de trabajo
 .specify/en-curso.json
+
+# El informe de cobertura del módulo de conexión
+**/coverage/
+**/node-compile-cache/

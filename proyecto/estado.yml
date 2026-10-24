@@ -101,11 +101,11 @@ RF-08:
   defectos:
     - "La lectura con la cámara real no tiene prueba automática y no hay medición de los 3 segundos"
     - "La prueba del escáner es el mismo archivo copiado para las dos interfaces; no hay una variante por interfaz"
-    - "Sin prueba: vencimiento del QR a los 5 minutos, del vínculo a las 12 horas y entrega de los códigos al reconectar"
+    - "Sin prueba: vencimiento del QR a los 5 minutos y del vínculo a los días configurados"
     - "El código de un producto no se puede quitar desde la ficha, solo reemplazar por otro"
     - "El emparejamiento que nace al entrar (#73) no está probado con un celular y una computadora de verdad"
     - "El lector del celular (decisión 59) está probado sin cámara: en la prueba el código se tipea"
-    - "El celular pregunta cada 3 segundos si la computadora pide una foto: no hay avisos con la aplicación cerrada"
+    - "No hay avisos con la aplicación del celular cerrada: el pedido de la computadora le llega al abrirla (segunda etapa de specs/023)"
     - "Un celular no puede estar emparejado con dos computadoras a la vez"
     - "En la computadora, buscar escaneando con el celular vinculado en la pantalla de productos y en el inventario no tiene prueba; el inventario de la computadora no escucha al celular"
 
@@ -421,7 +421,6 @@ RF-50:
   pruebas:
     - tests/e2e/escritorio/15-foto-con-celular.spec.ts
     - microservices/web/src/pantallas/FotoDeFactura.test.tsx
-    - microservices/api/src/rutas/pedidos-de-foto.test.ts
     - microservices/api/src/rutas/compras.test.ts
     - tests/e2e/escritorio/05-compras.spec.ts
     - tests/e2e/celular/05-compras.spec.ts
@@ -1497,7 +1496,7 @@ RF-133:
   defectos: []
 
 RF-134:
-  estado: "A validar (020): programado; falta que Carlos lo pruebe en el ambiente de pruebas"
+  estado: "Reemplazado por RF-138 (023): ya no hay pregunta del celular ni su ajuste"
   pruebas:
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
     - microservices/api/src/rutas/sistema.test.ts
@@ -1539,33 +1538,82 @@ RNF-67:
   defectos: []
 
 RF-136:
-  estado: "Nuevo (023): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "A validar (023): programado; falta que Carlos lo pruebe con la notebook y el celular del local, en su wifi"
+  pruebas:
+    - microservices/conexion/src/navegador/directa.test.ts
+    - microservices/conexion/src/navegador/enlace.test.ts
+    - tests/e2e/escritorio/17-espejo.spec.ts
+    - tests/e2e/celular/17-espejo.spec.ts
+    - tests/e2e/escritorio/15-foto-con-celular.spec.ts
+  defectos:
+    - "Si el mismo dispositivo tiene dos pestañas abiertas, no está comprobado cómo se comportan las dos con el mismo vínculo (revisión 3.7)"
+    - "El enlace de la aplicación (cómo se arma y se cambia según el vínculo) no tiene pruebas unitarias propias: se prueba por las pantallas y de punta a punta (revisión 4.5)"
+    - "La demora que muestra el indicador es la de la última confirmación: sin mensajes, no se actualiza"
 
 RF-137:
-  estado: "Nuevo (023): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "A validar (023): programado; falta que Carlos lo pruebe en el local"
+  pruebas:
+    - microservices/conexion/src/navegador/enlace.test.ts
+    - microservices/conexion/src/navegador/confiable.test.ts
+    - microservices/conexion/src/navegador/servidor.test.ts
+    - microservices/conexion/src/servidor/central.test.ts
+    - tests/e2e/escritorio/20-conexion.spec.ts
+    - tests/e2e/celular/20-conexion.spec.ts
+    - microservices/api/src/rutas/puestos.test.ts
+  defectos:
+    - "Un dato recibido y todavía no confirmado antes de que la página recargue puede llegar dos veces (revisión 1.6)"
+    - "Si falla un POST al servidor, las señales de la directa, «sin directa» y «probar» que iban en él no se reenvían (revisión 3.5)"
+    - "Una señal malformada del otro lado deja anotado que la red no deja la directa (revisión 3.6)"
+    - "Los límites de la central se miden en caracteres, no en bytes (revisión 2)"
+    - "Lo que no se pudo entregar vive en la memoria de la página: si se cierra la aplicación del celular antes de que la computadora lo reciba, se pierde (antes, los códigos esperaban en la base 2 minutos)"
+    - "Si la conexión directa se cae sin que la otra página se cierre (por ejemplo, el celular se suspende), el indicador tarda lo que el navegador tarde en notarlo (unos segundos) en pasar a «El otro no está abierto»"
 
 RF-138:
-  estado: "Nuevo (023): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "A validar (023): programado"
+  pruebas:
+    - microservices/conexion/src/navegador/enlace.test.ts
+    - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
+    - microservices/api/src/rutas/sistema.test.ts
+    - microservices/web/src/pantallas/Sistema.test.tsx
+  defectos:
+    - "Cada pedido a la sala comprueba la sesión y el vínculo en la base (la sesión, con lo que recuerda el servidor, RF-133)"
 
 RF-139:
-  estado: "Nuevo (023): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "A validar (023): programado como la variante A; falta que Carlos lo vea en el ambiente de pruebas"
+  pruebas:
+    - microservices/web/src/pantallas/IndicadorDelVinculo.test.tsx
+    - tests/e2e/escritorio/20-conexion.spec.ts
+    - tests/e2e/celular/20-conexion.spec.ts
+  defectos:
+    - "E22 con éxito (probar a mano y que la directa ande) no tiene prueba; la prueba que nombra E13 comprueba la pausa y no que el cambio se vea en los dos (revisión 1.2 y 1.3)"
+    - "En el celular, en Vender, el puntito queda encima del botón «En espejo» de la v2 y, con un texto largo («La compu no está abierta»), toca el título"
 
 RF-140:
-  estado: "Nuevo (023): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "A validar (023): programado; el lector, el espejo, la pausa y el pedido de foto van por la conexión entre los dos"
+  pruebas:
+    - microservices/web/src/espejo.test.tsx
+    - microservices/web/src/pantallas/FotoDeFactura.test.tsx
+    - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
+    - tests/e2e/escritorio/10-escaner.spec.ts
+    - tests/e2e/celular/10-escaner.spec.ts
+    - tests/e2e/escritorio/15-foto-con-celular.spec.ts
+    - tests/e2e/escritorio/17-espejo.spec.ts
+    - tests/e2e/celular/17-espejo.spec.ts
+  defectos:
+    - "El espejo y la foto se prueban de punta a punta solo por la directa; por el servidor, solo el lector (revisión 1.4)"
+    - "Un pedido de foto no vence ni se cancela en el celular: si la computadora lo canceló, el celular igual saca la foto y dice «Listo» (revisión 3.4)"
+    - "Al encontrarse, de cada trabajo en curso queda el que cambió último y solo en empate manda la computadora; el plan decía que manda la computadora: falta que Carlos decida (revisión 3.1)"
+    - "Los capítulos del manual de uso que muestran la foto con código QR (specs/012) quedaron viejos: hay que volver a grabarlos"
+    - "La tabla de códigos escaneados quedó sin uso en la base"
 
 RNF-68:
-  estado: "Nuevo (023): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (023): módulo propio, sin dependencias, con el 100 % de cobertura exigido por su vitest y las capas controladas"
+  pruebas:
+    - microservices/conexion/src/comun/avisos.test.ts
+    - microservices/conexion/src/comun/mensajes.test.ts
+    - microservices/conexion/src/servidor/central.test.ts
+    - microservices/conexion/src/navegador/enlace.test.ts
+    - microservices/web/src/conexion-modulo.test.ts
   defectos: []
 RNF-69:
   estado: "Nuevo (024): especificación aprobada"

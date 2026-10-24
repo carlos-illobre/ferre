@@ -46,23 +46,33 @@ export async function sellarVinculo(db: Db, puestoId: string) {
        FROM sesion a, sesion b WHERE p.id = $1 AND a.id = p.sesion_id AND b.id = p.celular_sesion_id`, [puestoId]);
 }
 
-// Un administrador cerró a distancia la sesión de un dispositivo: sus vínculos se cortan.
-export async function cortarVinculosDe(db: Db, sesionId: string) {
-  await db.query(`UPDATE puesto SET expira_en = now() WHERE ${VIGENTE} AND (sesion_id = $1 OR celular_sesion_id = $1)`, [sesionId]);
+// Los vínculos vigentes de un usuario: al desactivarlo se cierran sus salas.
+export async function vinculosDelUsuario(db: Db, usuarioId: string): Promise<string[]> {
+  const { rows } = await db.query<{ id: string }>(`SELECT id FROM puesto WHERE usuario_id = $1 AND ${VIGENTE}`, [usuarioId]);
+  return rows.map((r) => r.id);
 }
 
-// Deja sin efecto los emparejamientos anteriores de esa computadora o de ese celular.
-export async function soltarAnteriores(db: Db, compuSesionId: string, celularSesionId: string, salvo: string | null = null) {
-  await db.query(
-    "UPDATE puesto SET expira_en = now() WHERE vinculado_en IS NOT NULL AND expira_en > now() AND (sesion_id = $1 OR celular_sesion_id = $2) AND id IS DISTINCT FROM $3",
+// Un administrador cerró a distancia la sesión de un dispositivo: sus vínculos se cortan.
+// Devuelve cuáles, para cerrar sus salas (ADR-027).
+export async function cortarVinculosDe(db: Db, sesionId: string): Promise<string[]> {
+  const { rows } = await db.query<{ id: string }>(`UPDATE puesto SET expira_en = now() WHERE ${VIGENTE} AND (sesion_id = $1 OR celular_sesion_id = $1) RETURNING id`, [sesionId]);
+  return rows.map((r) => r.id);
+}
+
+// Deja sin efecto los emparejamientos anteriores de esa computadora o de ese celular. Devuelve
+// cuáles, para cerrar sus salas (ADR-027).
+export async function soltarAnteriores(db: Db, compuSesionId: string, celularSesionId: string, salvo: string | null = null): Promise<string[]> {
+  const { rows } = await db.query<{ id: string }>(
+    "UPDATE puesto SET expira_en = now() WHERE vinculado_en IS NOT NULL AND expira_en > now() AND (sesion_id = $1 OR celular_sesion_id = $2) AND id IS DISTINCT FROM $3 RETURNING id",
     [compuSesionId, celularSesionId, salvo],
   );
+  return rows.map((r) => r.id);
 }
 
 // Vincular de nuevo (o entrar a la computadora con el celular) reemplaza al vínculo anterior:
 // así se renueva el plazo.
-export async function emparejar(db: Db, compuSesionId: string, celularSesionId: string, nombre: string | null): Promise<{ id: string; expira_en: string }> {
-  await soltarAnteriores(db, compuSesionId, celularSesionId);
+export async function emparejar(db: Db, compuSesionId: string, celularSesionId: string, nombre: string | null): Promise<{ id: string; expira_en: string; soltados: string[] }> {
+  const soltados = await soltarAnteriores(db, compuSesionId, celularSesionId);
   const dias = await diasDeVinculo(db);
   const id = randomUUID();
   const { rows } = await db.query<{ expira_en: string }>(
@@ -72,12 +82,5 @@ export async function emparejar(db: Db, compuSesionId: string, celularSesionId: 
     [id, compuSesionId, hashear(generarToken()), nombre, celularSesionId, String(dias)],
   );
   await sellarVinculo(db, id);
-  return { id, expira_en: rows[0]?.expira_en ?? new Date(Date.now() + dias * 86400000).toISOString() };
-}
-
-// Las sesiones de computadora emparejadas hoy con esta sesión de celular.
-export async function computadorasDe(db: Db, celularSesionId: string): Promise<string[]> {
-  const { rows } = await db.query<{ sesion_id: string }>(
-    "SELECT sesion_id FROM puesto WHERE celular_sesion_id = $1 AND vinculado_en IS NOT NULL AND expira_en > now()", [celularSesionId]);
-  return rows.map((r) => r.sesion_id);
+  return { id, expira_en: rows[0]?.expira_en ?? new Date(Date.now() + dias * 86400000).toISOString(), soltados };
 }
