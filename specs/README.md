@@ -295,6 +295,7 @@ Los que son reglas generales están además en la constitución.
 | RNF-66 | Las pruebas de la capa de datos corren contra PostgreSQL y cubren el 100 % de sus líneas; una línea que no se puede cubrir no se escribe | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
 | RNF-67 | Todo lo que cambia entre ambientes está en el archivo de variables de entorno: el código que se prueba es el que corre en producción, sin valores por omisión | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
 | RNF-68 | La conexión entre dispositivos se puede llevar a otro proyecto: módulo propio, sin dependencias, simple, sin código repetido, comentado y con pruebas que recorren cada línea | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
+| RNF-69 | El front está en capas (técnica, piezas visuales, negocio y las pantallas de cada interfaz), sin código repetido, en piezas chicas y con poca complejidad, controlado en cada subida | [024-front-por-capas](024-front-por-capas/spec.md) |
 
 ## De dónde vino cada cosa
 

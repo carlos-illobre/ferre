@@ -321,3 +321,4 @@ Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con 
 - [ ] T138 [agente] Unificar los íconos de la v2, que quedaron en tres archivos con nombres distintos (castellano y los de Lucide), en uno solo: no cambia nada a la vista; toca unos 18 archivos (specs/021, T010)
 - [ ] T147 [carlos] Rehacer todas las teclas (Alt + letra y las de cada pantalla): hoy funcionan mal y sin consistencia; incluye las Alt nuevas de la v2 que hacen otra cosa y las Alt D, E y F que la decisión 80 prohíbe (revisión de specs/021, 1 y 2; decisión 153)
 - [ ] T148 [carlos] Redefinir los mínimos de tamaño del celular (letra y lugar para tocar): hoy el menú de abajo, «Roles y permisos» y las llaves de Configuración no cumplen los de E06 de specs/021 (revisión, 5; decisión 153)
+- [ ] T149 [agente] Ordenar el front por capas y en piezas chicas (specs/024, ADR-028, decisión 155)

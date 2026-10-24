@@ -31,3 +31,4 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [024](ADR-024-la-venta-corregida-guarda-su-historia.md) | La venta corregida guarda una foto de antes y después; un cambio es un registro propio; la plata de las diferencias va en movimientos de dinero del día | Aceptado | 2026-10-20 |
 | [025](ADR-025-sin-orm-todo-por-kysely.md) | Sin ORM: la capa de datos usa solo Kysely, migraciones SQL con su migrador y tipos generados desde la base | Aceptado | 2026-10-24 |
 | [026](ADR-026-una-base-por-servicio-en-la-maquina.md) | La base corre en la máquina, una instancia por ambiente y una base por servicio; sale de Supabase | Aceptado | 2026-10-24 |
+| [028](ADR-028-el-front-por-capas-y-en-piezas-chicas.md) | El front en cinco capas (app, plataforma, ui, negocio, pantallas), con reglas de dependencia, límites de complejidad, tamaño y duplicación medidos en cada subida, y estilos con CSS Modules | Aceptado | 2026-10-24 |

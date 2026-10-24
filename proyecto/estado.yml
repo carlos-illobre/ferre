@@ -1567,3 +1567,7 @@ RNF-68:
   estado: "Nuevo (023): especificación aprobada"
   pruebas: []
   defectos: []
+RNF-69:
+  estado: "Nuevo (024): especificación aprobada"
+  pruebas: []
+  defectos: []

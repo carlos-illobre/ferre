@@ -1300,3 +1300,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      specs/021). Carlos: como la v2. Depósito → Compras le abre el ingreso y no le muestra los
      pedidos pendientes; los pedidos por llegar los ven quienes ven las compras o encargan
      (specs/005, escenario 16).
+
+155. **El front, por capas y en piezas chicas** (2026-10-24). Carlos: el código del front está
+     desorganizado. Lo quiere dividido por capas (lo gráfico, lo guardado en el dispositivo, las
+     conexiones, el teclado, y las pantallas del celular y las de la computadora cada una en su
+     carpeta), sin código repetido, sin componentes grandes, todo reutilizable, con poca
+     complejidad, una responsabilidad por pieza y el menor acoplamiento. Aprobó la propuesta y
+     sus límites (8 caminos por función, unas 150 líneas por archivo y 40 por componente, nada
+     copiado); los estilos, «lo estándar, lo que se usa profesionalmente»: CSS Modules
+     (specs/024, ADR-028).
