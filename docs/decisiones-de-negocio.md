@@ -1283,3 +1283,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      código propias: simple, sin código repetido, comentado y con pruebas unitarias que recorren
      cada línea («si una línea no es cubierta por un test entonces no la escribas»); el resto del
      proyecto se ve más adelante (specs/023, RNF-68).
+     Respuestas del mismo día: la directa no se vuelve a probar nunca sola, solo a mano desde el
+     detalle del indicador; la foto se le pide solo al celular emparejado (se saca el código QR
+     para cualquier celular; sigue elegir un archivo); avisar con la aplicación cerrada y la huella
+     remota quedan para una segunda etapa.

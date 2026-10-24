@@ -49,6 +49,9 @@ desvincular) sigue escrito en `specs/007-usuarios-y-acceso/` (RF-76, RF-77), en
 - Q: ¿Cómo se muestra? → A: Un puntito con un color distinto para cada estado y un texto corto, en los dos dispositivos. Al tocarlo se ve el detalle. El diseño se ve después.
 - Q: ¿Dónde vive? → A: En un módulo propio, sin dependencias del resto del sistema, para poder usarlo en otros proyectos (RNF-68).
 - Q: ¿Qué reglas de código lleva? → A: Solo para este módulo: lo más simple posible, sin código repetido, comentado, y con pruebas unitarias que recorren cada línea (RNF-68). El resto del proyecto no cambia por ahora.
+- Q: ¿Cuándo se vuelve a probar la conexión directa? → A: Nunca sola. Solo cuando alguien la pide a mano desde el detalle del indicador.
+- Q: ¿Y el pedido de foto con código QR a un celular que no está emparejado? → A: Se saca: la foto se le pide solo al celular emparejado. En la computadora sigue estando elegir un archivo.
+- Q: ¿Qué queda para después? → A: Avisarle al celular con la aplicación cerrada y usar la huella del celular para confirmar algo en la computadora van en una segunda etapa.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -92,8 +95,10 @@ servidor» en los dos.
 1. **E06** **Given** el celular y la computadora emparejados, en una red que no deja conectarlos directo, **When** se abre la aplicación en los dos, **Then** a más tardar 5 segundos después se hablan por el servidor y el indicador dice «Por el servidor» en los dos.
 2. **E07** **Given** uno de los dos con un navegador que no permite la conexión directa, **When** se abre la aplicación en los dos, **Then** se hablan por el servidor enseguida, sin esperar los 5 segundos.
 3. **E08** **Given** la conexión por el servidor, **When** el celular escanea un código o cualquiera de los dos cambia la venta en espejo, **Then** el otro lo recibe igual que con la directa: una sola vez y en orden.
-4. **E09** **Given** la conexión por el servidor porque la directa no se pudo, **When** sigue abierta, **Then** no se vuelve a intentar la directa. [NEEDS CLARIFICATION: ¿cuándo se vuelve a probar la directa? Ver la pregunta 1.]
+4. **E09** **Given** la conexión por el servidor porque la directa no se pudo, **When** siguen abiertos, se cierra y se vuelve a abrir la aplicación, o uno se queda sin conexión y vuelve, **Then** se siguen hablando por el servidor: la directa no se vuelve a probar sola, ni en ese momento ni después.
 5. **E10** **Given** la conexión por el servidor, **When** pasa una hora sin mensajes, **Then** el servidor no consultó la base por el vínculo.
+6. **E22** **Given** la conexión por el servidor, **When** en cualquiera de los dos se abre el detalle del indicador y se toca «Probar conexión directa», **Then** se prueba una vez: si se puede, los dos pasan a «Directa»; si no, siguen «Por el servidor» y el detalle dice que se probó y no se pudo, con la hora.
+7. **E23** **Given** la conexión directa que andaba, **When** se corta (por ejemplo, el wifi se fue un momento) y los dos se vuelven a encontrar, **Then** se reconectan directo; si esta vez la directa no se puede, pasan al servidor y quedan así, como en E09.
 
 ---
 
@@ -111,7 +116,7 @@ directa) y ver que el puntito y su texto cambian en los dos.
 **Acceptance Scenarios**:
 
 1. **E11** **Given** un dispositivo emparejado, **When** se mira la pantalla, **Then** se ve el puntito con uno de estos estados: «Conectando…», «Directa», «Por el servidor», «El otro no está abierto», «En pausa» o «Sin conexión». Cada estado tiene su color, el mismo en el celular y la computadora.
-2. **E12** **Given** el puntito a la vista, **When** se lo toca, **Then** se ve el detalle: con qué dispositivo está, por qué camino van los mensajes, cuánto tarda un mensaje en ir y volver, desde cuándo está así y, si va por el servidor, por qué (los dispositivos no la permiten o la red no la deja).
+2. **E12** **Given** el puntito a la vista, **When** se lo toca, **Then** se ve el detalle: con qué dispositivo está, por qué camino van los mensajes, cuánto tarda un mensaje en ir y volver, desde cuándo está así y, si va por el servidor, por qué (los dispositivos no la permiten o la red no la deja) y el botón «Probar conexión directa».
 3. **E13** **Given** los dos conectados, **When** cambia el estado, **Then** cambia en los dos dispositivos a la vez.
 4. **E14** **Given** un dispositivo que no está emparejado, **When** se mira la pantalla, **Then** no hay puntito.
 
@@ -133,9 +138,10 @@ de foto, con la conexión directa y con la del servidor, y ver que pasan las dos
 
 1. **E15** **Given** el celular emparejado, **When** escanea un código, **Then** pasa en la computadora lo que dice RF-08, por cualquiera de los dos caminos.
 2. **E16** **Given** los dos en espejo, **When** uno cambia de parte o cambia el trabajo en curso, **Then** el otro hace lo que dice RF-77, por cualquiera de los dos caminos.
-3. **E17** **Given** la computadora que pide una foto, **When** el celular la saca, **Then** la foto llega a la computadora por la conexión entre los dos, sin que el servidor la guarde. [NEEDS CLARIFICATION: ¿y el pedido de foto con código QR a un celular que no está emparejado? Ver la pregunta 2.]
-4. **E18** **Given** los dos conectados, **When** uno se queda sin conexión un rato y vuelve, **Then** recibe lo que el otro le mandó mientras tanto, una sola vez y en orden (RF-08).
-5. **E19** **Given** dos personas, cada una con su celular y su computadora emparejados, **When** una escanea, **Then** el código llega solo a su computadora (RF-77).
+3. **E17** **Given** la computadora que pide una foto, **When** el celular emparejado la saca, **Then** la foto llega a la computadora por la conexión entre los dos, sin que el servidor la guarde.
+4. **E24** **Given** la computadora sin un celular emparejado y abierto, **When** hace falta una foto (comprobante, producto o ticket), **Then** no muestra un código QR para pedirla: ofrece elegir un archivo y vincular el celular.
+5. **E18** **Given** los dos conectados, **When** uno se queda sin conexión un rato y vuelve, **Then** recibe lo que el otro le mandó mientras tanto, una sola vez y en orden (RF-08).
+6. **E19** **Given** dos personas, cada una con su celular y su computadora emparejados, **When** una escanea, **Then** el código llega solo a su computadora (RF-77).
 
 ---
 
@@ -160,8 +166,13 @@ dispositivos que se mandan mensajes.
 - **Uno de los dos cierra la aplicación o se apaga la pantalla del celular:** el otro pasa a «El
   otro no está abierto» y guarda lo que no pudo entregar; al volver, se conectan de nuevo y se
   entrega (E18).
-- **La directa andaba y se corta** (se fue el wifi un momento): se reconecta. [NEEDS
-  CLARIFICATION: ¿vuelve a probar la directa o sigue por el servidor? Ver la pregunta 1.]
+- **La directa andaba y se corta** (se fue el wifi un momento): al volver a encontrarse se
+  reconectan directo; si no se puede, pasan al servidor y quedan así (E23).
+- **Se probó a mano y no se pudo:** siguen por el servidor; no se vuelve a probar hasta que
+  alguien lo toque otra vez.
+- **Lo que se sabe de la directa se recuerda:** que este par de dispositivos va por el servidor
+  sigue valiendo aunque se cierre la aplicación, hasta que se pruebe a mano o se vuelvan a
+  vincular.
 - **El celular está con datos móviles y la computadora en el wifi:** no se pueden conectar
   directo; van por el servidor.
 - **Sin internet en los dos y sin la directa armada:** no se pueden encontrar; el indicador dice
@@ -181,8 +192,9 @@ dispositivos que se mandan mensajes.
   servidor solo los presenta al empezar y comprueba que son dos sesiones del mismo usuario,
   emparejadas (RF-77).
 - **RF-137**: Si los dispositivos o la red no permiten la conexión directa, los mensajes pasan
-  solos por el servidor, a más tardar 5 segundos después de intentarla, y no se sigue
-  reintentando la directa [NEEDS CLARIFICATION: hasta cuándo; pregunta 1]. Por los dos caminos
+  solos por el servidor, a más tardar 5 segundos después de intentarla, y la directa no se
+  vuelve a probar sola nunca: solo cuando alguien la pide desde el detalle del indicador
+  (RF-139). Por los dos caminos
   cada mensaje llega una sola vez y en orden, y lo que no se pudo entregar se entrega al
   reconectar. El servidor no guarda los mensajes que pasa.
 - **RF-138**: Nada del vínculo corre solo a ritmo fijo contra el servidor ni contra la base: no
@@ -191,10 +203,11 @@ dispositivos que se mandan mensajes.
   (Conectando…, Directa, Por el servidor, El otro no está abierto, En pausa, Sin conexión), un
   color por estado y un texto corto, iguales en el celular y la computadora. Al tocarlo muestra
   con quién está, por qué camino, cuánto tarda un mensaje, desde cuándo y, si va por el
-  servidor, por qué.
+  servidor, por qué, con un botón para probar la directa de nuevo.
 - **RF-140**: Todo lo que viaja entre el celular y la computadora usa esta conexión: el lector
   de códigos (RF-08), el espejo y la pausa (RF-77) y el pedido de foto (RF-50). No queda otro
-  camino para lo mismo.
+  camino para lo mismo. La foto se le pide solo al celular emparejado: el pedido de foto con
+  código QR a cualquier celular se saca, y en la computadora sigue estando elegir un archivo.
 
 ### Non-Functional Requirements
 
@@ -210,8 +223,8 @@ dispositivos que se mandan mensajes.
 ### Key Entities
 
 - **Conexión entre dispositivos**: la de un celular y una computadora emparejados, con su estado
-  (los de RF-139), el camino (directa o por el servidor), por qué no es directa si no lo es, y
-  cuándo cambió.
+  (los de RF-139), el camino (directa o por el servidor), por qué no es directa si no lo es,
+  cuándo cambió y, si la directa no se pudo, que se recuerda hasta probarla a mano.
 - **Mensaje**: lo que un dispositivo le manda al otro, con su número de orden. No se guarda en
   el servidor.
 
@@ -232,10 +245,11 @@ dispositivos que se mandan mensajes.
 ## Assumptions
 
 - Lo que viaja y sus reglas no cambian: quién se empareja, cuánto dura el vínculo, el espejo, el
-  lector, la pausa y el pedido de foto siguen como están en 002, 005 y 007.
+  lector y la pausa siguen como están en 002 y 007. Cambia una sola regla de 005 (RF-50) y de
+  002 (RF-09): la foto ya no se pide con un código QR a cualquier celular, sino al emparejado.
 - Queda para una segunda etapa (Carlos, 2026-10-24: «enfocate más que nada en la conexión»):
   avisarle al celular con la aplicación cerrada (notificaciones) y usar la huella del celular
-  para confirmar algo en la computadora. [NEEDS CLARIFICATION: confirmar; pregunta 3.]
+  para confirmar algo en la computadora.
 - La conexión directa necesita internet para armarse, porque el servidor los presenta; una vez
   armada, sigue sin internet mientras el wifi siga.
 - La conexión directa no usa servicios de terceros: si los dos no están en la misma red, va por

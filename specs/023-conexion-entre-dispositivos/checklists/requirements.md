@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Quedan tres preguntas para Carlos (cuándo se vuelve a probar la directa, la foto por QR sin emparejar y qué queda para la segunda etapa).
+- Las tres preguntas las contestó Carlos el 2026-10-24.
 - RNF-68 nombra reglas de código porque es lo que Carlos pidió del módulo; no nombra tecnologías.
