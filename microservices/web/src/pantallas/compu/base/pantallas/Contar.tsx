@@ -2,29 +2,40 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEven
 import { abrirConteo, crearSector, ordenarSectores, useConteo, useSectores, type Cierre, type Contado, type Conteo, type Sector } from "../../../../negocio/deposito/conteo";
 import { cantidadContada } from "../../../../negocio/deposito/inventario";
 import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../../../catalogo";
+import { escucharPuesto, EVENTO_EMPAREJAMIENTO, pedirLector, puestoLocal } from "../../../../puesto";
+import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
+import { urlDeFoto } from "../../../../api";
 import { fecha } from "../../../../formato";
 import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../../../unidades";
-import { Escaner, hayCamara } from "../../../../plataforma/camara/Escaner";
 import { irA } from "../rutas";
-import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Toast, Vacio, numero } from "../ui";
-import { useEsCelular } from "../vista";
-import { BuscadorDeProducto, conSigno, detalleDe, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./deposito-comun";
+import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Progreso, Toast, Vacio, numero } from "../ui";
+import { BuscadorDeProducto, conSigno, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./deposito-comun";
+import { IconoDeDeposito, type IconoDeDepositoNombre } from "../../../IconoDeDeposito";
+import { TEXTOS } from "../../../textos";
 import "../estilos/contar.css";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 
-// Conteo por sector, caminando el local con el celular en una mano: elegir el sector, buscar
-// o escanear, cuántas hay, siguiente. El sector queda abierto hasta cerrarlo (si se
-// interrumpe, se retoma); al cerrar, cada diferencia contra el sistema pasa a ser un ajuste.
+// Contar, como la v2 («Sectores y conteo», decisión 148): arriba cuánto del stock está cargado y
+// qué falta contar; a la izquierda los sectores con su estado (en curso, nunca contado, la fecha
+// del último conteo); a la derecha el sector elegido. Si tiene un conteo abierto, se cuenta ahí
+// mismo: buscar o escanear, «¿Cuántas hay?», Enter y el siguiente, con los contados (y su
+// diferencia) al lado de los que faltan. El sector queda abierto hasta cerrarlo; al cerrar, cada
+// diferencia contra el sistema pasa a ser un ajuste. Empezar a contar un sector se pide con su
+// botón: elegirlo en la lista no abre un conteo. Teclas: Alt C cierra el sector, Alt E le pide
+// el lector al celular vinculado.
 type Renglon = Contado;
+const t = TEXTOS.contar;
 
 const diasDesde = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-const cuando = (s: Sector) => (s.ultimo_conteo === null ? "Nunca contado" : diasDesde(s.ultimo_conteo) === 0 ? "Contado hoy" : diasDesde(s.ultimo_conteo) === 1 ? "Contado ayer" : `Contado hace ${diasDesde(s.ultimo_conteo)} días`);
+const cuandoCorto = (iso: string) => (diasDesde(iso) === 0 ? "hoy" : diasDesde(iso) === 1 ? "ayer" : fecha(iso).slice(0, 5));
 const claseDif = (dif: number) => (dif === 0 ? "igual" : dif < 0 ? "falta" : "sobra");
+const estadoDe = (s: Sector): { clase: string; icono: IconoDeDepositoNombre; texto: string } =>
+  s.conteo_abierto ? { clase: "en-curso", icono: "hash", texto: t.enCurso.largo } : s.ultimo_conteo === null ? { clase: "nunca", icono: "circle-dashed", texto: t.nuncaContado.largo } : { clase: "contado", icono: "check", texto: `Contado el ${fecha(s.ultimo_conteo).slice(0, 5)}` };
 
 export function Contar() {
-  const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { sectores, error: falloDeSectores, recargar: cargarSectores } = useSectores();
+  const [elegidoId, setElegidoId] = useState<string | null>(null);
   const [conteo, setConteo] = useState<Conteo | null>(null);
   const [errorAlAbrir, setError] = useState<string | null>(null);
   const error = errorAlAbrir ?? (falloDeSectores && sectores === null ? mensajeDe(falloDeSectores, "Sin conexión: no se pudieron traer los sectores. Revisá internet y tocá «Reintentar».") : null);
@@ -33,8 +44,11 @@ export function Contar() {
 
   useEffect(() => { if (enLinea && sectores === null) void cargarSectores(); }, [enLinea, sectores, cargarSectores]);
 
-  async function abrir(sectorId: string) {
-    if (abriendo) return;
+  const ordenados = useMemo(() => ordenarSectores(sectores ?? []), [sectores]);
+  // De entrada, el primero de la lista (los que tienen un conteo en curso van primero).
+  const elegido = ordenados.find((s) => s.id === elegidoId) ?? ordenados[0] ?? null;
+
+  const abrir = useCallback(async (sectorId: string) => {
     setAbriendo(sectorId);
     try {
       setConteo(await abrirConteo(sectorId));
@@ -42,24 +56,22 @@ export function Contar() {
     } catch (e) {
       setError(mensajeDe(e, "No se pudo abrir el conteo: empezar o retomar un sector necesita internet. Una vez abierto, se cuenta sin conexión."));
     } finally { setAbriendo(null); }
-  }
+  }, []);
+  // Un sector con el conteo en curso se retoma solo al elegirlo: no cambia nada, solo lo trae.
+  useEffect(() => {
+    if (!elegido) return;
+    if (conteo?.sector_id === elegido.id) return;
+    setConteo(null);
+    if (elegido.conteo_abierto && enLinea) void abrir(elegido.id);
+  }, [elegido, conteo?.sector_id, enLinea, abrir]);
 
-  const ordenados = useMemo(() => ordenarSectores(sectores ?? []), [sectores]);
-
-  if (conteo) return <ConteoDeSector conteo={conteo} alActualizar={setConteo} alSalir={() => { setConteo(null); void cargarSectores(); }} />;
-
-  const estado = (s: Sector) => (s.conteo_abierto ? <Pastilla tipo="alerta">Conteo en curso</Pastilla> : s.ultimo_conteo === null ? <Pastilla tipo="azul">Nunca contado</Pastilla> : <Pastilla tipo="ok">Contado</Pastilla>);
-  const accion = (s: Sector) => (
-    <Boton variante={s.conteo_abierto ? "marino" : undefined} tam={esCelular ? undefined : "chico"} ancho={esCelular} disabled={!enLinea || abriendo !== null} onClick={() => void abrir(s.id)} data-testid="abrir-sector"
-      aria-label={`${s.conteo_abierto ? "Retomar el conteo de" : "Contar"} ${s.nombre}`}>
-      {abriendo === s.id ? "Abriendo…" : s.conteo_abierto ? "Retomar el conteo" : "Contar"}
-    </Boton>
-  );
+  const total = ordenados.length;
+  const contados = ordenados.filter((s) => s.ultimo_conteo !== null).length;
+  const nunca = ordenados.filter((s) => s.ultimo_conteo === null && !s.conteo_abierto).length;
   const enCurso = ordenados.filter((s) => s.conteo_abierto).length;
 
   return (
-    <Pagina titulo="Contar" testId="pantalla-contar" bajada="Se cuenta de a un sector: una estantería, una pared, el mostrador. Al cerrarlo, las diferencias contra el sistema se ajustan solas."
-      acciones={sectores && sectores.length > 0 ? <AlLadoDeLasPestanas><Boton icono="mas" onClick={() => setNuevo(true)} disabled={!enLinea} data-testid="sector-nuevo">Sector nuevo</Boton></AlLadoDeLasPestanas> : undefined}>
+    <Pagina titulo="Contar" testId="pantalla-contar" className="contar-v2">
       <Aviso tipo="alerta" testId="sin-conexion">{!enLinea ? "Sin conexión: empezar o retomar un sector, y crear uno nuevo, necesitan internet. Un conteo que ya está abierto en esta pantalla se sigue contando igual." : null}</Aviso>
       <Aviso tipo="error" accion={sectores === null ? <Boton tam="chico" icono="repetir" onClick={() => void cargarSectores()}>Reintentar</Boton> : undefined}>{error}</Aviso>
       {sectores === null && !error && <Progreso texto="Trayendo los sectores…" />}
@@ -72,39 +84,72 @@ export function Contar() {
 
       {sectores && sectores.length > 0 && (
         <>
-          {enCurso > 0 && <p className="contar-en-curso"><Icono nombre="reloj" tam={18} />{enCurso === 1 ? "Hay un conteo sin cerrar: se retoma donde quedó." : `Hay ${enCurso} conteos sin cerrar: se retoman donde quedaron.`}</p>}
-          {esCelular ? (
-            <ul className="contar-sectores" data-testid="sectores">
-              {ordenados.map((s) => (
-                <li key={s.id} className={`tarjeta contar-sector ${s.conteo_abierto ? "en-curso" : ""}`} data-testid="sector">
-                  <div className="contar-sector-cabeza"><h2>{s.nombre}</h2>{estado(s)}</div>
-                  <p className="detalle">{plural(Number(s.productos), "producto", "productos")}{s.ultimo_conteo ? ` · ${cuando(s).toLowerCase()}` : ""}</p>
-                  {accion(s)}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="tabla-marco">
-              <table className="tabla contar-tabla-sectores" data-testid="sectores">
-                <thead><tr><th>Sector</th><th className="num">Productos</th><th>Último conteo</th><th>Estado</th><th><span className="solo-lectores">Contar</span></th></tr></thead>
-                <tbody>
-                  {ordenados.map((s) => (
-                    <tr key={s.id} data-testid="sector">
-                      <td className="nombre">{s.nombre}</td>
-                      <td className="num">{numero(Number(s.productos))}</td>
-                      <td>{s.ultimo_conteo ? <>{cuando(s)} <span className="detalle">· {fecha(s.ultimo_conteo)}</span></> : <span className="detalle">Nunca</span>}</td>
-                      <td>{estado(s)}</td>
-                      <td className="angosta contar-celda-accion">{accion(s)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="ct-resumenes">
+            <div className="ct-resumen" data-testid="stock-cargado">
+              <span className="ct-ico"><IconoDeDeposito nombre="layers-3" /></span>
+              <span className="ct-res-texto"><span className="ct-et">{t.stockCargado.largo}</span><span className="ct-va">{contados} <small>de {plural(total, "sector", "sectores")}</small></span>
+                <span className="ct-riel"><i style={{ width: `${total ? (contados / total) * 100 : 0}%` }} /></span></span>
             </div>
-          )}
+            <div className="ct-resumen urgente" data-testid="nunca-contados">
+              <span className="ct-ico"><IconoDeDeposito nombre="circle-dashed" /></span>
+              <span className="ct-res-texto"><span className="ct-et">{t.nuncaContados.largo}</span><span className="ct-va">{nunca} <small>{nunca === 1 ? "sector" : "sectores"}</small></span></span>
+            </div>
+            <div className="ct-resumen" data-testid="conteos-en-curso">
+              <span className="ct-ico accion"><IconoDeDeposito nombre="pause" /></span>
+              <span className="ct-res-texto"><span className="ct-et">{t.conteosEnCurso.largo}</span><span className="ct-va">{enCurso}</span></span>
+            </div>
+            <div className="ct-resumen" data-testid="hoy-toca">
+              <span className="ct-ico"><IconoDeDeposito nombre="calendar-check" /></span>
+              <span className="ct-res-texto"><span className="ct-et">{t.hoyToca.largo}</span><span className="ct-va">— <small>productos</small></span>
+                <span className="ct-riel" /></span>
+            </div>
+          </div>
+
+          <div className="ct-cuerpo">
+            <section className="ct-sectores" aria-labelledby="ct-sectores">
+              <div className="ct-sectores-cab">
+                <h2 id="ct-sectores">{t.sectores.largo} <span className="ct-cuenta">{total}</span></h2>
+                <Boton tam="chico" icono="mas" onClick={() => setNuevo(true)} disabled={!enLinea} data-testid="sector-nuevo">{t.nuevo.largo}</Boton>
+              </div>
+              <ul className="ct-lista" data-testid="sectores">
+                {ordenados.map((s) => {
+                  const e = estadoDe(s);
+                  const abierto = conteo?.sector_id === s.id ? conteo : null;
+                  return (
+                    <li key={s.id}>
+                      <button type="button" className={`ct-sector ${s.id === elegido?.id ? "elegido" : ""}`} aria-current={s.id === elegido?.id} onClick={() => setElegidoId(s.id)} data-testid="sector"
+                        aria-label={`${s.nombre}: ${e.texto}`}>
+                        <span className={`ct-sector-ico ${e.clase}`}><IconoDeDeposito nombre={e.icono} /></span>
+                        <span className="ct-sector-texto"><b>{s.nombre}</b><span><em className={e.clase}>{e.texto}</em> · {abierto ? `${abierto.renglones.length} de ${abierto.renglones.length + abierto.sin_contar.length}` : numero(Number(s.productos))}</span></span>
+                        <span className="ct-sector-cuando">{abierto?.abierto_en ? cuandoCorto(abierto.abierto_en) : ""}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+
+            <section className="ct-panel" aria-label={elegido?.nombre}>
+              {elegido && conteo?.sector_id === elegido.id
+                ? <ConteoDeSector key={conteo.id} conteo={conteo} alActualizar={setConteo} alCerrado={() => void cargarSectores()} alOtro={() => { setConteo(null); setElegidoId(ordenados.find((s) => s.id !== elegido.id && !s.conteo_abierto)?.id ?? null); }} />
+                : elegido && (
+                  <div className="ct-sin-abrir">
+                    <h2>{elegido.nombre}</h2>
+                    <p className="detalle">{plural(Number(elegido.productos), "producto", "productos")} · {elegido.ultimo_conteo ? `contado por última vez el ${fecha(elegido.ultimo_conteo)}` : "nunca se contó"}</p>
+                    {abriendo === elegido.id ? <Progreso texto="Abriendo el conteo…" /> : (
+                      <Boton variante="principal" tam="grande" icono="contar" disabled={!enLinea || abriendo !== null} onClick={() => void abrir(elegido.id)} data-testid="abrir-sector" aria-label={`${elegido.conteo_abierto ? "Retomar el conteo de" : "Contar"} ${elegido.nombre}`}>
+                        {elegido.conteo_abierto ? "Retomar el conteo" : "Empezar a contar"}
+                      </Boton>
+                    )}
+                    <p className="detalle">Se cuenta de a un producto: lo buscás o lo escaneás, ponés cuántas hay y pasás al siguiente. Al cerrar el sector, las diferencias contra el sistema se ajustan solas.</p>
+                  </div>
+                )}
+            </section>
+          </div>
         </>
       )}
 
-      {nuevo && <SectorNuevo alCerrar={() => setNuevo(false)} alCrear={async (idNuevo) => { setNuevo(false); await cargarSectores(); await abrir(idNuevo); }} />}
+      {nuevo && <SectorNuevo alCerrar={() => setNuevo(false)} alCrear={async (idNuevo) => { setNuevo(false); await cargarSectores(); setElegidoId(idNuevo); await abrir(idNuevo); }} />}
     </Pagina>
   );
 }
@@ -143,16 +188,15 @@ function SectorNuevo({ alCerrar, alCrear }: { alCerrar: () => void; alCrear: (id
   );
 }
 
-function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alActualizar: (c: Conteo) => void; alSalir: () => void }) {
-  const esCelular = useEsCelular();
+// El conteo abierto del sector elegido, a la derecha de la lista.
+function ConteoDeSector({ conteo, alActualizar, alCerrado, alOtro }: { conteo: Conteo; alActualizar: (c: Conteo) => void; alCerrado: () => void; alOtro: () => void }) {
   const enLinea = useEnLinea();
-  const { catalogo, error: errorCatalogo, buscarProductos } = useCatalogo();
+  const { error: errorCatalogo, buscarProductos } = useCatalogo();
   const [consulta, setConsulta] = useState("");
   const [producto, setProducto] = useState<Producto | null>(null);
   const [cantidad, setCantidad] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [cerrando, setCerrando] = useState(false);
-  const [escaneando, setEscaneando] = useState(false);
   const [resultado, setResultado] = useState<{ cierre: Cierre; ajustes: Renglon[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorCantidad, setErrorCantidad] = useState<string | null>(null);
@@ -165,12 +209,11 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 6) : []), [buscarProductos, consulta]);
 
-  // En la computadora el foco va y vuelve solo: buscador, cantidad, buscador. En el celular
-  // solo se abre el teclado para la cantidad: después de «Siguiente» se puede escanear.
+  // El foco va y vuelve solo: buscador, cantidad, buscador.
   useEffect(() => {
     if (producto) { cajaCantidad.current?.focus(); cajaCantidad.current?.select(); }
-    else if (!esCelular) caja.current?.focus();
-  }, [producto, catalogo, esCelular]);
+    else caja.current?.focus();
+  }, [producto]);
 
   useEffect(() => { if (enLinea && enElDispositivo.size) void recargar(); }, [enLinea, enElDispositivo.size, recargar]);
 
@@ -186,15 +229,29 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
     });
   };
   const alDetectar = useCallback((codigo: string) => {
-    setEscaneando(false);
     void traerPorCodigo(codigo).then((p) => {
       if (p) elegir(p); else setError(`El código ${codigo} no está en el catálogo. Buscá el producto por su nombre.`);
     }).catch((e: Error) => setError(e.message));
   }, [elegir]);
 
+  // Lo que lee el celular vinculado elige el producto (decisión 59).
+  const [emparejado, setEmparejado] = useState(() => puestoLocal()?.id ?? null);
+  useEffect(() => { const mirar = () => setEmparejado(puestoLocal()?.id ?? null); window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar); return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); }, []);
+  const lector = useRef(alDetectar);
+  useEffect(() => { lector.current = alDetectar; }, [alDetectar]);
+  useEffect(() => { if (!emparejado || resultado) return; return escucharPuesto(emparejado, (codigo) => lector.current(codigo), undefined, true); }, [emparejado, resultado]);
+  const [lectorPedido, setLectorPedido] = useState<boolean | null>(null);
+  const pedirAlCelular = useCallback(() => { void pedirLector().then(setLectorPedido); }, []);
+
+  const teclas = useCallback((e: globalThis.KeyboardEvent) => {
+    if (document.querySelector("dialog[open]") || !e.altKey || resultado) return;
+    if (e.code === "KeyC" && conteo.renglones.length > 0) { e.preventDefault(); setCerrando(true); }
+    else if (e.code === "KeyE" && emparejado) { e.preventDefault(); pedirAlCelular(); }
+  }, [conteo.renglones.length, emparejado, pedirAlCelular, resultado]);
+  useTeclasGlobales(teclas);
+
   const unidad = unidadDe(producto);
   const leida = producto ? cantidadContada(cantidad, producto) : NaN;
-  const mover = (paso: number) => { setCantidad(String(Math.max(0, Math.round(((Number.isNaN(leida) ? 0 : leida) + paso) * 10) / 10)).replace(".", ",")); setErrorCantidad(null); cajaCantidad.current?.focus(); };
 
   async function guardar(e?: FormEvent) {
     e?.preventDefault();
@@ -224,158 +281,151 @@ function ConteoDeSector({ conteo, alActualizar, alSalir }: { conteo: Conteo; alA
   if (resultado) {
     const { cierre, ajustes } = resultado;
     return (
-      <Pagina titulo={conteo.sector} testId="pantalla-contar" className="contar-conteo">
-        <section className="tarjeta contar-resultado">
+      <div className="ct-conteo">
+        <section className="contar-resultado">
           <div className="contar-tilde"><Icono nombre="tilde" tam={34} grosor={3} /></div>
           <h2>{conteo.sector}: conteo cerrado</h2>
           <p role="status" data-testid="resultado-conteo">{plural(cierre.contados, "producto contado", "productos contados")}, {cierre.ajustados} con diferencia ajustada{cierre.puestos_en_cero ? `, ${plural(cierre.puestos_en_cero, "puesto", "puestos")} en cero` : ""}.</p>
           <div className="contar-resultado-botones">
-            <Boton variante="principal" tam="grande" autoFocus onClick={alSalir} data-testid="otro-sector">Contar otro sector</Boton>
+            <Boton variante="principal" tam="grande" autoFocus onClick={alOtro} data-testid="otro-sector">Contar otro sector</Boton>
             <Boton icono="stock" onClick={() => irA("stock")}>Ver el stock</Boton>
           </div>
         </section>
         {ajustes.length > 0 ? (
           <section className="contar-ajustes" aria-labelledby={`${id}-ajustes`}>
-            <h2 id={`${id}-ajustes`} className="seccion-titulo">Ajustes que se aplicaron al stock</h2>
-            <ul className="lista" data-testid="ajustes">
+            <h3 id={`${id}-ajustes`} className="ct-col-titulo">Ajustes que se aplicaron al stock</h3>
+            <ul className="ct-renglones" data-testid="ajustes">
               {ajustes.map((r) => {
                 const dif = Number(r.cantidad_contada) - Number(r.stock_teorico);
                 return (
-                  <li key={r.producto_id} className="renglon">
-                    <span className="nombre">{r.descripcion}</span>
-                    <span className={`deposito-dif ${claseDif(dif)}`}>{conSigno(dif)} {abreviarUnidad(r.unidad || "unidad")}</span>
-                    <span className="detalle">Había {conUnidad(r.stock_teorico, r.unidad)}, hay {conUnidad(r.cantidad_contada, r.unidad)}</span>
+                  <li key={r.producto_id} className="ct-renglon">
+                    <FotoChica id={r.producto_id} />
+                    <span className="ct-r-texto"><b>{r.descripcion}</b><span>Había {conUnidad(r.stock_teorico, r.unidad)}, hay {conUnidad(r.cantidad_contada, r.unidad)}</span></span>
+                    <span className={`ct-dif ${claseDif(dif)}`}><b>{conSigno(dif)}</b><small>{abreviarUnidad(r.unidad || "unidad")}</small></span>
                   </li>
                 );
               })}
             </ul>
           </section>
         ) : <p className="detalle">Todo lo contado coincidía con el sistema: no hizo falta ningún ajuste.</p>}
-      </Pagina>
+      </div>
     );
   }
 
   const previo = producto ? contadoPorId.get(producto.id) : undefined;
-  const botonCerrar = (
-    <Boton variante="marino" tam={esCelular ? "grande" : undefined} ancho={esCelular} icono="tilde" disabled={conteo.renglones.length === 0} onClick={() => setCerrando(true)} data-testid="cerrar">Cerrar {conteo.sector}</Boton>
-  );
+  const totalDelSector = conteo.renglones.length + conteo.sin_contar.length;
 
   return (
-    <Pagina titulo={conteo.sector} testId="pantalla-contar" className={`contar-conteo ${esCelular && !producto ? "deposito-con-pie" : ""}`}
-      acciones={<><Boton icono="izquierda" onClick={alSalir} data-testid="volver">Volver</Boton>{!esCelular && botonCerrar}</>}
-      bajada={<span className="contar-avance" data-testid="avance"><Pastilla tipo="ok">{plural(conteo.renglones.length, "contado", "contados")}</Pastilla><Pastilla>{conteo.sin_contar.length} sin contar</Pastilla>{conDiferencia.length > 0 && <Pastilla tipo="alerta">{conDiferencia.length} con diferencia</Pastilla>}</span>}>
+    <div className="ct-conteo" data-testid="conteo">
+      <AlLadoDeLasPestanas>
+        <div className="ct-acciones">
+          {emparejado && <Boton tam="chico" onClick={pedirAlCelular} data-testid="pedir-lector"><IconoDeDeposito nombre="scan-barcode" tam={16} />{t.escanearConElCelular.largo} <kbd className="tecla">Alt E</kbd></Boton>}
+          <Boton tam="chico" variante="principal" className="ct-cerrar" disabled={conteo.renglones.length === 0} onClick={() => setCerrando(true)} data-testid="cerrar"><IconoDeDeposito nombre="square-check-big" tam={16} />{t.cerrarElSector.largo} <kbd className="tecla">Alt C</kbd></Boton>
+        </div>
+      </AlLadoDeLasPestanas>
+      <div className="ct-cab">
+        <div><h2>{conteo.sector}</h2><p className="detalle">{conteo.abierto_en ? `Abierto el ${fecha(conteo.abierto_en)} · ` : ""}lo seguís desde acá o desde el celular</p></div>
+        <div className="ct-avance" data-testid="avance">
+          <span><span>{t.contados.largo}</span><b>{conteo.renglones.length} <small>de {totalDelSector}</small></b></span>
+          <span className="ct-riel oscuro"><i style={{ width: `${totalDelSector ? (conteo.renglones.length / totalDelSector) * 100 : 0}%` }} /></span>
+          {conDiferencia.length > 0 && <span className="ct-con-dif">{plural(conDiferencia.length, "con diferencia", "con diferencia")}</span>}
+        </div>
+      </div>
       <Aviso tipo="alerta" testId="sin-conexion">{!enLinea ? "Sin conexión: seguí contando. Lo contado queda guardado en este dispositivo y se manda solo al volver internet; cerrar el sector necesita conexión." : null}</Aviso>
       <Aviso tipo="error">{errorCatalogo}</Aviso>
       <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
+      {lectorPedido !== null && <Aviso tipo={lectorPedido ? "info" : "alerta"}>{lectorPedido ? "Abrí Ferrebress en el celular y tocá «Abrir el lector»." : "No se pudo avisar al celular."}</Aviso>}
 
-      <div className="contar-cuerpo">
-        <div className="contar-puesto">
-          {producto ? (
-            <form className="tarjeta contar-contando" onSubmit={guardar} noValidate data-testid="contando" onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); setProducto(null); } }}>
-              <div>
-                <h2>{producto.descripcion}</h2>
-                <p className="detalle">{[producto.marca, producto.codigo_proveedor].filter(Boolean).join(" · ") || detalleDe(producto) || "Sin marca"}</p>
-              </div>
-              {previo && <p className="contar-previo" data-testid="ya-contado"><Icono nombre="info" tam={18} />Ya lo contaste: pusiste {conUnidad(previo.cantidad_contada, previo.unidad)}. Lo que pongas ahora lo reemplaza.</p>}
-              <label className="contar-cuantas" htmlFor={`${id}-cantidad`}>¿Cuántas hay?{!enteras(unidad) && <span className="detalle"> En {nombreUnidad(unidad)}, con un decimal.</span>}</label>
-              <div className="contar-numero">
-                <button type="button" aria-label="Una menos" onClick={() => mover(-1)}><Icono nombre="menos" tam={22} grosor={2.4} /></button>
-                <input ref={cajaCantidad} id={`${id}-cantidad`} inputMode={enteras(unidad) ? "numeric" : "decimal"} enterKeyHint="next" autoComplete="off" placeholder="0" value={cantidad}
-                  onChange={(e) => { setCantidad(e.target.value.replace(enteras(unidad) ? /[^\d]/g : /[^\d,.]/g, "")); setErrorCantidad(null); }}
-                  aria-invalid={Boolean(errorCantidad)} aria-describedby={errorCantidad ? `${id}-falta` : undefined} data-testid="cantidad" />
-                <button type="button" aria-label="Una más" onClick={() => mover(1)}><Icono nombre="mas" tam={22} grosor={2.4} /></button>
-              </div>
-              {errorCantidad && <p className="contar-falta" id={`${id}-falta`} role="alert">{errorCantidad}</p>}
-              <Aviso tipo="error">{error}</Aviso>
-              <div className="contar-contando-botones">
-                <Boton onClick={() => setProducto(null)} disabled={guardando}>Cancelar</Boton>
-                <Boton type="submit" variante="principal" tam="grande" disabled={guardando} tecla="Enter" data-testid="siguiente">{guardando ? "Guardando…" : "Siguiente"}</Boton>
-              </div>
-              {previo && <div><Boton variante="peligro" tam="chico" icono="basura" onClick={() => void quitar()} disabled={guardando} data-testid="quitar-contado">Quitar de lo contado</Boton></div>}
-            </form>
-          ) : (
-            <>
-              <BuscadorDeProducto consulta={consulta} alCambiar={(v) => { setConsulta(v); setError(null); }} resultados={resultados} alElegir={elegir} cajaRef={caja}
-                placeholder={esCelular ? (hayCamara() ? "Buscá o escaneá" : "Buscá el producto") : hayCamara() ? "Buscá o escaneá el producto" : "Buscá el producto"} alEscanear={hayCamara() ? () => setEscaneando(true) : undefined}
-                aLaDerecha={(p) => (contadoPorId.has(p.id) ? <Pastilla tipo="ok">Ya contado: {conUnidad(contadoPorId.get(p.id)!.cantidad_contada, p.unidad)}</Pastilla> : null)} />
-              <Aviso tipo="error" testId="error-conteo">{error}</Aviso>
-              <p className="detalle solo-compu">Flechas y Enter para elegir; después la cantidad y Enter otra vez. Escape limpia.</p>
-              {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} />}
-            </>
-          )}
-        </div>
-
-        <div className="contar-listas">
-          <section aria-labelledby={`${id}-contados`} className="pila">
-            <h2 id={`${id}-contados`} className="seccion-titulo">Contados <span className="detalle">· {conteo.renglones.length}</span></h2>
-            {conteo.renglones.length === 0 ? (
-              <Vacio icono="contar" titulo="Buscá o escaneá el primer producto">Empezá por una punta de la estantería y andá de a un producto: lo buscás, ponés cuántas hay y pasás al siguiente.</Vacio>
-            ) : esCelular ? (
-              <ul className="lista" data-testid="contados">
-                {conteo.renglones.map((r) => {
-                  const dif = Number(r.cantidad_contada) - Number(r.stock_teorico);
-                  return (
-                    <li key={r.producto_id}>
-                      <button type="button" className="renglon" onClick={() => elegirPorId(r.producto_id, r.descripcion)} aria-label={`${r.descripcion}: hay ${conUnidad(r.cantidad_contada, r.unidad)}. Corregir`}>
-                        <span className="nombre">{r.descripcion}</span>
-                        <span className="contar-contado"><span className="importe">{conUnidad(r.cantidad_contada, r.unidad)}</span><span className={`deposito-dif ${claseDif(dif)}`}>{conSigno(dif)} {abreviarUnidad(r.unidad || "unidad")}</span></span>
-                        <span className="detalle">{dif === 0 ? `Coincide con el sistema${r.marca ? ` · ${r.marca}` : ""}` : `Había ${conUnidad(r.stock_teorico, r.unidad)}, hay ${conUnidad(r.cantidad_contada, r.unidad)}${r.marca ? ` · ${r.marca}` : ""}`}{enElDispositivo.has(r.producto_id) && <> <Pastilla tipo="alerta">Se manda al volver internet</Pastilla></>}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <div className="tabla-marco">
-                <table className="tabla contar-tabla" data-testid="contados">
-                  <thead><tr><th>Producto</th><th className="num">Hay</th><th className="num">Había</th><th className="num">Diferencia</th><th><span className="solo-lectores">Corregir</span></th></tr></thead>
-                  <tbody>
-                    {conteo.renglones.map((r) => {
-                      const dif = Number(r.cantidad_contada) - Number(r.stock_teorico);
-                      return (
-                        <tr key={r.producto_id} data-testid="contado">
-                          <td><span className="nombre">{r.descripcion}</span>{r.marca && <span className="detalle"> · {r.marca}</span>}{enElDispositivo.has(r.producto_id) && <div><Pastilla tipo="alerta">Se manda al volver internet</Pastilla></div>}</td>
-                          <td className="num"><span className="importe chico">{conUnidad(r.cantidad_contada, r.unidad)}</span></td>
-                          <td className="num">{conUnidad(r.stock_teorico, r.unidad)}</td>
-                          <td className="num">{dif === 0 ? <span className="deposito-dif igual" title="Coincide con el sistema">=</span> : (
-                            <Explicado className={`deposito-dif ${claseDif(dif)}`} valor={conSigno(dif)} titulo={`Diferencia de ${r.descripcion}`} pasos={[`Según el sistema había ${conUnidad(r.stock_teorico, r.unidad)}.`, `Contaste ${conUnidad(r.cantidad_contada, r.unidad)}.`, `Diferencia: ${conSigno(dif)}. Al cerrar el sector se aplica al stock como un ajuste.`]} />
-                          )}</td>
-                          <td className="angosta"><Boton tam="chico" icono="editar" onClick={() => elegirPorId(r.producto_id, r.descripcion)} aria-label={`Corregir lo contado de ${r.descripcion}`}>Corregir</Boton></td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-
-          {conteo.sin_contar.length > 0 && (
-            <Plegable titulo="Sin contar todavía" extra={String(conteo.sin_contar.length)} testId="sin-contar" relleno={false}>
-              <ul className="contar-sin-contar">
-                {conteo.sin_contar.map((p) => (
-                  <li key={p.producto_id}>
-                    <button type="button" className="renglon" onClick={() => elegirPorId(p.producto_id, p.descripcion)} aria-label={`Contar ${p.descripcion}`}>
-                      <span className="nombre">{p.descripcion}</span>
-                      <span className="contar-tocar">Contar<Icono nombre="derecha" tam={16} grosor={2.4} /></span>
-                      <span className="detalle">{[p.marca, `el sistema dice ${conUnidad(p.stock_teorico, p.unidad)}`].filter(Boolean).join(" · ")}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </Plegable>
-          )}
-        </div>
+      <div className="ct-buscar">
+        <BuscadorDeProducto consulta={consulta} alCambiar={(v) => { setConsulta(v); setError(null); }} resultados={resultados} alElegir={elegir} cajaRef={caja}
+          placeholder={t.buscar.largo}
+          aLaDerecha={(p) => (contadoPorId.has(p.id) ? <span className="ct-pastilla">Ya contado: {conUnidad(contadoPorId.get(p.id)!.cantidad_contada, p.unidad)}</span> : null)} />
+        {!consulta && <span className="ct-ayuda detalle" aria-hidden="true">{t.ayudaBuscar.largo}</span>}
       </div>
+      <Aviso tipo="error" testId="error-conteo">{error}</Aviso>
 
-      {esCelular && !producto && <div className="deposito-pie contar-pie">{botonCerrar}</div>}
+      {producto && (
+        <form className="ct-contando" onSubmit={guardar} noValidate data-testid="contando" onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); setProducto(null); } }}>
+          <FotoChica id={producto.id} grande />
+          <div className="ct-contando-texto">
+            <b>{producto.descripcion}</b>
+            <span className="detalle">{[producto.marca, producto.codigo_proveedor && `Cód. ${producto.codigo_proveedor}`].filter(Boolean).join(" · ") || "Sin marca"}</span>
+            {previo && <span className="ct-previo" data-testid="ya-contado"><IconoDeDeposito nombre="history" tam={16} />Antes {conUnidad(previo.cantidad_contada, previo.unidad)}: lo que pongas lo reemplaza</span>}
+          </div>
+          <label className="ct-cuantas" htmlFor={`${id}-cantidad`}>
+            <span>¿Cuántas hay?</span>
+            <input ref={cajaCantidad} id={`${id}-cantidad`} inputMode={enteras(unidad) ? "numeric" : "decimal"} enterKeyHint="next" autoComplete="off" placeholder="0" value={cantidad}
+              onChange={(e) => { setCantidad(e.target.value.replace(enteras(unidad) ? /[^\d]/g : /[^\d,.]/g, "")); setErrorCantidad(null); }}
+              aria-invalid={Boolean(errorCantidad)} aria-describedby={errorCantidad ? `${id}-falta` : undefined} data-testid="cantidad" />
+            <small>{nombreUnidad(unidad)}</small>
+          </label>
+          <Boton type="submit" variante="marino" className="ct-siguiente" disabled={guardando} data-testid="siguiente">{guardando ? "Guardando…" : "Siguiente"} <kbd className="tecla">Enter</kbd></Boton>
+          <div className="ct-contando-pie">
+            {errorCantidad && <p className="contar-falta" id={`${id}-falta`} role="alert">{errorCantidad}</p>}
+            {!enteras(unidad) && <span className="detalle">En {nombreUnidad(unidad)}, con un decimal.</span>}
+            <Boton tam="chico" onClick={() => setProducto(null)} disabled={guardando}>Cancelar <kbd className="tecla">Esc</kbd></Boton>
+            {previo && <Boton variante="peligro" tam="chico" icono="basura" onClick={() => void quitar()} disabled={guardando} data-testid="quitar-contado">Quitar de lo contado</Boton>}
+          </div>
+        </form>
+      )}
+
+      <div className="ct-columnas">
+        <section aria-labelledby={`${id}-contados`}>
+          <div className="ct-col-cab"><h3 id={`${id}-contados`} className="ct-col-titulo">{t.contados.largo} <span className="ct-cuenta">{conteo.renglones.length}</span></h3><span className="detalle">el último arriba</span></div>
+          {conteo.renglones.length === 0 ? (
+            <Vacio icono="contar" titulo="Buscá o escaneá el primer producto">Empezá por una punta de la estantería y andá de a un producto.</Vacio>
+          ) : (
+            <ul className="ct-renglones" data-testid="contados">
+              {conteo.renglones.map((r) => {
+                const dif = Number(r.cantidad_contada) - Number(r.stock_teorico);
+                return (
+                  <li key={r.producto_id} data-testid="contado" className={`ct-renglon ${producto?.id === r.producto_id ? "elegido" : ""}`}>
+                    <button type="button" className="ct-r-boton" onClick={() => elegirPorId(r.producto_id, r.descripcion)} aria-label={`${r.descripcion}: hay ${conUnidad(r.cantidad_contada, r.unidad)}. Corregir`}>
+                      <FotoChica id={r.producto_id} />
+                      <span className="ct-r-texto"><b>{r.descripcion}</b><span>Contaste {conUnidad(r.cantidad_contada, r.unidad)} · había {numero(Number(r.stock_teorico))}{enElDispositivo.has(r.producto_id) && " · se manda al volver internet"}</span></span>
+                    </button>
+                      {dif === 0 ? <span className="ct-dif igual" title="Coincide con el sistema"><b>=</b><small>igual</small></span> : (
+                        <span className={`ct-dif ${claseDif(dif)}`}>
+                          <Explicado valor={conSigno(dif)} titulo={`Diferencia de ${r.descripcion}`} pasos={[`Según el sistema había ${conUnidad(r.stock_teorico, r.unidad)}.`, `Contaste ${conUnidad(r.cantidad_contada, r.unidad)}.`, `Diferencia: ${conSigno(dif)}. Al cerrar el sector se aplica al stock como un ajuste.`]} />
+                          <small>{Number.isInteger(dif) ? "ajusta" : abreviarUnidad(r.unidad || "unidad")}</small>
+                        </span>
+                      )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+        <section aria-labelledby={`${id}-sin-contar`} data-testid="sin-contar">
+          <div className="ct-col-cab"><h3 id={`${id}-sin-contar`} className="ct-col-titulo">{t.sinContar.largo} <span className="ct-cuenta urgente">{conteo.sin_contar.length}</span></h3><span className="detalle">tocá uno para contarlo</span></div>
+          {conteo.sin_contar.length === 0 ? <p className="detalle">Ya contaste todo el sector.</p> : (
+            <ul className="ct-renglones">
+              {conteo.sin_contar.map((p) => (
+                <li key={p.producto_id}>
+                  <button type="button" className="ct-renglon" onClick={() => elegirPorId(p.producto_id, p.descripcion)} aria-label={`Contar ${p.descripcion}`}>
+                    <FotoChica id={p.producto_id} />
+                    <span className="ct-r-texto"><b>{p.descripcion}</b><span>{[p.marca, `el sistema dice ${conUnidad(p.stock_teorico, p.unidad)}`].filter(Boolean).join(" · ")}</span></span>
+                    <IconoDeDeposito nombre="chevron-right" className="ct-flecha" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
 
       {cerrando && (
         <CerrarSector conteo={conteo} cerrarConteo={cerrar} conDiferencia={conDiferencia.length} enLinea={enLinea} pendientes={enElDispositivo.size} alCerrar={() => setCerrando(false)}
-          alCerrado={(cierre) => { setCerrando(false); setResultado({ cierre, ajustes: conDiferencia }); }} />
+          alCerrado={(cierre) => { setCerrando(false); setResultado({ cierre, ajustes: conDiferencia }); alCerrado(); }} />
       )}
-    </Pagina>
+    </div>
   );
+}
+
+// La foto del producto si este dispositivo la tiene; si no, el ícono de la v2.
+function FotoChica({ id, grande }: { id: string; grande?: boolean }) {
+  const url = urlDeFoto(productoEnMemoria(id)?.foto_url ?? null);
+  return <span className={`ct-foto ${grande ? "grande" : ""}`}>{url ? <img src={url} alt="" loading="lazy" /> : <IconoDeDeposito nombre="hash" tam={grande ? 22 : 18} />}</span>;
 }
 
 // Cerrar no se deshace: antes muestra qué se contó, qué tiene diferencia y qué quedó sin

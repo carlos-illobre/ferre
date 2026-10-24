@@ -288,6 +288,27 @@ sector.
 - Error: nombre de sector repetido o vacío, cantidad que no es un número mayor o igual a
   cero, conteo que ya cerró otro usuario; cada uno en su lugar.
 
+**Cómo se ve: la v2 (decisión 148, 2026-10-24).** Es la variante 1 de la maqueta del director
+de arte, «Sectores y conteo» en la computadora y «Seguí donde quedaste» en el celular.
+
+- Computadora: arriba, cuatro números: stock cargado (cuántos sectores se contaron alguna vez,
+  de cuántos, con su barra), nunca contados (amarillo), conteos en curso y hoy toca. A la
+  izquierda «Sectores» con su cuenta y «Nuevo», y cada sector con su ícono y su estado: en
+  curso (naranja), nunca contado (amarillo) o «Contado el 12/10». A la derecha, el sector
+  elegido: si tiene un conteo en curso se retoma ahí mismo (nombre, cuándo se abrió, la barra
+  «Contados N de M», el buscador, el producto elegido con «¿Cuántas hay?», «Siguiente» con
+  Enter y «Antes N» si ya se había contado, y abajo, lado a lado, «Contados» con su
+  diferencia —el último arriba— y «Sin contar», que se tocan para contarlos); si no, su resumen
+  y «Empezar a contar»: elegirlo en la lista no abre un conteo. Arriba, al lado de las
+  pestañas, «Escanear con el celular» (Alt E, si hay uno vinculado) y «Cerrar el sector»
+  (Alt C). El cierre y su resultado no cambian.
+- Celular: arriba «Seguí donde quedaste» con el anillo de avance del conteo a medias y cuántos
+  faltan; «Hoy toca contar»; «Sectores» con cuántos se contaron y «+», y cada sector con su
+  ícono y estado. Fijos al pulgar, encima del menú, escanear y «Seguir contando». El conteo de
+  un sector, por dentro, sigue como estaba (la v2 no lo dibujó).
+- Quedan vacíos hasta que se programen (E02): «Hoy toca» (el plan A B C de la historia 10) y
+  quién abrió el conteo.
+
 ## Historia 5: cargar la factura con una foto (Comprador)
 
 **Tiene que poder:** desde el ingreso de mercadería, sacar o elegir la foto de la factura;

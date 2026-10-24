@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent }
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { detalleDelRegistro, diferenciaConLaLista, useIngreso } from "../../negocio/deposito/ingreso";
 import { cantidadContada } from "../../negocio/deposito/inventario";
-import { abrirConteo, crearSector as crearSectorNuevo, useConteo, useSectores, type Conteo } from "../../negocio/deposito/conteo";
+import { abrirConteo, crearSector as crearSectorNuevo, ordenarSectores, useConteo, useSectores, type Conteo } from "../../negocio/deposito/conteo";
 import { AvisoDePedido, Pedidos, usePedidoAIngresar } from "../Pedidos";
 import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
@@ -11,12 +11,15 @@ import { FotoDeProducto } from "./FotoDeProducto";
 import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
 import { ErrorApi } from "../../api";
 import { busquedaAlDia, esperarBusqueda, productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../catalogo";
-import { pesos, pesosCortos, porcentaje } from "../../formato";
+import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
 import { irA } from "../../rutas";
 import { cantidadValida, conUnidad, enteras, unidadDe } from "../../unidades";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Stock } from "./Stock";
+import { IconoDeDeposito } from "../IconoDeDeposito";
+import { TEXTOS } from "../textos";
+import "./contar.css";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import type { Producto } from "./pantallas/Productos";
 
@@ -185,6 +188,10 @@ function Contar() {
   const [aviso, setError] = useState<string | null>(null);
   const error = aviso ?? (!fallo || fallo === cerrado ? null : fallo instanceof ErrorApi ? fallo.message : "Sin conexión con el servidor.");
   const [nuevo, setNuevo] = useState(false);
+  // El conteo a medias, para mostrar cuánto falta: retomarlo solo lo trae, no cambia nada.
+  const enCurso = ordenarSectores(sectores).find((s) => s.conteo_abierto) ?? null;
+  const [retomable, setRetomable] = useState<Conteo | null>(null);
+  useEffect(() => { if (enCurso && retomable?.sector_id !== enCurso.id) abrirConteo(enCurso.id).then(setRetomable).catch(() => undefined); }, [enCurso, retomable?.sector_id]);
 
   async function abrir(sectorId: string) {
     try {
@@ -200,24 +207,50 @@ function Contar() {
     } catch (err) { setError((err as Error).message); }
   }
 
-  if (conteo) return <ConteoDeSector conteo={conteo} alActualizar={setConteo} alSalir={() => { setConteo(null); void cargarSectores(); }} />;
+  if (conteo) return <ConteoDeSector conteo={conteo} alActualizar={setConteo} alSalir={() => { setConteo(null); setRetomable(null); void cargarSectores(); }} />;
 
+  // Como la v2 (decisión 148): primero el conteo a medias, con su avance y «Seguir contando» al
+  // pulgar; después lo que toca hoy y los sectores con su estado.
+  const ordenados = ordenarSectores(sectores);
+  const contados = ordenados.filter((s) => s.ultimo_conteo !== null).length;
+  const avance = retomable ? retomable.renglones.length / Math.max(1, retomable.renglones.length + retomable.sin_contar.length) : 0;
+  const tc = TEXTOS.contar;
   return (
-    <>
-      <p className="subtitulo">Se cuenta de a un sector. Al cerrarlo, las diferencias contra el stock teórico se ajustan solas.</p>
+    <div className="ctc">
       <AvisoError texto={error} alCerrar={() => { setError(null); setCerrado(fallo); }} />
-      <div className="sectores" data-testid="sectores">
-        {sectores.map((s) => {
-          const dias = s.ultimo_conteo ? Math.floor((Date.now() - new Date(s.ultimo_conteo).getTime()) / 86400000) : null;
+      {enCurso && (
+        <button type="button" className="ctc-seguir" onClick={() => void abrir(enCurso.id)} data-testid="segui-donde-quedaste">
+          <span className="ctc-anillo" style={{ background: `conic-gradient(var(--p-naranja) ${avance * 360}deg, var(--p-relleno) 0)` }}><span>{retomable ? `${Math.round(avance * 100)}%` : "—"}</span></span>
+          <span className="ctc-seguir-texto"><em><IconoDeDeposito nombre="pause" tam={16} />{tc.seguiDondeQuedaste.corto}</em><b>{enCurso.nombre}</b>
+            <span>{retomable ? `Faltan ${retomable.sin_contar.length}${retomable.abierto_en ? ` · abierto el ${fecha(retomable.abierto_en).slice(0, 5)}` : ""}` : `${enCurso.productos} productos`}</span></span>
+        </button>
+      )}
+      <div className="ctc-hoy" data-testid="hoy-toca">
+        <div className="ctc-hoy-cab"><IconoDeDeposito nombre="calendar-check" /><b>{tc.hoyTocaContar.corto} —</b></div>
+        <span className="ctc-riel" />
+      </div>
+      <div className="ctc-cab"><h2>{tc.sectores.corto}</h2><span>{contados} de {ordenados.length} contados</span>
+        <button type="button" className="ctc-mas" onClick={() => setNuevo(true)} aria-label="Sector nuevo" data-testid="sector-nuevo"><IconoDeDeposito nombre="plus" /></button></div>
+      <ul className="ctc-lista" data-testid="sectores">
+        {ordenados.filter((s) => s.id !== enCurso?.id).map((s) => {
+          const clase = s.conteo_abierto ? "en-curso" : s.ultimo_conteo === null ? "nunca" : "contado";
           return (
-            <button key={s.id} type="button" className={`sector ${s.conteo_abierto ? "abierto" : dias === null ? "nunca" : ""}`} onClick={() => abrir(s.id)}>
-              <strong>{s.nombre}</strong>
-              <span className="pie"><span>{s.productos} productos</span><span>{s.conteo_abierto ? "conteo en curso" : dias === null ? "nunca contado" : dias === 0 ? "contado hoy" : `contado hace ${dias} días`}</span></span>
-            </button>
+            <li key={s.id}>
+              <button type="button" className="ctc-sector" onClick={() => void abrir(s.id)} data-testid="sector">
+                <span className={`ctc-ico ${clase}`}><IconoDeDeposito nombre={s.conteo_abierto ? "pause" : s.ultimo_conteo === null ? "circle-dashed" : "check"} /></span>
+                <span className="ctc-texto"><b>{s.nombre}</b><span><em className={clase}>{s.conteo_abierto ? tc.enCurso.corto : s.ultimo_conteo === null ? tc.nuncaContado.corto : `Contado el ${fecha(s.ultimo_conteo).slice(0, 5)}`}</em> · {s.productos}</span></span>
+                <IconoDeDeposito nombre="chevron-right" className="ctc-flecha" />
+              </button>
+            </li>
           );
         })}
-        <button type="button" className="sector nuevo" onClick={() => setNuevo(true)} data-testid="sector-nuevo">+ Sector nuevo</button>
-      </div>
+      </ul>
+      {enCurso && (
+        <div className="ctc-pie">
+          <button type="button" className="ctc-escanear" onClick={() => void abrir(enCurso.id)} aria-label={`Escanear en ${enCurso.nombre}`}><IconoDeDeposito nombre="scan-barcode" tam={26} /></button>
+          <button type="button" className="ctc-seguir-boton" onClick={() => void abrir(enCurso.id)} data-testid="seguir-contando">{tc.seguirContando.corto}<IconoDeDeposito nombre="arrow-right" /></button>
+        </div>
+      )}
       {nuevo && (
         <Hoja titulo="Sector nuevo" alCerrar={() => setNuevo(false)}>
           <form className="formulario" onSubmit={(e) => { e.preventDefault(); const n = String(new FormData(e.currentTarget).get("nombre") ?? "").trim(); if (n) void crearSector(n); }}>
@@ -226,7 +259,7 @@ function Contar() {
           </form>
         </Hoja>
       )}
-    </>
+    </div>
   );
 }
 

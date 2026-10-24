@@ -133,6 +133,27 @@ export const TEXTOS = {
     vencePrimero: igual("Vence primero"),
     todaviaNo: { largo: "Todavía no se anota lo que se les debe a los proveedores.", corto: "Todavía no se anota" },
   },
+  // Depósito → Contar como la v2 (decisión 148).
+  contar: {
+    stockCargado: igual("Stock cargado"),
+    nuncaContados: igual("Nunca contados"),
+    conteosEnCurso: igual("Conteos en curso"),
+    hoyToca: igual("Hoy toca"),
+    sectores: igual("Sectores"),
+    nuevo: igual("Nuevo"),
+    enCurso: igual("En curso"),
+    nuncaContado: igual("Nunca contado"),
+    contados: igual("Contados"),
+    sinContar: igual("Sin contar"),
+    escanearConElCelular: igual("Escanear con el celular"),
+    cerrarElSector: igual("Cerrar el sector"),
+    buscar: { largo: "Buscá o escaneá el producto", corto: "Buscá o escaneá" },
+    ayudaBuscar: igual("Enter cuenta y vuelve acá · lector o celular también"),
+    seguiDondeQuedaste: igual("Seguí donde quedaste"),
+    seguirContando: igual("Seguir contando"),
+    hoyTocaContar: igual("Hoy toca contar"),
+    verCuales: igual("Ver cuáles"),
+  },
   // Depósito → Stock como la v2 (decisión 148).
   stock: {
     buscar: { largo: "Buscá por nombre, código o estantería", corto: "Producto, código o estante" },

@@ -66,3 +66,7 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Configuración (celular): cuánto ocupa lo guardado en el celular y su barra («38 KB de 150 KB»); queda con «—».
 - Configuración (computadora y celular): la marca «Este» en el celular desde el que se mira y el nombre del dispositivo vinculado («Vinculada con Moto G54»); dice «tu celular» o «tu computadora».
 - Configuración (computadora): cuánto ocupa lo guardado para trabajar sin conexión («23,4 MB»).
+- Contar (computadora y celular): «Hoy toca» con los productos A, B y C del plan de conteo y su barra, y la marca «9 A» en cada sector («—»).
+- Contar (computadora y celular): quién abrió el conteo («Lo abrió Lucas ayer a las 17:10»); se muestra solo cuándo.
+- Contar (computadora): la foto de cada producto en Contados y Sin contar se ve solo si el dispositivo ya trajo el producto; si no, un ícono.
+- Contar (computadora): la estantería del producto elegido («De Electricidad») al lado de «Antes 8 un.».
