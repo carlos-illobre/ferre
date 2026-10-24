@@ -1,10 +1,10 @@
 [
- "src/catalogo.ts",
- "src/descarga.ts",
+ "src/datos/almacenamiento/descarga.ts",
  "src/espejo.ts",
  "src/formato.ts",
  "src/negocio/anomalias.ts",
  "src/negocio/apartados.ts",
+ "src/negocio/catalogo/catalogo.ts",
  "src/negocio/deposito/ingreso.ts",
  "src/negocio/usuarios.ts",
  "src/negocio/ventas/resumen-del-dia.ts",

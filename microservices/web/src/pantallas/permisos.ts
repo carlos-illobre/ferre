@@ -1,33 +1,8 @@
-import { useSesion, type Usuario } from "../sesion";
+import { useSesion, type Usuario } from "../datos/sesion";
 
-// Qué puede hacer quien está usando la aplicación (RF-72, ADR-017). Los permisos son los del
-// servidor, que es quien decide de verdad: acá sirven para mostrar solo lo que se puede usar.
-// Es el mismo criterio en el celular y en la computadora (decisión 47).
-export const PERMISOS = {
-  "ventas.registrar": "Vender",
-  "ventas.ver": "Ver las ventas del día",
-  "ventas.anular": "Anular ventas del día",
-  "ventas.anular_cualquiera": "Anular ventas de cualquier día",
-  "catalogo.costos": "Ver costos",
-  "catalogo.margenes": "Fijar márgenes",
-  "catalogo.listas": "Cargar listas de precios",
-  "catalogo.duplicados": "Unir duplicados",
-  "deposito.pedidos": "Encargar compras",
-  "deposito.ingresos": "Registrar ingresos",
-  "deposito.compras": "Ver las compras",
-  "deposito.stock": "Contar y corregir stock",
-  "negocio.ventas": "Ver las ventas del negocio",
-  "negocio.gastos": "Ver los gastos",
-  "negocio.invertido": "Ver el dinero invertido",
-  "negocio.anomalias": "Ver las anomalías",
-  "negocio.actividad": "Ver quién hizo qué",
-  "procesos.ver": "Ver procesos",
-  "procesos.dibujar": "Dibujar procesos",
-  "admin.usuarios": "Administrar usuarios",
-  "admin.roles": "Administrar roles",
-  "admin.sistema": "Administrar el sistema",
-} as const;
-export type Permiso = keyof typeof PERMISOS;
+// La lista de permisos está en el negocio (sin dependencias, para que la usen también las pruebas).
+import { PERMISOS, type Permiso } from "../negocio/permisos";
+export { PERMISOS, type Permiso };
 
 // Tiene alguno de los permisos pedidos. Sin pedir ninguno, alcanza con tener sesión.
 export const puede = (usuario: Usuario | null | undefined, ...claves: Permiso[]) => Boolean(usuario) && (claves.length === 0 || claves.some((p) => usuario!.permisos?.includes(p)));

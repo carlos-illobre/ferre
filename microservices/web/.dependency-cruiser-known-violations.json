@@ -202,9 +202,1171 @@
   },
   {
     "type": "dependency",
-    "from": "src/negocio/catalogo/ficha.test.tsx",
-    "to": "src/plataforma/portapapeles/copiar.ts",
-    "unresolvedTo": "../../plataforma/portapapeles/copiar",
+    "from": "src/pantallas/actualizacion.ts",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/App.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Catalogo.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/componentes/EstadoDeConexion.tsx",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../../../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/componentes/Foto.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/componentes/OfrecerHuella.tsx",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../../../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Deposito.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Entrar.tsx",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/EntrarEnLaCompu.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/FichaProducto.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/FotoDeProducto.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Lector.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/MisCelulares.tsx",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Negocio.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Negocio.tsx",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Negocio.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/Anomalias.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/Configuracion.tsx",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../../../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/CorregirYCambio.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/Listas.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/Login.tsx",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../../../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/Login.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/Tickets.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/VentasDeHoy.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/pantallas/VincularCelular.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Stock.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Vender.tsx",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/celular/Vender.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/App.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Anomalias.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Configuracion.tsx",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../../../../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Contar.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/deposito-comun.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Duplicados.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Entrar.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Entrar.tsx",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../../../../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Entrar.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/FichaAlLado.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/FichaProducto.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Hoy.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Listas.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/negocio-comun.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/OfrecerHuella.tsx",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../../../../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Resumen.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Resumen.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Tickets.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Tickets.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Usuarios.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Usuarios.tsx",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../../../../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/Usuarios.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/pantallas/VincularCelular.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../../../../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/ui.tsx",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../../../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/base/ui.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/FotoDeProducto.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/Inventario.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/Vender.tsx",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/compu/Vender.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/configuracion-comun.ts",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/configuracion-comun.ts",
+    "to": "src/datos/credenciales/index.ts",
+    "unresolvedTo": "../datos/credenciales",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/DineroInvertido.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/FotoDeFactura.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/FotoParaLaCompu.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/Pedidos.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/PedidosDeLaCompu.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/PedidosDeLaCompu.tsx",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/PedirFoto.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/permisos.ts",
+    "to": "src/datos/sesion/index.ts",
+    "unresolvedTo": "../datos/sesion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/Procesos.tsx",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/Procesos.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/Roles.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/RolesDeUsuario.tsx",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/sugeridos.ts",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/sugeridos.ts",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/tickets.ts",
+    "to": "src/datos/almacenamiento/index.ts",
+    "unresolvedTo": "../datos/almacenamiento",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pantallas/tickets.ts",
+    "to": "src/datos/conexion/index.ts",
+    "unresolvedTo": "../datos/conexion",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "las-pantallas-piden-los-datos-al-negocio"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/datos/almacenamiento/almacen.ts",
+    "to": "src/plataforma/almacenamiento/base-local.ts",
+    "unresolvedTo": "../../plataforma/almacenamiento/base-local",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "por-la-puerta-de-entrada"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/datos/almacenamiento/cola.ts",
+    "to": "src/plataforma/sin-conexion/cola.ts",
+    "unresolvedTo": "../../plataforma/sin-conexion/cola",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "por-la-puerta-de-entrada"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/datos/almacenamiento/preferencias.ts",
+    "to": "src/plataforma/preferencias/preferencias.ts",
+    "unresolvedTo": "../../plataforma/preferencias/preferencias",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "por-la-puerta-de-entrada"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/datos/conexion/api.ts",
+    "to": "src/plataforma/imagenes/reducir.ts",
+    "unresolvedTo": "../../plataforma/imagenes/reducir",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "por-la-puerta-de-entrada"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/datos/conexion/api.ts",
+    "to": "src/plataforma/servidor/cliente.ts",
+    "unresolvedTo": "../../plataforma/servidor/cliente",
+    "dependencyTypes": [
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "por-la-puerta-de-entrada"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/negocio/catalogo/catalogo.ts",
+    "to": "src/plataforma/busqueda/busqueda.ts",
+    "unresolvedTo": "../../plataforma/busqueda/busqueda",
     "dependencyTypes": [
       "local",
       "import"
@@ -217,20 +1379,6 @@
   {
     "type": "dependency",
     "from": "src/negocio/catalogo/ficha.ts",
-    "to": "src/negocio/precios/vista-previa.ts",
-    "unresolvedTo": "../precios/vista-previa",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/negocio/catalogo/listas.test.tsx",
     "to": "src/negocio/precios/vista-previa.ts",
     "unresolvedTo": "../precios/vista-previa",
     "dependencyTypes": [
@@ -324,91 +1472,6 @@
     "rule": {
       "severity": "error",
       "name": "por-la-puerta-de-entrada"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/almacen.ts",
-    "to": "src/plataforma/almacenamiento/base-local.ts",
-    "unresolvedTo": "./plataforma/almacenamiento/base-local",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/api.ts",
-    "to": "src/plataforma/imagenes/reducir.ts",
-    "unresolvedTo": "./plataforma/imagenes/reducir",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/api.ts",
-    "to": "src/plataforma/servidor/cliente.ts",
-    "unresolvedTo": "./plataforma/servidor/cliente",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/catalogo.ts",
-    "to": "src/negocio/catalogo/stock-y-filtros.ts",
-    "unresolvedTo": "./negocio/catalogo/stock-y-filtros",
-    "dependencyTypes": [
-      "local",
-      "type-only",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/catalogo.ts",
-    "to": "src/plataforma/busqueda/busqueda.ts",
-    "unresolvedTo": "./plataforma/busqueda/busqueda",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/cola.ts",
-    "to": "src/plataforma/sin-conexion/cola.ts",
-    "unresolvedTo": "./plataforma/sin-conexion/cola",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
     }
   },
   {
@@ -542,20 +1605,6 @@
     "from": "src/pantallas/celular/App.tsx",
     "to": "src/plataforma/camara/Escaner.tsx",
     "unresolvedTo": "../../plataforma/camara/Escaner",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.para-vender.test.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../negocio/ventas/venta-en-curso",
     "dependencyTypes": [
       "local",
       "import"
@@ -808,34 +1857,6 @@
     "from": "src/pantallas/celular/Entrar.tsx",
     "to": "src/plataforma/camara/Escaner.tsx",
     "unresolvedTo": "../../plataforma/camara/Escaner",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/FichaProducto.test.tsx",
-    "to": "src/negocio/catalogo/ficha.ts",
-    "unresolvedTo": "../../negocio/catalogo/ficha",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/FichaProducto.test.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../negocio/ventas/venta-en-curso",
     "dependencyTypes": [
       "local",
       "import"
@@ -1519,20 +2540,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Entrar.qr.test.ts",
-    "to": "src/plataforma/camara/esquinasDelQR.ts",
-    "unresolvedTo": "../../../../plataforma/camara/esquinasDelQR",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/Entrar.tsx",
     "to": "src/plataforma/servidor/useResponde.ts",
     "unresolvedTo": "../../../../plataforma/servidor/useResponde",
@@ -1578,34 +2585,6 @@
     "from": "src/pantallas/compu/base/pantallas/FichaAlLado.tsx",
     "to": "src/negocio/catalogo/stock-y-filtros.ts",
     "unresolvedTo": "../../../../negocio/catalogo/stock-y-filtros",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.test.tsx",
-    "to": "src/negocio/catalogo/ficha.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/ficha",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.test.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../../../negocio/ventas/venta-en-curso",
     "dependencyTypes": [
       "local",
       "import"
@@ -1788,20 +2767,6 @@
     "from": "src/pantallas/compu/base/pantallas/Listas.tsx",
     "to": "src/plataforma/teclado/teclas.ts",
     "unresolvedTo": "../../../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.para-vender.test.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../../../negocio/ventas/venta-en-curso",
     "dependencyTypes": [
       "local",
       "import"
@@ -2065,34 +3030,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/Productos.test.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../negocio/ventas/venta-en-curso",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/Vender.test.tsx",
-    "to": "src/negocio/ventas/llegados-del-celular.ts",
-    "unresolvedTo": "../../negocio/ventas/llegados-del-celular",
-    "dependencyTypes": [
-      "local",
-      "dynamic-import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/Vender.tsx",
     "to": "src/negocio/catalogo/precio.ts",
     "unresolvedTo": "../../negocio/catalogo/precio",
@@ -2233,20 +3170,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/Sistema.test.tsx",
-    "to": "src/negocio/sistema/ajustes.ts",
-    "unresolvedTo": "../negocio/sistema/ajustes",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/Sistema.tsx",
     "to": "src/negocio/sistema/ajustes.ts",
     "unresolvedTo": "../negocio/sistema/ajustes",
@@ -2290,9 +3213,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/preferencias.ts",
-    "to": "src/plataforma/preferencias/preferencias.ts",
-    "unresolvedTo": "./plataforma/preferencias/preferencias",
+    "from": "src/pruebas/catalogo-falso.tsx",
+    "to": "src/plataforma/busqueda/busqueda.ts",
+    "unresolvedTo": "../plataforma/busqueda/busqueda",
     "dependencyTypes": [
       "local",
       "import"
@@ -2304,9 +3227,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/pruebas/catalogo-falso.tsx",
-    "to": "src/plataforma/busqueda/busqueda.ts",
-    "unresolvedTo": "../plataforma/busqueda/busqueda",
+    "from": "src/pruebas/preparar.ts",
+    "to": "src/datos/conexion/consultas.ts",
+    "unresolvedTo": "../datos/conexion/consultas",
     "dependencyTypes": [
       "local",
       "import"
@@ -2323,6 +3246,20 @@
     "unresolvedTo": "../negocio/ventas/venta-en-curso",
     "dependencyTypes": [
       "local",
+      "dynamic-import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "por-la-puerta-de-entrada-desde-afuera"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "src/pruebas/sesion.ts",
+    "to": "src/negocio/permisos/lista.ts",
+    "unresolvedTo": "../negocio/permisos/lista",
+    "dependencyTypes": [
+      "local",
       "import"
     ],
     "rule": {
@@ -2335,34 +3272,6 @@
     "from": "src/rutas.ts",
     "to": "src/plataforma/navegacion/rutas-por-hash.tsx",
     "unresolvedTo": "./plataforma/navegacion/rutas-por-hash",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/sesion.test.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "./negocio/ventas/venta-en-curso",
-    "dependencyTypes": [
-      "local",
-      "dynamic-import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/sesion.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "./negocio/ventas/venta-en-curso",
     "dependencyTypes": [
       "local",
       "import"

@@ -6,11 +6,10 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 // lectura del código, el archivo de origen y la hora de la lectura que viaja con el código.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const enviar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => ({ encolado: false })));
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-vi.mock("../../cola", async (original) => ({ ...(await original<typeof import("../../cola")>()), enviarOEncolar: (...a: unknown[]) => enviar(...a) }));
-vi.unmock("../../catalogo");
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../datos/almacenamiento")>()), enviarOEncolar: (...a: unknown[]) => enviar(...a) }));
 import { cuentaDelPrecio, olvidarOrigenes, ultimaLectura, useOrigenDeLista } from "./ficha";
-import { ErrorApi } from "../../api";
+import { ErrorApi } from "../../datos/conexion";
 import { copiarTexto } from "../../plataforma/portapapeles/copiar";
 
 describe("«Así se calcula» (RF-114)", () => {
@@ -42,7 +41,7 @@ describe("la última lectura del código (RF-112)", () => {
   it("016-E09: cargar el código manda la hora de la lectura; borrarlo, no", async () => {
     vi.useFakeTimers({ now: new Date("2026-10-13T13:24:00.000Z"), toFake: ["Date"] });
     try {
-      const { useCatalogo } = await import("../../catalogo");
+      const { useCatalogo } = await import("./catalogo");
       const { result } = renderHook(() => useCatalogo());
       await result.current.actualizarProducto("p-1", { codigo_barras: "7791234000004" });
       expect(enviar).toHaveBeenLastCalledWith("producto.cambio", "PATCH", "/productos/p-1", { codigo_barras: "7791234000004", codigo_leido_en: "2026-10-13T13:24:00.000Z" });
@@ -61,7 +60,7 @@ describe("un código que el servidor rechaza (E12)", () => {
     apiFalsa.mockReset();
     apiFalsa.mockImplementation(async (ruta: string) => (String(ruta).startsWith("/productos/pagina") ? { productos: [P], stock: {}, hay_mas: false, total: 1 } : []));
     vi.resetModules();
-    const { traerPorIds, useCatalogo } = await import("../../catalogo");
+    const { traerPorIds, useCatalogo } = await import("./catalogo");
     const { result } = renderHook(() => useCatalogo());
     await act(async () => { await traerPorIds(["p-9"]); });
     expect(result.current.catalogo.find((p) => p.id === "p-9")).toBeTruthy();

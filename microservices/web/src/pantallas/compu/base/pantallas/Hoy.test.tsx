@@ -7,9 +7,9 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 // (specs/019). El dispositivo cree que es el sábado 17/10/2026 a las 12:00; el servidor de mentira
 // contesta las ventas de cada día.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../../../api", async (original) => ({ ...(await original<typeof import("../../../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { Hoy } from "./Hoy";
-import { consultas } from "../../../../consultas";
+import { consultas } from "../../../../datos/conexion";
 
 const a = (dia: string, h: number, m = 0) => new Date(`${dia}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`).toISOString();
 let n = 0;

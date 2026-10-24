@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { subirFoto } from "../../api";
+import { subirFoto } from "../../datos/conexion";
 import { FotoProducto } from "./base/ui";
 
 // La foto de un producto, donde sea que aparezca en una lista (ingreso, inventario): se toca

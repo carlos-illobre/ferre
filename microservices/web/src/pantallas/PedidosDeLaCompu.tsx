@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
+import { api } from "../datos/conexion";
 import { EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../puesto";
 import { alPedidoDeLaCompu } from "../espejo";
-import { alCambiarAjustes, celularCadaMs } from "../ajustes-del-sistema";
+import { alCambiarAjustes, celularCadaMs } from "../datos/sesion";
 import "./pedidos-de-la-compu.css";
 import type { AvisosParaElCelular } from "@servidor/puestos";
 import type { FotoQueEspera } from "@servidor/pedidos-de-foto";

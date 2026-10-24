@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cuantosFiltros, filtrar, marcasDe, SIN_FILTROS, stockDe } from "./stock-y-filtros";
-import type { Producto } from "../../producto";
+import type { Producto } from "../../datos/almacenamiento";
 
 // specs/015-catalogo-para-vender: el stock en el Catálogo y los filtros.
 const producto = (id: string, marca: string | null, unidad = "unidad") => ({ id, descripcion: id, marca, unidad } as unknown as Producto);

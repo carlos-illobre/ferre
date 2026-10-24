@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { agregarALaVenta, useVentaEnCurso, ventaActual } from "./venta-en-curso";
-import type { Producto } from "../../producto";
+import type { Producto } from "../catalogo";
 
 // La venta en curso vive fuera de las pantallas (ADR-022, specs/015-catalogo-para-vender).
 const MECHA = { id: "p-mecha", descripcion: "Mecha 6 mm", marca: "Bosch", codigo_barras: null, unidad: "unidad", margen_elegido: 100, proveedor: null, codigo_proveedor: null, costo_neto: 1500, iva: 21, fecha_lista: null, explicacion_costo: [] } as unknown as Producto;

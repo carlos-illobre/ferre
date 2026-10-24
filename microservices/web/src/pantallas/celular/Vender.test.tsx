@@ -5,14 +5,14 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
+vi.mock("../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../negocio/catalogo")>()), ...((await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
 vi.mock("../../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
 vi.mock("./componentes/VincularCelular", () => ({ VincularCelular: () => null }));
 vi.mock("../../puesto", async (original) => ({ ...(await original<typeof import("../../puesto")>()), enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), puestoRemoto: () => null, puestoLocal: () => null, guardarPuestoLocal: vi.fn() }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: vi.fn(async () => 0), pendientes: vi.fn(async () => []), alCambiarLaCola: () => () => undefined }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../datos/almacenamiento")>()), ...(({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: vi.fn(async () => 0), pendientes: vi.fn(async () => []), alCambiarLaCola: () => () => undefined })) }));
 
 import { ParteVender } from "./Vender";
 

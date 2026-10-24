@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
-import { consultas } from "../../consultas";
+import { consultas } from "../../datos/conexion";
 import { Duplicados } from "./pantallas/Duplicados";
 
 const UNION = { absorbido_id: "d-9", absorbido: "LLAVE FRANCESA 10\" BAHCO", conservado_id: "p-9", conservado: "Llave francesa 10 pulgadas", marca: "Bahco", foto_url: null, unido_en: "2026-10-14T10:00:00Z", proveedores: "Comodo, Dimetal" };

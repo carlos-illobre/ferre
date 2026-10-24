@@ -101,6 +101,8 @@ test("cargarle el código de barras a un producto desde su ficha y encontrarlo p
   await expect(page.getByTestId("producto").filter({ hasText: "GUANTES ESCANER" })).toBeVisible();
   await page.getByTestId("busqueda").press("Enter");
   const ficha = page.getByTestId("ficha-producto");
+  // La ficha cambia al producto elegido: se espera la suya antes de tocar «Escanear».
+  await expect(ficha).toContainText("GUANTES ESCANER");
   await ficha.getByTestId("escanear-codigo").click();
   await ficha.getByTestId("codigo-tipeado").fill("7790009998881");
   await ficha.getByTestId("guardar-codigo").click();

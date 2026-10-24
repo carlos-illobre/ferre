@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../api";
-import { consultas } from "../consultas";
+import { api } from "../datos/conexion";
+import { consultas } from "../datos/conexion";
 import type { Proveedor, ProveedorNuevo } from "@servidor/proveedores";
 
 export type { Proveedor };

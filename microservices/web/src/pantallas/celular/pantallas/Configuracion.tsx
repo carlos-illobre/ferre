@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias } from "../../../preferencias";
-import { guardaEnElDispositivo } from "../../../guardado";
-import { useDescarga } from "../../../descarga";
+import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias } from "../../../datos/almacenamiento";
+import { guardaEnElDispositivo } from "../../../datos/almacenamiento";
+import { useDescarga } from "../../../datos/almacenamiento";
 import { fecha } from "../../../formato";
 import { cambiarSinConexion, NOMBRE_DEL_TIEMPO, useMiVinculo, useMisCelulares, useReducirMovimiento } from "../../configuracion-comun";
 import { IconoDeLaV2, type IconoV2 } from "../../IconoDeLaV2";

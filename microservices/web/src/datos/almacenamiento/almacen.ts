@@ -1,5 +1,5 @@
 import { guardaEnElDispositivo } from "./guardado";
-import { crearBaseLocal } from "./plataforma/almacenamiento/base-local";
+import { crearBaseLocal } from "../../plataforma/almacenamiento/base-local";
 
 // Lo que el mostrador necesita sin conexión (ADR-005): catálogo, stock, clientes, ventas de los
 // últimos 7 días y la cola de cambios pendientes. La base local en sí es tecnología de la

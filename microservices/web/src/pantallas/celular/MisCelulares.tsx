@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fecha } from "../../formato";
-import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../credenciales";
+import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../datos/credenciales";
 import { AvisoError, Icono, Lista, Toast } from "./componentes/base";
 import { describirDispositivo } from "./pantallas/Login";
 

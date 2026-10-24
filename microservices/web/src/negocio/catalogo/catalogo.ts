@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { normalizar } from "./plataforma/busqueda/busqueda";
-import { api, ErrorApi, esFaltaDeRed, EVENTO_CAMBIO } from "./api";
-import { cambiosDeProductosPendientes, enviarOEncolar } from "./cola";
-import { loBajado, type Bajado } from "./descarga";
-import type { Producto } from "./producto";
+import { normalizar } from "../../plataforma/busqueda/busqueda";
+import { api, ErrorApi, esFaltaDeRed, EVENTO_CAMBIO } from "../../datos/conexion";
+import { cambiosDeProductosPendientes, enviarOEncolar } from "../../datos/almacenamiento";
+import { loBajado, type Bajado } from "../../datos/almacenamiento";
+import type { Producto } from "../../datos/almacenamiento";
 import type { CambiosDeProducto, PaginaDeProductos } from "@servidor/productos";
 import type { FilaDeStock } from "@servidor/stock";
 import type { Cliente } from "@servidor/clientes";
 import type { Unidad } from "./unidades";
-import type { Disponibilidad } from "./negocio/catalogo/stock-y-filtros";
+import type { Disponibilidad } from "./stock-y-filtros";
 
 // El catálogo vive en el servidor (specs/018, RF-122; ADR-023). El dispositivo no lo baja ni lo
 // guarda: cada pantalla pide lo que muestra (una búsqueda, un código, unos productos, una página

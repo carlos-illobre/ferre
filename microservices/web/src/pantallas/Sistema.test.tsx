@@ -4,8 +4,8 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 
 // Más → Sistema (specs/020): lo que vale para todos los dispositivos.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-import { ErrorApi } from "../api";
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+import { ErrorApi } from "../datos/conexion";
 import { Sistema } from "./Sistema";
 import { Configuracion } from "../pruebas/configuracion";
 import { olvidarAjustesVistos } from "../negocio/sistema/ajustes";

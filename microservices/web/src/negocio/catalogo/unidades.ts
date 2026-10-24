@@ -1,4 +1,4 @@
-import type { Producto } from "./producto";
+import type { Producto } from "../../datos/almacenamiento";
 
 // Cómo se vende (y se compra) un producto: por unidad, con cantidades enteras, o a
 // granel por kilo, metro o litro, con hasta un decimal. Queda guardado en el producto.

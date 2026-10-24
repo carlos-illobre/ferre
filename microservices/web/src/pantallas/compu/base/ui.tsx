@@ -2,11 +2,11 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } f
 import { useVeCostos } from "../../Costos";
 import { Isotipo, Logotipo } from "../../Logotipo";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
-import { leerMeta } from "../../../almacen";
-import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../cola";
-import { urlDeFoto } from "../../../api";
+import { leerMeta } from "../../../datos/almacenamiento";
+import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../datos/almacenamiento";
+import { urlDeFoto } from "../../../datos/conexion";
 import { MARGENES } from "../../../negocio/precios/vista-previa";
-import { UNIDADES, type Unidad } from "../../../unidades";
+import { UNIDADES, type Unidad } from "../../../negocio/catalogo";
 
 // Piezas de Ferrebress v2. Todas las pantallas arman con estas y con las clases de
 // estilos/base.css; ninguna inventa su botón ni su ventana.

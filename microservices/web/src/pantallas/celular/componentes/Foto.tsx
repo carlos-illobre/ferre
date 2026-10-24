@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { urlDeFoto } from "../../../api";
+import { urlDeFoto } from "../../../datos/conexion";
 import { Icono } from "./base";
 import { useVolverCierra } from "../../../plataforma/navegacion/volver";
 

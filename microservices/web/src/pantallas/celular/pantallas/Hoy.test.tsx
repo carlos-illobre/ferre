@@ -6,10 +6,10 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 // «Hoy» renovada en el celular (specs/017, maqueta C). El dispositivo cree que es el sábado
 // 17/10/2026 a las 12:00; el servidor de mentira contesta las ventas de cada día.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../../api", async (original) => ({ ...(await original<typeof import("../../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { VentasDeHoy } from "./VentasDeHoy";
-import { consultas } from "../../../consultas";
-import { ErrorApi } from "../../../api";
+import { consultas } from "../../../datos/conexion";
+import { ErrorApi } from "../../../datos/conexion";
 
 const a = (dia: string, h: number, m = 0) => new Date(`${dia}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`).toISOString();
 const renglon = (descripcion: string, cantidad: string, precio: number) => ({ descripcion, cantidad, precio_unitario: String(precio), subtotal: Number(cantidad) * precio, margen_aplicado: null, explicacion: null });

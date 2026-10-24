@@ -2,7 +2,7 @@
 
 **Estado:** Aceptado
 **Fecha:** 2026-10-24
-**Enmienda:** la parte de ADR-018 que dice cómo se ordena el front (sus tres capas pasan a cinco)
+**Enmienda:** la parte de ADR-018 que dice cómo se ordena el front (sus tres capas pasan a seis)
 **Especificación:** `specs/024-front-por-capas/`
 
 ---
@@ -45,16 +45,21 @@ Para los estilos:
 
 ## Decisión
 
-### Las cinco capas
+### Las seis capas
 
 ```
 src/
   app/            arranque: elige celular o computadora, monta la sesión y los datos
   plataforma/     técnica que sirve para cualquier aplicación; nada de la ferretería
-    almacenamiento/   IndexedDB: la base local, la cola de envíos, lo guardado, lo bajado
-    conexion/         la API, si hay red, el tiempo real, el enlace entre dispositivos
+    almacenamiento/   IndexedDB en general: abrir una base, guardar y leer
+    servidor/ tiempo-real/ sin-conexion/   pedir, escuchar, encolar, en general
     teclado/          atajos, flechas y foco: lógica, sin dibujar
-    navegacion/ camara/ imagenes/ busqueda/ animacion/ formato/ …
+    navegacion/ camara/ imagenes/ busqueda/ animacion/ …
+  datos/          cómo habla Ferrebress con el servidor y qué guarda en el dispositivo
+    conexion/         la API de Ferrebress, la memoria de lo pedido, el enlace con el otro dispositivo
+    almacenamiento/   las bases de IndexedDB de Ferrebress: lo bajado, la cola de envíos, lo guardado, las preferencias
+    sesion/           quién entró y su token; avisa cuando la sesión termina
+    credenciales/     entrar y vincular con la huella
   ui/             las piezas de «Mostrador» (botón, hoja, aviso, pestañas, lista, buscador,
                   un solo juego de íconos, la paleta); no saben qué es una venta
   negocio/<capacidad>/   las reglas en funciones puras y los hooks que traen y guardan los
@@ -72,8 +77,9 @@ Cada capa importa solo de las de abajo:
 | Capa | Puede importar de |
 |---|---|
 | `plataforma/` | nada del proyecto |
+| `datos/` | `plataforma/` |
 | `ui/` | `ui/` y `plataforma/` |
-| `negocio/` | `plataforma/` |
+| `negocio/` | `datos/` y `plataforma/` |
 | `pantallas/comun/` | `ui/`, `negocio/` y `plataforma/` |
 | `pantallas/celular/` y `pantallas/compu/` | `comun/`, `ui/`, `negocio/` y `plataforma/`; nunca una de la otra |
 | `app/` | todo |
@@ -81,7 +87,8 @@ Cada capa importa solo de las de abajo:
 Además:
 
 - **Puerta de entrada:** de otra carpeta de primer nivel de una capa (`plataforma/teclado/`,
-  `negocio/ventas/`) se usa solo su `index.ts`.
+  `datos/conexion/`, `negocio/ventas/`) se usa solo su `index.ts`. Las pruebas pueden entrar
+  a lo de adentro, para reemplazarlo.
 - **Sin ciclos:** ningún archivo depende, a la larga, de sí mismo.
 - **Control automático:** `dependency-cruiser` (`pnpm capas`) lo controla en cada subida.
 
@@ -114,6 +121,8 @@ Las pruebas no cuentan para el tamaño.
 - Cada etapa saca de la lista lo que ordenó.
 - Al terminar, la lista queda vacía.
 - La verificación nunca se pone roja por lo de antes; sí por lo nuevo.
+- Al mover archivos, la lista de las capas se vuelve a escribir con los caminos nuevos, y nunca
+  puede quedar más larga que antes.
 
 ## Consecuencias
 
@@ -122,9 +131,13 @@ Las pruebas no cuentan para el tamaño.
 - **Coordinación:**
   - IndexedDB lo está cambiando specs/022; la conexión entre dispositivos, specs/023.
   - Esas partes se ordenan después de que terminen, o esas funcionalidades las dejan ya en
-    `plataforma/almacenamiento/` y `plataforma/conexion/`.
+    `datos/almacenamiento/` y `datos/conexion/` (lo genérico, en `plataforma/`).
 - ESLint y `jscpd` entran como dependencias de desarrollo.
 - Las hojas de estilo globales quedan solo para la paleta, la letra y lo básico del documento.
+- Un `index.ts` carga todo su módulo. Por eso las pruebas reemplazan un módulo por su index
+  (que es lo que usa el código), y la preparación común de las pruebas no importa módulos de
+  datos ni de negocio antes de que cada prueba ponga sus reemplazos.
+- Mover archivos se hace con `microservices/web/scripts/mover.mjs`, que corrige cada import.
 
 ## Cuándo revisar esta decisión
 

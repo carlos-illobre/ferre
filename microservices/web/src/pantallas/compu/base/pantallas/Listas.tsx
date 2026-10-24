@@ -2,7 +2,7 @@ import { useCallback, useEffect, useId, useRef, useState, type DragEvent, type F
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 import { TEXTOS } from "../../../textos";
-import { ErrorApi } from "../../../../api";
+import { ErrorApi } from "../../../../datos/conexion";
 import { aplicarLista, buscarProveedores, cargarLista, descartarLista, descuentosDe, fraccionAplicada, pendientes, retomar, situacionDelProveedor, ultimaAplicada, useFilasDeLista, useLectores, useListas, variacion, type Avance, type Cargada, type Fila, type ListaFila, type Proveedor } from "../../../../negocio/catalogo/listas";
 import { altaDeProveedor, faltaEnProveedor } from "../../../../negocio/proveedores";
 import { fecha, pesos, porcentaje } from "../../../../formato";

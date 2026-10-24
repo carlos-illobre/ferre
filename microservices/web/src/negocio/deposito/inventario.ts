@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api, esFaltaDeRed } from "../../api";
-import { loBajado } from "../../descarga";
-import { traerPorIds, type StockFila } from "../../catalogo";
+import { api, esFaltaDeRed } from "../../datos/conexion";
+import { loBajado } from "../../datos/almacenamiento";
+import { traerPorIds, type StockFila } from "../catalogo";
 import type { AjusteDeStock, Movimiento, Stock } from "@servidor/stock";
-import { enviarOEncolar } from "../../cola";
-import { consultas } from "../../consultas";
-import type { Producto } from "../../producto";
-import { cantidadValida, unidadDe } from "../../unidades";
+import { enviarOEncolar } from "../../datos/almacenamiento";
+import { consultas } from "../../datos/conexion";
+import type { Producto } from "../catalogo";
+import { cantidadValida, unidadDe } from "../catalogo";
 
 // El inventario, una sola vez para el celular y la computadora (RNF-60): cuánto hay de cada
 // producto, los movimientos que lo explican y la corrección a mano, que siempre lleva motivo (RF-53).

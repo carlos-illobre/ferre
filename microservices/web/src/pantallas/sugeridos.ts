@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "../api";
-import { leerTodo } from "../almacen";
-import { traerPorIds } from "../catalogo";
+import { api } from "../datos/conexion";
+import { leerTodo } from "../datos/almacenamiento";
+import { traerPorIds } from "../negocio/catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
 import { precioDelProducto } from "../negocio/catalogo/precio";
 import type { UltimosProductos } from "@servidor/ventas";

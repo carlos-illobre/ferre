@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ErrorApi } from "../../../../api";
+import { ErrorApi } from "../../../../datos/conexion";
 import { buscarDuplicados, buscarUniones, resolverSugerencia, separar as separarProductos, unir as unirProductos, useDuplicados, type Lado, type Resumen, type Sugerencia, type Union } from "../../../../negocio/catalogo/duplicados";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
 import { TEXTOS } from "../../../textos";
-import { useCatalogo } from "../../../../catalogo";
+import { useCatalogo } from "../../../../negocio/catalogo";
 import { fecha, pesos } from "../../../../formato";
 import { Aviso, Boton, Buscador, Hoja, Icono, Pagina, Progreso, Vacio, numero } from "../ui";
 import { useEsCelular } from "../vista";

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { api, ErrorApi } from "../../api";
+import { api, ErrorApi } from "../../datos/conexion";
 import { precioDeVenta, preciosDeUnProducto } from "../precios/vista-previa";
 import type { OrigenDeLista } from "@servidor/listas";
-import type { Producto } from "../../producto";
+import type { Producto } from "../../datos/almacenamiento";
 
 // La ficha del producto (specs/016): lo que muestra y que no es de una pantalla.
 

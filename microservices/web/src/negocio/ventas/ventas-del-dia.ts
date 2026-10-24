@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { AnulacionDeVenta, Consulta, VentaDelDia, VentasDelDia } from "@servidor/ventas";
-import { api } from "../../api";
-import { consultas } from "../../consultas";
+import { api } from "../../datos/conexion";
+import { consultas } from "../../datos/conexion";
 import { useDelServidor } from "../del-servidor";
 import { hoyLocal } from "../../formato";
 

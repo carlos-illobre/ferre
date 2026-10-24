@@ -1,5 +1,5 @@
-import { api } from "../api";
-import { consultas } from "../consultas";
+import { api } from "../datos/conexion";
+import { consultas } from "../datos/conexion";
 import { useDelServidor } from "./del-servidor";
 import { stockCambio } from "./deposito/inventario";
 import type { AnulacionDeCompra, CompraReciente, GastosDeLaSemana } from "@servidor/compras";

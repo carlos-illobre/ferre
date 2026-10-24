@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
+import { api } from "../datos/conexion";
 import "./roles.css";
 import type { Rol } from "@servidor/usuarios";
 

@@ -1,5 +1,5 @@
-import type { Producto } from "../../producto";
-import { abreviarUnidad, unidadDe } from "../../unidades";
+import type { Producto } from "../../datos/almacenamiento";
+import { abreviarUnidad, unidadDe } from "./unidades";
 
 // Lo que el Catálogo muestra y filtra del stock y de la marca (RF-107, RF-109), una sola vez
 // para el celular y la computadora (decisión 47). El stock es el mismo de Depósito.

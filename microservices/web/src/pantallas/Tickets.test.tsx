@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a), reducirImagen: async (f: File) => f }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a), reducirImagen: async (f: File) => f }));
 
 // jsdom no sabe guardar un archivo en su IndexedDB simulada: el almacén del dispositivo se
 // reemplaza por uno en memoria, que alcanza para probar que nada se pierde ni se duplica.
 const guardado = vi.hoisted(() => new Map<string, unknown>());
-vi.mock("../almacen", async (original) => ({ ...(await original<typeof import("../almacen")>()), guardarMeta: async (clave: string, valor: unknown) => { guardado.set(clave, valor); }, leerMeta: async (clave: string) => guardado.get(clave) ?? null }));
+vi.mock("../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../datos/almacenamiento")>()), guardarMeta: async (clave: string, valor: unknown) => { guardado.set(clave, valor); }, leerMeta: async (clave: string) => guardado.get(clave) ?? null }));
 
 import { Tickets } from "./compu/base/pantallas/Tickets";
 

@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { productoEnMemoria, traerPorIds, useCatalogo } from "../../catalogo";
+import { productoEnMemoria, traerPorIds, useCatalogo } from "../catalogo";
 import { useEspejar, useEspejo } from "../../espejo";
 import { marcarLoQueEntro } from "./llegados-del-celular";
 import type { MedioDePago } from "@servidor/ventas";
 import { cambiarVenta, useVentaEnCurso, ventaActual } from "./venta-en-curso";
-import type { Producto } from "../../producto";
+import type { Producto } from "../catalogo";
 
 // La venta en curso, como viaja entre el celular y la computadora en espejo (decisión 60): los
 // renglones con su cantidad, unidad, precio a mano y margen, el medio de pago y el cliente. De

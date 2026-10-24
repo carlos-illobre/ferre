@@ -1,9 +1,9 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { NOMBRES, TEXTOS } from "../../../textos";
-import { api, ErrorApi } from "../../../../api";
+import { api, ErrorApi } from "../../../../datos/conexion";
 import { fecha } from "../../../../formato";
-import { useSesion } from "../../../../sesion";
-import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../../../credenciales";
+import { useSesion } from "../../../../datos/sesion";
+import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../../../datos/credenciales";
 import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Toast, Vacio, haceCuanto } from "../ui";
 import { describirDispositivo } from "../dispositivo";

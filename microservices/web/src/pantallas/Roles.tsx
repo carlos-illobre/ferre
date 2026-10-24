@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { api } from "../api";
+import { api } from "../datos/conexion";
 import "./roles.css";
 import type { PermisoDelSistema, Rol, RolNuevo } from "@servidor/usuarios";
 import { AlLadoDeLasPestanas } from "./AlLadoDeLasPestanas";

@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { buscarDuplicados, buscarUniones, resolverSugerencia, separar as separarProductos, unir as unirProductos, useDuplicados, type Resumen, type Sugerencia, type Union } from "../../../negocio/catalogo/duplicados";
-import { useCatalogo } from "../../../catalogo";
+import { useCatalogo } from "../../../negocio/catalogo";
 import { fecha, pesos } from "../../../formato";
 import { AvisoError, Buscador, Hoja, Icono, Toast, Lista } from "../componentes/base";
 import { TEXTOS } from "../../textos";

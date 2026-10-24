@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { api, leerToken, urlApi } from "../api";
+import { api, leerToken, urlApi } from "../datos/conexion";
 import { puestoLocal } from "../puesto";
 import "./foto-de-factura.css";
 import type { EstadoDelPedidoDeFoto, PedidoDeFoto, PedidoDeFotoNuevo } from "@servidor/pedidos-de-foto";

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { abrirConteo, crearSector, ordenarSectores, useConteo, useSectores, type Cierre, type Contado, type Conteo, type Sector } from "../../../../negocio/deposito/conteo";
 import { cantidadContada } from "../../../../negocio/deposito/inventario";
-import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../../../catalogo";
+import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../../../negocio/catalogo";
 import { escucharPuesto, EVENTO_EMPAREJAMIENTO, pedirLector, puestoLocal } from "../../../../puesto";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
-import { urlDeFoto } from "../../../../api";
+import { urlDeFoto } from "../../../../datos/conexion";
 import { fecha } from "../../../../formato";
-import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../../../unidades";
+import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../../../negocio/catalogo";
 import { irA } from "../rutas";
 import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Progreso, Toast, Vacio, numero } from "../ui";
 import { BuscadorDeProducto, conSigno, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./deposito-comun";

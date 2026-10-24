@@ -1,4 +1,4 @@
-import { api, leerToken, urlApi } from "./api";
+import { api, leerToken, urlApi } from "./datos/conexion";
 import type { CodigoEscaneado, CodigoEscaneadoEntrada, VinculoDeLaSesion, VinculosDeLaSesion } from "@servidor/puestos";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). La computadora es un "puesto";

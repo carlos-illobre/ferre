@@ -22,8 +22,8 @@ const DISPOSICION: DisposicionParaFlechas = {
 };
 import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
-import { esAmbienteDePrueba } from "../../ambiente";
-import { ProveedorDeSesion, useSesion } from "../../sesion";
+import { esAmbienteDePrueba } from "../../plataforma/ambiente";
+import { ProveedorDeSesion, useSesion } from "../../datos/sesion";
 import { ConRutas, irA, useRuta } from "./base/rutas";
 import { Boton, EstadoDeConexion, Icono, Marca, Pagina, type NombreDeIcono } from "./base/ui";
 import { Entrar } from "./base/pantallas/Entrar";

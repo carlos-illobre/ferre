@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { api, ErrorApi } from "../../api";
-import { consultas } from "../../consultas";
+import { api, ErrorApi } from "../../datos/conexion";
+import { consultas } from "../../datos/conexion";
 import { useProveedores, type Proveedor } from "../proveedores";
 import type { EstadoDeLista, FilasDeLista, ListaCargada, ListaEnHistorial, ResumenDeLista, Salteada } from "@servidor/listas";
 

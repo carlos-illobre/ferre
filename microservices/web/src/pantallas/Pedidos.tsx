@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { abreviarUnidad, conUnidad } from "../unidades";
-import { api } from "../api";
-import { busquedaAlDia, esperarBusqueda, traerPorCodigo, traerPorIds, useCatalogo } from "../catalogo";
+import { abreviarUnidad, conUnidad } from "../negocio/catalogo";
+import { api } from "../datos/conexion";
+import { busquedaAlDia, esperarBusqueda, traerPorCodigo, traerPorIds, useCatalogo } from "../negocio/catalogo";
 import type { Producto } from "./celular/pantallas/Productos";
 import { Escaner, hayCamara } from "../plataforma/camara/Escaner";
 import { usePuede } from "./permisos";

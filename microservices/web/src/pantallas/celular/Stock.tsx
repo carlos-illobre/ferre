@@ -3,11 +3,11 @@ import { cantidadContada, nombreDeMovimiento, productosConStock, useCorregirStoc
 import { usePuede } from "../permisos";
 import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
-import { ErrorApi } from "../../api";
-import { useCatalogo } from "../../catalogo";
+import { ErrorApi } from "../../datos/conexion";
+import { useCatalogo } from "../../negocio/catalogo";
 import { fecha, pesos } from "../../formato";
 import { irA } from "../../rutas";
-import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../unidades";
+import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../negocio/catalogo";
 import { AvisoError, Buscador, Hoja, Toast } from "./componentes/base";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { IconoDeDeposito, type IconoDeDepositoNombre } from "../IconoDeDeposito";

@@ -7,11 +7,10 @@ import { act, render, renderHook, screen, waitFor } from "@testing-library/react
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const enCola = vi.hoisted(() => ({ cambios: new Map<string, Record<string, unknown>>() }));
 const enviar = vi.hoisted(() => vi.fn(async () => ({ encolado: false })));
-vi.mock("./api", async (original) => ({ ...(await original<typeof import("./api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 const loBajado = vi.hoisted(() => ({ actual: null as null | { productos: any[]; stock: Map<string, number>; clientes: any[] } }));
-vi.mock("./descarga", () => ({ loBajado: async () => loBajado.actual }));
-vi.mock("./cola", () => ({ cambiosDeProductosPendientes: async () => enCola.cambios, enviarOEncolar: (...a: unknown[]) => (enviar as any)(...a) }));
-import { ErrorApi } from "./api";
+vi.mock("../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../datos/almacenamiento")>()), ...(({ loBajado: async () => loBajado.actual })), ...(({ cambiosDeProductosPendientes: async () => enCola.cambios, enviarOEncolar: (...a: unknown[]) => (enviar as any)(...a) })) }));
+import { ErrorApi } from "../../datos/conexion";
 import { olvidarTodo, pedirClientes, SIN_CONEXION_PARA_BUSCAR, traerPorCodigo, traerPorIds, useCatalogo, useListaDeProductos } from "./catalogo";
 
 const prod = (id: string, descripcion: string, extra: any = {}) => ({ id, descripcion, marca: "MARCA", codigo_barras: null, unidad: "unidad", margen_elegido: null, proveedor: "P", codigo_proveedor: null, costo_neto: "100", iva: "0.21", fecha_lista: "2026-08-11", lista_importada_id: "l", explicacion_costo: [], ...extra });

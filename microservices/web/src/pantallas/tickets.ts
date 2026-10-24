@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, ErrorApi, leerToken, reducirImagen, urlApi } from "../api";
-import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "../guardado";
-import { guardarMeta, leerMeta } from "../almacen";
+import { api, ErrorApi, leerToken, reducirImagen, urlApi } from "../datos/conexion";
+import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "../datos/almacenamiento";
+import { guardarMeta, leerMeta } from "../datos/almacenamiento";
 import type { Ticket } from "@servidor/tickets";
 
 // Tickets (RF-80): errores y mejoras que reporta quien usa la app. Un ticket se guarda

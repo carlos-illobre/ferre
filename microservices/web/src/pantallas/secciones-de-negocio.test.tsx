@@ -4,10 +4,10 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 import { conPermisos, conTodosLosPermisos } from "../pruebas/sesion";
-import { consultas } from "../consultas";
+import { consultas } from "../datos/conexion";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "./pestanas-de-negocio";
 import { DE_MAS as DE_MAS_COMPU, Mas } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";

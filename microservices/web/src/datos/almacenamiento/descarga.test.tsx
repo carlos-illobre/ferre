@@ -4,12 +4,12 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 
 // La descarga a mano para trabajar sin conexión (specs/018, historia 5).
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("./api", async (original) => ({ ...(await original<typeof import("./api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-import { ErrorApi } from "./api";
+vi.mock("../conexion", async (original) => ({ ...(await original<typeof import("../conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+import { ErrorApi } from "../conexion";
 import { guardar, leerMeta, leerTodo, respetarElGuardado } from "./almacen";
 import { descargar, loBajado, olvidarLaDescarga, SIN_CONEXION_PARA_BAJAR } from "./descarga";
 import { cambiarPreferencia, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./pruebas/configuracion";
+import { Configuracion } from "../../pruebas/configuracion";
 
 const prod = (id: string, extra: any = {}) => ({ id, descripcion: id.toUpperCase(), marca: null, codigo_barras: null, unidad: "unidad", margen_elegido: null, proveedor: "P", codigo_proveedor: null, costo_neto: "100", iva: "0.21", fecha_lista: "2026-08-11", lista_importada_id: "l", explicacion_costo: [], ...extra });
 const pedidos = () => apiFalsa.mock.calls.map((c) => String(c[0]));

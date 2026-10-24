@@ -6,7 +6,7 @@ import { usePuede } from "../permisos";
 import { COMPROBANTES } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { hoyLocal, pesos, porcentaje } from "../../formato";
-import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe, type Unidad } from "../../unidades";
+import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe, type Unidad } from "../../negocio/catalogo";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { Aviso, Boton, Contador, Exito, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Segmentos, Toast, Vacio, numero as cifra, pesosCortos } from "./base/ui";
 import { useEsCelular } from "./base/vista";

@@ -6,11 +6,11 @@ import { catalogoFalso, producto } from "../../../../pruebas/catalogo-falso";
 
 // La ficha del producto renovada en la computadora (specs/016): la maqueta A en dos columnas.
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
-vi.mock("../../../../catalogo", async () => (await import("../../../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
+vi.mock("../../../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../../../negocio/catalogo")>()), ...((await import("../../../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const subir = vi.hoisted(() => vi.fn(async () => "/fotos/nueva.jpg"));
 const descargar = vi.hoisted(() => vi.fn(async () => undefined));
-vi.mock("../../../../api", async (original) => ({ ...(await original<typeof import("../../../../api")>()), api: (...a: unknown[]) => apiFalsa(...a), subirFoto: (...a: unknown[]) => (subir as any)(...a), descargar: (...a: unknown[]) => (descargar as any)(...a) }));
+vi.mock("../../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a), subirFoto: (...a: unknown[]) => (subir as any)(...a), descargar: (...a: unknown[]) => (descargar as any)(...a) }));
 import { FichaProducto } from "./FichaProducto";
 import { olvidarOrigenes } from "../../../../negocio/catalogo/ficha";
 import { ventaActual } from "../../../../negocio/ventas/venta-en-curso";

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
-import { api, leerToken, urlApi } from "./api";
+import { api, leerToken, urlApi } from "./datos/conexion";
 import { escucharFlujo } from "./plataforma/tiempo-real/flujo-de-eventos";
 import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, guardarPuestoRemoto, puestoLocal, puestoRemoto } from "./puesto";
-import { EVENTO_SESION_ABIERTA } from "./sesion";
+import { EVENTO_SESION_ABIERTA } from "./datos/sesion";
 import type { CambioEnEspejo } from "@servidor/puestos";
 
 // El espejo entre el celular y la computadora emparejados (decisión 60). Con la aplicación

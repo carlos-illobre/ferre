@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api } from "../../api";
+import { api } from "../../datos/conexion";
 import { enviarCodigoAlPuesto, puestoRemoto } from "../../puesto";
 import { irA } from "../../rutas";
 import { Escaner } from "../../plataforma/camara/Escaner";

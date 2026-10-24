@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ErrorApi } from "../../../../api";
+import { ErrorApi } from "../../../../datos/conexion";
 
 // Lo que comparten la entrada y las pantallas de Negocio: saber si hay conexión, traer
 // datos con sus tres estados (cargando, error, listo) y decir los errores en castellano.

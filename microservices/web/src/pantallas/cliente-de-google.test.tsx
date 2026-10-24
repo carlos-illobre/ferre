@@ -5,7 +5,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 // El identificador de Google lo da el servidor (007-T043): el mismo con el que verifica las
 // credenciales, así no puede haber uno distinto en la aplicación.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 let configurado: { client_id: string } | null = null;
 beforeEach(() => {

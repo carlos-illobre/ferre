@@ -7,8 +7,8 @@ import { catalogoFalso, producto } from "../../../../pruebas/catalogo-falso";
 // El Catálogo para vender en la computadora (specs/015-catalogo-para-vender): la columna Stock,
 // «Agregar» debajo del precio, la tecla «+», el buscador largo y el panel de filtros con Esc.
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
-vi.mock("../../../../catalogo", async () => (await import("../../../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
-vi.mock("../../../../api", async (original) => ({ ...(await original<typeof import("../../../../api")>()), api: async () => [] }));
+vi.mock("../../../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../../../negocio/catalogo")>()), ...((await import("../../../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
+vi.mock("../../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../../datos/conexion")>()), api: async () => [] }));
 import { Productos } from "./Productos";
 import { ventaActual } from "../../../../negocio/ventas/venta-en-curso";
 

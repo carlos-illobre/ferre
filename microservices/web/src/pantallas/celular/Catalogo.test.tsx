@@ -6,10 +6,10 @@ import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 import { ObservadorFalso } from "../../pruebas/preparar";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
+vi.mock("../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../negocio/catalogo")>()), ...((await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
 const descargar = vi.fn<(...a: any[]) => Promise<void>>(async () => undefined);
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar: (...a: unknown[]) => descargar(...a), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), descargar: (...a: unknown[]) => descargar(...a), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 vi.mock("../../plataforma/camara/Escaner", () => ({
   hayCamara: () => true,

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { Anotadas as Anomalias } from "./compu/base/pantallas/Anomalias";
 
 const una = { id: "a1", tipo: "venta_sin_stock", cantidad: "3", detalle: "Se vendieron 3 y el sistema tenía 0 en stock: faltaban 3", creado_en: "2026-10-11T15:30:00Z", producto: "MECHA 8 MM", unidad: "unidad", usuario: "Marta" };

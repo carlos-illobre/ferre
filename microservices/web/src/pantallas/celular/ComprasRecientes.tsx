@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { conUnidad } from "../../unidades";
+import { conUnidad } from "../../negocio/catalogo";
 import { usePuede } from "../permisos";
 import { VerComprobante } from "../FotoDeFactura";
 import { anularCompra, faltanDe, gastoPorDia, letrasDeLaSemana, nombreDelComprobante, useComprasRecientes, useGastosDeLaSemana, usePedidosPorLlegar, type CompraFila } from "../../negocio/compras";

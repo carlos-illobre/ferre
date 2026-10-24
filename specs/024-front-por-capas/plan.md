@@ -5,8 +5,8 @@
 
 ## Summary
 
-Reordenar `microservices/web/src` en cinco capas (`app/`, `plataforma/`, `ui/`, `negocio/`,
-`pantallas/`), sin cambiar nada de lo que hace la aplicación. Primero se ponen las mediciones y
+Reordenar `microservices/web/src` en seis capas (`app/`, `plataforma/`, `datos/`, `ui/`,
+`negocio/`, `pantallas/`), sin cambiar nada de lo que hace la aplicación. Primero se ponen las mediciones y
 las reglas, que arrancan con la lista de lo que hoy no cumple. Después se ordena por etapas, y
 cada etapa vacía su parte de esa lista.
 
@@ -43,9 +43,14 @@ Cada una deja todo en verde y se sube sola.
    - Corren en el CI con `pnpm test`.
 2. **`app/` y la raíz de `src/`.**
    - El arranque va a `app/`.
-   - Cada archivo suelto de la raíz va a su capa: `almacen`, `cola`, `guardado` y `descarga` a
-     `plataforma/almacenamiento/`; `api`, `espejo` y `puesto` a `plataforma/conexion/`; `formato`
-     y `unidades` a `plataforma/formato/`; lo del negocio a `negocio/`.
+   - Cada archivo suelto de la raíz va a su capa:
+     - `almacen`, `cola`, `guardado`, `descarga` y `preferencias` a `datos/almacenamiento/`;
+     - `api` y `consultas` a `datos/conexion/` (después, `espejo` y `puesto`);
+     - `sesion` y `ajustes-del-sistema` a `datos/sesion/`, y `credenciales` a `datos/credenciales/`;
+     - `producto` (la forma del producto que llega y se guarda) a `datos/almacenamiento/`;
+     - `catalogo` y `unidades` a `negocio/catalogo/`;
+     - la lista de permisos a `negocio/permisos/`;
+     - el arranque y la elección de interfaz a `app/`.
    - Lo que specs/022 o specs/023 estén cambiando se mueve cuando esas terminen.
 3. **`ui/` única.**
    - Las piezas de `compu/base/ui.tsx` y `celular/componentes/base.tsx`, juntas.

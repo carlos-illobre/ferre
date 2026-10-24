@@ -1,6 +1,6 @@
 import { browserSupportsWebAuthn, startAuthentication, startRegistration } from "@simplewebauthn/browser";
-import { api } from "./api";
-import type { Usuario } from "./sesion";
+import { api } from "../conexion";
+import type { Usuario } from "../sesion";
 import type { PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/browser";
 import type { Credencial, DesafioDeHuella, EntradaConHuella, HuellaNueva, HuellaVinculada } from "@servidor/credenciales";
 

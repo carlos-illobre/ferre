@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../../../api";
+import { api } from "../../../datos/conexion";
 import { cuandoCorto } from "../../../negocio/apartados";
 import { describirDispositivo } from "../../compu/base/dispositivo";
 import { MAXIMO_DE_FOTOS, crearTicket, diasAbierto, DIAS_DE_ESPERA, useTickets, type Pendiente, type Ticket } from "../../tickets";

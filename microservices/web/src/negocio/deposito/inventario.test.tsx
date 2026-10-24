@@ -4,15 +4,14 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { producto } from "../../pruebas/catalogo-falso";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
-vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a) }));
-vi.mock("../../catalogo", () => ({ traerPorIds: async () => undefined }));
+vi.mock("../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../datos/almacenamiento")>()), ...(({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a) })), ...(({ loBajado: async () => bajado.actual })) }));
+vi.mock("../catalogo", async (original) => ({ ...(await original<typeof import("../catalogo")>()), ...(({ traerPorIds: async () => undefined })) }));
 const bajado = vi.hoisted(() => ({ actual: null as any }));
-vi.mock("../../descarga", () => ({ loBajado: async () => bajado.actual }));
 
-import { ErrorApi } from "../../api";
-import { consultas } from "../../consultas";
+import { ErrorApi } from "../../datos/conexion";
+import { consultas } from "../../datos/conexion";
 import { cantidadContada, nombreDeMovimiento, productosConStock, useCorregirStock, useMovimientos, useStock } from "./inventario";
 
 // El inventario, probado una sola vez y sin pantalla (010-E05).

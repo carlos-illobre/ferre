@@ -1,6 +1,6 @@
 import { registerSW } from "virtual:pwa-register";
 import { repetirMientrasSeVe } from "../plataforma/tiempo/mientras-se-ve";
-import { alCambiarPreferencias, buscaVersionSola, cadaCuantoBuscarVersion, preferencias } from "../preferencias";
+import { alCambiarPreferencias, buscaVersionSola, cadaCuantoBuscarVersion, preferencias } from "../datos/almacenamiento";
 import { EVENTO_VERSION_NUEVA } from "./VersionNueva";
 
 // Cómo se actualiza la app instalada (decisiones 54, 91 y 92, ADR-020). El navegador solo busca

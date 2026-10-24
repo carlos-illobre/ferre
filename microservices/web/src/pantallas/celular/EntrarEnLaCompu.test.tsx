@@ -3,15 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-import { ErrorApi } from "../../api";
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+import { ErrorApi } from "../../datos/conexion";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
 import { alAvisoDelEspejo } from "../../espejo";
 import { irA } from "../../rutas";
 import { destinoDelCodigo, Entrar } from "./Entrar";
 
 const huella = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../credenciales", () => ({ hayHuella: () => true, entrarConHuella: huella, huellaVinculadaAca: () => true }));
+vi.mock("../../datos/credenciales", async (original) => ({ ...(await original<typeof import("../../datos/credenciales")>()), ...(({ hayHuella: () => true, entrarConHuella: huella, huellaVinculadaAca: () => true })) }));
 // La cámara de mentira: un botón que «lee» el código que muestra la computadora.
 vi.mock("../../plataforma/camara/Escaner", () => ({
   hayCamara: () => true,

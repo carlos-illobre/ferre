@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "../../api";
+import { api } from "../../datos/conexion";
 import { irA } from "../../rutas";
 import { dispositivoId, sincronizarEmparejamiento } from "../../puesto";
 import { avisarEnEsteDispositivo } from "../../espejo";

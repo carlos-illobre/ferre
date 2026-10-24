@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { irA } from "../../rutas";
-import { urlApi } from "../../api";
-import { esAmbienteDePrueba } from "../../ambiente";
+import { urlApi } from "../../datos/conexion";
+import { esAmbienteDePrueba } from "../../plataforma/ambiente";
 import { fecha, pesosCortos } from "../../formato";
-import { useSesion } from "../../sesion";
+import { useSesion } from "../../datos/sesion";
 import { MEDIOS } from "../../negocio/ventas/venta";
 import { useConsultas, useVentasDelDia } from "../../negocio/ventas/ventas-del-dia";
 import { usePuede } from "../permisos";

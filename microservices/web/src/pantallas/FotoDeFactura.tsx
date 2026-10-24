@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api, reducirImagen } from "../api";
+import { api, reducirImagen } from "../datos/conexion";
 import { useFoto } from "./tickets";
 import { PedirFotoAlCelular } from "./PedirFoto";
 import "./foto-de-factura.css";

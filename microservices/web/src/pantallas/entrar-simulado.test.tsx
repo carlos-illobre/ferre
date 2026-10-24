@@ -7,14 +7,14 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 // passkeys, que habla con el lector) y el servidor (api). Se prueba qué hace Ferrebress con lo
 // que devuelven. Casos de docs/pruebas-manuales/entrar.md.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 const lector = vi.hoisted(() => ({ registrar: vi.fn<(...a: any[]) => Promise<any>>(), leer: vi.fn<(...a: any[]) => Promise<any>>() }));
 // La sesión de verdad: el arreglo general de las pruebas la reemplaza por una de prueba.
-vi.unmock("../sesion");
+vi.unmock("../datos/sesion");
 vi.mock("@simplewebauthn/browser", () => ({ browserSupportsWebAuthn: () => true, startRegistration: lector.registrar, startAuthentication: lector.leer }));
 
-const { ErrorApi } = await import("../api");
-const { ProveedorDeSesion, useSesion } = await import("../sesion");
+const { ErrorApi } = await import("../datos/conexion");
+const { ProveedorDeSesion, useSesion } = await import("../datos/sesion");
 const compu = await import("./compu/base/pantallas/Entrar");
 const OfrecerEnLaCompu = (await import("./compu/base/pantallas/OfrecerHuella")).OfrecerHuella;
 const celular = await import("./celular/pantallas/Login");

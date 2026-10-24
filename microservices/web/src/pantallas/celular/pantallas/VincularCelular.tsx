@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { vincularConCodigo } from "../../../negocio/vinculo";
-import { useSesion } from "../../../sesion";
+import { useSesion } from "../../../datos/sesion";
 import { irA } from "../../../rutas";
 import { BotonGoogle } from "./Login";
 import { AvisoError } from "../componentes/base";

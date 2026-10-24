@@ -5,10 +5,10 @@ import { catalogoFalso, producto } from "../pruebas/catalogo-falso";
 import { conPermisos } from "../pruebas/sesion";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../catalogo", async () => (await import("../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
+vi.mock("../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../negocio/catalogo")>()), ...((await import("../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
 vi.mock("../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 import { Pedidos, textoDelPedido, type Pedido } from "./Pedidos";
 

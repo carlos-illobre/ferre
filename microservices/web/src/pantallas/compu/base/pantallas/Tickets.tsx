@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "../../../../api";
+import { api } from "../../../../datos/conexion";
 import { cuandoCorto } from "../../../../negocio/apartados";
-import { useSesion } from "../../../../sesion";
+import { useSesion } from "../../../../datos/sesion";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { describirDispositivo } from "../dispositivo";
 import { iniciales } from "../../../../negocio/apartados";

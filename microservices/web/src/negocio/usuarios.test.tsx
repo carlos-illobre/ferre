@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-vi.mock("../almacen", async (original) => ({ ...(await original<typeof import("../almacen")>()), leerTodo: async () => [] }));
-vi.mock("../catalogo", () => ({ traerPorIds: async () => undefined }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../datos/almacenamiento")>()), leerTodo: async () => [] }));
+vi.mock("./catalogo", async (original) => ({ ...(await original<typeof import("./catalogo")>()), ...(({ traerPorIds: async () => undefined })) }));
 
 import { autorizar, cambiarUsuario, cerrarSesion, cuantosQuedan, faltaEnAlta, filtrarUsuarios, ordenarUsuarios, partesResaltadas, SIN_FILTRO, sugerenciasDeUsuarios, useSesiones, useUsuarios } from "./usuarios";
 import { anularCompra, nombreDelComprobante, useComprasRecientes, type CompraFila } from "./compras";

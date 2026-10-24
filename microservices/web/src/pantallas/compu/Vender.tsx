@@ -13,11 +13,11 @@ import { NOMBRE_DE_MEDIO, cuentaDelRenglon, precioDe, subtotalDe, useVenta, type
 import { esMargenBoton } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { useCodigoParaVincular } from "../../negocio/vinculo";
-import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe, type Unidad } from "../../unidades";
-import { api, ErrorApi, subirFoto, urlDeFoto } from "../../api";
-import { guardar, borrarAnterioresA } from "../../almacen";
-import { enviarOEncolar, enviarPendientes } from "../../cola";
-import { busquedaAlDia, esperarBusqueda, useCatalogo, type Cliente } from "../../catalogo";
+import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe, type Unidad } from "../../negocio/catalogo";
+import { api, ErrorApi, subirFoto, urlDeFoto } from "../../datos/conexion";
+import { guardar, borrarAnterioresA } from "../../datos/almacenamiento";
+import { enviarOEncolar, enviarPendientes } from "../../datos/almacenamiento";
+import { busquedaAlDia, esperarBusqueda, useCatalogo, type Cliente } from "../../negocio/catalogo";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { nombreDeProducto, pesos } from "../../formato";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";

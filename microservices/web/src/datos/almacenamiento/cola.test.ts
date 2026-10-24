@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ErrorApi } from "./api";
+import { ErrorApi } from "../conexion";
 
 // La cola es write-ahead: se anota antes de mandar, los cambios de un mismo producto se
 // funden, todo sale en orden por un solo drenaje, y lo pendiente se aplica sobre el
 // catálogo bajado. Es lo que hace que un margen elegido sobreviva a una recarga.
 const apiFalsa = vi.fn();
-vi.mock("./api", async (original) => ({ ...(await original<typeof import("./api")>()), api: (...args: unknown[]) => apiFalsa(...args) }));
+vi.mock("../conexion", async (original) => ({ ...(await original<typeof import("../conexion")>()), api: (...args: unknown[]) => apiFalsa(...args) }));
 
 import { abrirBase } from "./almacen";
 async function vaciarCola() {
@@ -89,7 +89,7 @@ describe("cola de cambios", () => {
     localStorage.setItem("ferre.usuario", JSON.stringify({ id: "ana", email: "ana@ferre.test", nombre: "Ana" }));
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     const { enviarOEncolar, pendientes, apartarLoDeQuienSalio } = await import("./cola");
-    const { EVENTO_SESION_CERRADA } = await import("./api");
+    const { EVENTO_SESION_CERRADA } = await import("../conexion");
     await enviarOEncolar("venta", "POST", "/ventas", { id: "de-ana" });
     const subidas: { url: string; init: RequestInit }[] = [];
     let respuesta = 409;

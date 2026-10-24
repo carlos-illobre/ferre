@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 const pedidosDelEspejo = vi.hoisted(() => new Set<() => void>());
 vi.mock("../espejo", async (original) => ({ ...(await original<typeof import("../espejo")>()), alPedidoDeLaCompu: (o: () => void) => { pedidosDelEspejo.add(o); return () => pedidosDelEspejo.delete(o); } }));
 import { guardarPuestoRemoto } from "../puesto";
 import { PedidosDeLaCompu } from "./PedidosDeLaCompu";
-import { olvidarAjustes, ponerAjustes } from "../ajustes-del-sistema";
+import { olvidarAjustes, ponerAjustes } from "../datos/sesion";
 
 const unInstante = () => act(async () => { await new Promise((r) => setTimeout(r, 10)); });
 

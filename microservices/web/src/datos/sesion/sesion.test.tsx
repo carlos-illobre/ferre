@@ -5,10 +5,10 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 // distancia, venció o desactivaron al usuario. Para el dispositivo es lo mismo: el servidor
 // contesta 401 y la aplicación borra la sesión y vuelve sola a la entrada. Se simula el servidor
 // (fetch); la sesión y el cliente son los de verdad. Casos D4 a D6 de docs/pruebas-manuales/entrar.md.
-vi.unmock("./sesion");
+vi.unmock("./index"); // la preparación reemplaza la sesión por su index
 const { ProveedorDeSesion, useSesion, CONTROL_DE_SESION_MS } = await import("./sesion");
-const { api } = await import("./api");
-const { agregarALaVenta, ventaActual } = await import("./negocio/ventas/venta-en-curso");
+const { api } = await import("../conexion");
+const { agregarALaVenta, ventaActual } = await import("../../negocio/ventas/venta-en-curso");
 
 const CARLOS = { id: "u-1", email: "carlos@ferre.test", nombre: "Carlos", roles: [], permisos: [] };
 const respuesta = (estado: number, cuerpo: unknown = {}) => new Response(JSON.stringify(cuerpo), { status: estado, headers: { "Content-Type": "application/json" } });

@@ -3,13 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("./api", async (original) => ({ ...(await original<typeof import("./api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-import { ErrorApi } from "./api";
+vi.mock("../conexion", async (original) => ({ ...(await original<typeof import("../conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+import { ErrorApi } from "../conexion";
 import { abrirBase, guardar, leerTodo, respetarElGuardado } from "./almacen";
 import { enviarOEncolar, pendientes } from "./cola";
 import { guardaEnElDispositivo } from "./guardado";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
-import { Configuracion } from "./pruebas/configuracion";
+import { Configuracion } from "../../pruebas/configuracion";
 
 // Trabajar sin conexión en el celular (RF-84, specs/009-configuracion): el celular guarda datos
 // del negocio solo si la persona lo habilita; la computadora, siempre.

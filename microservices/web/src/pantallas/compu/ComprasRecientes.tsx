@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, type KeyboardEvent } from "react";
-import { conUnidad } from "../../unidades";
+import { conUnidad } from "../../negocio/catalogo";
 import { usePuede } from "../permisos";
 import { anularCompra, esDeLaSemana, letrasDeLaSemana, faltanDe, gastoPorDia, useComprasRecientes, useGastosDeLaSemana, usePedidosPorLlegar, type CompraFila, type Gastos } from "../../negocio/compras";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";

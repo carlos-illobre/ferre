@@ -9,10 +9,10 @@ import { fueSinConexion, type VentaDelDia } from "../../../negocio/ventas/ventas
 import { aEntrada, conCantidad, conPrecio, diferenciaDe, porQueNoSeGuarda, quitar, resolucionDe, subtotalCorregido, totalCorregido, useCorregirVenta, type Correccion, type RenglonCorregido } from "../../../negocio/ventas/correccion";
 import { aEntradaDeCambio, diferenciaDelCambio, paraVolver, paraVolverDeLaBusqueda, resolucionDelCambio, useRegistrarCambio, useVentasParaCambio, valorQueVuelve, type ParaVolver, type SeLleva, type VentaParaCambio, type Vuelve } from "../../../negocio/ventas/cambio";
 import { precioDelProducto } from "../../../negocio/catalogo/precio";
-import { pedirClientes, useCatalogo } from "../../../catalogo";
+import { pedirClientes, useCatalogo } from "../../../negocio/catalogo";
 import { nombreDeProducto, pesosCortos } from "../../../formato";
-import { urlDeFoto } from "../../../api";
-import { abreviarUnidad, conUnidad } from "../../../unidades";
+import { urlDeFoto } from "../../../datos/conexion";
+import { abreviarUnidad, conUnidad } from "../../../negocio/catalogo";
 
 // Corregir y cambiar una venta en el celular (specs/019, decisiones 124 y 135), como la v2: corregir
 // edita la venta en su hoja, con lo de antes tachado; el cambio (o la devolución, si no se lleva

@@ -5,9 +5,9 @@ import { precioDeVenta } from "../precios/vista-previa";
 import { producto } from "../../pruebas/catalogo-falso";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
-import { ErrorApi } from "../../api";
+import { ErrorApi } from "../../datos/conexion";
 import { aplicarLista, buscarProveedores, cargarLista, descuentosDe, situacionDelProveedor, fraccionAplicada, pendientes, retomar, ultimaAplicada, useFilasDeLista, useListas, variacion, type Cargada, type Fila, type ListaFila } from "./listas";
 import { altaDeProveedor, faltaEnProveedor, useProveedoresActivos } from "../proveedores";
 import { margenAMano, otroMargen, precioDelProducto } from "./precio";

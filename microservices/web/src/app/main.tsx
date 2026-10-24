@@ -1,11 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { mantenerActualizada } from "./actualizacion";
-import { VersionNueva } from "./VersionNueva";
-import { esAmbienteDePrueba } from "../ambiente";
-import { MarcoDePrueba } from "./MarcoDePrueba";
-import "../preferencias"; // aplica al abrir lo que la persona eligió en Configuración (RF-83)
-import { respetarElGuardado } from "../almacen";
+import { mantenerActualizada } from "../pantallas/actualizacion";
+import { VersionNueva } from "../pantallas/VersionNueva";
+import { esAmbienteDePrueba } from "../plataforma/ambiente";
+import { MarcoDePrueba } from "../pantallas/MarcoDePrueba";
+// Importarlo aplica al abrir lo que la persona eligió en Configuración (RF-83).
+import { respetarElGuardado } from "../datos/almacenamiento";
+import { ANCHO_DE_ESCRITORIO, vistaPara } from "./vista";
 
 // Ferrebress tiene dos juegos de pantallas: en el celular, una cosa por vez, con tarjetas y
 // hojas; en la computadora, menú lateral, tablas y teclado. Comparten paleta y el menú «Más».
@@ -14,14 +15,13 @@ import { respetarElGuardado } from "../almacen";
 // mismo ternario Vite les asigna a los dos la precarga de uno solo.
 mantenerActualizada();
 void respetarElGuardado();
-const ANCHO_DE_COMPUTADORA = 900;
 
 async function cargarInterfaz() {
-  if (window.innerWidth >= ANCHO_DE_COMPUTADORA) {
-    const { App } = await import("./compu/App");
+  if (vistaPara(window.innerWidth) === "escritorio") {
+    const { App } = await import("../pantallas/compu/App");
     return App;
   }
-  const { App } = await import("./celular/App");
+  const { App } = await import("../pantallas/celular/App");
   return App;
 }
 void cargarInterfaz().then((App) => {
@@ -33,4 +33,4 @@ void cargarInterfaz().then((App) => {
     </StrictMode>,
   );
 });
-window.matchMedia(`(min-width: ${ANCHO_DE_COMPUTADORA}px)`).addEventListener("change", () => window.location.reload());
+window.matchMedia(`(min-width: ${ANCHO_DE_ESCRITORIO}px)`).addEventListener("change", () => window.location.reload());

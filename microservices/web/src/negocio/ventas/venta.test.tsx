@@ -4,9 +4,9 @@ import { act, renderHook } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
+vi.mock("../catalogo", async (original) => ({ ...(await original<typeof import("../catalogo")>()), ...((await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
-vi.mock("../../cola", () => ({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: async () => 0 }));
+vi.mock("../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../datos/almacenamiento")>()), ...(({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: async () => 0 })) }));
 
 import { useVenta, type OpcionesDeVenta } from "./venta";
 
@@ -69,7 +69,7 @@ describe("la venta", () => {
   });
 
   it("si el servidor rechaza la venta, sigue armada y lo dice con las palabras de la interfaz", async () => {
-    const { ErrorApi } = await import("../../api");
+    const { ErrorApi } = await import("../../datos/conexion");
     enviarOEncolar.mockRejectedValue(new ErrorApi(409, "Ya estaba registrada"));
     const { result } = armar();
     act(() => { result.current.agregar(mecha); });

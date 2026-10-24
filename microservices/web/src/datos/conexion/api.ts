@@ -1,5 +1,5 @@
-import { crearCliente, ErrorDelServidor, esFaltaDeRed } from "./plataforma/servidor/cliente";
-import { reducirImagen } from "./plataforma/imagenes/reducir";
+import { crearCliente, ErrorDelServidor, esFaltaDeRed } from "../../plataforma/servidor/cliente";
+import { reducirImagen } from "../../plataforma/imagenes/reducir";
 import type { FotoSubida } from "@servidor/productos";
 
 // Única puerta a la API de Ferrebress. El cliente en sí es tecnología de la plataforma; acá

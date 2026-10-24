@@ -2,7 +2,7 @@ import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { decidir, diaCorto, horaCorta, iniciales, porPersona, useParaRevisar, vistaDelCambio, cuandoCorto, type CambioApartado, type VistaDelCambio } from "../../../negocio/apartados";
 import { horaDe, laSemana, porDia, TITULOS_DE_ANOMALIA, useAnomalias } from "../../../negocio/anomalias";
 import { NOMBRE_DE_MEDIO } from "../../../negocio/ventas/venta";
-import { urlDeFoto } from "../../../api";
+import { urlDeFoto } from "../../../datos/conexion";
 import { nombreDeProducto } from "../../../formato";
 import { IconoDeLaV2, type IconoV2 } from "../../IconoDeLaV2";
 import { TEXTOS } from "../../textos";

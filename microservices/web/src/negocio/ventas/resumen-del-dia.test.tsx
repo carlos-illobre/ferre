@@ -4,9 +4,9 @@ import { renderHook, waitFor } from "@testing-library/react";
 
 // «Hoy» renovada (specs/017): lo que se calcula de las ventas de un día.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { comparar, diaAnterior, nombreDelDia, porHora, resumenDelDia, totalHasta, useResumenDelDia } from "./resumen-del-dia";
-import { consultas } from "../../consultas";
+import { consultas } from "../../datos/conexion";
 import { hoyLocal } from "../../formato";
 
 const a = (h: number, m = 0, dia = "2026-10-17") => new Date(`${dia}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`).toISOString();

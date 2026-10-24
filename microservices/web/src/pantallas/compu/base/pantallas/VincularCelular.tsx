@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { vincularConCodigo, type Vinculado } from "../../../../negocio/vinculo";
-import { useSesion } from "../../../../sesion";
+import { useSesion } from "../../../../datos/sesion";
 import { irA } from "../rutas";
 import { BotonGoogle, BotonHuella, MarcoDeEntrada } from "./Entrar";
 import { esFallaDeRed } from "./negocio-comun";

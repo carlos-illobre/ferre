@@ -5,7 +5,7 @@ import { ConRutas } from "../rutas";
 import { Icono } from "../ui";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../../../api", async (original) => ({ ...(await original<typeof import("../../../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 // El dibujo del QR es trabajo asíncrono de verdad: con la máquina cargada termina tarde y corre
 // el momento en que vence el código. Acá es instantáneo; lo que se prueba es la entrada.
 vi.mock("qrcode", () => ({ default: { toDataURL: async (texto: string) => `data:image/png;base64,${btoa(texto)}` } }));

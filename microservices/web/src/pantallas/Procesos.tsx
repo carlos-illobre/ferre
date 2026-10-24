@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
-import { borrarToken, leerToken, urlApi } from "../api";
-import { guardaEnElDispositivo } from "../guardado";
+import { borrarToken, leerToken, urlApi } from "../datos/conexion";
+import { guardaEnElDispositivo } from "../datos/almacenamiento";
 import { usePuede } from "./permisos";
 import "./procesos.css";
 

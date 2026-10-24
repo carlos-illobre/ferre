@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cantidadValida, enteras, unidadDe } from "./unidades";
-import { producto } from "./pruebas/catalogo-falso";
+import { producto } from "../../pruebas/catalogo-falso";
 
 // Pedido del dueño: por unidad las cantidades son enteras (ni cero a la izquierda ni
 // decimales); a granel (kg, m, l) admiten un solo decimal.

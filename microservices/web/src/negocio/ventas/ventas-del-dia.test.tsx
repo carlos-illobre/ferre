@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { ErrorApi } from "../../api";
+import { ErrorApi } from "../../datos/conexion";
 import { fueSinConexion, hoyLocal, useAnularVenta, useVentasDelDia, ventasCambiaron, type VentaDelDia } from "./ventas-del-dia";
 
 const apiFalsa = vi.fn();
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
 const venta = (id: string, estado: VentaDelDia["estado"] = "confirmada"): VentaDelDia =>
   ({ id, fecha: "2026-10-13T12:00:00Z", medio_pago: "efectivo", total: "1500.00", estado, pagada_en: null, cliente: null, items: [{ descripcion: "Martillo", cantidad: "1.000", precio_unitario: "1500.00", margen_aplicado: null, explicacion: null, foto_url: null, subtotal: 2000 }] });

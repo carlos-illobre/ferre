@@ -1,7 +1,7 @@
 import { useCallback, type ReactNode } from "react";
-import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias } from "../../../../preferencias";
-import { guardaEnElDispositivo } from "../../../../guardado";
-import { useDescarga } from "../../../../descarga";
+import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias } from "../../../../datos/almacenamiento";
+import { guardaEnElDispositivo } from "../../../../datos/almacenamiento";
+import { useDescarga } from "../../../../datos/almacenamiento";
 import { fecha } from "../../../../formato";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { cambiarSinConexion, NOMBRE_DEL_TIEMPO, useMiVinculo, useMisCelulares, useReducirMovimiento } from "../../../configuracion-comun";

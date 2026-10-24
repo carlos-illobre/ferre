@@ -3,11 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
-import { ErrorApi } from "../api";
+import { ErrorApi } from "../datos/conexion";
 import { conPermisos, conTodosLosPermisos } from "../pruebas/sesion";
-import { consultas } from "../consultas";
+import { consultas } from "../datos/conexion";
 import { PESTANAS_DE_ANOMALIAS, PIDE_LAS_ANOMALIAS } from "./pestanas-de-anomalias";
 import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";

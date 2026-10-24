@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../api";
-import { consultas } from "../../consultas";
+import { api } from "../../datos/conexion";
+import { consultas } from "../../datos/conexion";
 import type { BusquedaDeDuplicados, ProductoAUnir, ResolverSugerencia, Separar, Sugerencia, UnirAMano, Union } from "@servidor/equivalencias";
 
 // Los duplicados, una sola vez para el celular y la computadora (RNF-60): el mismo artículo en

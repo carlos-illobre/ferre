@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../api", async (original) => ({ ...(await original<typeof import("../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-vi.mock("../credenciales", () => ({ hayHuella: () => false, listarCredenciales: async () => [{ id: "mio", dispositivo: "Motorola del depósito", creada_en: "2026-06-02T10:00:00Z", ultimo_uso_en: null }], quitarCredencial: vi.fn(), vincularEsteDispositivo: vi.fn(), EVENTO_CREDENCIALES: "x" }));
+vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../datos/credenciales", async (original) => ({ ...(await original<typeof import("../datos/credenciales")>()), ...(({ hayHuella: () => false, listarCredenciales: async () => [{ id: "mio", dispositivo: "Motorola del depósito", creada_en: "2026-06-02T10:00:00Z", ultimo_uso_en: null }], quitarCredencial: vi.fn(), vincularEsteDispositivo: vi.fn(), EVENTO_CREDENCIALES: "x" })) }));
 const espejo = vi.hoisted(() => ({ emparejado: false }));
 vi.mock("../espejo", async (original) => ({ ...(await original<typeof import("../espejo")>()), useEspejo: () => ({ emparejado: espejo.emparejado, lado: "celular", conectado: true, otroPresente: true, pausado: false, enEspejo: true }) }));
 

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { api } from "../api";
-import { consultas } from "../consultas";
+import { api } from "../datos/conexion";
+import { consultas } from "../datos/conexion";
 
 // Lo que pide una pantalla a una ruta del servidor: los datos (`null` mientras no llegaron),
 // el error si lo hubo, si está pidiendo y cómo volver a pedir. Con error no quedan a la vista

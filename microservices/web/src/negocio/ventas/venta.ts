@@ -1,17 +1,17 @@
 import type { ConsultaEntrada, MedioDePago, VentaEntrada } from "@servidor/ventas";
 import { CONSULTAS, ventasCambiaron } from "./ventas-del-dia";
 import { IVA_SI_NO_SE_SABE, precioDelProducto } from "../catalogo/precio";
-import { consultas } from "../../consultas";
+import { consultas } from "../../datos/conexion";
 import { useCallback, useEffect, useState } from "react";
 import { margenReal, precioDeVenta, subtotalDeRenglon } from "../precios/vista-previa";
-import { ErrorApi, subirFoto } from "../../api";
-import { borrarAnterioresA, guardar } from "../../almacen";
-import { pedirClientes, traerPorCodigo, useCatalogo } from "../../catalogo";
-import { enviarOEncolar, enviarPendientes } from "../../cola";
+import { ErrorApi, subirFoto } from "../../datos/conexion";
+import { borrarAnterioresA, guardar } from "../../datos/almacenamiento";
+import { pedirClientes, traerPorCodigo, useCatalogo } from "../catalogo";
+import { enviarOEncolar, enviarPendientes } from "../../datos/almacenamiento";
 import { contarAlEspejo } from "../../espejo";
 import { pesos, pesosCortos } from "../../formato";
-import type { Producto } from "../../producto";
-import { cantidadValida, conUnidad, type Unidad } from "../../unidades";
+import type { Producto } from "../catalogo";
+import { cantidadValida, conUnidad, type Unidad } from "../catalogo";
 import { agregarALaVenta, ponerCliente, ponerItems, ponerMedio, useVentaEnCurso, vaciarVenta, type Item } from "./venta-en-curso";
 export type { Item };
 

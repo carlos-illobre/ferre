@@ -1,8 +1,8 @@
-import { api, ErrorApi, EVENTO_SESION_CERRADA, urlApi } from "./api";
+import { api, ErrorApi, EVENTO_SESION_CERRADA, urlApi } from "../conexion";
 import { abrirBase, guardarMeta } from "./almacen";
 import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "./guardado";
-import { crearCola, type Cambio } from "./plataforma/sin-conexion/cola";
-import { idDelUsuarioDeEsteDispositivo } from "./sesion";
+import { crearCola, type Cambio } from "../../plataforma/sin-conexion/cola";
+import { idDelUsuarioDeEsteDispositivo } from "../sesion";
 
 // La cola de cambios de Ferrebress hechos sin conexión (issue #18): ventas, «no llevó»,
 // márgenes y precios, ajustes de stock, renglones de conteo. La cola en sí es tecnología de la

@@ -10,7 +10,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 // docs/pruebas-manuales/entrar.md.
 // El servidor se simula en fetch, debajo del cliente de la API: así la sesión, que el arreglo
 // general de las pruebas ya cargó, usa el mismo servidor de mentira que el resto.
-vi.unmock("../../sesion");
+vi.unmock("../../datos/sesion");
 const lector = vi.hoisted(() => ({ leer: vi.fn<(...a: any[]) => Promise<any>>() }));
 vi.mock("@simplewebauthn/browser", () => ({ browserSupportsWebAuthn: () => true, startRegistration: vi.fn(), startAuthentication: lector.leer }));
 // Cada prueba carga la aplicación de cero: la anterior deja trabajo andando (el espejo que se

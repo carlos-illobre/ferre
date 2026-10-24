@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from "react";
 import type { MedioDePago } from "@servidor/ventas";
-import type { Producto } from "../../producto";
-import { unidadDe, type Unidad } from "../../unidades";
+import type { Producto } from "../catalogo";
+import { unidadDe, type Unidad } from "../catalogo";
+import { EVENTO_SESION_TERMINADA } from "../../datos/sesion";
 
 // La venta en curso: los renglones, cómo se paga y el cliente, mientras la aplicación está
 // abierta (ADR-022). No es de ninguna pantalla: Vender la muestra y la cambia, el Catálogo le
@@ -31,6 +32,9 @@ export const ponerItems = (valor: Valor<Item[]>) => cambiarVenta({ items: typeof
 export const ponerMedio = (medio: MedioDePago | null) => cambiarVenta({ medio });
 export const ponerCliente = (clienteId: string) => cambiarVenta({ clienteId });
 export const vaciarVenta = () => cambiarVenta(VACIA);
+// La venta a medio armar es de quien la estaba armando: al terminar su sesión no queda para el
+// que entre después (015, ADR-022).
+if (typeof window !== "undefined") window.addEventListener(EVENTO_SESION_TERMINADA, vaciarVenta);
 
 // Agregar un producto (o un ítem libre, con su descripción): entra con cantidad 1; si el
 // producto ya está, se le suma 1 al renglón que había. La misma regla en Vender y en el Catálogo.

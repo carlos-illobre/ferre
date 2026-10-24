@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../api";
-import { enviarOEncolar } from "../../cola";
-import { consultas } from "../../consultas";
-import type { Producto } from "../../producto";
+import { api } from "../../datos/conexion";
+import { enviarOEncolar } from "../../datos/almacenamiento";
+import { consultas } from "../../datos/conexion";
+import type { Producto } from "../catalogo";
 import type { CierreDeConteo, Contado, Conteo, ConteoAbierto, ConteoCerrado, ConteoNuevo, RenglonContado, Sector, SectorCreado, SectorNuevo, SinContar } from "@servidor/conteos";
 import { stockCambio } from "./inventario";
 

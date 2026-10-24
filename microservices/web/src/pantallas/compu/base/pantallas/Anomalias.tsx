@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { cuandoCorto, decidir, diaCorto, haceCuanto, horaCorta, iniciales, porPersona, resumenDeLoApartado, useParaRevisar, vistaDelCambio, type CambioApartado, type VistaDelCambio } from "../../../../negocio/apartados";
 import { laSemana, porDia, horaDe, TITULOS_DE_ANOMALIA, ultimaVez, useAnomalias } from "../../../../negocio/anomalias";
-import { urlDeFoto } from "../../../../api";
+import { urlDeFoto } from "../../../../datos/conexion";
 import { nombreDeProducto } from "../../../../formato";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";

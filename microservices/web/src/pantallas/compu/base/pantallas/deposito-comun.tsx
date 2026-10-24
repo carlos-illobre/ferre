@@ -1,10 +1,10 @@
 import { useEffect, useId, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
-import { ErrorApi } from "../../../../api";
+import { ErrorApi } from "../../../../datos/conexion";
 import type { Producto } from "../../../celular/pantallas/Productos";
 import { Buscador, numero } from "../ui";
-import { abreviarUnidad } from "../../../../unidades";
+import { abreviarUnidad } from "../../../../negocio/catalogo";
 import "../estilos/deposito-comun.css";
-import { busquedaAlDia, esperarBusqueda } from "../../../../catalogo";
+import { busquedaAlDia, esperarBusqueda } from "../../../../negocio/catalogo";
 
 // Lo que comparten Stock, Compras y Contar: el buscador de productos que se maneja con
 // flechas y Enter, y las pocas cuentas y palabras que las tres escriben igual.

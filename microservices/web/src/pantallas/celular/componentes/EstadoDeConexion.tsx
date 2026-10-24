@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { leerMeta } from "../../../almacen";
-import { guardaEnElDispositivo } from "../../../guardado";
-import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../cola";
+import { leerMeta } from "../../../datos/almacenamiento";
+import { guardaEnElDispositivo } from "../../../datos/almacenamiento";
+import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../datos/almacenamiento";
 
 // Indicador discreto (issue #18): un punto y dos palabras. Sin conexión y cuántos cambios
 // esperan; sincronizado hace cuánto; coral si hay cambios esperando desde hace más de una hora.

@@ -1,8 +1,8 @@
-import { api } from "../api";
-import { consultas } from "../consultas";
+import { api } from "../datos/conexion";
+import { consultas } from "../datos/conexion";
 import { pesosCortos } from "../formato";
-import { productoEnMemoria } from "../catalogo";
-import { conUnidad } from "../unidades";
+import { productoEnMemoria } from "./catalogo";
+import { conUnidad } from "./catalogo";
 import { useDelServidor } from "./del-servidor";
 import { NOMBRE_DE_MEDIO } from "./ventas/venta";
 import type { CambioApartado, CambiosParaRevisar } from "@servidor/apartados";

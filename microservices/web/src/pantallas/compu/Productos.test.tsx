@@ -4,9 +4,9 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
-vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
+vi.mock("../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../negocio/catalogo")>()), ...((await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
 const descargar = vi.hoisted(() => vi.fn(async () => undefined));
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), descargar }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), descargar }));
 
 import { ventaActual } from "../../negocio/ventas/venta-en-curso";
 import { Productos } from "./base/pantallas/Productos";

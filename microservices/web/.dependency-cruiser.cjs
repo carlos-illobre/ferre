@@ -4,8 +4,8 @@
 // usa solo las de abajo. Lo que hoy no cumple está en `.dependency-cruiser-known-violations.json`
 // y sale de ahí al ordenarlo. Corre en cada subida.
 const FUERA_DE_LAS_PRUEBAS = "\\.test\\.tsx?$";
-// Un archivo de un módulo (una carpeta de primer nivel de plataforma, ui o negocio) que no es su index.
-const ADENTRO_DE_UN_MODULO = "^src/(plataforma|ui|negocio)/[^/]+/(?!index\\.tsx?$)";
+// Un archivo de un módulo (una carpeta de primer nivel de plataforma, datos, ui o negocio) que no es su index.
+const ADENTRO_DE_UN_MODULO = "^src/(plataforma|datos|ui|negocio)/[^/]+/(?!index\\.tsx?$)";
 
 module.exports = {
   forbidden: [
@@ -21,6 +21,20 @@ module.exports = {
       severity: "error",
       from: { path: "^src/plataforma/.*\\.test\\.tsx?$" },
       to: { path: "^src/", pathNot: "^src/(plataforma|pruebas)/" },
+    },
+    {
+      name: "los-datos-no-saben-del-negocio",
+      comment: "src/datos es cómo habla Ferrebress con el servidor y qué guarda en el dispositivo: usa solo src/datos y src/plataforma.",
+      severity: "error",
+      from: { path: "^src/datos/", pathNot: FUERA_DE_LAS_PRUEBAS },
+      to: { path: "^src/", pathNot: "^src/(datos|plataforma)/" },
+    },
+    {
+      name: "las-pantallas-piden-los-datos-al-negocio",
+      comment: "Las pantallas no llaman a la API ni a IndexedDB: usan los hooks de src/negocio.",
+      severity: "error",
+      from: { path: "^src/pantallas/", pathNot: FUERA_DE_LAS_PRUEBAS },
+      to: { path: "^src/datos/" },
     },
     {
       name: "la-ui-no-sabe-del-negocio",
@@ -63,16 +77,16 @@ module.exports = {
     },
     {
       name: "por-la-puerta-de-entrada",
-      comment: "Fuera de su carpeta, un módulo de plataforma, ui o negocio se usa solo por su index.ts.",
+      comment: "Fuera de su carpeta, un módulo de plataforma, datos, ui o negocio se usa solo por su index.ts (las pruebas pueden entrar, para reemplazarlo).",
       severity: "error",
-      from: { path: "^src/(plataforma|ui|negocio)/([^/]+)/" },
+      from: { path: "^src/(plataforma|datos|ui|negocio)/([^/]+)/", pathNot: FUERA_DE_LAS_PRUEBAS },
       to: { path: ADENTRO_DE_UN_MODULO, pathNot: "^src/$1/$2/" },
     },
     {
       name: "por-la-puerta-de-entrada-desde-afuera",
       comment: "Lo mismo para las pantallas, el arranque y lo que todavía está suelto.",
       severity: "error",
-      from: { pathNot: "^src/(plataforma|ui|negocio)/[^/]+/" },
+      from: { pathNot: ["^src/(plataforma|datos|ui|negocio)/[^/]+/", FUERA_DE_LAS_PRUEBAS] },
       to: { path: ADENTRO_DE_UN_MODULO },
     },
     {

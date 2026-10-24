@@ -1,5 +1,5 @@
-import { productoEnMemoria } from "../catalogo";
-import { conUnidad } from "../unidades";
+import { productoEnMemoria } from "./catalogo";
+import { conUnidad } from "./catalogo";
 import { useDelServidor } from "./del-servidor";
 import type { Anomalia, PaginaDeAnomalias } from "@servidor/anomalias";
 

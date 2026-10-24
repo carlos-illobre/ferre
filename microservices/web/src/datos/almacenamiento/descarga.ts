@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
-import { api, esFaltaDeRed } from "./api";
+import { api, esFaltaDeRed } from "../conexion";
 import { guardarMeta, guardarVarios, leerMeta, leerTodo, reemplazarTodo } from "./almacen";
 import { guardaEnElDispositivo } from "./guardado";
 import type { Producto } from "./producto";

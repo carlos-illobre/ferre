@@ -3,8 +3,11 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 export const CONTROL_DE_SESION_MS = 30_000;
 // Quien dependa de la sesión para conectarse (el espejo con el celular) se entera al entrar.
 export const EVENTO_SESION_ABIERTA = "ferre:sesion-abierta";
-import { api, borrarToken, guardarToken, leerToken } from "./api";
-import { vaciarVenta } from "./negocio/ventas/venta-en-curso";
+// Avisa que la persona ya no está: salió o se le cerró la sesión. Lo que es de ella (la venta a
+// medio armar) se borra al enterarse; los datos no saben qué es una venta (ADR-028).
+export const EVENTO_SESION_TERMINADA = "ferre:sesion-terminada";
+const terminar = () => window.dispatchEvent(new Event(EVENTO_SESION_TERMINADA));
+import { api, borrarToken, guardarToken, leerToken } from "../conexion";
 import { ponerAjustes } from "./ajustes-del-sistema";
 import type { SesionActual, UsuarioDeLaSesion } from "@servidor/sesiones";
 
@@ -33,9 +36,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
         const guardado = leerUsuarioGuardado();
         setSesion(guardado ? { estado: "con-sesion", usuario: guardado, sinConexion: true, sesionId: null } : { estado: "sin-sesion" });
       });
-    // La venta a medio armar es de quien la estaba armando: al cerrarse su sesión no queda para
-    // el que entre después (015, ADR-022; antes se perdía al cerrar Vender).
-    const alCerrar = () => { vaciarVenta(); setSesion({ estado: "sin-sesion" }); };
+    const alCerrar = () => { terminar(); setSesion({ estado: "sin-sesion" }); };
     window.addEventListener("sesion-cerrada", alCerrar);
     return () => window.removeEventListener("sesion-cerrada", alCerrar);
   }, []);
@@ -66,7 +67,7 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
   const salir = useCallback(async () => {
     await api("/sesiones/actual", { method: "DELETE" }).catch(() => undefined);
     borrarToken();
-    vaciarVenta();
+    terminar();
     setSesion({ estado: "sin-sesion" });
   }, []);
 

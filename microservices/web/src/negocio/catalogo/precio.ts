@@ -1,5 +1,5 @@
 import { esMargenBoton, preciosDeUnProducto, type Explicado } from "../precios/vista-previa";
-import type { Producto } from "../../producto";
+import type { Producto } from "../../datos/almacenamiento";
 
 // El precio de un producto, una sola vez para todas las pantallas (RNF-60). Lo calcula el
 // servidor y llega con el producto (ADR-018). La cuenta del front (la vista previa) se usa solo

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, esFaltaDeRed } from "../../api";
+import { api, esFaltaDeRed } from "../../datos/conexion";
 import type { AjustesDelSistema, CambiosDeAjustes } from "@servidor/sistema";
 
 // Más → Sistema (specs/020): lo que vale para todos los dispositivos. Los tramos y lo que vale los

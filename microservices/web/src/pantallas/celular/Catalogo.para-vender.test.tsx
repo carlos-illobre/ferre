@@ -8,9 +8,9 @@ import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 // El Catálogo para vender en el celular (specs/015-catalogo-para-vender, maqueta B): el stock de
 // cada producto, «Agregar» a la venta, el aviso, el número en Vender y los filtros.
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
+vi.mock("../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../negocio/catalogo")>()), ...((await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { Catalogo } from "./Catalogo";
 import { ParteVender } from "./Vender";
 import { App } from "./App";

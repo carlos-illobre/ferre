@@ -4,11 +4,11 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../catalogo", async () => (await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual));
+vi.mock("../catalogo", async (original) => ({ ...(await original<typeof import("../catalogo")>()), ...((await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../api", async (original) => ({ ...(await original<typeof import("../../api")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 
-import { ErrorApi } from "../../api";
+import { ErrorApi } from "../../datos/conexion";
 import { detalleDelRegistro, renglonesDelPedido, useIngreso, type OpcionesDeIngreso, type PedidoAIngresar } from "./ingreso";
 
 // El ingreso de mercadería, probado una sola vez y sin pantalla (010-E05): lo usan igual el
