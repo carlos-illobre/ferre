@@ -9,3 +9,5 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 
 ## Tareas
 
+
+- [x] T001 [regla] Quien solo registra ingresos no ve los pedidos por llegar: Depósito → Compras como la v2 (decisión 154)

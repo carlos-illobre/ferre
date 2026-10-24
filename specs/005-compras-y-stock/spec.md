@@ -266,7 +266,7 @@ pedido queda como recibido parcial y el stock subió solo en lo recibido.
 13. **Given** un pedido recibido parcial cuyo resto no va a llegar, **When** el Comprador lo cierra, **Then** queda «cerrado incompleto», sigue mostrando qué llegó y qué no, y ya no ofrece ingresar mercadería.
 14. **Given** un pedido en armado, que todavía no se mandó, **When** el Comprador sale de la pantalla y vuelve, **Then** el pedido sigue ahí como «borrador», se puede seguir editando y se puede borrar.
 15. **Given** un proveedor sin número de WhatsApp cargado, **When** el Comprador manda el pedido por WhatsApp, **Then** se le pide el número una vez, queda guardado en el proveedor y la próxima vez no se pregunta.
-16. **Given** un usuario sin el permiso «Encargar compras», **When** abre Depósito, **Then** no ve los pedidos; quien registra ingresos sí ve los pedidos pendientes de llegar, para ingresar la mercadería desde ellos, pero no los puede armar, mandar ni cancelar.
+16. **Given** un usuario sin el permiso «Encargar compras», **When** abre Depósito, **Then** no ve los pedidos ni los pedidos pendientes de llegar, aunque registre ingresos: entra directo al ingreso, como la v2 (decisión 154).
 
 ---
 

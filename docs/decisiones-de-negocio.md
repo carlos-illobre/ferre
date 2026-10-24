@@ -1295,3 +1295,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      celular se redefinen (T148). Se arreglan ya: quien solo encarga compras llega a los Pedidos
      desde Compras, y la tarjeta de una persona en el celular muestra cada sesión, aunque dos
      aparatos se llamen igual.
+
+154. **Quien solo registra ingresos no ve los pedidos por llegar** (2026-10-24, revisión de
+     specs/021). Carlos: como la v2. Depósito → Compras le abre el ingreso y no le muestra los
+     pedidos pendientes; los pedidos por llegar los ven quienes ven las compras o encargan
+     (specs/005, escenario 16).
