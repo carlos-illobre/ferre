@@ -56,3 +56,6 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Duplicados (computadora): el stock y las ventas en «así queda» («16 un. y las 35 ventas»); dice solo los proveedores y de quién sale el costo.
 - Mejoras y errores (computadora y celular): en el ticket abierto, «A mí también» con quiénes lo sumaron, la charla («Lo que pasó») y la marca sobre la captura.
 - Mejoras y errores (computadora): en «Va con», el nombre del dispositivo («Compu del mostrador»); hoy dice qué es y el navegador («computadora · Chrome»).
+- Quién hizo qué (computadora): «Bajar en planilla» (apagado).
+- Quién hizo qué (computadora): «Ver la venta» desde la acción elegida, que abra esa venta.
+- Quién hizo qué (celular): «A revisar», cuántas acciones hay para revisar («—»).

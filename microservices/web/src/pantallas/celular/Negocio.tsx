@@ -5,7 +5,7 @@ import { ComprasRecientes } from "./ComprasRecientes";
 import { urlApi } from "../../api";
 import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, quitarCelularDeOtro, useCelularesDeOtros, useSesiones, useUsuarios, type CelularDeOtroFila, type SesionFila } from "../../negocio/usuarios";
 import { useGastosDeLaSemana } from "../../negocio/compras";
-import { paginasDe, useActividad } from "../../negocio/actividad";
+import { Actividad } from "./Actividad";
 import { fecha, pesos } from "../../formato";
 import { useSesion } from "../../sesion";
 import { usePuede } from "../permisos";
@@ -37,7 +37,7 @@ export function Negocio({ parte, cabeza }: { parte: Parte; cabeza?: ReactNode })
       <div className="dos-columnas">
       <div className="columna">
       {parte === "usuarios" && puedeEsto("admin.usuarios") && <Usuarios />}
-      {parte === "actividad" && puedeEsto("negocio.actividad") && <Auditoria />}
+      {parte === "actividad" && puedeEsto("negocio.actividad") && <Actividad />}
       </div>
       </div>
     </main>
@@ -110,31 +110,3 @@ function Usuarios() {
   );
 }
 
-
-function Auditoria() {
-  const [pagina, setPagina] = useState(1);
-  const { datos } = useActividad({ pagina });
-  const paginas = paginasDe(datos);
-  const resumen = (contenido: Record<string, unknown>) => { const t = JSON.stringify(contenido); return t.length > 120 ? `${t.slice(0, 120)}…` : t; };
-  return (
-    <div data-testid="auditoria" style={{ display: "contents" }}>
-      <h2 className="seccion">Quién hizo qué</h2>
-      <Lista>
-        {(datos?.eventos ?? []).map((e) => (
-          <div key={e.id} className="fila">
-            <span className="nombre"><strong>{e.nombre ?? "sistema"}</strong> · {e.tipo}</span>
-            <small className="derecha">{new Date(e.fecha).toLocaleString("es-AR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</small>
-            <span className="detalle"><code title={JSON.stringify(e.contenido)}>{resumen(e.contenido)}</code></span>
-          </div>
-        ))}
-      </Lista>
-      {datos && (
-        <div className="paginado" data-testid="paginado">
-          <button type="button" className="boton chico" disabled={pagina <= 1} onClick={() => setPagina((p) => p - 1)}>← Anteriores</button>
-          <span>Página {datos.pagina} de {paginas} · {datos.total} acciones</span>
-          <button type="button" className="boton chico" disabled={pagina >= paginas} onClick={() => setPagina((p) => p + 1)}>Siguientes →</button>
-        </div>
-      )}
-    </div>
-  );
-}

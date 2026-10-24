@@ -1,256 +1,200 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useActividad, type Evento } from "../../../../negocio/actividad";
-import { useUsuarios, type UsuarioFila as Usuario } from "../../../../negocio/usuarios";
-import { fecha } from "../../../../formato";
-import { nombreDeMedio } from "../../../../negocio/ventas/venta";
-import { useEsCelular } from "../vista";
-import { Aviso, Boton, Hoja, Icono, Pagina, Pastilla, Progreso, Vacio, numero, pesosCortos } from "../ui";
-import { diaYHora, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
+import { useUsuarios } from "../../../../negocio/usuarios";
+import { Aviso, Boton, Hoja, Pagina, Progreso, Vacio } from "../ui";
+import { fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
+import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
+import { IconoN, Iniciales } from "../../../iconos-de-negocio";
+import { CATEGORIAS, TIPOS, aplanar, detalleDe, diasDelPeriodo, haceCuantoFue, horaDe, inicioDelDia, queFue, type Periodo } from "../../../actividad-en-palabras";
 import "../estilos/negocio.css";
+import "../estilos/actividad.css";
 
-type Contenido = Record<string, unknown>;
-type UsuarioFila = Pick<Usuario, "id" | "nombre" | "activo">;
-type Filtros = { usuario: string; tipo: string; desde: string; hasta: string };
-type Color = "ok" | "alerta" | "mal" | "azul" | undefined;
+type Filtros = { usuario: string; tipo: string; periodo: Periodo; desde: string; hasta: string };
+const AL_ABRIR: Filtros = { usuario: "", tipo: "", periodo: "hoy", desde: "", hasta: "" };
+const PERIODOS: { valor: Periodo; nombre: string }[] = [{ valor: "hoy", nombre: "Hoy" }, { valor: "ayer", nombre: "Ayer" }, { valor: "semana", nombre: "Esta semana" }];
 
-const SIN_FILTROS: Filtros = { usuario: "", tipo: "", desde: "", hasta: "" };
+const enPalabras = (f: Filtros) => f.periodo === "hoy" ? "hoy" : f.periodo === "ayer" ? "ayer" : f.periodo === "semana" ? "esta semana"
+  : f.desde && f.hasta ? `del ${f.desde.slice(8)}/${f.desde.slice(5, 7)} al ${f.hasta.slice(8)}/${f.hasta.slice(5, 7)}` : f.desde ? `desde el ${f.desde.slice(8)}/${f.desde.slice(5, 7)}` : f.hasta ? `hasta el ${f.hasta.slice(8)}/${f.hasta.slice(5, 7)}` : "en todo el registro";
+const primerNombre = (n: string | null) => (n ? n.split(/\s+/)[0]! : "El sistema");
 
-// Lo que el registro guarda con nombres técnicos, dicho con palabras del mostrador.
-const QUE: Record<string, { nombre: string; color?: Color }> = {
-  "venta.registrada": { nombre: "Venta", color: "ok" },
-  "venta.anulada": { nombre: "Venta anulada", color: "mal" },
-  "venta.pagada": { nombre: "Cobro de cuenta corriente", color: "ok" },
-  "compra.registrada": { nombre: "Compra", color: "azul" },
-  "compra.anulada": { nombre: "Compra anulada", color: "mal" },
-  "producto.precio_elegido": { nombre: "Cambio en un producto", color: "alerta" },
-  "producto.foto": { nombre: "Foto de un producto" },
-  "producto.unido": { nombre: "Productos unidos", color: "alerta" },
-  "producto.separado": { nombre: "Productos separados", color: "alerta" },
-  "equivalencia.rechazada": { nombre: "Duplicado descartado" },
-  "lista.cargada": { nombre: "Lista de precios cargada", color: "azul" },
-  "lista.aplicada": { nombre: "Lista de precios aplicada", color: "alerta" },
-  "lista.descartada": { nombre: "Lista de precios descartada" },
-  "stock.ajustado": { nombre: "Ajuste de stock", color: "alerta" },
-  "sector.creado": { nombre: "Sector nuevo" },
-  "conteo.abierto": { nombre: "Conteo empezado" },
-  "conteo.cerrado": { nombre: "Conteo cerrado", color: "azul" },
-  "usuario.creado": { nombre: "Usuario autorizado", color: "azul" },
-  "usuario.modificado": { nombre: "Cambio en un usuario", color: "alerta" },
-  "sesion.iniciada": { nombre: "Entró a la app" },
-  "sesion.cerrada": { nombre: "Salió de la app" },
-  "sesion.revocada": { nombre: "Sesión cerrada a distancia", color: "alerta" },
-  "credencial.vinculada": { nombre: "Celular vinculado con huella" },
-  "credencial.quitada": { nombre: "Celular con huella quitado" },
-  "puesto.vinculado": { nombre: "Celular vinculado a la computadora" },
-  "sistema.ajustes_cambiados": { nombre: "Cambio en los ajustes del sistema", color: "alerta" },
-  "cliente.creado": { nombre: "Cliente nuevo" },
-  "proveedor.creado": { nombre: "Proveedor nuevo" },
-  "proveedor.modificado": { nombre: "Cambio en un proveedor" },
-  "proceso.creado": { nombre: "Proceso nuevo" },
-  "proceso.importado": { nombre: "Proceso importado" },
-  "proceso.renombrado": { nombre: "Proceso con otro nombre" },
-  "proceso.vigente": { nombre: "Proceso vigente", color: "azul" },
-  "proceso.borrador_cambiado": { nombre: "Cambio en el borrador de un proceso" },
-  "proceso.borrador_descartado": { nombre: "Borrador de un proceso descartado" },
-  "proceso.borrado": { nombre: "Proceso borrado", color: "mal" },
-};
-
-// El filtro de la API compara el comienzo del tipo: «venta.» trae todo lo de ventas.
-const TIPOS: { valor: string; nombre: string }[] = [
-  { valor: "venta.", nombre: "Ventas" },
-  { valor: "venta.anulada", nombre: "Venta anulada" },
-  { valor: "compra.", nombre: "Compras" },
-  { valor: "producto.precio_elegido", nombre: "Cambio de margen o de datos de un producto" },
-  { valor: "producto.", nombre: "Productos (cambios, fotos y uniones)" },
-  { valor: "lista.", nombre: "Listas de precios" },
-  { valor: "stock.", nombre: "Ajustes de stock" },
-  { valor: "conteo.", nombre: "Conteos" },
-  { valor: "usuario.", nombre: "Usuarios" },
-  { valor: "proceso.", nombre: "Procesos" },
-  { valor: "sesion.", nombre: "Entradas y salidas de la app" },
-  { valor: "credencial.", nombre: "Celulares con huella" },
-  { valor: "cliente.", nombre: "Clientes" },
-  { valor: "proveedor.", nombre: "Proveedores" },
-  { valor: "sistema.", nombre: "Ajustes del sistema" },
-];
-
-const texto = (v: unknown) => (typeof v === "string" ? v : typeof v === "number" ? numero(v) : "");
-const cuantos = (v: unknown, uno: string, muchos: string) => (typeof v === "number" ? `${numero(v)} ${v === 1 ? uno : muchos}` : "");
-const juntar = (...partes: (string | false | null | undefined)[]) => partes.filter(Boolean).join(" · ");
-
-function queFue(e: Evento): { nombre: string; color?: Color } {
-  if (e.tipo === "producto.precio_elegido" && "margen_elegido" in e.contenido) return { nombre: "Cambio de margen", color: "alerta" };
-  return QUE[e.tipo] ?? { nombre: e.tipo.replace(/[._]/g, " ") };
-}
-
-// El detalle en una línea: qué se cambió, de cuánto a cuánto, sobre quién.
-function detalleDe(e: Evento, usuarios: UsuarioFila[]): string {
-  const c = e.contenido;
-  const persona = (id: unknown) => usuarios.find((u) => u.id === id)?.nombre ?? "un usuario";
-  switch (e.tipo) {
-    case "venta.registrada": return juntar(pesosCortos(c.total as number), nombreDeMedio(texto(c.medio_pago)), cuantos(c.items, "producto", "productos"));
-    case "venta.anulada": case "compra.anulada": return c.motivo ? `Motivo: ${texto(c.motivo)}` : "Sin motivo anotado";
-    case "compra.registrada": return juntar(texto(c.proveedor), pesosCortos(c.total as number), c.comprobante ? `comprobante ${texto(c.comprobante)}` : "", cuantos(c.items, "producto", "productos"));
-    case "producto.precio_elegido": return juntar("margen_elegido" in c && (c.margen_elegido === null ? "Sin margen elegido" : `Margen del ${texto(c.margen_elegido)} %`), "unidad" in c && `Se vende por ${texto(c.unidad)}`, "codigo_barras" in c && (c.codigo_barras ? `Código de barras ${texto(c.codigo_barras)}` : "Sin código de barras"), "proveedor_preferido_id" in c && "Cambió el proveedor preferido", "foto_url" in c && "Cambió la foto");
-    case "stock.ajustado": return juntar(`De ${texto(c.antes)} a ${texto(c.despues)}`, c.motivo ? texto(c.motivo) : "");
-    case "lista.cargada": return juntar(texto(c.proveedor), texto(c.archivo), c.fechaLista ? `lista del ${fecha(texto(c.fechaLista))}` : "");
-    case "lista.aplicada": return juntar(c.fechaLista ? `Lista del ${fecha(texto(c.fechaLista))}` : "", cuantos(c.actualizados, "precio actualizado", "precios actualizados"), cuantos(c.nuevos, "producto nuevo", "productos nuevos"));
-    case "conteo.cerrado": return juntar(texto(c.sector), cuantos(c.contados, "producto contado", "productos contados"), cuantos(c.ajustados, "ajustado", "ajustados"));
-    case "usuario.creado": return juntar(texto(c.email), Array.isArray(c.roles) ? `con ${c.roles.length} ${c.roles.length === 1 ? "rol" : "roles"}` : "");
-    case "usuario.modificado": {
-      const cambios = (c.cambios ?? {}) as Contenido;
-      return juntar(cambios.activo === false && `Desactivó a ${persona(c.id)}`, cambios.activo === true && `Reactivó a ${persona(c.id)}`, Array.isArray(cambios.roles) && `Cambió los roles de ${persona(c.id)}`, typeof cambios.nombre === "string" && `Ahora se llama ${cambios.nombre}`);
-    }
-    case "sesion.iniciada": return juntar(c.medio === "huella" ? "Con la huella" : "Con Google", texto(c.dispositivo));
-    case "credencial.vinculada": return texto(c.dispositivo);
-    case "sistema.ajustes_cambiados": {
-      // Qué ajuste, de cuánto a cuánto (specs/020).
-      const antes = (c.antes ?? {}) as Contenido, despues = (c.despues ?? {}) as Contenido;
-      const tiempo = (s: unknown) => (s === 0 ? "no recordarla" : typeof s === "number" ? (s < 60 ? `${s} s` : `${s / 60} min`) : "");
-      return juntar(
-        "sesion_segundos" in despues && `Sesión recordada: de ${tiempo(antes.sesion_segundos)} a ${tiempo(despues.sesion_segundos)}`,
-        "celular_segundos" in despues && `Pregunta del celular: de ${tiempo(antes.celular_segundos)} a ${tiempo(despues.celular_segundos)}`,
-        "vinculo_dias" in despues && `Días del vínculo: de ${texto(antes.vinculo_dias)} a ${texto(despues.vinculo_dias)}`,
-      );
-    }
-    case "sector.creado": case "cliente.creado": case "proveedor.creado": case "proceso.creado": case "proceso.importado": case "proceso.renombrado": case "proceso.vigente": return texto(c.nombre);
-    default: return "";
-  }
-}
-
-// Para el detalle completo: los nombres de los datos, legibles; los valores, como se guardaron.
-const rotulo = (clave: string) => { const t = clave.replace(/_/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase(); return t.charAt(0).toUpperCase() + t.slice(1); };
-function aplanar(c: Contenido, prefijo = ""): [string, string][] {
-  return Object.entries(c).flatMap(([k, v]): [string, string][] => {
-    const nombre = prefijo ? `${prefijo}: ${rotulo(k).toLowerCase()}` : rotulo(k);
-    if (v !== null && typeof v === "object" && !Array.isArray(v)) return aplanar(v as Contenido, nombre);
-    return [[nombre, v === null || v === "" ? "—" : v === true ? "Sí" : v === false ? "No" : Array.isArray(v) ? v.join(", ") : String(v)]];
-  });
-}
-
-const inicioDelDia = (dia: string, corrimiento = 0) => { const d = new Date(`${dia}T00:00:00`); d.setDate(d.getDate() + corrimiento); return d.toISOString(); };
-
-// «Quién hizo qué»: el registro de acciones, de a 10, de la más reciente a la más vieja.
-// Es de solo lectura.
+// «Quién hizo qué» como la v2 («Registro», decisión 148): los filtros en una fila (quién, el
+// período en segmentos y qué), la tabla de a 10 con la acción elegida a la derecha, «Qué pasó»
+// con cuántas de cada tipo y el paginador. Es de solo lectura.
 export function Actividad() {
-  const esCelular = useEsCelular();
   const enLinea = useEnLinea();
-  const [filtros, setFiltros] = useState<Filtros>(SIN_FILTROS);
+  const [filtros, setFiltros] = useState<Filtros>(AL_ABRIR);
   const [pagina, setPagina] = useState(1);
-  const desde = filtros.desde ? inicioDelDia(filtros.desde) : undefined;
-  const hasta = filtros.hasta ? inicioDelDia(filtros.hasta, 1) : undefined; // el «hasta» de la pantalla incluye ese día
-  const registro = useActividad({ pagina, usuario: filtros.usuario || undefined, tipo: filtros.tipo || undefined, desde, hasta });
+  const [rango, setRango] = useState(false);
+  const dias = diasDelPeriodo(filtros);
+  const desde = dias.desde ? inicioDelDia(dias.desde) : undefined;
+  const hasta = dias.hasta ? inicioDelDia(dias.hasta, 1) : undefined;
+  const usuario = filtros.usuario || undefined;
+  const registro = useActividad({ pagina, usuario, tipo: filtros.tipo || undefined, desde, hasta });
   const { datos, cargando } = registro;
   const error = registro.error ? textoDeError(registro.error, "No se pudo traer el registro") : null;
   const usuarios = useUsuarios().datos ?? [];
+  const [marcado, setMarcado] = useState(0);
   const [abierto, setAbierto] = useState<Evento | null>(null);
+  const tabla = useRef<HTMLDivElement>(null);
+
+  // «Qué pasó»: el total de cada tipo en el período, con la persona elegida.
+  const todas = useActividad({ pagina: 1, usuario, desde, hasta }).datos?.total ?? null;
+  const porTipo = CATEGORIAS.map((c) => useActividad({ pagina: 1, usuario, tipo: c.tipo, desde, hasta }).datos?.total ?? null); // eslint-disable-line react-hooks/rules-of-hooks
 
   // Cambiar un filtro lleva a la página 1; avanzar y retroceder los conserva.
-  const filtrar = (cambio: Partial<Filtros>) => { setFiltros((f) => ({ ...f, ...cambio })); setPagina(1); };
-  const conFiltros = Object.values(filtros).some(Boolean);
+  const filtrar = (cambio: Partial<Filtros>) => { setFiltros((f) => ({ ...f, ...cambio })); setPagina(1); setMarcado(0); };
+  const conFiltros = Boolean(filtros.usuario || filtros.tipo || filtros.periodo !== "hoy");
   const paginas = datos ? Math.max(1, Math.ceil(datos.total / datos.por_pagina)) : 1;
   const eventos = datos?.eventos ?? [];
-  const fechasAlReves = Boolean(filtros.desde && filtros.hasta && filtros.desde > filtros.hasta);
+  const elegido = eventos[Math.min(marcado, eventos.length - 1)] ?? null;
+  const fechasAlReves = Boolean(filtros.periodo === "rango" && filtros.desde && filtros.hasta && filtros.desde > filtros.hasta);
+  useEffect(() => { setMarcado(0); }, [pagina]);
+
+  function teclear(e: React.KeyboardEvent) {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const i = Math.min(eventos.length - 1, Math.max(0, marcado + (e.key === "ArrowDown" ? 1 : -1)));
+      setMarcado(i);
+      tabla.current?.querySelectorAll<HTMLButtonElement>("[data-testid='evento']")[i]?.focus();
+    } else if (e.key === "Enter" && elegido) { e.preventDefault(); setAbierto(elegido); }
+  }
+
+  const ahora = new Date();
+  const hoyTexto = `${ahora.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })} · ${ahora.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })}`;
+  const desdeN = datos && datos.total ? (datos.pagina - 1) * datos.por_pagina + 1 : 0;
+  const hastaN = datos ? Math.min(datos.total, datos.pagina * datos.por_pagina) : 0;
+  const numeros = Array.from({ length: paginas }, (_, i) => i + 1).filter((n) => Math.abs(n - pagina) <= 2 || (pagina <= 2 && n <= 5) || (pagina >= paginas - 1 && n > paginas - 5));
 
   return (
-    <Pagina titulo="Quién hizo qué" testId="actividad" className="actividad" bajada="Cada venta, compra, cambio de precio o de usuario queda anotado con quién lo hizo y cuándo. No se puede editar ni borrar.">
+    <Pagina titulo="Quién hizo qué" testId="actividad" className="actividad av2" bajada={<span className="solo-lectores">Cada venta, compra, cambio de precio o de usuario queda anotado con quién lo hizo y cuándo. No se puede editar ni borrar.</span>}>
+      <AlLadoDeLasPestanas>
+        <span className="av2-hoy">{hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1)}</span>
+        <button type="button" className="av2-boton" disabled title="Bajar el registro en planilla todavía no se puede"><IconoN nombre="file-down" tam={16} />Bajar en planilla</button>
+      </AlLadoDeLasPestanas>
       {!enLinea && <Aviso tipo="alerta" testId="actividad-sin-conexion">Sin conexión: el registro necesita internet. Se actualiza solo cuando vuelva.</Aviso>}
 
-      <form className="tarjeta actividad-filtros" role="search" aria-label="Filtros del registro" onSubmit={(e) => e.preventDefault()} data-testid="filtros">
-        <label className="campo">
-          <span>Quién</span>
-          <select className="selector" value={filtros.usuario} onChange={(e) => filtrar({ usuario: e.target.value })} data-testid="filtro-usuario">
-            <option value="">Todos</option>
-            {usuarios.map((u) => <option key={u.id} value={u.id}>{u.nombre}{u.activo ? "" : " (desactivado)"}</option>)}
-          </select>
-        </label>
-        <label className="campo">
-          <span>Qué</span>
-          <select className="selector" value={filtros.tipo} onChange={(e) => filtrar({ tipo: e.target.value })} data-testid="filtro-tipo">
-            <option value="">Todas las acciones</option>
-            {TIPOS.map((t) => <option key={t.valor} value={t.valor}>{t.nombre}</option>)}
-          </select>
-        </label>
-        <label className="campo">
-          <span>Desde el día</span>
-          <input className="entrada" type="date" value={filtros.desde} max={filtros.hasta || undefined} onChange={(e) => filtrar({ desde: e.target.value })} aria-invalid={fechasAlReves} aria-describedby={fechasAlReves ? "actividad-fechas" : undefined} data-testid="filtro-desde" />
-        </label>
-        <label className="campo">
-          <span>Hasta el día</span>
-          <input className="entrada" type="date" value={filtros.hasta} min={filtros.desde || undefined} onChange={(e) => filtrar({ hasta: e.target.value })} aria-invalid={fechasAlReves} aria-describedby={fechasAlReves ? "actividad-fechas" : undefined} data-testid="filtro-hasta" />
-        </label>
-        <Boton icono="cerrar" disabled={!conFiltros} onClick={() => { setFiltros(SIN_FILTROS); setPagina(1); }} data-testid="quitar-filtros">Quitar filtros</Boton>
-        {fechasAlReves && <small className="actividad-fechas" id="actividad-fechas" role="alert">El «desde» es posterior al «hasta»: así no hay días para mostrar.</small>}
-      </form>
-
-      <div className="actividad-cuenta" role="status" aria-live="polite" data-testid="cuenta">
-        {datos
-          ? <span><strong>{datos.total.toLocaleString("es-AR")} {datos.total === 1 ? "acción" : "acciones"}</strong>{conFiltros ? " con esos filtros" : " registradas"}{datos.total > 0 && ` · página ${datos.pagina} de ${paginas}`}</span>
-          : !error && <span>Trayendo el registro…</span>}
-        {cargando && datos && <span className="detalle">Trayendo la página…</span>}
-      </div>
-
-      <Aviso tipo="error" accion={<Boton tam="chico" onClick={registro.recargar}>Reintentar</Boton>}>{error}</Aviso>
-      {!datos && !error && <Progreso texto="Trayendo las últimas acciones…" />}
-
-      {datos && datos.total === 0 && (
-        <div className="tarjeta">
-          {conFiltros
-            ? <Vacio icono="filtro" titulo="No hay acciones con esos filtros" accion={<Boton onClick={() => { setFiltros(SIN_FILTROS); setPagina(1); }}>Quitar filtros</Boton>}>Probá con otro día, otra persona u otro tipo de acción.</Vacio>
-            : <Vacio icono="actividad" titulo="Todavía no hay acciones registradas">Apenas alguien venda, compre o cambie un precio, queda anotado acá.</Vacio>}
-        </div>
-      )}
-
-      {eventos.length > 0 && (
-        <div data-testid="auditoria" className={cargando ? "actividad-cargando" : ""} aria-busy={cargando}>
-          {esCelular ? (
-            <ul className="lista">
-              {eventos.map((e) => {
-                const que = queFue(e);
-                return (
-                  <li key={e.id} data-testid="evento">
-                    <button type="button" className="renglon actividad-renglon" onClick={() => setAbierto(e)} aria-haspopup="dialog">
-                      <span className="actividad-que"><Pastilla tipo={que.color}>{que.nombre}</Pastilla></span>
-                      <span className="detalle actividad-cuando">{diaYHora(e.fecha)}</span>
-                      <span className="actividad-linea"><strong>{e.nombre ?? "El sistema"}</strong>{detalleDe(e, usuarios) && <> · {detalleDe(e, usuarios)}</>}</span>
-                      <span className="actividad-flecha" aria-hidden="true"><Icono nombre="derecha" tam={18} /></span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <div className="tabla-marco">
-              <table className="tabla">
-                <thead><tr><th scope="col" className="angosta">Cuándo</th><th scope="col">Quién</th><th scope="col">Qué</th><th scope="col">Detalle</th><th scope="col" className="angosta"><span className="solo-lectores">Ver todo</span></th></tr></thead>
-                <tbody>
-                  {eventos.map((e) => {
-                    const que = queFue(e);
-                    const detalle = detalleDe(e, usuarios);
-                    return (
-                      <tr key={e.id} data-testid="evento">
-                        <td className="angosta" title={fechaCompleta(e.fecha)}>{diaYHora(e.fecha)}</td>
-                        <td className="nombre actividad-quien" title={e.email ?? undefined}>{e.nombre ?? <span className="detalle">El sistema</span>}</td>
-                        <td className="angosta"><Pastilla tipo={que.color}>{que.nombre}</Pastilla></td>
-                        <td className="actividad-detalle" title={detalle || undefined}>{detalle || <span className="detalle">—</span>}</td>
-                        <td className="angosta"><Boton tam="chico" onClick={() => setAbierto(e)} aria-label={`Ver todo sobre ${que.nombre.toLowerCase()}, ${diaYHora(e.fecha)}`} aria-haspopup="dialog">Ver todo</Boton></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+      <div className="av2-pantalla">
+        <div className="av2-izq">
+          <form className="av2-filtros" role="search" aria-label="Filtros del registro" onSubmit={(e) => e.preventDefault()} data-testid="filtros">
+            <label className={`av2-selector ${filtros.usuario ? "puesto" : ""}`}>
+              <span className="av2-et">Quién</span>
+              <select value={filtros.usuario} onChange={(e) => filtrar({ usuario: e.target.value })} data-testid="filtro-usuario">
+                <option value="">Todos</option>
+                {usuarios.map((u) => <option key={u.id} value={u.id}>{u.nombre}{u.activo ? "" : " (desactivado)"}</option>)}
+              </select>
+              <IconoN nombre="chevron-down" tam={16} />
+            </label>
+            <div className="av2-segmentos" role="group" aria-label="Período">
+              {PERIODOS.map((p) => <button key={p.valor} type="button" className={filtros.periodo === p.valor ? "elegido" : ""} aria-pressed={filtros.periodo === p.valor} onClick={() => { setRango(false); filtrar({ periodo: p.valor }); }} data-testid={`periodo-${p.valor}`}>{p.nombre}</button>)}
+              <button type="button" className={filtros.periodo === "rango" ? "elegido" : ""} aria-pressed={filtros.periodo === "rango"} aria-expanded={rango} onClick={() => { setRango((r) => !r); filtrar({ periodo: "rango" }); }} data-testid="periodo-rango"><IconoN nombre="calendar" tam={16} />Desde… hasta</button>
+            </div>
+            <label className={`av2-selector ${filtros.tipo ? "puesto" : ""}`}>
+              <span className="av2-et">Qué</span>
+              <select value={filtros.tipo} onChange={(e) => filtrar({ tipo: e.target.value })} data-testid="filtro-tipo">
+                <option value="">Todo</option>
+                {TIPOS.map((t) => <option key={t.valor} value={t.valor}>{t.nombre}</option>)}
+              </select>
+              <IconoN nombre="chevron-down" tam={16} />
+            </label>
+            {conFiltros && <button type="button" className="av2-boton fantasma" onClick={() => { setFiltros(AL_ABRIR); setPagina(1); setRango(false); }} data-testid="quitar-filtros"><IconoN nombre="x" tam={16} />Quitar filtros</button>}
+          </form>
+          {rango && (
+            <div className="av2-rango">
+              <label className="campo"><span>Desde el día</span><input className="entrada" type="date" value={filtros.desde} max={filtros.hasta || undefined} onChange={(e) => filtrar({ desde: e.target.value })} aria-invalid={fechasAlReves} data-testid="filtro-desde" /></label>
+              <label className="campo"><span>Hasta el día</span><input className="entrada" type="date" value={filtros.hasta} min={filtros.desde || undefined} onChange={(e) => filtrar({ hasta: e.target.value })} aria-invalid={fechasAlReves} data-testid="filtro-hasta" /></label>
+              <span className="uv-detalle">Sin días, se ve todo el registro.</span>
+              {fechasAlReves && <small className="actividad-fechas" role="alert">El «desde» es posterior al «hasta»: así no hay días para mostrar.</small>}
             </div>
           )}
-        </div>
-      )}
 
-      {datos && datos.total > 0 && (
-        <nav className="actividad-paginado" data-testid="paginado" aria-label="Páginas del registro">
-          <Boton icono="izquierda" disabled={pagina <= 1 || cargando} onClick={() => setPagina((p) => p - 1)} data-testid="anteriores">Anteriores</Boton>
-          <span>Página {datos.pagina} de {paginas} · {datos.total.toLocaleString("es-AR")} {datos.total === 1 ? "acción" : "acciones"}</span>
-          <Boton disabled={pagina >= paginas || cargando} onClick={() => setPagina((p) => p + 1)} data-testid="siguientes" className="actividad-siguientes">Siguientes<Icono nombre="derecha" /></Boton>
-        </nav>
-      )}
+          <div className="av2-total" role="status" aria-live="polite" data-testid="cuenta">
+            {datos ? <><b>{datos.total.toLocaleString("es-AR")} {datos.total === 1 ? "acción" : "acciones"}</b><span className="av2-detalle av2-crece">{enPalabras(filtros)}, de la más nueva a la más vieja</span>{datos.total > 0 && <span className="av2-detalle">Página <b>{datos.pagina}</b> de <b>{paginas}</b></span>}</>
+              : !error && <span className="av2-detalle">Trayendo el registro…</span>}
+            {cargando && datos && <span className="av2-detalle">Trayendo la página…</span>}
+          </div>
+
+          <Aviso tipo="error" accion={<Boton tam="chico" onClick={registro.recargar}>Reintentar</Boton>}>{error}</Aviso>
+          {!datos && !error && <Progreso texto="Trayendo las últimas acciones…" />}
+
+          {datos && datos.total === 0 && (
+            <div className="tarjeta">
+              {conFiltros
+                ? <Vacio icono="filtro" titulo="No hay acciones con esos filtros" accion={<Boton onClick={() => { setFiltros({ ...AL_ABRIR, periodo: "rango" }); setPagina(1); }}>Ver todo el registro</Boton>}>Probá con otro día, otra persona u otro tipo de acción.</Vacio>
+                : <Vacio icono="actividad" titulo="Hoy todavía no hay acciones" accion={<Boton onClick={() => filtrar({ periodo: "rango" })}>Ver todo el registro</Boton>}>Apenas alguien venda, compre o cambie un precio, queda anotado acá.</Vacio>}
+            </div>
+          )}
+
+          {eventos.length > 0 && (
+            <div className={`av2-tabla ${cargando ? "actividad-cargando" : ""}`} data-testid="auditoria" aria-busy={cargando} ref={tabla} onKeyDown={teclear}>
+              <div className="av2-fila cab" aria-hidden="true"><span>Hora</span><span>Quién</span><span>Qué</span><span>Detalle</span><span /></div>
+              {eventos.map((e, i) => {
+                const que = queFue(e);
+                const detalle = detalleDe(e, usuarios);
+                return (
+                  <button key={e.id} type="button" className={`av2-fila ${e === elegido ? "elegida" : ""}`} aria-pressed={e === elegido} onClick={() => setMarcado(i)} onDoubleClick={() => setAbierto(e)} data-testid="evento" title={fechaCompleta(e.fecha)}>
+                    <span className="av2-hora">{horaDe(e.fecha)}</span>
+                    <span className="av2-quien" title={e.email ?? undefined}><Iniciales nombre={e.nombre ?? "Sistema"} clave={e.email ?? "sistema"} tam="s" />{primerNombre(e.nombre)}</span>
+                    <span className="av2-que"><span className={`av2-tipo ${que.tono ?? ""}`}><IconoN nombre={que.icono} tam={16} /></span>{que.nombre}</span>
+                    <span className="av2-det">{detalle || "—"}</span>
+                    <IconoN nombre="chevron-right" className="av2-mas" />
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {datos && datos.total > 0 && (
+            <nav className="av2-pie" data-testid="paginado" aria-label="Páginas del registro">
+              <span className="av2-detalle">{desdeN} a {hastaN} de {datos.total.toLocaleString("es-AR")} · <span className="av2-kbd">↑</span> <span className="av2-kbd">↓</span> recorren, <span className="av2-kbd">Enter</span> abre</span>
+              <span className="av2-paginador">
+                <button type="button" className="av2-boton icono" disabled={pagina <= 1 || cargando} onClick={() => setPagina((p) => p - 1)} aria-label="Anteriores" data-testid="anteriores"><IconoN nombre="chevron-left" tam={16} /></button>
+                {numeros.map((n) => <button key={n} type="button" className={`av2-pag ${n === pagina ? "actual" : ""}`} aria-current={n === pagina ? "page" : undefined} onClick={() => setPagina(n)} disabled={cargando}>{n}</button>)}
+                <button type="button" className="av2-boton" disabled={pagina >= paginas || cargando} onClick={() => setPagina((p) => p + 1)} data-testid="siguientes">Siguiente <IconoN nombre="chevron-right" tam={16} /></button>
+              </span>
+            </nav>
+          )}
+        </div>
+
+        <div className="av2-der">
+          <section className="av2-caja" aria-labelledby="av2-que-paso" data-testid="que-paso">
+            <h3 id="av2-que-paso">Qué pasó {enPalabras(filtros)}<small>tocá para filtrar</small></h3>
+            <div className="av2-barras">
+              {CATEGORIAS.map((c, i) => {
+                const n = porTipo[i];
+                const max = Math.max(1, todas ?? 1);
+                return (
+                  <button key={c.tipo} type="button" className={`av2-b ${c.tono ?? ""} ${filtros.tipo === c.tipo ? "puesto" : ""}`} aria-pressed={filtros.tipo === c.tipo} onClick={() => filtrar({ tipo: filtros.tipo === c.tipo ? "" : c.tipo })}>
+                    <IconoN nombre={c.icono} tam={16} /><span>{c.nombre}</span><i style={{ width: `${n ? Math.max(6, (n / max) * 56) : 0}px` }} /><b>{n ?? "—"}</b>
+                  </button>
+                );
+              })}
+              <div className="av2-b otras"><IconoN nombre="ellipsis" tam={16} /><span>Otras</span><i style={{ width: `${todas !== null && porTipo.every((n) => n !== null) ? Math.max(6, ((todas - porTipo.reduce<number>((s, n) => s + (n ?? 0), 0)) / Math.max(1, todas)) * 56) : 0}px` }} /><b>{todas !== null && porTipo.every((n) => n !== null) ? todas - porTipo.reduce<number>((s, n) => s + (n ?? 0), 0) : "—"}</b></div>
+            </div>
+          </section>
+
+          {elegido && (() => {
+            const que = queFue(elegido);
+            const detalle = detalleDe(elegido, usuarios);
+            const motivo = typeof elegido.contenido.motivo === "string" ? elegido.contenido.motivo : null;
+            const quienFue = usuarios.find((u) => u.email === elegido.email);
+            return (
+              <section className="av2-caja av2-elegido" aria-label={`${que.nombre}, ${horaDe(elegido.fecha)}`} data-testid="accion-elegida">
+                <div className="av2-det-cab"><span className={`av2-tipo l ${que.tono ?? ""}`}><IconoN nombre={que.icono} /></span><div><div className="av2-det-titulo">{que.nombre}</div><div className="av2-detalle">{horaDe(elegido.fecha)} · {haceCuantoFue(elegido.fecha)}</div></div></div>
+                <dl className="av2-kv">
+                  <dt>Quién</dt><dd className="av2-kv-quien"><Iniciales nombre={elegido.nombre ?? "Sistema"} clave={elegido.email ?? "sistema"} tam="s" />{elegido.nombre ?? "El sistema"}</dd>
+                  {detalle && <><dt>Qué</dt><dd>{detalle}</dd></>}
+                  <dt>Cuándo</dt><dd>{fechaCompleta(elegido.fecha)}</dd>
+                </dl>
+                {motivo && <div className="av2-cita">«{motivo}»</div>}
+                <div className="av2-acciones">
+                  <button type="button" className="av2-boton suave" onClick={() => setAbierto(elegido)} aria-haspopup="dialog">Ver todo</button>
+                  {quienFue && <button type="button" className="av2-boton suave" onClick={() => filtrar({ usuario: quienFue.id })}>Lo de {primerNombre(elegido.nombre)}</button>}
+                </div>
+              </section>
+            );
+          })()}
+        </div>
+      </div>
 
       {abierto && (
         <Hoja titulo={queFue(abierto).nombre} alCerrar={() => setAbierto(null)} testId="hoja-evento" pie={<Boton variante="marino" onClick={() => setAbierto(null)}>Entendido</Boton>}>

@@ -578,3 +578,25 @@ fecha o rango de fechas y por tipo de acción, solos o combinados; quitar los fi
 | Cargando | Que se está trayendo la página; los filtros y la página anterior no desaparecen |
 | Error | Que no se pudo traer, con reintento |
 | Sin conexión | Que el registro necesita internet |
+
+**Cómo se ve: la v2 (decisión 148, 2026-10-24).** Tiene el diseño de la v2 del director de arte
+(«Registro», en la computadora y en el celular), con el lenguaje «Mostrador»:
+
+- **Computadora:** arriba, al lado de las pestañas, la fecha y hora de hoy y «Bajar en planilla»
+  (apagado hasta que exista). Los filtros en una fila: «Quién», el período en segmentos (Hoy,
+  Ayer, Esta semana y «Desde… hasta», que abre el desde y el hasta) y «Qué». Al abrir, el
+  período es Hoy; «Desde… hasta» sin días muestra todo. Debajo, «38 acciones» con el período
+  en palabras y la página. La tabla tiene Hora, Quién (sus iniciales y el nombre), Qué (el ícono
+  del tipo y su nombre) y Detalle; ↑ ↓ la recorren y la acción elegida se ve a la derecha, con su
+  ícono, cuándo y hace cuánto, quién, cada dato en palabras y el motivo como cita; desde ahí,
+  «Lo de <persona>» filtra por esa persona. Arriba a la derecha, «Qué pasó»: cuántas ventas
+  cobradas, entradas, cambios de margen, ajustes de stock, ventas anuladas (en rojo) y otras hubo
+  en el período; tocar una filtra por ese tipo. Abajo, «1 a 10 de 38», las teclas y el paginador
+  con los números de página y «Siguiente».
+- **Celular:** tres números arriba (las acciones del período, las anuladas en rojo y «A revisar»,
+  que queda con «—»), los filtros como pastillas (período, quién y tipo), «38 acciones · la más
+  nueva primero» y una tarjeta por acción con el ícono del tipo, qué fue con su importe, quién y
+  el detalle, y la hora; una venta anulada lleva el borde rojo. Al tocarla sube la hoja con todo.
+  Abajo, «Nuevas» y «Anteriores» con la página en el medio.
+- El ícono de cada tipo es gris, salvo lo que el dueño revisa: una venta anulada en rojo, un
+  cambio de margen o un ajuste de stock en ámbar.

@@ -1,0 +1,41 @@
+/* Quién hizo qué en el celular, como la v2 («Registro», decisión 148). Las medidas son las de la maqueta. */
+.ac2 { display: flex; flex-direction: column; gap: 0; }
+.ac2-res { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.ac2-num { display: flex; flex-direction: column; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--p-borde); border-radius: 16px; background: var(--p-superficie); box-shadow: 0 1px 2px rgb(26 29 27 / .05); text-align: left; font: inherit; color: var(--p-tinta); }
+.ac2-num span { font-size: 14px; font-weight: 650; color: var(--p-texto-2); }
+.ac2-num b { font-size: 22px; line-height: 28px; font-weight: 800; }
+.ac2-num.rojo { background: var(--p-medio-cuenta-suave); border-color: transparent; }
+.ac2-num.rojo b { color: var(--p-medio-cuenta); }
+.ac2-num.ambar { background: var(--p-amarillo-suave); border-color: transparent; }
+.ac2-num.ambar b { color: var(--p-amarillo-texto); }
+.ac2-num.puesto { box-shadow: inset 0 0 0 2px var(--p-verde); }
+.ac2-filtros { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; scrollbar-width: none; }
+.ac2-chip { position: relative; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font-size: 15px; font-weight: 700; white-space: nowrap; }
+.ac2-chip.oscuro { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
+.ac2-chip.puesto { border-color: var(--p-verde); background: var(--p-verde-suave); color: var(--p-verde); }
+.ac2-chip select { position: absolute; inset: -1px; opacity: 0; width: 100%; font-size: 16px; }
+.ac2-rango { display: flex; gap: 8px; margin-top: 10px; }
+.ac2-rango label { flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--p-texto-2); font-weight: 600; }
+.ac2-rango input { height: 44px; border: 1px solid var(--p-borde-fuerte); border-radius: 12px; padding: 0 10px; font: inherit; background: #fff; }
+.ac2-total { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 2px 8px; font-size: 14px; color: var(--p-texto-2); font-weight: 600; }
+.ac2-total b { font-size: 16px; font-weight: 800; color: var(--p-tinta); }
+.ac2-lista { display: flex; flex-direction: column; gap: 6px; }
+.ac2-ac { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; padding: 10px 12px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 14px; box-shadow: 0 1px 2px rgb(26 29 27 / .05); text-align: left; font: inherit; color: var(--p-tinta); }
+.ac2-ac.rojo { box-shadow: inset 4px 0 0 var(--p-medio-cuenta), 0 1px 2px rgb(26 29 27 / .05); border-color: #F0B8B1; }
+.ac2-tipo { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--p-relleno); color: var(--p-texto-2); }
+.ac2-tipo.error { background: var(--p-medio-cuenta-suave); color: var(--p-medio-cuenta); }
+.ac2-tipo.urgente { background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); }
+.ac2-texto { min-width: 0; display: flex; flex-direction: column; }
+.ac2-q { font-weight: 750; font-size: 15px; line-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ac2-d { display: block; font-size: 14px; line-height: 20px; color: var(--p-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac2-d .iniciales.s { display: inline-grid; width: 20px; height: 20px; font-size: 14px; vertical-align: -5px; margin-right: 4px; }
+.ac2-h { align-self: start; padding-top: 2px; font-size: 14px; font-weight: 750; color: var(--p-texto-2); text-align: right; white-space: nowrap; }
+.ac2-pager { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-top: 12px; }
+.ac2-boton { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; border-radius: 12px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); font: inherit; font-weight: 700; font-size: 16px; color: var(--p-tinta); }
+.ac2-boton:disabled { opacity: .45; }
+.ac2-t { text-align: center; font-weight: 750; font-size: 15px; }
+.ac2-t small { display: block; font-size: 14px; color: var(--p-texto-2); font-weight: 600; }
+.ac2-resumen { margin: 0 0 8px; font-size: 16px; font-weight: 650; }
+.ac2-kv { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 6px 10px; margin: 0 0 12px; font-size: 15px; }
+.ac2-kv dt { color: var(--p-texto-2); font-weight: 600; }
+.ac2-kv dd { margin: 0; font-weight: 650; overflow-wrap: anywhere; }
