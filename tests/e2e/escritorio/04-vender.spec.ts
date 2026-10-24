@@ -49,7 +49,7 @@ test.beforeAll(() => {
 });
 
 test("buscar, agregar, cobrar en efectivo, ver la venta del día, corregirla y anularla", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
@@ -160,7 +160,7 @@ test("sin mouse: lo que llega del servidor no le saca el foco al menú", async (
   let soltar = () => {};
   const suelto = new Promise<void>((listo) => { soltar = listo; });
   await page.route((url) => url.pathname.startsWith("/productos/pagina"), async (r) => { await suelto; await r.continue(); }, { times: 1 });
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/vender");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeEnabled();
@@ -182,7 +182,7 @@ test("sin mouse: lo que llega del servidor no le saca el foco al menú", async (
 // El menú se achica a solo íconos con su botón o Ctrl+B y recuerda cómo quedó (decisión 122);
 // achicado, sigue andando con el teclado (decisión 121).
 test("el menú se achica con su botón o con Ctrl+B, recuerda cómo quedó y sigue andando con el teclado", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/vender");
   const app = page.locator(".app");
   await expect(page.getByTestId("menu-vender")).toContainText("Vender");
@@ -202,7 +202,7 @@ test("el menú se achica con su botón o con Ctrl+B, recuerda cómo quedó y sig
 
 // Todo con el teclado (decisión 61, RNF-05): el menú, las pestañas y una venta completa, sin mouse.
 test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una venta con Tab y los atajos", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/productos");
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeFocused();

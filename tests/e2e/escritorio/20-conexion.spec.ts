@@ -56,7 +56,7 @@ async function abrirLosDos(browser: import("@playwright/test").Browser, enCadaUn
   const compu = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
   const celular = await otraVentana(browser, CELULAR);
   for (const [pagina, token] of [[compu, TOKEN_COMPU], [celular, TOKEN_CELULAR]] as const) {
-    await pagina.addInitScript((t) => { localStorage.clear(); localStorage.setItem("ferre.sesion", t); }, token);
+    await pagina.addInitScript((t) => { localStorage.clear(); localStorage.setItem("ferre.sesion.desarrollo", t); }, token);
     await pagina.addInitScript(enCadaUno);
     await pagina.goto("/#/vender");
   }

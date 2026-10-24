@@ -1,6 +1,6 @@
 # Data Model: Base del sistema
 
-Modelo de datos completo de `gestion-del-local`, único dueño de la base (ADR-003). Es
+Modelo de datos completo de `gestion-del-local`, único dueño de la base del mostrador (ADR-003, ADR-026). Es
 contrato: el servidor se conserva y cualquier pantalla nueva trabaja contra estos datos a
 través de la API. Coincide columna por columna con las migraciones del servicio; si hay una
 diferencia, mandan las migraciones y este documento se corrige.
@@ -62,6 +62,8 @@ erDiagram
   `movimiento_stock`, `item_venta`, `item_compra`, `consulta` y `renglon_conteo`, deja
   registrado qué movió en el evento `producto.unido` y con eso la unión se deshace; y
   quitar un renglón de un conteo abierto elimina su fila de `renglon_conteo`.
+- **Listas cerradas de valores** (medio de pago, estados de cada documento, tipos de movimiento,
+  de anomalía, de ticket…): tipos `ENUM` de Postgres, una sola vez en la base (ADR-025).
 - **Dinero:** `numeric(14,4)` para costos (las listas traen 4 decimales), `numeric(12,2)`
   para precios de venta ya redondeados y totales. Cantidades: `numeric(12,3)`.
 - **Fechas de alta y cambio:** `creado_en` en casi todo; `modificado_en`, mantenido por el
@@ -151,14 +153,15 @@ Tal como quedan después de la migración `0011`. PK = clave primaria; → = ref
 
 **`evento`**: `id` uuid PK · `tipo` text · `version` integer, por omisión 1 · `fecha` timestamptz · `dispositivo_id` text, nulo · `contenido` jsonb (el evento completo) · `usuario_id` → usuario, nulo · `creado_en`. Índices por `creado_en`, por (`tipo`, `creado_en`) y por (`usuario_id`, `creado_en`).
 
-**`migracion`**: `nombre` text PK (el archivo SQL) · `aplicada_en` timestamptz. No figura en ningún archivo de migración: la crea el corredor.
+**`kysely_migration`** y **`kysely_migration_lock`**: el registro de las migraciones aplicadas y su candado. No figuran en ningún archivo de migración: las crea el migrador (ADR-025).
 
 ## Migraciones
 
-Archivos `NNNN_nombre.sql` en orden, en la carpeta de migraciones del servicio. El corredor, que es parte del servidor, toma un lock, crea
-`migracion` si no existe, y aplica cada archivo sin aplicar en su propia transacción. Si uno
-falla, no queda registrado y la API no arranca. Para un cambio de esquema se agrega un
-archivo nuevo; nunca se edita uno aplicado.
+Archivos `NNNN_nombre.sql` en orden, en la carpeta de migraciones de la capa de datos del
+servicio. Los aplica el migrador de Kysely al arrancar (ADR-025): toma su candado, aplica en una
+transacción los que falten y los anota. Si uno falla, no queda aplicado ninguno de esa vez y la
+API no arranca. Para un cambio de esquema se agrega un archivo nuevo; nunca se edita uno
+aplicado. La forma de las tablas que usa el código se genera de la base migrada.
 
 | Archivo | Qué cambia |
 |---|---|
@@ -173,12 +176,13 @@ archivo nuevo; nunca se edita uno aplicado.
 | `0009_foto_de_producto.sql` | `producto.foto_url` |
 | `0010_margen_a_mano.sql` | `margen_elegido` acepta cualquier entero entre 1 y 10000; se quita `producto.precio_manual` |
 | `0011_credenciales_passkey.sql` | `credencial` |
+| `0031_listas_cerradas_como_tipos.sql` | Las listas cerradas de valores (medio de pago, estados, tipos de movimiento…) pasan de `CHECK` a tipos `ENUM` (022, ADR-025) |
 
 ## En el dispositivo
 
 No es parte de la base ni del contrato del servidor, pero toda pantalla tiene que guardar
 esto en el dispositivo para cumplir RNF-10 y RNF-20. Va en IndexedDB, detrás de un módulo
-propio (ADR-005).
+propio (ADR-005), en una base local por ambiente (`ferre.<ambiente>`, 022-E21).
 
 | Qué | Clave | Para qué |
 |---|---|---|
@@ -189,5 +193,5 @@ propio (ADR-005).
 | Cola de cambios | orden de llegada | Cambios por enviar: cada uno, el pedido completo a la API |
 | Datos sueltos | nombre | Por ejemplo, cuándo fue el último envío |
 
-El token de sesión y el vínculo del celular como lector de códigos también viven en el
-almacenamiento del navegador (ADR-011).
+El token de sesión, el usuario, el vínculo del celular como lector de códigos y lo apartado
+también viven en el almacenamiento del navegador (ADR-011), con claves que llevan el ambiente.

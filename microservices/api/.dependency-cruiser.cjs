@@ -1,4 +1,4 @@
-// Las capas del servidor (ADR-018, ADR-025): la ruta traduce el pedido, las reglas deciden y la
+// 022-E11 022-E12: las capas del servidor (ADR-018, ADR-025): la ruta traduce el pedido, las reglas deciden y la
 // capa de datos (`src/persistencia/`) lee y escribe. Solo la capa de datos usa la base o el disco;
 // una ruta no habla con ella; y ella no depende de las reglas ni de las rutas. Corre en cada subida.
 const PRUEBAS = "\\.test\\.ts$|^src/pruebas/|^src/persistencia/pruebas/";

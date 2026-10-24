@@ -37,7 +37,7 @@ SALIDA = sys.argv[1] if len(sys.argv) > 1 else os.path.join(RAIZ, "microservices
 MARCAS_DEL_MANUAL = os.path.join(RAIZ, "microservices/web/src/pantallas/compu/base/pantallas/manual-entrar-marcas.json")
 WEB = os.path.join(RAIZ, "microservices/web")
 HUELLA_ACA = "try { localStorage.setItem('ferre.huella-en-este-dispositivo', '1'); } catch (e) {}"
-CON_SESION = "try { localStorage.setItem('ferre.sesion', 'x'); } catch (e) {}"
+CON_SESION = "try { localStorage.setItem('ferre.sesion.desarrollo', 'x'); } catch (e) {}"
 MARCAS = {}
 
 

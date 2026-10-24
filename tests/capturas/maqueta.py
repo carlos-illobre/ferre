@@ -29,7 +29,7 @@ with sync_playwright() as pw:
     nav = pw.chromium.launch(executable_path=os.environ.get("CHROMIUM") or None)
     opciones = {"viewport": {"width": 1366, "height": 768}} if compu else {"viewport": {"width": 390, "height": alto}, "is_mobile": True, "has_touch": True, "user_agent": UA_CELU}
     c = nav.new_context(locale="es-AR", device_scale_factor=2, **opciones)
-    c.add_init_script("try { localStorage.setItem('ferre.sesion', 'x'); } catch (e) {}")
+    c.add_init_script("try { localStorage.setItem('ferre.sesion.desarrollo', 'x'); } catch (e) {}")
     p = c.new_page()
     p.goto(BASE + "#/" + ruta.lstrip("#/"))
     p.wait_for_timeout(2500)

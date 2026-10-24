@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import pg from "pg";
 import { afterAll } from "vitest";
 
-// Las pruebas de la capa de datos usan un PostgreSQL de verdad (ADR-025). BASE_DE_PRUEBAS es la
+// 022-E17: las pruebas de la capa de datos usan un PostgreSQL de verdad (ADR-025). BASE_DE_PRUEBAS es la
 // cadena de un usuario que puede crear bases (tests/utest.sh la arma). Cada archivo de pruebas
 // tiene su propia base, vacía, que se borra al terminar: BASE_DE_PROCESOS.
 const admin = process.env.BASE_DE_PRUEBAS;

@@ -2,7 +2,7 @@
 # La marca «xmin» de la copia del catálogo (specs/018, ADR-023) contra una base real: el cambio de
 # una transacción que confirma tarde, después de que otra leyó, se lee la vez siguiente desde la
 # marca; y mover un movimiento de stock (unir duplicados) lo anota. Deja la base como estaba.
-# Necesita el stack (perfil local): con RAPIDO=1 se saltea (código 3).
+# Necesita el stack: con RAPIDO=1 se saltea (código 3).
 set -uo pipefail
 [[ "${RAPIDO:-0}" == "1" ]] && exit 3
 cd "$(dirname "$0")/../.."

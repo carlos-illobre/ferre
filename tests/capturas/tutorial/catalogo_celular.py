@@ -30,7 +30,7 @@ from entrar import API, BASE, CELU, RAIZ, SIN_MARCO, TOQUE, UA_CELU, mentira  # 
 
 SALIDA = sys.argv[1] if len(sys.argv) > 1 else os.path.join(RAIZ, "microservices/web/public/manual/catalogo-celular")
 MARCAS_DEL_MANUAL = os.path.join(RAIZ, "microservices/web/src/pantallas/compu/base/pantallas/manual-catalogo-celular-marcas.json")
-CON_SESION = "try { localStorage.setItem('ferre.sesion', 'x'); } catch (e) {}"
+CON_SESION = "try { localStorage.setItem('ferre.sesion.desarrollo', 'x'); } catch (e) {}"
 MARCAS = {}
 TALADRO, NUEVO = "7791234000005", "7791234000098"
 # Para la captura de la cámara abierta: un código con el dígito verificador mal, que se ve pero no se lee.

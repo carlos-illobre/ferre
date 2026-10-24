@@ -38,10 +38,10 @@ test.beforeAll(() => {
 test.afterEach(cerrarLasOtrasVentanas);
 
 test("023-E17: la computadora le pide la foto de la factura al celular emparejado y la recibe sola", async ({ page, browser }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/ingreso");
   const telefono = await otraVentana(browser, { viewport: { width: 412, height: 915 }, userAgent: "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36" });
-  await telefono.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN_CELULAR);
+  await telefono.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN_CELULAR);
   await telefono.goto("/#/vender");
   await expect(page.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
 
@@ -63,7 +63,7 @@ test("023-E17: la computadora le pide la foto de la factura al celular emparejad
 });
 
 test("023-E24: sin celular emparejado no hay código QR: se elige un archivo o se vincula el celular", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN_SOLA);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN_SOLA);
   await page.goto("/#/ingreso");
   await page.getByTestId("foto-con-celular").click();
   await expect(page.getByTestId("foto-sin-celular")).toContainText("Vincular el celular");

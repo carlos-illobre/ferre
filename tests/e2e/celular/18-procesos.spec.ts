@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql } = stack("celular");
+const { API, psql, psqlProcesos } = stack("celular");
 
 // Procesos (specs/011-procesos) en el celular: «Pasos» que se ordenan arrastrando y «Diagrama»
 // con la hoja de figuras, pasando por el servidor de Ferrebress y el servicio de Procesos.
@@ -13,7 +13,7 @@ const EMAIL = "e2e-procesos-celular@ferre.test";
 const VENTA = readFileSync("../../microservices/procesos/web/src/modelo/ejemplos/venta.bpmn", "utf8");
 
 test.beforeAll(() => {
-  psql("DELETE FROM procesos.proceso WHERE nombre LIKE 'Venta celular E2E%'");
+  psqlProcesos("DELETE FROM procesos.proceso WHERE nombre LIKE 'Venta celular E2E%'");
   const id = `(SELECT id FROM usuario WHERE email = '${EMAIL}')`;
   psql(`DELETE FROM sesion WHERE usuario_id IN ${id}`);
   psql(`DELETE FROM evento WHERE usuario_id IN ${id}`);
@@ -29,7 +29,7 @@ async function abrirVenta(page: Page, nombre: string) {
   const creado = await page.request.post(`${API}/procesos`, { headers: { Authorization: `Bearer ${TOKEN}` }, data: { nombre, bpmn: VENTA } });
   expect(creado.status()).toBe(201);
   const { id } = (await creado.json()) as { id: string };
-  await page.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN);
+  await page.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), TOKEN);
   await page.goto("/#/mas/procesos");
   await page.getByTestId(`procesos-item-${id}`).click();
   // Abre en «Diagrama», la primera pestaña.
@@ -67,7 +67,7 @@ test("011-E25 011-E26 011-E27 011-E31 los pasos se leen como lista y una tarjeta
 
   // Quedó guardado en el borrador: «Anotar el pedido» sigue con «Cobrar».
   await expect(page.getByTestId("procesos-guardado")).toHaveText("Guardado");
-  await expect.poll(() => psql(`SELECT bpmn FROM procesos.version WHERE proceso_id = '${id}' AND estado = 'borrador'`)).toMatch(/sourceRef="Anotar" targetRef="Cobrar"/);
+  await expect.poll(() => psqlProcesos(`SELECT bpmn FROM procesos.version WHERE proceso_id = '${id}' AND estado = 'borrador'`)).toMatch(/sourceRef="Anotar" targetRef="Cobrar"/);
 });
 
 test("011-E30 011-E31 «Diagrama» muestra el dibujo y la hoja de figuras; tocar una la agrega al dibujo", async ({ page }) => {

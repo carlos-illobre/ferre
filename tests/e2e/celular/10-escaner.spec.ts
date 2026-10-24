@@ -45,7 +45,7 @@ test.afterEach(cerrarLasOtrasVentanas);
 
 test("023-E15: vincular el celular y que lo escaneado aparezca en la laptop", async ({ browser }) => {
   const laptop = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
-  await laptop.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_LAPTOP);
+  await laptop.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), TOKEN_LAPTOP);
   await laptop.goto("/#/vender");
   await expect(laptop.getByTestId("busqueda")).toBeEnabled();
   await laptop.getByTestId("emparejar-celular").click();
@@ -56,7 +56,7 @@ test("023-E15: vincular el celular y que lo escaneado aparezca en la laptop", as
 
   // El celular abre el enlace del QR (hayCamara() es falso en el navegador de prueba: se tipea el código).
   const celular = await otraVentana(browser, { viewport: { width: 390, height: 844 } });
-  await celular.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_CELULAR);
+  await celular.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), TOKEN_CELULAR);
   await celular.goto(enlace.replace(/^https?:\/\/[^/]+/, ""));
   await expect(celular.getByTestId("vinculacion-ok")).toContainText("quedó vinculado");
   await expect(laptop.getByTestId("celular-vinculado")).toBeVisible({ timeout: 10000 });
@@ -97,7 +97,7 @@ test("023-E15: vincular el celular y que lo escaneado aparezca en la laptop", as
 // buscarlo. En el navegador de prueba la cámara no abre: se tipea, que es la alternativa de la regla.
 test("cargarle el código de barras a un producto desde su ficha y encontrarlo por ese código", async ({ page }) => {
   psql(`UPDATE producto SET codigo_barras = NULL WHERE codigo_barras = '7790009998881'`);
-  await page.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_LAPTOP);
+  await page.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), TOKEN_LAPTOP);
   await page.goto("/#/catalogo");
   await page.getByTestId("busqueda").fill("GUANTES ESCANER");
   await page.getByTestId("producto").filter({ hasText: "GUANTES ESCANER" }).click();

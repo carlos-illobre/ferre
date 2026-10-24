@@ -216,7 +216,7 @@ En esta primera versión todos los usuarios son Administrador y el Administrador
 4. **RNF-20.** Los 7 días de ventas en cada dispositivo sirven para rellenar un hueco si se restaura una copia vieja. ¿El dispositivo reenvía solo lo que le falta al servidor, o lo dispara el Administrador a mano?
 
 **Respaldos y disponibilidad**
-5. **RNF-21.** Los Excel originales de las listas y las fotos de productos son archivos, no filas de la base, y ninguna decisión dice dónde se guardan. Como la máquina no puede guardar datos, ¿dónde viven y entran en las copias?
+5. ~~**RNF-21.** Dónde viven los Excel de las listas y las fotos, y si entran en las copias.~~ Respondida (decisión 150, 2026-10-24): en un almacenamiento de objetos fuera de la máquina, dentro de las copias, desde la etapa 4 del almacenamiento.
 6. **RNF-21.** ¿Las copias se hacen solo de la base de producción, o también de la de pruebas?
 7. **RNF-21, RNF-52.** Con una copia por hora se pueden perder hasta 60 minutos de lo que no son ventas (compras, listas aplicadas, usuarios). ¿Se acepta? Si se pierde la máquina, ¿en cuánto tiempo como máximo tiene que estar el servidor andando de nuevo?
 8. **RNF-22.** ¿Dónde se guarda la copia semanal cifrada (por ejemplo, un Google Drive del negocio), cuántas semanas se conserva y quién guarda la clave?

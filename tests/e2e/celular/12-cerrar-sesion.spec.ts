@@ -25,7 +25,7 @@ test.beforeEach(() => {
 });
 
 test("007-T037 en la tarjeta de la persona se cierra la sesión de otro dispositivo; la de este no figura", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/mas/usuarios");
   // La tarjeta está plegada: se abre y se va a «Acceso», como la v2 (decisión 102).
   const tarjeta = page.getByTestId("usuario-fila").filter({ hasText: "Dueño cerrar E2E" });
@@ -43,7 +43,7 @@ test("007-T037 en la tarjeta de la persona se cierra la sesión de otro disposit
 });
 
 test("Salir vuelve al login", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   // En el celular, Salir está en la tarjeta del usuario, en Negocio.
   await page.goto("/#/mas/negocio");
   await page.getByRole("button", { name: "Salir" }).click();

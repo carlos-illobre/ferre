@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Las migraciones se aplicaron todas y el esquema tiene las tablas del modelo. Necesita
-# el stack (perfil local): con RAPIDO=1 se saltea (código 3).
+# el stack: con RAPIDO=1 se saltea (código 3).
 set -uo pipefail
 [[ "${RAPIDO:-0}" == "1" ]] && exit 3
 cd "$(dirname "$0")/../.."

@@ -34,7 +34,7 @@ test.beforeAll(() => {
 });
 
 test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/stock");
   // Depósito → Stock muestra las cantidades y, con «Ver el dinero invertido», el dinero (decisiones 96 y 149).
   await expect(page.getByTestId("pestana-stock")).toHaveAttribute("aria-current", "page");

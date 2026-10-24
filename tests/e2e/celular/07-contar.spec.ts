@@ -44,7 +44,7 @@ test.beforeAll(() => {
 });
 
 test("contar un sector desde el celular y cerrarlo con ajustes", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/contar");
   // Sector nuevo: se crea y se abre.
   await page.getByTestId("sector-nuevo").click();

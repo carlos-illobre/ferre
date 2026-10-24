@@ -24,15 +24,15 @@ Eso levanta la API en http://localhost (vía Caddy) y un PostgreSQL local. El cl
 se sirve aparte, como en producción:
 
 ```bash
-VITE_API_URL=http://localhost pnpm --filter gestion-del-local-web dev
+VITE_API_URL=http://localhost VITE_AMBIENTE=desarrollo VITE_VERSION=local pnpm --filter gestion-del-local-web dev
 ```
 
-En producción la base es Supabase y el cliente está en GitHub Pages.
+En producción la base es un contenedor de PostgreSQL en la máquina (ADR-026) y el cliente está en GitHub Pages.
 
 ## Pruebas
 
 ```bash
-tests/utest.sh            # unitarias, sin nada levantado
+tests/utest.sh            # unitarias; la capa de datos, contra la base del compose (la levanta)
 tests/itest.sh --rapido   # paridad de configuración
 tests/e2e.sh              # caminos principales, levanta el stack (a mano; en CI corren las unitarias)
 ```

@@ -7,7 +7,7 @@ import type { Page } from "@playwright/test";
 // todavía no salió (la base local «ferre», almacén «cola»; la abre la aplicación).
 export function cambiosEnLaCola(page: Page): Promise<number> {
   return page.evaluate(() => new Promise<number>((ok, mal) => {
-    const pedido = indexedDB.open("ferre");
+    const pedido = indexedDB.open("ferre.desarrollo");
     pedido.onerror = () => mal(pedido.error);
     pedido.onsuccess = () => {
       const base = pedido.result;

@@ -22,7 +22,7 @@ migraciones se aplican solas al arrancar la API.
 El cliente web se sirve aparte, como en producción:
 
 ```bash
-VITE_API_URL=http://localhost pnpm --filter gestion-del-local-web dev
+VITE_API_URL=http://localhost VITE_AMBIENTE=desarrollo VITE_VERSION=local pnpm --filter gestion-del-local-web dev
 ```
 
 `ORIGEN_WEB` del `.env` tiene que coincidir con el origen desde el que se abre el cliente:
@@ -37,7 +37,7 @@ resto sí. El primer usuario se crea desde el contenedor:
 docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre"
 ```
 
-En pruebas y producción la base es Supabase y el cliente está en GitHub Pages. `master` es
+En pruebas y producción la base es el contenedor `db` de cada ambiente, en la máquina, y el cliente está en GitHub Pages. `master` es
 el ambiente de pruebas y `produccion` el de producción; en cada push la máquina se despliega
 sola (ADR-012, ADR-013). Pasar a producción: `git push origin master:produccion`. La puesta
 en marcha de la máquina está en `deployment/oracle-single/ORACLE.md`.
@@ -47,10 +47,11 @@ en marcha de la máquina está en `deployment/oracle-single/ORACLE.md`.
 Estrategia en ADR-004 y su enmienda del 2026-09-14: las unitarias corren en cada push y son
 la red de seguridad del CI; las de punta a punta (E2E) de los caminos principales se lanzan
 a mano antes de promover a producción y tras un cambio grande; integración solo sobre lo
-estable. Sin compuerta de cobertura ni mutation testing.
+estable. Sin compuerta de cobertura ni mutation testing, salvo la capa de datos de cada servicio, que
+se prueba contra PostgreSQL con el 100 % de cobertura (enmienda del 2026-10-24).
 
 ```bash
-tests/utest.sh               # unitarias, sin nada levantado
+tests/utest.sh               # unitarias; la capa de datos, contra la base del compose (la levanta)
 node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
 tests/itest.sh               # integración completa (necesita el stack levantado)

@@ -41,7 +41,7 @@ test.beforeAll(() => {
 });
 
 test("sugerir, unir y ver el proveedor más barato como preferido", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/duplicados");
   await page.getByTestId("buscar-duplicados").click();
   const sugerencia = page.getByTestId("sugerencia").filter({ hasText: "SILICONA DUPLICADA" });

@@ -3,7 +3,9 @@ import { vi } from "vitest";
 import { olvidarSesiones, type Usuario } from "../acceso/sesiones.js";
 import { PERMISOS } from "../permisos.js";
 
-// Base de datos simulada para probar las rutas sin Postgres: cada consulta se anota y se
+// 022-E14: las rutas y las reglas se prueban como antes de separar la capa de datos: solo cambió
+// de dónde se simula la base (el pool de `persistencia/`). Base de datos simulada para probar las
+// rutas sin Postgres: cada consulta se anota y se
 // contesta con lo que la prueba programó (por expresión regular sobre el SQL). Lo que no
 // se programó devuelve cero filas. La sesión del que llama se contesta acá también.
 export type Consulta = { sql: string; params: unknown[] };

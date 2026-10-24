@@ -196,7 +196,7 @@ El tablero (<https://gratis-vnic.tail994934.ts.net:8444/>) lee `specs/README.md`
 ## Comandos
 
 ```bash
-tests/utest.sh               # unitarias, sin nada levantado
+tests/utest.sh               # unitarias; la capa de datos contra la base del compose, al 100 %
 node tests/trazabilidad.mjs  # la especificación y el estado coinciden, y specs/ no nombra código
 tests/itest.sh --rapido      # paridad de configuración
 tests/e2e.sh                 # caminos principales de la aplicación, en celular y computadora (levanta el stack)

@@ -1,7 +1,7 @@
 # Poner ferre online en la máquina de Oracle, paso a paso
 
 Una sola máquina (Ampere ARM, 2 núcleos, 12 GB) corre los dos ambientes, **pruebas** y
-**producción**, cada uno con su base en Supabase. El cliente web vive en GitHub Pages.
+**producción**, cada uno con su base en un contenedor de la máquina (ADR-026). El cliente web vive en GitHub Pages.
 Nadie entra a la máquina para desplegar: GitHub publica un aviso y la máquina, que lo
 escucha, verifica contra el repositorio y se actualiza sola (ADR-013). Todo lo de ferre
 corre como el usuario **`ferre`**, sin privilegios y con Docker rootless: sin root, sin
@@ -70,13 +70,12 @@ dig +short ferre-api.duckdns.org
 
 **Bien:** devuelve la IP de la máquina.
 
-## 5. Las dos bases en Supabase
+## 5. Las bases
 
-1. En [supabase.com](https://supabase.com/), crear **dos proyectos** en la región
-   **South America (São Paulo)**: `ferre-produccion` y `ferre-pruebas`.
-2. En cada uno: **Connect** → **Session pooler**, copiar la cadena `postgres://...` y
-   reemplazar `[YOUR-PASSWORD]`. **No usar la conexión directa:** es solo IPv6 y la
-   máquina sale por IPv4.
+No hay nada que crear afuera: cada ambiente levanta su propio contenedor de PostgreSQL (`db`),
+que la primera vez crea la base del mostrador y la de Procesos, con un usuario cada una
+(ADR-026). Solo hacen falta tres claves por ambiente, para el paso 6: `openssl rand -hex 24`
+cada una, distintas en pruebas y en producción.
 
 ## 6. Completar la configuración
 
@@ -84,8 +83,8 @@ Tres archivos, reemplazando todos los marcadores `<...>`:
 
 | Archivo | Qué va |
 |---|---|
-| `~/ferre/produccion/.env` | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), cadena de Supabase de producción, un token de servicio |
-| `~/ferre/pruebas/.env` | lo mismo para pruebas, con su base y **otro** token |
+| `~/ferre/produccion/.env` | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), las tres claves de la base (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`), un token de servicio |
+| `~/ferre/pruebas/.env` | lo mismo para pruebas, con **otras** claves y **otro** token |
 | `~/ferre/despliegue.env` | el canal de avisos (paso 7) |
 
 Token de servicio, uno por ambiente: `openssl rand -hex 32`. `IMAGEN_TAG` se deja como
@@ -212,9 +211,8 @@ cd ~/ferre/pruebas && docker compose down
 
 | Volumen | Qué guarda | Si se pierde |
 |---|---|---|
-| `ferre-<ambiente>_listas-data` | los Excel originales de cada lista cargada | no se pueden reprocesar listas viejas; los precios aplicados están en la base |
-
-La base de datos no está en la máquina: está en Supabase, con el respaldo del ADR-002.
+| `ferre-<ambiente>_db-data` | la base del mostrador y la de Procesos | se pierde todo: hasta la etapa 2 del almacenamiento no hay copias (`docs/operacion/DEPLOYMENT.md`, «Respaldo y recuperación») |
+| `ferre-<ambiente>_listas-data` | los Excel originales de cada lista cargada, las fotos y la copia del catálogo | no se pueden reprocesar listas viejas ni ver las fotos; los precios aplicados están en la base |
 
 ## Los límites del plan gratuito que importan
 

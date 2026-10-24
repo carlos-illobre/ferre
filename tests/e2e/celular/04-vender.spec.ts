@@ -45,7 +45,7 @@ test.beforeAll(() => {
 });
 
 test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/vender");
   await expect(page.getByTestId("abrir-busqueda")).toBeVisible();
   // En el celular la búsqueda no se abre sola: es una hoja que se abre al tocar la caja (decisión 140).
@@ -149,7 +149,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
 // 019-E12 019-E18: una devolución desde «Ventas del día»: se vende una mecha, se abre la venta, «Cambio»,
 // vuelve la mecha (no fallada) y no se lleva nada: se devuelve en efectivo y la mecha vuelve al stock.
 test("devolver un producto desde la hoja de la venta", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/vender");
   const antes = Number(psql(`SELECT COALESCE(sum(cantidad), 0) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`));
   await (await buscarEnVender(page, "e2e mecha vender")).press("Enter");

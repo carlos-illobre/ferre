@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # La base anota qué productos cambiaron y avisa (specs/018, RF-124): altas, costos, productos
 # movidos entre duplicados, el nombre de un proveedor, márgenes y bajas. Corre dentro de una
-# transacción que se deshace. Necesita el stack (perfil local): con RAPIDO=1 se saltea (código 3).
+# transacción que se deshace. Necesita el stack: con RAPIDO=1 se saltea (código 3).
 set -uo pipefail
 [[ "${RAPIDO:-0}" == "1" ]] && exit 3
 cd "$(dirname "$0")/../.."

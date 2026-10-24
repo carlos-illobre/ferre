@@ -100,7 +100,7 @@ def main() -> int:
             contexto = navegador.new_context(locale="es-AR", **MEDIDAS[medida])
             contexto.route("https://accounts.google.com/**", lambda r: r.fulfill(status=200, content_type="application/javascript", body=GOOGLE))
             if not o.sin_sesion:
-                contexto.add_init_script("try { localStorage.setItem('ferre.sesion', 'x'); } catch (e) {}")
+                contexto.add_init_script("try { localStorage.setItem('ferre.sesion.desarrollo', 'x'); } catch (e) {}")
             page = contexto.new_page()
             errores = []
             page.on("console", lambda m: errores.append(m.text) if m.type == "error" else None)

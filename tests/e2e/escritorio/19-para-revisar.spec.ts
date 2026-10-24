@@ -60,7 +60,7 @@ test.afterAll(() => {
 
 async function entrarComo(page: Page, token: string, ruta: string) {
   await page.goto("/");
-  await page.evaluate((t) => localStorage.setItem("ferre.sesion", t), token);
+  await page.evaluate((t) => localStorage.setItem("ferre.sesion.desarrollo", t), token);
   await page.goto(`/#/${ruta}`);
   await page.reload();
 }

@@ -56,7 +56,7 @@ test("023-E16 023-E19: emparejados y abiertos los dos, van juntos: la parte, la 
   test.setTimeout(90_000);
   const abrir = async (ancho: number, alto: number, token: string, ruta: string) => {
     const pagina = await otraVentana(browser, { viewport: { width: ancho, height: alto } });
-    await pagina.addInitScript((t) => localStorage.setItem("ferre.sesion", t), token);
+    await pagina.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), token);
     await pagina.goto(ruta);
     return pagina;
   };
@@ -221,7 +221,7 @@ test("023-E16 023-E19: emparejados y abiertos los dos, van juntos: la parte, la 
   psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(TOKEN_COMPU_2)}', 'e2e compu de nuevo', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   const enEsteDispositivo = async (token: string) => {
     const contexto = await otroContexto(browser, { viewport: { width: 1366, height: 768 } });
-    await contexto.addInitScript(([t, d]) => { localStorage.setItem("ferre.sesion", t!); localStorage.setItem("ferre.dispositivo", d!); }, [token, dispositivo!]);
+    await contexto.addInitScript(([t, d]) => { localStorage.setItem("ferre.sesion.desarrollo", t!); localStorage.setItem("ferre.dispositivo", d!); }, [token, dispositivo!]);
     const pagina = await contexto.newPage();
     await pagina.goto("/#/stock");
     return pagina;

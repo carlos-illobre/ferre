@@ -29,4 +29,28 @@ if [[ -n "$faltantes" ]]; then
   estado=1
 fi
 
+# 022-E10: ningún ambiente usa Supabase.
+if grep -qi supabase "${archivos[@]}"; then
+  echo "Algún .env todavía nombra Supabase: la base es la del compose (ADR-026)."
+  estado=1
+fi
+
+# 022-E02: cada proyecto de compose (un ambiente) tiene su propia instancia de base: el volumen
+# de datos no tiene un nombre fijo que compartan dos proyectos.
+if ! docker compose -p ambiente-a config 2>/dev/null | grep -q "name: ambiente-a_db-data"; then
+  echo "El volumen de la base no es propio de cada proyecto de compose."
+  estado=1
+fi
+
+# 022-E22: el código no tiene direcciones, puertos ni nombres de ambiente escritos adentro: salen
+# del .env. Se revisa el código que corre (sin pruebas); `ambiente.ts` de la web es donde se dice
+# qué valor del ambiente es producción.
+escrito=$(grep -rnE "localhost|127\.0\.0\.1|supabase|duckdns|:5432|\"(produccion|pruebas)\"" microservices/*/src microservices/procesos/*/src \
+  --include=*.ts --include=*.tsx --exclude=*.test.ts --exclude=*.test.tsx 2>/dev/null | grep -v "/pruebas/" | grep -v "^microservices/web/src/ambiente.ts:" || true)
+if [[ -n "$escrito" ]]; then
+  echo "El código tiene direcciones o ambientes escritos adentro:"
+  echo "$escrito"
+  estado=1
+fi
+
 exit $estado

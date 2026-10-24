@@ -44,7 +44,7 @@ test.beforeAll(() => {
 });
 
 test("contar un sector y cerrarlo con ajustes", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/contar");
   // Depósito → Contar, como la v2 (decisión 149).
   await expect(page.getByTestId("pestana-contar")).toHaveAttribute("aria-current", "page");

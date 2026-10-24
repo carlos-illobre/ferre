@@ -44,7 +44,7 @@ test.beforeAll(() => {
 test("armar un pedido, mandarlo, recibirlo en parte desde el ingreso y cerrarlo incompleto", async ({ page }) => {
   // WhatsApp no se abre de verdad: se anota a dónde se quiso ir.
   await page.addInitScript((token) => {
-    localStorage.setItem("ferre.sesion", token);
+    localStorage.setItem("ferre.sesion.desarrollo", token);
     window.open = ((url: string) => { (window as unknown as { __abierto: string }).__abierto = String(url); return null; }) as typeof window.open;
   }, TOKEN);
   await page.goto(`/#/${RUTA}`);

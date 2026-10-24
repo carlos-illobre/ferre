@@ -35,7 +35,7 @@ test.beforeAll(() => {
 });
 
 test("ver el stock, su valor, sus movimientos y corregirlo", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/deposito/stock");
   // Inventario muestra las cantidades y, con «Ver el dinero invertido», el dinero (decisión 96).
 

@@ -126,7 +126,7 @@ RF-09:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "La foto no se muestra en el conteo de stock"
     - "Sin prueba: reemplazar la foto de un producto que ya tiene una"
-    - "Las fotos y los archivos de las listas se guardan en el disco del servidor, sin copia (contradice ADR-002)"
+    - "Las fotos y los archivos de las listas se guardan en el volumen de la máquina, sin copia hasta la etapa 2 del almacenamiento (T140)"
 
 RF-09b:
   estado: "Nuevo, segunda versión"
@@ -1054,18 +1054,16 @@ RNF-20:
     - "Sin prueba: el aviso de cambios en espera desde hace más de una hora"
 
 RNF-21:
-  estado: "Pendiente (#92)"
+  estado: "Pendiente (#92): la base pasó a la máquina (022, ADR-026); las copias llegan por etapas (T140, T142)"
   pruebas: []
   defectos:
-    - "Sin construir: no hay copia de la base cada hora ni ningún script o tarea de respaldo (contra ADR-002)"
-    - "Los Excel originales de las listas y las fotos de productos viven en un volumen de la máquina, uno por ambiente, sin copia (contra ADR-002: la máquina no guarda datos)"
-    - "docs/operacion/DEPLOYMENT.md describe el volcado horario como si estuviera en marcha"
+    - "Sin construir: no hay copia de la base ni de los archivos, ni ningún script o tarea de respaldo"
 
 RNF-22:
   estado: "Pendiente (#92)"
   pruebas: []
   defectos:
-    - "Sin construir: no hay copia semanal cifrada fuera de Oracle y de Supabase (contra ADR-002)"
+    - "Sin construir: no hay copia semanal cifrada fuera de Oracle (llega en la etapa 5, T143)"
 
 RNF-23:
   estado: "Pendiente (#92)"
@@ -1157,8 +1155,8 @@ RNF-53:
   estado: "Hecho en parte: se aparta de la regla en 1 punto"
   pruebas:
     - tests/integration/paridad_env.sh
+    - microservices/web/src/ambiente.test.ts
   defectos:
-    - "Pruebas y producción se publican en el mismo origen y el cliente usa la misma base IndexedDB (ferre) y las mismas claves de localStorage en los dos: en un dispositivo que abre ambos, la sesión, el catálogo guardado y la cola de cambios se comparten (visto en el código, sin reproducir)"
     - "Sin prueba: el despliegue automático de pruebas y la promoción a producción"
 
 RNF-54:
@@ -1512,28 +1510,55 @@ RF-135:
     - "Guardar varios ajustes en un mismo pedido no es todo o nada: si fallan los días, los tiempos ya quedaron (la pantalla manda uno por vez; revisión de 020, D5)"
 
 RNF-63:
-  estado: "Nuevo (022): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "Hecho (022-T003, 022-T006): PostgreSQL en el contenedor db de cada ambiente, con las bases mostrador y procesos y un usuario por base; publicada solo en 127.0.0.1"
+  pruebas:
+    - tests/integration/base-propia.sh
+    - tests/integration/paridad_env.sh
+    - microservices/api/src/persistencia/migrar.test.ts
+    - microservices/procesos/servidor/src/persistencia/migrar.test.ts
+  defectos:
+    - "Sin copias hasta la etapa 2 (T140): perder el disco de la máquina pierde la base"
 
 RNF-64:
-  estado: "Nuevo (022): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "Hecho (022-T003, 022-T008): las bases arrancan vacías; Supabase no se usa; una marca de otra base no se usa, en el servidor ni en el dispositivo"
+  pruebas:
+    - tests/integration/base-propia.sh
+    - tests/integration/paridad_env.sh
+    - microservices/api/src/persistencia/conexion.test.ts
+    - microservices/api/src/rutas/productos.test.ts
+    - microservices/api/src/rutas/stock.test.ts
+    - microservices/web/src/descarga.test.tsx
+  defectos:
+    - "Carlos tiene que agregar las claves de la base al .env de cada ambiente en la máquina y borrar los secretos BASE_PRODUCCION y BASE_PRUEBAS (T147)"
 
 RNF-65:
-  estado: "Nuevo (022): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "Hecho (022-T004, 022-T006): src/persistencia/ en el mostrador y en Procesos, todo por Kysely, una sola forma de cada cosa, tipos generados; pnpm capas lo controla"
+  pruebas:
+    - microservices/api/.dependency-cruiser.cjs
+    - microservices/procesos/servidor/.dependency-cruiser.cjs
+    - microservices/api/src/persistencia/transaccion.test.ts
+    - microservices/api/src/persistencia/archivos.test.ts
+    - microservices/api/src/persistencia/tablas.test.ts
+    - microservices/procesos/servidor/src/persistencia/tablas.test.ts
+  defectos:
+    - "Procesos conserva su almacén en memoria para las pruebas de reglas y rutas, que repite las reglas de unicidad de la base: se reordena con las reglas, más adelante"
 
 RNF-66:
-  estado: "Nuevo (022): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (022-T005, 022-T006): las pruebas de la capa de datos corren contra PostgreSQL 17 y cubren el 100 % de líneas, ramas y funciones; la CI corta si baja"
+  pruebas:
+    - microservices/api/vitest.config.ts
+    - microservices/procesos/servidor/vitest.config.ts
+    - microservices/api/src/persistencia/acceso.test.ts
+    - microservices/api/src/persistencia/ventas.test.ts
+    - microservices/procesos/servidor/src/persistencia/procesos.test.ts
   defectos: []
 
 RNF-67:
-  estado: "Nuevo (022): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (022-T009): AMBIENTE en el .env y VITE_AMBIENTE al construir la web; sin valores por omisión; lo guardado en el dispositivo lleva el ambiente"
+  pruebas:
+    - microservices/api/src/config.test.ts
+    - microservices/web/src/ambiente.test.ts
+    - tests/integration/paridad_env.sh
   defectos: []
 
 RF-136:

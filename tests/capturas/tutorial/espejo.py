@@ -26,7 +26,7 @@ RECORRIDO = ["menu-vender", "menu-deposito", "menu-catalogo"]
 
 
 def sesion(token, dispositivo):
-    return f"try {{ localStorage.setItem('ferre.sesion', '{token}'); localStorage.setItem('ferre.dispositivo', '{dispositivo}'); }} catch (e) {{}}"
+    return f"try {{ localStorage.setItem('ferre.sesion.desarrollo', '{token}'); localStorage.setItem('ferre.dispositivo', '{dispositivo}'); }} catch (e) {{}}"
 
 
 def tocar(page, testid):

@@ -69,7 +69,7 @@ test("012-E01 012-E04 012-E05 012-E12 012-E13 012-E14 «Ver tutorial» abre el m
 });
 
 test("con sesión el dueño entra y ve la administración", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/");
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   // Usuarios está en la parte Negocio del menú, como la v2 (decisión 149).
@@ -90,7 +90,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
 
   // En la computadora la app no ofrece la huella aunque se acabe de entrar con Google
   // (eso es del celular): se vincula a mano desde Configuración.
-  await page.addInitScript((token) => { localStorage.setItem("ferre.sesion", token); sessionStorage.setItem("ferre.recien-google", "1"); }, TOKEN);
+  await page.addInitScript((token) => { localStorage.setItem("ferre.sesion.desarrollo", token); sessionStorage.setItem("ferre.recien-google", "1"); }, TOKEN);
   await page.goto("/#/configuracion");
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
   await expect(page.getByTestId("ofrecer-huella")).toHaveCount(0);
@@ -146,7 +146,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
 
   // Un celular que ya tenía la sesión: un toque, y la computadora entra sola con ese usuario.
   const celular = await otraVentana(browser, { viewport: { width: 390, height: 844 } });
-  await celular.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_CELULAR);
+  await celular.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), TOKEN_CELULAR);
   await celular.goto(ruta);
   await celular.getByTestId("dejar-entrar").click();
   // El celular sigue a su pantalla de siempre y lo dice arriba un momento (pedido de Carlos del 2026-10-15).
@@ -184,7 +184,7 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
 
   // El código sirve una sola vez.
   const otro = await otraVentana(browser, { viewport: { width: 390, height: 844 } });
-  await otro.addInitScript((t) => localStorage.setItem("ferre.sesion", t), TOKEN_CELULAR);
+  await otro.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), TOKEN_CELULAR);
   await otro.goto(ruta);
   await otro.getByTestId("dejar-entrar").click();
   await expect(otro.getByTestId("compu-no-entro")).toContainText("Leé el que la computadora muestra ahora");

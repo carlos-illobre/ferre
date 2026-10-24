@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql } = stack("escritorio");
+const { API, psql, psqlProcesos } = stack("escritorio");
 
 const VENTA = readFileSync("../../microservices/procesos/web/src/modelo/ejemplos/venta.bpmn", "utf8");
 
@@ -30,7 +30,7 @@ function crearUsuario(email: string, token: string, roles: string) {
 
 test.beforeAll(() => {
   // El esquema lo crea el servicio de Procesos al arrancar.
-  psql("DELETE FROM procesos.proceso");
+  psqlProcesos("DELETE FROM procesos.proceso");
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
   crearUsuario(EMAIL, TOKEN, "r.id::text LIKE '00000000-0000-4000-8000-%'");
   psql(`DELETE FROM rol_permiso WHERE rol_id = '${ROL_LECTOR}'`);
@@ -40,7 +40,7 @@ test.beforeAll(() => {
 });
 
 async function entrar(page: Page, token = TOKEN) {
-  await page.addInitScript((t) => localStorage.setItem("ferre.sesion", t), token);
+  await page.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), token);
   await page.goto("/#/procesos");
 }
 const formas = (page: Page) => page.locator("g.djs-element.djs-shape:not([data-element-id$='_label']):not([data-element-id^='Proceso']):not([data-element-id^='Participant']):not([data-element-id^='Lane'])");
@@ -122,7 +122,7 @@ test("011-E02 011-E04 011-E05 011-E09 011-E10 011-E13 011-E14 011-E15 011-E22 di
 
   // E10: se guardó solo, en el borrador.
   await expect(page.getByTestId("procesos-guardado")).toHaveText("Guardado");
-  await expect.poll(() => psql("SELECT pasos FROM procesos.version v JOIN procesos.proceso p ON p.id = v.proceso_id WHERE p.nombre = 'Venta E2E' AND v.estado = 'borrador'")).toBe("3");
+  await expect.poll(() => psqlProcesos("SELECT pasos FROM procesos.version v JOIN procesos.proceso p ON p.id = v.proceso_id WHERE p.nombre = 'Venta E2E' AND v.estado = 'borrador'")).toBe("3");
 
   // E22: marcarlo vigente queda en «Quién hizo qué».
   await page.getByTestId("procesos-marcar-vigente").click();
@@ -202,7 +202,7 @@ test("011-E43 un proceso de 200 pasos se abre y se mueve sin trabarse", { tag: "
   const creado = await page.request.post(`${API}/procesos`, { headers: { Authorization: `Bearer ${TOKEN}` }, data: { nombre: "Grande E2E", bpmn: procesoDe(200) } });
   expect(creado.status()).toBe(201);
   const { id } = (await creado.json()) as { id: string };
-  await page.addInitScript(([t, ultimo]) => { localStorage.setItem("ferre.sesion", t); localStorage.setItem("procesos.ultimo", JSON.stringify(ultimo)); }, [TOKEN, id] as const);
+  await page.addInitScript(([t, ultimo]) => { localStorage.setItem("ferre.sesion.desarrollo", t); localStorage.setItem("procesos.ultimo", JSON.stringify(ultimo)); }, [TOKEN, id] as const);
   const inicio = Date.now();
   await page.goto("/#/procesos");
   await expect(page.getByText("Grande E2E", { exact: true })).toBeVisible();

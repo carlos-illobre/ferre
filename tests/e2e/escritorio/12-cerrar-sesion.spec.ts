@@ -25,7 +25,7 @@ test.beforeEach(() => {
 });
 
 test("007-T037 en la tarjeta de la persona se cierra la sesión de otro dispositivo; la de este no figura", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/usuarios");
   // Como la v2 (021): la persona se elige en la lista y su ficha, al lado, tiene su acceso.
   const fila = page.getByTestId("usuario-fila").filter({ hasText: "Dueño cerrar E2E" });
@@ -43,7 +43,7 @@ test("007-T037 en la tarjeta de la persona se cierra la sesión de otro disposit
 });
 
 test("Salir vuelve al login", async ({ page }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/vender");
   // «Cerrar sesión» está en el menú del usuario, abajo del menú (decisión 126).
   await page.getByTestId("cuenta").click();

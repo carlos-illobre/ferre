@@ -7,16 +7,19 @@ cp .env.example .env
 docker compose up -d --build --wait
 ```
 
-Los perfiles (base local, Caddy) vienen de `COMPOSE_PROFILES` en el `.env`; no hace
-falta pasarlos por línea de comandos.
-
-El perfil `local` levanta un PostgreSQL en el compose; `DATABASE_URL` del `.env.example`
-ya apunta ahí. La API queda en http://localhost vía Caddy. El cliente web se sirve
-aparte, como en producción (ADR-010):
+El perfil de Caddy viene de `COMPOSE_PROFILES` en el `.env`; no hace falta pasarlo por línea de
+comandos. La base (`db`) corre en todos los ambientes, con una base y un usuario por servicio
+([ADR-026](../adr/ADR-026-una-base-por-servicio-en-la-maquina.md)); el compose arma la cadena de
+cada servicio con las claves del `.env`. La API queda en http://localhost vía Caddy. El cliente
+web se sirve aparte, como en producción (ADR-010), con las variables de su ambiente, sin valores
+por omisión:
 
 ```bash
-VITE_API_URL=http://localhost pnpm --filter gestion-del-local-web dev
+VITE_API_URL=http://localhost VITE_AMBIENTE=desarrollo VITE_VERSION=local pnpm --filter gestion-del-local-web dev
 ```
+
+Un volumen de datos de antes de la base propia (con el usuario `ferre`) no sirve: se borra con
+`docker compose down -v` y la base arranca vacía.
 
 `ORIGEN_WEB` del `.env` tiene que coincidir con el origen desde el que se abre el
 cliente (`http://localhost:4173` para `vite preview`; `http://localhost:5173` para `dev`).
@@ -29,11 +32,13 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   En cada push CI construye, publica y avisa; la máquina despliega sola su ambiente
   ([ADR-013](../adr/ADR-013-despliegue-por-aviso-y-gateway-compartido.md)). Pasar a
   producción: `git push origin master:produccion`.
-- Máquina Always Free (Ampere, arm64), sin estado: dos proyectos de compose, uno por
-  ambiente, con `gestion-del-local`, `listas-de-proveedores` y `procesos`, corriendo como el usuario
+- Máquina Always Free (Ampere, arm64): dos proyectos de compose, uno por ambiente, con `db`,
+  `gestion-del-local`, `listas-de-proveedores` y `procesos`, corriendo como el usuario
   `ferre` con Docker rootless, publicados solo en `127.0.0.1` (8081 y 8082), detrás del
   reverse proxy de la máquina, que no es parte de este proyecto (contrato en la guía).
-- Base de datos en Supabase ([ADR-002](../adr/ADR-002-base-de-datos-respaldo-y-disponibilidad.md)).
+- Base de datos: el contenedor `db` de cada ambiente, con sus datos en un volumen y publicado
+  solo en `127.0.0.1` (5433 producción, 5434 pruebas)
+  ([ADR-026](../adr/ADR-026-una-base-por-servicio-en-la-maquina.md)). Supabase ya no se usa.
 - Imágenes publicadas por CI en GHCR, etiquetadas por SHA corto
   ([ADR-007](../adr/ADR-007-imagenes-en-ci-y-ghcr.md)).
 - Configuración de la aplicación en la máquina: `~/ferre/produccion/.env` y
@@ -41,7 +46,8 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   Nunca se versionan.
 - **Cliente web en GitHub Pages:** un sitio, dos carpetas: la raíz es `produccion` y
   `/pruebas/` es `master`. CI lo construye con las variables de repositorio `API_URL` y
-  `API_URL_PRUEBAS`. Es lo único que vive fuera del `.env`. El identificador de Google no va:
+  `API_URL_PRUEBAS`, y el ambiente (`VITE_AMBIENTE`) y la versión de cada build. Es lo único que
+  vive fuera del `.env`. El identificador de Google no va:
   la aplicación se lo pide al servidor de su ambiente (007-T043).
   Cada carpeta tiene una sola aplicación, que abre en su raíz.
 - **Sin acceso entrante:** GitHub no entra a la máquina. El job `avisar` publica en el
@@ -63,36 +69,30 @@ docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.co
 ## Monitor
 
 Una tarea programada en GitHub (`.github/workflows/monitor.yml`, RNF-12, T091) mira los dos
-ambientes una vez por día, a las 08:47 de Buenos Aires: que el servidor conteste en `/health`,
-que la base responda y que no pase los 350 MB. Si algo falla, la tarea queda en rojo y GitHub
-manda un correo. También se corre a mano: Actions → Monitor → «Run workflow».
-
-La salud del servidor no consulta la base (specs/018, para no llenar sus registros); la base la
-mantiene despierta el propio servidor, con una consulta por día. El monitor la consulta por su
-cuenta, así se entera aunque el servidor ande y la base no.
+ambientes una vez por día, a las 08:47 de Buenos Aires: que el servidor conteste en `/health` y
+diga que anda, lo que incluye que su base responda (specs/022, E05). Si algo falla, la tarea queda
+en rojo y GitHub manda un correo. También se corre a mano: Actions → Monitor → «Run workflow».
+La base vive en la máquina y no se alcanza desde internet: el monitor no la consulta directo.
 
 **Lo que tiene que hacer Carlos una sola vez:**
 
-1. **Los secretos.** En GitHub, Settings → Secrets and variables → Actions → «New repository
-   secret»: `BASE_PRODUCCION` y `BASE_PRUEBAS`, cada uno con la cadena de conexión de su base
-   (en Supabase: Connect → Session pooler; la misma que está como `DATABASE_URL` en el `.env` de
-   cada ambiente en Oracle). Más seguro: un usuario que solo puede conectarse, creado en el SQL
-   Editor de Supabase de cada proyecto con
-   `CREATE ROLE monitor LOGIN PASSWORD '<una clave larga>'; GRANT CONNECT ON DATABASE postgres TO monitor;`
-   y usarlo en esa cadena (en el «Session pooler» el usuario se escribe `monitor.<id del proyecto>`).
-2. **Que el correo le llegue a él.** GitHub avisa de una tarea programada que falla a quien
+1. **Que el correo le llegue a él.** GitHub avisa de una tarea programada que falla a quien
    cambió por última vez su horario. En GitHub, editar `.github/workflows/monitor.yml` y mover un
    minuto el horario (`47 11` → `46 11`), con el botón «Commit changes». Y en Settings →
    Notifications → System → Actions, que esté «Email».
-3. **Probarlo.** Actions → Monitor → «Run workflow»: los dos ambientes en verde.
+2. **Probarlo.** Actions → Monitor → «Run workflow»: los dos ambientes en verde.
+3. **Borrar los secretos viejos** `BASE_PRODUCCION` y `BASE_PRUEBAS` (las cadenas de Supabase), en
+   Settings → Secrets and variables → Actions: ya no se usan.
 
 ## Respaldo y recuperación
 
-- Volcado horario de la base a Oracle Object Storage, retención 30 días.
-- Copia semanal cifrada fuera de Oracle y de Supabase.
-- Prueba mensual automática de restauración.
-- Ante pérdida de la máquina: crear otra, copiar el `.env`, `docker compose pull && up`.
-  Objetivo: menos de 30 minutos. El mostrador sigue vendiendo desde la PWA mientras tanto.
+**Todavía no hay copias de la base** (etapa 1 del almacenamiento, decisión 150): si se pierde el
+disco de la máquina, se pierde la base. Llegan por etapas (`proyecto/tasks.md`, «Almacenamiento de
+datos»): la copia por noche fuera de Oracle en la etapa 2; la copia continua, la prueba de
+restauración y los avisos en la etapa 4; la copia semanal en otro proveedor en la etapa 5.
+
+Ante pérdida de la máquina: crear otra, copiar el `.env`, `docker compose pull && up`. La base
+arranca vacía hasta que haya copias. El mostrador sigue vendiendo desde la PWA mientras tanto.
 
 ## Reversión
 

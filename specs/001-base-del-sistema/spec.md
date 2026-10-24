@@ -175,7 +175,7 @@ reciente, y hay prueba de que esa copia sirve antes de necesitarla.
 5. **Given** un mes cualquiera, **When** termina, **Then** una copia se restauró sola en una base limpia y se compararon su cantidad de ventas y su total facturado con los de la base viva.
 6. **Given** la prueba mensual de restauración, **When** la copia no se puede restaurar o los números no coinciden, **Then** los Administradores reciben un aviso.
 7. **Given** la base restaurada desde una copia de una hora atrás, **When** se reenvían las ventas de los últimos 7 días que conserva cada dispositivo, **Then** las ventas que la copia no tenía vuelven a estar en el servidor, una sola vez cada una.
-8. **Given** la máquina del servidor destruida, **When** se levanta el sistema en otra máquina con la misma configuración, **Then** no se perdió ningún dato: la máquina no guarda ninguno.
+8. **Given** la máquina del servidor destruida, **When** se levanta el sistema en otra máquina con la misma configuración y la última copia, **Then** no se perdió ningún dato más allá de lo que la copia no tenía. (Cambiado por `022-base-de-datos-propia`, 2026-10-24: la base vive en la máquina, ADR-026; decía que la máquina no guarda datos.)
 
 ---
 
@@ -193,9 +193,9 @@ que entrar a mirar.
 1. **Given** el servidor de producción sin responder, **When** el monitor hace su consulta, **Then** los Administradores reciben un aviso que dice qué dejó de responder.
 2. **Given** el servidor respondiendo y la base sin responder, **When** el monitor hace su consulta, **Then** los Administradores reciben un aviso que nombra la base.
 3. **Given** la máquina del servidor apagada, **When** el monitor hace su consulta, **Then** el aviso sale igual: el monitor no corre en esa máquina.
-4. **Given** un día sin ninguna venta ni consulta de usuarios, **When** termina el día, **Then** el monitor consultó la base al menos una vez, para que el servicio gratuito no la pause por inactividad.
-5. **Given** la base de producción, **When** supera los 350 MB, **Then** los Administradores reciben un aviso.
-6. **Given** el monitor, **When** corre (una vez por día, o a mano desde GitHub), **Then** mira los dos ambientes, pruebas y producción, y su aviso dice cuál falló y qué: el servidor, la base o el tamaño.
+4. Retirado por `022-base-de-datos-propia` (2026-10-24): sin Supabase no hay pausa por inactividad. Decía: el monitor consulta la base al menos una vez por día.
+5. Retirado por `022-base-de-datos-propia` (2026-10-24): sin el plan gratuito no hay tope de 500 MB; el aviso de disco llega con la etapa 4. Decía: la base que pasa los 350 MB avisa.
+6. **Given** el monitor, **When** corre (una vez por día, o a mano desde GitHub), **Then** mira los dos ambientes, pruebas y producción, y su aviso dice cuál falló y qué: el servidor o su base.
 
 ---
 
@@ -390,7 +390,7 @@ qué cada cosa es como es.
 - **Google caído:** no se puede entrar en un dispositivo nuevo; los que ya tienen sesión siguen (ADR-011).
 - **El servidor se reinicia en medio de un ingreso con huella:** el desafío de ese ingreso deja de valer y la app pide otro (ADR-011).
 - **Un aviso de despliegue que se pierde:** la máquina se pone al día en su próximo arranque o con un comando a mano (ADR-013).
-- **El servicio de base gratuito pausa la base tras 7 días sin consultas** (ADR-002): la consulta diaria del monitor lo evita (RNF-12).
+- ~~El servicio de base gratuito pausa la base tras 7 días sin consultas~~: ya no aplica; la base está en la máquina (022, ADR-026).
 - **Unir dos productos duplicados (RF-06)** y **quitar un renglón de un conteo abierto (RF-52)** tocan filas ya escritas; ver la pregunta en RNF-30.
 - **Los dos ambientes abiertos en el mismo dispositivo:** ver la pregunta en RNF-53.
 
@@ -421,15 +421,15 @@ notebook del local» es el equipo de RNF-40.
 - **RNF-10**: Sin internet se sigue vendiendo: vender funciona igual y, si se bajaron a mano los datos para trabajar sin conexión (specs/018, historia 5), también buscar y escanear; sin eso, buscar dice que hace falta internet (decisión 129). Lo demás funciona igual, y lo que quedó por enviar se manda solo al reconectar, en orden y una sola vez. Vale para todo cambio del mostrador: ventas, «no llevó», cambios de margen, ajustes de stock y renglones de conteo. Lo demás (compras, listas de precios, administración) necesita conexión y lo dice. Un indicador siempre visible dice «Sin conexión», cuántos cambios hay por enviar o «Sincronizado». Ver constitución, principio IV.
   - [NEEDS CLARIFICATION: cuando un dispositivo con conexión cambia algo (el Administrador cambia un margen desde su celular, o se aplica una lista de precios), ¿en cuánto tiempo como máximo lo tiene que ver otro dispositivo que también está conectado: al instante, en un minuto, al volver a abrir la app?]
 - **RNF-11**: Una caída del servidor o de la base no frena el mostrador: las pantallas se publican en un lugar distinto de la máquina del servidor y abren desde el dispositivo; lo que no se pudo mandar se reintenta solo al reconectar y, a más tardar, un minuto después. Ver constitución, principio IV, y ADR-010.
-- **RNF-12**: Los Administradores reciben un aviso si el servidor o la base dejan de responder. Lo manda un monitor que no corre en la máquina del servidor, que además consulta la base al menos una vez por día y avisa cuando la base supera los 350 MB (ADR-002). Carlos eligió (2026-10-20, T091): el monitor es una tarea programada en GitHub que mira los dos ambientes una vez por día, y el aviso es el correo de GitHub al dueño del repositorio cuando la tarea falla, con hasta un día de demora. Si falla una copia de respaldo o la prueba de restauración, cómo se avisa se decide con T092.
+- **RNF-12**: Los Administradores reciben un aviso si el servidor o la base dejan de responder. Lo manda un monitor que no corre en la máquina del servidor y le pregunta al servidor si anda y si su base responde (cambiado por `022-base-de-datos-propia`, 2026-10-24: antes consultaba la base directo, una vez por día, y avisaba cuando pasaba los 350 MB del plan gratuito de Supabase). Carlos eligió (2026-10-20, T091): el monitor es una tarea programada en GitHub que mira los dos ambientes una vez por día, y el aviso es el correo de GitHub al dueño del repositorio cuando la tarea falla, con hasta un día de demora. Si falla una copia de respaldo o la prueba de restauración, cómo se avisa se decide con T092.
 - **RNF-13**: Actualizar la versión no corta el mostrador ni pierde datos. Las pantallas toman la versión nueva solas al abrirse y conservan lo guardado en el dispositivo. La máquina despliega una versión identificada, comprueba la salud de los servicios y vuelve sola a la anterior si la nueva no queda sana. El esquema de la base cambia solo con cambios numerados que el servidor aplica en orden al arrancar, antes de atender (ADR-007, ADR-013).
 
 #### Respaldos
 
 - **RNF-20**: No se pierde ninguna venta ni ningún cambio del mostrador (margen, «no llevó», ajuste de stock, conteo): cada uno vive en el dispositivo hasta que el servidor lo confirma, aunque se recargue la página, se cierre el navegador o se corte internet. Las ventas confirmadas quedan además 7 días en el dispositivo. Si hay cambios en espera desde hace más de una hora, el indicador de conexión lo avisa. Ver constitución, principio IV, y ADR-002 (primera capa de respaldo).
   - [NEEDS CLARIFICATION: los 7 días de ventas que guarda cada dispositivo sirven para rellenar un hueco si hay que restaurar una copia vieja de la base. ¿El dispositivo tiene que reenviar solo las ventas que al servidor le quedaron afuera, o lo dispara el Administrador a mano después de restaurar?]
-- **RNF-21**: Se toma una copia completa de la base cada hora, fuera de la base y de la máquina, y cada copia se guarda 30 días (ADR-002, segunda capa). La máquina del servidor no guarda ningún dato: perderla no pierde nada.
-  - [NEEDS CLARIFICATION: los Excel originales de las listas (RF-01b) y las fotos de los productos (RF-09) son archivos, no filas de la base, y ninguna decisión dice dónde se guardan. Como la máquina no puede guardar datos, ¿dónde tienen que vivir (dentro de la base, o en un almacenamiento de archivos gratuito aparte) y tienen que entrar en las copias de cada hora y de cada semana?]
+- **RNF-21**: Se toma una copia completa de la base cada hora, fuera de la base y de la máquina, y cada copia se guarda 30 días (ADR-002, segunda capa). La base vive en la máquina (cambiado por `022-base-de-datos-propia`, 2026-10-24, ADR-026; decía que la máquina no guarda datos): hasta que estén las copias, que llegan por etapas (decisión 150), perderla pierde la base.
+  - Los Excel originales de las listas (RF-01b) y las fotos de los productos (RF-09) van en un almacenamiento de objetos fuera de la máquina y entran en las copias, desde la etapa 4 del almacenamiento; hasta entonces, en un volumen de la máquina (decisión 150).
   - [NEEDS CLARIFICATION: ¿las copias se hacen solo de la base de producción, o también de la de pruebas?]
   - [NEEDS CLARIFICATION: con una copia por hora, si la base se pierde se pueden perder hasta 60 minutos de lo que no son ventas (compras, listas aplicadas, altas de usuarios), porque el dispositivo solo conserva las ventas. ¿Se acepta esa pérdida, o esos datos también tienen que poder recuperarse? Y si se pierde la máquina, ¿en cuánto tiempo como máximo tiene que estar el servidor andando de nuevo?]
 - **RNF-22**: Una vez por semana se guarda una copia cifrada fuera del proveedor de la máquina y fuera del proveedor de la base (ADR-002, tercera capa). [NEEDS CLARIFICATION: ¿dónde se guarda la copia semanal (por ejemplo, una cuenta de Google Drive del negocio), cuántas semanas se conserva y quién guarda la clave para descifrarla?]

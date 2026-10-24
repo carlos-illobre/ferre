@@ -13,11 +13,13 @@ export type Interfaz = "escritorio" | "celular";
 const RAIZ = fileURLToPath(new URL("../../../", import.meta.url));
 const conexiones = new Map<string, (sql: string) => string>();
 
-export function stack(interfaz: Interfaz): { API: string; psql: (sql: string) => string } {
+export function stack(interfaz: Interfaz): { API: string; psql: (sql: string) => string; psqlProcesos: (sql: string) => string } {
   const propio = interfaz === "celular" && process.env.E2E_CELULAR_COMPOSE;
   const compose = ["compose", ...(propio ? process.env.E2E_CELULAR_COMPOSE!.split(" ").filter(Boolean) : [])];
   const API = propio ? process.env.E2E_CELULAR_API! : (process.env.API_URL ?? "http://localhost");
-  return { API, psql: (sql) => conexion(compose)(sql) };
+  // Procesos tiene su propia base (specs/022, E08): lo suyo se consulta ahí, por el contenedor.
+  const psqlProcesos = (sql: string) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "procesos", "-d", "procesos", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
+  return { API, psql: (sql) => conexion(compose)(sql), psqlProcesos };
 }
 
 // Una consulta como `psql -tA`: filas con las columnas separadas por «|» y, en lo que no es
@@ -39,7 +41,7 @@ function conectar(compose: string[]): (sql: string) => string {
   let puerto = "";
   try { puerto = execFileSync("docker", [...compose, "port", "db", "5432"], { cwd: RAIZ, encoding: "utf8" }).trim().split("\n")[0]!.split(":").pop() ?? ""; } catch { /* sin puerto publicado */ }
   if (!puerto) {
-    // La base no está publicada (un .env sin el perfil local, por ejemplo): por el contenedor.
+    // La base no está publicada (sin puerto publicado): por el contenedor.
     return (sql) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "mostrador", "-d", "mostrador", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
   }
   // El cliente de PostgreSQL es asíncrono y las pruebas consultan de forma sincrónica: la

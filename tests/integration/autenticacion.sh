@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# La API exige sesión y respeta roles. Necesita el stack (perfil local): con RAPIDO=1 se
+# La API exige sesión y respeta roles. Necesita el stack: con RAPIDO=1 se
 # saltea (código 3). Crea un dueño y un empleado con sesiones insertadas a mano (sin
 # pasar por Google) y verifica 401, 403 y 200 donde corresponde.
 set -uo pipefail

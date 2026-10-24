@@ -47,7 +47,7 @@ async function bajarLosDatos(page: import("@playwright/test").Page) {
 }
 
 test("vender y cambiar un margen sin red; al volver la red llega todo una sola vez", async ({ page, context }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await bajarLosDatos(page);
   // «Actualizar» trae solo lo que cambió desde la descarga anterior, con la marca del servidor (018-E25).
   const pedidos: string[] = [];
@@ -99,7 +99,7 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
 });
 
 test("la app abre sin red gracias al service worker", async ({ page, context }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await bajarLosDatos(page);
   await page.goto("/#/vender");
   await expect(page.getByTestId("busqueda")).toBeEnabled();

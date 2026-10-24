@@ -52,14 +52,14 @@ async function bajarLosDatos(page: import("@playwright/test").Page) {
 }
 
 test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y sin red no se puede vender", async ({ page, context }) => {
-  await page.addInitScript((token) => localStorage.setItem("ferre.sesion", token), TOKEN);
+  await page.addInitScript((token) => localStorage.setItem("ferre.sesion.desarrollo", token), TOKEN);
   await page.goto("/#/vender");
   await expect(page.getByTestId("abrir-busqueda")).toBeVisible();
   // Con conexión se trabaja igual: se busca en el servidor y se encuentra el producto (E08).
   await (await buscarEnVender(page, "e2e destornillador offline")).press("Enter");
   await expect(page.getByTestId("item").filter({ hasText: "DESTORNILLADOR OFFLINE" })).toBeVisible();
   // En el celular no quedó ninguna base con datos del negocio, y lo guardado no llega a 150 KB.
-  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
+  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre.desarrollo");
   expect(await page.evaluate(() => Object.keys(localStorage).reduce((n, k) => n + k.length + (localStorage.getItem(k) ?? "").length, 0))).toBeLessThan(150_000);
 
   // Sin red (E09): no se registra ni se guarda, y dice cómo habilitarlo.
@@ -74,7 +74,7 @@ test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y 
   await expect(page.getByText(/habilitalo en Más → Configuración/)).toBeVisible();
   await expect(page.getByTestId("exito")).toHaveCount(0);
   await expect(page.getByTestId("item")).toHaveCount(1);
-  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
+  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre.desarrollo");
   await context.setOffline(false);
   await expect.poll(() => psql(`SELECT count(*) FROM item_venta WHERE producto_id = '${ID_PROD}'`)).toBe("0");
 
@@ -84,15 +84,15 @@ test("en el celular, sin habilitar el trabajo sin conexión no se guarda nada y 
   await page.getByTestId("cfg-sin-conexion").click();
   await expect(page.getByTestId("cfg-sin-conexion")).toHaveAttribute("aria-checked", "true");
   await page.goto("/#/vender");
-  await expect.poll(async () => page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).toContain("ferre");
+  await expect.poll(async () => page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).toContain("ferre.desarrollo");
 });
 
 test("vender y cambiar un margen sin red; al volver la red llega todo una sola vez", async ({ page, context }) => {
-  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, HABILITADO]);
+  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion.desarrollo", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, HABILITADO]);
   // Nada se baja solo (018-E24): el catálogo se baja a mano, antes de cortar.
   await page.goto("/#/vender");
   await expect(page.getByTestId("abrir-busqueda")).toBeVisible();
-  expect(await page.evaluate(() => new Promise<number>((r) => { const p = indexedDB.open("ferre"); p.onsuccess = () => { try { const c = p.result.transaction("catalogo").objectStore("catalogo").count(); c.onsuccess = () => r(c.result); } catch { r(0); } }; }))).toBe(0);
+  expect(await page.evaluate(() => new Promise<number>((r) => { const p = indexedDB.open("ferre.desarrollo"); p.onsuccess = () => { try { const c = p.result.transaction("catalogo").objectStore("catalogo").count(); c.onsuccess = () => r(c.result); } catch { r(0); } }; }))).toBe(0);
   await bajarLosDatos(page);
   await page.goto("/#/vender");
   await expect(page.getByTestId("abrir-busqueda")).toBeVisible();
@@ -136,7 +136,7 @@ test("vender y cambiar un margen sin red; al volver la red llega todo una sola v
 });
 
 test("con el trabajo sin conexión habilitado, la app abre sin red gracias al service worker", async ({ page, context }) => {
-  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, HABILITADO]);
+  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion.desarrollo", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, HABILITADO]);
   await bajarLosDatos(page);
   await page.goto("/#/vender");
   await expect(page.getByTestId("abrir-busqueda")).toBeVisible();
@@ -156,7 +156,7 @@ test("con el trabajo sin conexión habilitado, la app abre sin red gracias al se
 // Con el guardado deshabilitado el catálogo no se baja: se busca en el servidor (specs/018).
 test("en el celular, sin guardar no se baja el catálogo y se busca, se lee un código y se vende igual", async ({ page }) => {
   const EN_EL_SERVIDOR = JSON.stringify({ animaciones: true, sinConexion: false });
-  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, EN_EL_SERVIDOR]);
+  await page.addInitScript(([token, preferencias]) => { localStorage.setItem("ferre.sesion.desarrollo", token!); localStorage.setItem("ferre.preferencias", preferencias!); }, [TOKEN, EN_EL_SERVIDOR]);
   const pedidos: string[] = [];
   page.on("request", (r) => { const u = new URL(r.url()); if (u.pathname.startsWith("/productos") && r.method() === "GET") pedidos.push(u.pathname + u.search); });
   await page.goto("/#/vender");
@@ -170,7 +170,7 @@ test("en el celular, sin guardar no se baja el catálogo y se busca, se lee un c
   await expect.poll(() => pedidos.some((q) => q.startsWith("/productos/pagina?buscar="))).toBe(true);
   // Nunca se pidió el catálogo entero (018-E01): cada pedido es de una página, con su límite.
   expect(pedidos.filter((q) => !/[?&]limite=/.test(q))).toEqual([]);
-  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre");
+  expect(await page.evaluate(async () => (await indexedDB.databases()).map((b) => b.name))).not.toContain("ferre.desarrollo");
 
   // Configuración ya no ofrece «Cómo buscar productos» (009-E15, decisión 138).
   await page.goto("/#/mas/configuracion");

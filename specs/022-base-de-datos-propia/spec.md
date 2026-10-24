@@ -108,7 +108,7 @@ capa de datos usa la base o el disco.
 1. **E11** **Given** el código de un servicio con base, **When** se lo mira, **Then** todo el acceso a datos está en una sola carpeta de ese servicio, separada de las rutas y de las reglas.
 2. **E12** **Given** una regla del negocio o una ruta que importa la biblioteca de la base o lee o escribe un archivo directamente, **When** se sube el cambio, **Then** el control de capas lo rechaza y dice qué archivo y qué importó.
 3. **E13** **Given** la capa de datos, **When** se busca código repetido, **Then** hay una sola forma de abrir una transacción, una sola de consultar, una sola de aplicar las migraciones y una sola de guardar y leer un archivo; la forma de las tablas que usa el código no se escribe a mano aparte de las migraciones, sale de ellas.
-4. **E14** **Given** las reglas y las rutas, **When** se compara el código antes y después de esta etapa, **Then** solo cambió de dónde importan la capa de datos; su lógica y sus pruebas siguen iguales.
+4. **E14** **Given** las reglas y las rutas, **When** se compara el código antes y después de esta etapa, **Then** su lógica es la misma: cambió de dónde llaman a la capa de datos, y sus pruebas cambiaron solo en cómo reconocen cada consulta (el texto y el orden de sus parámetros) y en de dónde simulan la base.
 
 
 ---

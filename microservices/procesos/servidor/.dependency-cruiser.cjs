@@ -1,5 +1,5 @@
 // Procesos se lleva a otro proyecto (ADR-019): no puede importar nada de fuera de su carpeta.
-// Y las capas de siempre (ADR-025): la ruta traduce, la regla decide y la capa de datos
+// Y las capas de siempre (ADR-025, 022-E11 022-E12): la ruta traduce, la regla decide y la capa de datos
 // (`src/persistencia/`) lee y escribe; solo ella usa la base o el disco.
 const PRUEBAS = "\\.test\\.ts$|^src/persistencia/pruebas/";
 module.exports = {
