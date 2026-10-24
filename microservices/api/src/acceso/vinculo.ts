@@ -15,8 +15,8 @@ import type { Ejecutor } from "../persistencia/transaccion.js";
 // apuntar a su sesión nueva. Dura los días configurados y se corta solo al desvincular.
 export const DIAS_EMPAREJADO = 30; // los de arranque; el negocio los cambia desde Más
 
-export async function diasDeVinculo(): Promise<number> {
-  const dias = Number((await leer(["vinculo.dias"]).catch(() => new Map<string, string>())).get("vinculo.dias"));
+export async function diasDeVinculo(db?: Ejecutor): Promise<number> {
+  const dias = Number((await leer(["vinculo.dias"], db).catch(() => new Map<string, string>())).get("vinculo.dias"));
   return Number.isInteger(dias) && dias >= 1 && dias <= 365 ? dias : DIAS_EMPAREJADO;
 }
 
@@ -47,7 +47,7 @@ export const soltarAnteriores = (db: Ejecutor, compuSesionId: string, celularSes
 // así se renueva el plazo.
 export async function emparejar(db: Ejecutor, compuSesionId: string, celularSesionId: string, nombre: string | null): Promise<{ id: string; expira_en: string; soltados: string[] }> {
   const soltados = await soltarAnteriores(db, compuSesionId, celularSesionId);
-  const dias = await diasDeVinculo();
+  const dias = await diasDeVinculo(db);
   const puesto = await datos.puestoVinculado(db, { compuSesionId, celularSesionId, nombre, dias });
   await sellarVinculo(db, puesto.id);
   return { id: puesto.id, expira_en: puesto.expira_en ?? new Date(Date.now() + dias * 86400000).toISOString(), soltados };

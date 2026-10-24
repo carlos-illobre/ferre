@@ -14,6 +14,15 @@ describe("la conexión", () => {
     expect(await baseResponde()).toBe(false);
   });
 
+  it("022-E05: si la base corta una conexión sin uso, el servidor sigue y la base vuelve a responder", async () => {
+    const anotar = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    await Promise.all([sql`SELECT pg_sleep(0.05)`.execute(base), sql`SELECT pg_sleep(0.05)`.execute(base)]);
+    await sql`SELECT pg_terminate_backend(pid) FROM pg_stat_activity
+              WHERE datname = current_database() AND pid <> pg_backend_pid() AND state = 'idle'`.execute(base);
+    await vi.waitFor(() => expect(anotar).toHaveBeenCalledWith(expect.stringMatching(/^base: se perdió una conexión sin uso/)));
+    expect(await baseResponde()).toBe(true);
+  });
+
   it("022-E23: dice de qué instalación de PostgreSQL es la base", async () => {
     expect(await identificadorDeLaBase()).toMatch(/^\d+$/);
   });

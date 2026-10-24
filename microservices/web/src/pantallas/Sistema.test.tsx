@@ -18,7 +18,9 @@ const elegido = (grupo: string) => within(screen.getByTestId(grupo)).getAllByRol
 
 beforeEach(() => {
   olvidarAjustesVistos(); apiFalsa.mockReset();
-  apiFalsa.mockImplementation(async (_r: string, o?: { method?: string; body?: string }) => (o?.method === "PUT" ? { ...AJUSTES, ...JSON.parse(o.body!) } : AJUSTES));
+  // Los ajustes del sistema; cualquier otra lista (los celulares de Configuración) viene vacía.
+  apiFalsa.mockImplementation(async (r: string, o?: { method?: string; body?: string }) =>
+    (r !== "/sistema/ajustes" ? [] : o?.method === "PUT" ? { ...AJUSTES, ...JSON.parse(o.body!) } : AJUSTES));
 });
 afterEach(() => { vi.useRealTimers(); });
 

@@ -12,7 +12,8 @@ const leer = vi.hoisted(() => ({ entero: vi.fn<() => Promise<LecturaDeLaCopia>>(
 vi.mock("../persistencia/productos.js", async (original) => ({ ...(await original<typeof import("../persistencia/productos.js")>()), leerCatalogoEntero: leer.entero, leerCambiosDesde: leer.cambios }));
 
 // De qué base es: sin base de verdad, una cualquiera.
-vi.mock("../persistencia/conexion.js", async (original) => ({ ...(await original<typeof import("../persistencia/conexion.js")>()), identificadorDeLaBase: async () => "prueba" }));
+const instalacion = vi.hoisted(() => ({ id: "7300000000000000001" }));
+vi.mock("../persistencia/conexion.js", async (original) => ({ ...(await original<typeof import("../persistencia/conexion.js")>()), identificadorDeLaBase: async () => instalacion.id }));
 
 const oyentes = vi.hoisted(() => [] as (EventEmitter & { query: (q: string) => Promise<void>; end: () => Promise<void> })[]);
 const conexion = vi.hoisted(() => ({ falla: false }));
@@ -136,20 +137,21 @@ describe("la copia del catálogo", () => {
     expect(descripciones(copia)).toEqual(["Arandela", "Bulón"]);
   });
 
-  it("una copia guardada de otra base no se usa: se lee la base entera", async () => {
+  it("022-E23: la copia guardada dice de qué base es; la de otra base no se usa y se lee la base entera", async () => {
     leer.entero.mockResolvedValue(lectura("100", [fila("a", "Arandela")]));
     leer.cambios.mockResolvedValue(lectura("100", []));
     const copia = await copiaNueva();
     await copia.iniciar();
     await vi.advanceTimersByTimeAsync(2500);
     await hastaQueEsteEnElDisco();
-    const { readFile, writeFile } = await import("node:fs/promises");
-    const guardada = JSON.parse(await readFile(ARCHIVO, "utf8"));
-    await writeFile(ARCHIVO, JSON.stringify({ ...guardada, base: "otro-servidor:5432/postgres" }));
+    const { readFile } = await import("node:fs/promises");
+    expect(JSON.parse(await readFile(ARCHIVO, "utf8")).base).toBe("7300000000000000001");
+    instalacion.id = "7300000000000000002";
     leer.entero.mockClear();
     const otra = await copiaNueva();
     await otra.iniciar();
     expect(leer.entero).toHaveBeenCalledTimes(1);
+    instalacion.id = "7300000000000000001";
   });
 
   it("un producto que la base borró de verdad se manda como quitado en la descarga siguiente", async () => {

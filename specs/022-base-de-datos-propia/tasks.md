@@ -11,5 +11,5 @@
 - [x] T009 Todo lo que cambia entre ambientes en el .env: AMBIENTE, sin valores por omisión, la base del dispositivo por ambiente (E19–E22) (depende de T003)
 - [x] T010 Una prueba por cada escenario, anotada en `proyecto/estado.yml`; e2e en Docker (depende de T005, T006, T007, T008, T009)
 - [x] T011 Documentación de operación (DEPLOYMENT, ORACLE, quickstart, data-model) (depende de T010)
-- [ ] T012 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T010)
-- [ ] T013 Actualizar `proyecto/estado.yml`, incorporar lo nuevo a la `spec.md` de 001 y marcar T139 (depende de T012)
+- [x] T012 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T010)
+- [x] T013 Actualizar `proyecto/estado.yml`, incorporar lo nuevo a la `spec.md` de 001 y marcar T139 (depende de T012)

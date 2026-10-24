@@ -252,7 +252,7 @@ describe("PATCH /productos/:id", () => {
     await pedir(app, "PATCH", "/productos/p1", { rol: "mostrador", cuerpo: { margen_elegido: 50 } });
     const evento = base.actual.sqlDe(/insert into "evento"/).at(-1)!;
     expect(evento.params[1]).toBe("producto.precio_elegido");
-    expect(evento.params[5]).toBe("u-mostrador");
+    expect(evento.params[4]).toBe("u-mostrador");
   });
 });
 

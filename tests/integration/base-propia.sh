@@ -19,6 +19,10 @@ falla() { echo "$1"; exit 1; }
 # 022-E04: el usuario de cada servicio no puede abrir la base del otro.
 como procesos "$(valor CLAVE_BASE_PROCESOS)" mostrador "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Procesos abrió la base del mostrador"
 como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" procesos "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base de Procesos"
+for base in postgres template1; do
+  como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base $base"
+  como procesos "$(valor CLAVE_BASE_PROCESOS)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Procesos abrió la base $base"
+done
 
 # 022-E08: las tablas de Procesos están en su base, no en la del mostrador.
 [[ "$(como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'procesos'")" == "0" ]] || falla "la base del mostrador tiene tablas de Procesos"

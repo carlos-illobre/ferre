@@ -271,7 +271,7 @@ Las reglas no van acá: van en `specs/`.
 Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con su carpeta en
 `specs/` cuando se empieza; la última cumple todas las restricciones.
 
-- [ ] T139 [agente] [en curso] [alta] Etapa 1: PostgreSQL en un contenedor de la máquina de Oracle, una base por servicio (mostrador y Procesos), mudanza desde Supabase, capa de datos aparte con 100 % de cobertura y todo lo que cambia entre ambientes en el .env (specs/022-base-de-datos-propia)
+- [x] T139 [agente] [alta] Etapa 1: PostgreSQL en un contenedor de la máquina de Oracle, una base por servicio (mostrador y Procesos), mudanza desde Supabase, capa de datos aparte con 100 % de cobertura y todo lo que cambia entre ambientes en el .env (specs/022-base-de-datos-propia)
 - [ ] T140 [agente] Etapa 2: copia cifrada por noche de la base y los archivos fuera de Oracle, guía de restauración probada, y Tickets en su propio servicio con su base (depende de T139)
 - [ ] T141 [agente] Etapa 3: el dispositivo guarda todos los cambios del mostrador, con tope por espacio y sin borrar lo no confirmado; pide al navegador no borrar los datos; sin almacenamiento local no trabaja sin conexión (depende de T139)
 - [ ] T142 [agente] Etapa 4: copia continua de la base (perder como mucho un minuto), avisos del monitor externo, prueba mensual de restauración, archivos en un almacenamiento de objetos y las listas de proveedores con su base (depende de T140)

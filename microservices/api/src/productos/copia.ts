@@ -1,4 +1,3 @@
-import { config } from "../config.js";
 import * as archivos from "../persistencia/archivos.js";
 import { escuchar as escucharLaBase, identificadorDeLaBase } from "../persistencia/conexion.js";
 import * as datos from "../persistencia/productos.js";
@@ -15,9 +14,6 @@ import type { FilaDeLaCopia, LecturaDeLaCopia } from "../persistencia/productos.
 
 // Sube cuando cambia la forma de la fila: una copia guardada con otra forma no se usa.
 const FORMATO = 3;
-// De qué base es la copia guardada: el servidor, el puerto y el nombre de la base (sin usuario ni
-// clave). Una copia de otra base (un volumen copiado entre ambientes) no se usa.
-const BASE = () => { try { const u = new URL(config.databaseUrl); return `${u.hostname}:${u.port}${u.pathname}`; } catch { return "?"; } };
 const ARCHIVO = () => archivos.ruta("copia", "catalogo.json");
 
 // Lo que la búsqueda compara de un producto: minúsculas, sin acentos y con todo lo que no es
@@ -99,12 +95,12 @@ function guardarPronto() {
 }
 async function guardar() {
   if (marca === null) return;
-  await archivos.guardar("copia", "catalogo.json", JSON.stringify({ formato: FORMATO, base: BASE(), marca, filas: [...porId.values()].map((e) => e.fila), borrados: [...borrados] }));
+  await archivos.guardar("copia", "catalogo.json", JSON.stringify({ formato: FORMATO, base: idDeLaBase, marca, filas: [...porId.values()].map((e) => e.fila), borrados: [...borrados] }));
 }
 async function leerDelDisco(): Promise<boolean> {
   try {
     const guardada = JSON.parse(String(await archivos.leer(ARCHIVO()))) as { formato?: unknown; base?: unknown; marca?: unknown; filas?: unknown; borrados?: unknown };
-    if (guardada.formato !== FORMATO || guardada.base !== BASE() || typeof guardada.marca !== "string" || !/^\d+$/.test(guardada.marca) || !Array.isArray(guardada.filas)) return false;
+    if (guardada.formato !== FORMATO || guardada.base !== idDeLaBase || typeof guardada.marca !== "string" || !/^\d+$/.test(guardada.marca) || !Array.isArray(guardada.filas)) return false;
     // Cada fila tiene que tener, al menos, su identificador y su descripción.
     if (!guardada.filas.every((f) => f && typeof f.id === "string" && typeof f.descripcion === "string")) return false;
     aplicar({ marca: guardada.marca, filas: guardada.filas as FilaDeLaCopia[], quitados: [] }, true);
@@ -132,7 +128,9 @@ function alAviso(demora = 200) {
 
 export const iniciada = () => escuchando;
 
-// De qué base es la copia (022-E23): las marcas que se dan a los dispositivos lo llevan.
+// De qué base es la copia (022-E23): el identificador de la instalación de PostgreSQL, que lo lleva
+// la copia guardada en el disco y cada marca que se da a los dispositivos. Una copia de otra base
+// (recreada, restaurada o de otro ambiente) no se usa.
 let idDeLaBase = "";
 export const deQueBase = () => idDeLaBase;
 

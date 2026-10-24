@@ -103,7 +103,7 @@ src/persistencia/
 
 - `AMBIENTE` (`desarrollo`, `pruebas`, `produccion`) en el `.env`, y `VITE_AMBIENTE` al construir
   la web: decide la barra de «Ambiente de prueba» y el nombre de la base local del dispositivo
-  (`ferre-<ambiente>`).
+  (`ferre.<ambiente>`).
 - Sin valores por omisión en el servidor ni en la web: `VERSION`, `VITE_VERSION` y `VITE_BASE`
   pasan a obligatorias.
 - Variables nuevas: `CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS` y

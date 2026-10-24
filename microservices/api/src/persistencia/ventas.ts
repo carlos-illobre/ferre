@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { sql } from "kysely";
 import type { Ejecutor } from "./transaccion.js";
+import type { EstadoDeDocumento, MedioPago, TipoDeMovimientoDeDinero } from "./tablas.js";
 import type { ItemDeVenta } from "../contratos/ventas.js";
 
 // Ventas: el acceso a los datos (ADR-018, etapa 5). Solo lee y escribe; las reglas están en
@@ -12,7 +13,7 @@ const hoyDelLocal = sql<string>`(now() AT TIME ZONE ${ZONA})::date`;
 export const ventaPorId = (e: Ejecutor, id: string) =>
   e.selectFrom("venta").select(["id", "total", "estado"]).where("id", "=", id).executeTakeFirst();
 
-export type VentaNueva = { id: string; fecha: string; cliente_id: string | null; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; total: string; dispositivo_id: string | null };
+export type VentaNueva = { id: string; fecha: string; cliente_id: string | null; medio_pago: MedioPago; total: string; dispositivo_id: string | null };
 // El orden de las columnas es el de siempre: id, fecha, cliente, medio, total, dispositivo.
 export const insertarVenta = (e: Ejecutor, v: VentaNueva) => e.insertInto("venta").values(v).execute();
 
@@ -31,7 +32,7 @@ export const descontarStock = (e: Ejecutor, m: { producto_id: string; cantidad: 
 export const anotarFaltante = (e: Ejecutor, a: { producto_id: string; usuario_id: string; venta_id: string; cantidad: number; detalle: string }) =>
   e.insertInto("anomalia").values({ id: randomUUID(), producto_id: a.producto_id, usuario_id: a.usuario_id, venta_id: a.venta_id, cantidad: a.cantidad, detalle: a.detalle, tipo: "venta_sin_stock" }).execute();
 
-export type FilaDelDia = { id: string; fecha: Date; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; total: string; estado: "confirmada" | "anulada"; pagada_en: Date | null; cliente: string | null; cliente_id: string | null; version: Date; correcciones: number; items: Omit<ItemDeVenta, "subtotal">[] };
+export type FilaDelDia = { id: string; fecha: Date; medio_pago: MedioPago; total: string; estado: EstadoDeDocumento; pagada_en: Date | null; cliente: string | null; cliente_id: string | null; version: Date; correcciones: number; items: Omit<ItemDeVenta, "subtotal">[] };
 
 // Las ventas de un día (sin día, hoy), las más nuevas primero, cada una con sus renglones en orden.
 export function ventasDelDia(e: Ejecutor, dia: string | null): Promise<FilaDelDia[]> {
@@ -144,7 +145,7 @@ export const actualizarRenglon = (e: Ejecutor, id: string, r: { cantidad: number
 export const quitarRenglon = (e: Ejecutor, id: string, correccionId: string) =>
   e.updateTable("item_venta").set({ quitado_por: correccionId }).where("id", "=", id).execute();
 
-export const actualizarVenta = (e: Ejecutor, id: string, v: { total: number; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; cliente_id: string | null }) =>
+export const actualizarVenta = (e: Ejecutor, id: string, v: { total: number; medio_pago: MedioPago; cliente_id: string | null }) =>
   e.updateTable("venta").set({ total: v.total.toFixed(2), medio_pago: v.medio_pago, cliente_id: v.cliente_id }).where("id", "=", id).execute();
 
 // Un movimiento de stock por una corrección o un cambio: positivo vuelve, negativo sale.
@@ -158,7 +159,7 @@ export const moverStock = (e: Ejecutor, m: { producto_id: string; cantidad: numb
 export const anotarDevueltoFallado = (e: Ejecutor, a: { producto_id: string; usuario_id: string; venta_id: string; cantidad: number; detalle: string }) =>
   e.insertInto("anomalia").values({ id: randomUUID(), tipo: "devuelto_fallado", ...a }).execute();
 
-export const insertarMovimientoDeDinero = (e: Ejecutor, m: { tipo: "cobro_diferencia" | "devolucion"; medio_pago: "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente"; cliente_id: string | null; importe: number; venta_id: string; correccion_id?: string; cambio_id?: string; usuario_id: string }) =>
+export const insertarMovimientoDeDinero = (e: Ejecutor, m: { tipo: TipoDeMovimientoDeDinero; medio_pago: MedioPago; cliente_id: string | null; importe: number; venta_id: string; correccion_id?: string; cambio_id?: string; usuario_id: string }) =>
   e.insertInto("movimiento_dinero").values({ id: randomUUID(), fecha: sql<Date>`now()`, ...m, importe: m.importe.toFixed(2), correccion_id: m.correccion_id ?? null, cambio_id: m.cambio_id ?? null }).execute();
 
 // Las ventas de los últimos 15 días con un producto que coincide con lo buscado (019, E11): sin

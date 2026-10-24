@@ -133,6 +133,7 @@ solo con `CARGA=1`.
 | `health.sh` | Cada servicio responde 200 en `/health` con el stack arriba | Primera verificación después de cualquier despliegue |
 | `migraciones.sh` | Todas las migraciones aplicadas y existen las doce tablas de la primera migración | Verifica el arranque real de la API contra la base |
 | `listas.sh` | Alta de proveedores, carga con detección automática, vista previa, aplicación, reaplicar no duplica, descartar, archivo irreconocible; la lista real de Ixnova si está en `privado/` | Es el circuito completo de precios contra los dos servicios |
+| `base-propia.sh` | La base del ambiente: una base y un usuario por servicio, que no abre las otras; publicada solo en 127.0.0.1; los datos sobreviven a recrear el contenedor; el primer usuario con la base vacía (specs/022) | Es la seguridad de la base, que las unitarias no ven |
 | `autenticacion.sh` | 401 sin sesión, 403 por rol, alta de usuario, auditoría, cierre de sesión | Es la puerta de todo; se prueba sin Google sembrando sesiones |
 
 ## Unitarias
@@ -144,6 +145,7 @@ Cada pedido del dueño que cambia un comportamiento trae la suya.
 |---|---|
 | `microservices/api` (`src/precios.test.ts`) y `microservices/web` (`src/negocio/precios/`, `src/plataforma/busqueda/`) | Redondeo para arriba a $1.000, precio de venta con margen de botón o tipeado, explicación paso a paso, margen real de un precio a mano; que la vista previa del front haga la misma cuenta que el servidor; búsqueda (orden de palabras, acentos, códigos, velocidad con 50.000 productos) |
 | `microservices/api` (`src/**/*.test.ts`, base simulada en `src/pruebas/base-falsa.ts`) | Validaciones y permisos de las rutas: margen entero, unidad, foto (subida, servida sin sesión, nombres raros), Excel original de una lista, auditoría paginada, roles (admin no toca dueños), ventas (validación, reenvío sin duplicar, ítems con precio/margen/explicación, stock), unir y separar productos, orden de migraciones |
+| La capa de datos de `microservices/api` y de `microservices/procesos/servidor` (`src/persistencia/**/*.test.ts`) | Cada consulta contra un PostgreSQL 17 de verdad, con el 100 % de cobertura: si baja, la subida se corta (specs/022, E15–E18). Se corre con `pnpm --filter <paquete> test:persistencia` y necesita `BASE_DE_PRUEBAS`, una cadena con un usuario que pueda crear bases (`tests/utest.sh` la arma con el `db` del compose). Después de una migración nueva, `pnpm --filter <paquete> tablas` vuelve a generar `tablas.ts`; si no, la prueba de `tablas.test.ts` falla |
 | `microservices/web` (`src/**/*.test.ts(x)`, jsdom + IndexedDB simulada) | Cantidades enteras o a granel; cola de cambios (orden, fusión por producto, reintentos, rechazos); debounce; atajos sin foco; elección de interfaz por ancho; ambiente de prueba; Desplegable, Explicación «?», foto ampliada y sacar foto; Productos; Vender; Compras; Administración. Cada interfaz tiene las suyas al lado de sus pantallas |
 | `microservices/listas` (pytest) | Los lectores contra muestras anonimizadas (y contra las listas reales de `privado/` cuando existen), el cálculo de costo neto, la API del servicio y su token |
 

@@ -194,4 +194,14 @@ propio (ADR-005), en una base local por ambiente (`ferre.<ambiente>`, 022-E21).
 | Datos sueltos | nombre | Por ejemplo, cuándo fue el último envío |
 
 El token de sesión, el usuario, el vínculo del celular como lector de códigos y lo apartado
-también viven en el almacenamiento del navegador (ADR-011), con claves que llevan el ambiente.
+también viven en el almacenamiento del navegador (ADR-011), con claves que llevan el ambiente
+(`ferre.sesion.<ambiente>`, `ferre.usuario.<ambiente>`, `ferre.puesto.<ambiente>`,
+`ferre.puesto-remoto.<ambiente>`, `ferre.para-apartar.<ambiente>`). Lo que es del aparato y no de
+los datos de un ambiente queda en una sola clave para todos: el identificador del dispositivo,
+sus preferencias de pantalla, el menú, el panel, el manual visto y si tiene huella.
+
+**La marca de la descarga** (specs/018, 022-E23) es `<identificador de la base>.<transacción>`: el
+`system_identifier` de la instalación de PostgreSQL y hasta qué transacción trae lo bajado. Una
+marca sin punto o con otro identificador vale como ninguna: el dispositivo baja todo de nuevo.
+La copia del catálogo que el servidor guarda en su disco también lleva el identificador de la
+base, y la de otra base no se usa.

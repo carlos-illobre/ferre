@@ -19,7 +19,7 @@ import { describirDispositivo } from "./pantallas/Login";
 import { useSugeridos } from "../sugeridos";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import { VincularCelular } from "./componentes/VincularCelular";
-import { EVENTO_EMPAREJAMIENTO, puestoRemoto } from "../../puesto";
+import { EVENTO_EMPAREJAMIENTO, puestoLocal, puestoRemoto } from "../../puesto";
 import { escucharPuesto } from "../../codigos-del-celular";
 import { VentasDeHoy } from "./pantallas/VentasDeHoy";
 import { Pestanas } from "./Pestanas";
@@ -138,7 +138,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
   // Códigos que llegan del celular vinculado.
   const alVincular = useCallback((puestoId: string) => {
     setPuestoVinculado(true);
-    const parar = escucharPuesto(puestoId, (codigo) => manejarCodigo.current(codigo), (conectado) => { if (!conectado) setPuestoVinculado(Boolean(localStorage.getItem("ferre.puesto"))); });
+    const parar = escucharPuesto(puestoId, (codigo) => manejarCodigo.current(codigo), (conectado) => { if (!conectado) setPuestoVinculado(Boolean(puestoLocal())); });
     (window as unknown as { __pararPuesto?: () => void }).__pararPuesto?.();
     (window as unknown as { __pararPuesto?: () => void }).__pararPuesto = parar;
   }, []);

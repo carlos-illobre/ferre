@@ -2,8 +2,13 @@ import { Kysely, PostgresDialect, sql } from "kysely";
 import pg from "pg";
 import type { DB } from "./tablas.js";
 
-// La única puerta a la base de Procesos (ADR-025, ADR-026): toda consulta pasa por Kysely.
-export const crearBase = (url: string) => new Kysely<DB>({ dialect: new PostgresDialect({ pool: new pg.Pool({ connectionString: url }) }) });
+// La única puerta a la base de Procesos (ADR-025, ADR-026): toda consulta pasa por Kysely. Si la
+// base corta una conexión que esperaba sin uso, el pool la descarta: se anota y el proceso sigue.
+export function crearBase(url: string): Kysely<DB> {
+  const pool = new pg.Pool({ connectionString: url });
+  pool.on("error", (error) => console.error(`procesos: se perdió una conexión sin uso (${error.message})`));
+  return new Kysely<DB>({ dialect: new PostgresDialect({ pool }) });
+}
 export type Base = Kysely<DB>;
 
 // La base puede tardar más que este proceso en aceptar conexiones (arranque en frío): se espera

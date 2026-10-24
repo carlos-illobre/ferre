@@ -39,6 +39,15 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
 - Base de datos: el contenedor `db` de cada ambiente, con sus datos en un volumen y publicado
   solo en `127.0.0.1` (5433 producción, 5434 pruebas)
   ([ADR-026](../adr/ADR-026-una-base-por-servicio-en-la-maquina.md)). Supabase ya no se usa.
+- **Las claves de la base** (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`) se
+  leen una sola vez: cuando `db` arranca con el volumen vacío y crea las bases y sus usuarios.
+  Cambiar después una clave en el `.env` no cambia la del usuario, y el servicio deja de
+  conectarse. Para cambiarla: primero en la base y después en el `.env`, y se reinicia el
+  servicio:
+  `docker compose exec db psql -U postgres -c "ALTER ROLE mostrador PASSWORD 'clave-nueva'"`
+  (o `procesos`, o `postgres` para la del administrador).
+- Desde afuera del contenedor, la base pide clave siempre; adentro, por el socket, el
+  administrador entra sin clave (lo usa el control de salud del contenedor).
 - Imágenes publicadas por CI en GHCR, etiquetadas por SHA corto
   ([ADR-007](../adr/ADR-007-imagenes-en-ci-y-ghcr.md)).
 - Configuración de la aplicación en la máquina: `~/ferre/produccion/.env` y
@@ -47,7 +56,8 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
 - **Cliente web en GitHub Pages:** un sitio, dos carpetas: la raíz es `produccion` y
   `/pruebas/` es `master`. CI lo construye con las variables de repositorio `API_URL` y
   `API_URL_PRUEBAS`, y el ambiente (`VITE_AMBIENTE`) y la versión de cada build. Es lo único que
-  vive fuera del `.env`. El identificador de Google no va:
+  vive fuera del `.env`, porque la web no se construye en la máquina (falla anotada en
+  `proyecto/estado.yml`, RNF-67: lo decide Carlos). El identificador de Google no va:
   la aplicación se lo pide al servidor de su ambiente (007-T043).
   Cada carpeta tiene una sola aplicación, que abre en su raíz.
 - **Sin acceso entrante:** GitHub no entra a la máquina. El job `avisar` publica en el
@@ -56,6 +66,14 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   abiertos en la Security List de la VCN, que es el firewall efectivo.
 
 El script de despliegue, el preflight y la guía paso a paso se generan en el issue #19.
+
+## Al pasar a la base propia (specs/022)
+
+Con la versión que trae la base propia, cada dispositivo guarda lo suyo aparte por ambiente
+(RNF-67). Al recibirla, cada computadora y cada celular **pierden la sesión** (hay que volver a
+entrar), bajan el catálogo de nuevo y dejan de ver lo que tenían guardado antes, incluida una
+cola de ventas sin enviar: conviene que no quede ninguna pendiente antes de actualizar. El
+vínculo entre celular y computadora se hace de nuevo. Pasa una sola vez.
 
 ## Primer usuario
 

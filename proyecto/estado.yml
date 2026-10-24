@@ -1155,7 +1155,7 @@ RNF-53:
   estado: "Hecho en parte: se aparta de la regla en 1 punto"
   pruebas:
     - tests/integration/paridad_env.sh
-    - microservices/web/src/ambiente.test.ts
+    - microservices/web/src/plataforma/ambiente/ambiente.test.ts
   defectos:
     - "Sin prueba: el despliegue automático de pruebas y la promoción a producción"
 
@@ -1518,6 +1518,8 @@ RNF-63:
     - microservices/procesos/servidor/src/persistencia/migrar.test.ts
   defectos:
     - "Sin copias hasta la etapa 2 (T140): perder el disco de la máquina pierde la base"
+    - "Las pruebas de E02 y E09 son más débiles que el escenario: E02 solo mira el nombre del volumen de cada ambiente, y E09 no parte de una base vacía (revisión de 022, 1.5)"
+    - "Sin prueba de dos copias del mismo servicio migrando a la vez (lo resuelve el candado de Kysely) ni de la base sin lugar en el disco (revisión de 022, 1.7)"
 
 RNF-64:
   estado: "Hecho (022-T003, 022-T008): las bases arrancan vacías; Supabase no se usa; una marca de otra base no se usa, en el servidor ni en el dispositivo"
@@ -1525,11 +1527,13 @@ RNF-64:
     - tests/integration/base-propia.sh
     - tests/integration/paridad_env.sh
     - microservices/api/src/persistencia/conexion.test.ts
+    - microservices/api/src/productos/copia.test.ts
     - microservices/api/src/rutas/productos.test.ts
     - microservices/api/src/rutas/stock.test.ts
-    - microservices/web/src/descarga.test.tsx
+    - microservices/web/src/datos/almacenamiento/descarga.test.tsx
   defectos:
     - "Carlos tiene que agregar las claves de la base al .env de cada ambiente en la máquina y borrar los secretos BASE_PRODUCCION y BASE_PRUEBAS (T147)"
+    - "La prueba de E07 comprueba que migrar de nuevo no aplica nada, no que la aplicación responda sin productos ni ventas con la base vacía (revisión de 022, 1.5)"
 
 RNF-65:
   estado: "Hecho (022-T004, 022-T006): src/persistencia/ en el mostrador y en Procesos, todo por Kysely, una sola forma de cada cosa, tipos generados; pnpm capas lo controla"
@@ -1542,6 +1546,9 @@ RNF-65:
     - microservices/procesos/servidor/src/persistencia/tablas.test.ts
   defectos:
     - "Procesos conserva su almacén en memoria para las pruebas de reglas y rutas, que repite las reglas de unicidad de la base: se reordena con las reglas, más adelante"
+    - "Casi todo el SQL que estaba escrito a mano pasó tal cual a plantillas sql con el tipo de la fila escrito a mano, para no romper cómo la base simulada de las pruebas de rutas reconoce cada consulta: se pasa al constructor de Kysely cuando se reordenen esas pruebas (revisión de 022, 3.2)"
+    - "Existen solo por la base simulada de las pruebas de rutas: el pool aparte de la conexión (pool.ts), el valor 0 de numero() cuando no hay filas y cargarParaPrueba en la copia del catálogo; se van con esa base simulada (revisión de 022, 3.1)"
+    - "E14 no tiene control automático; cambios chicos que quedan: el mensaje cuando falta el archivo al volver a leer una lista, y la búsqueda normalizada y el releer que pasaron de la capa de datos a las reglas (revisión de 022, 1.6)"
 
 RNF-66:
   estado: "Hecho (022-T005, 022-T006): las pruebas de la capa de datos corren contra PostgreSQL 17 y cubren el 100 % de líneas, ramas y funciones; la CI corta si baja"
@@ -1557,9 +1564,12 @@ RNF-67:
   estado: "Hecho (022-T009): AMBIENTE en el .env y VITE_AMBIENTE al construir la web; sin valores por omisión; lo guardado en el dispositivo lleva el ambiente"
   pruebas:
     - microservices/api/src/config.test.ts
-    - microservices/web/src/ambiente.test.ts
+    - microservices/web/src/plataforma/ambiente/ambiente.test.ts
     - tests/integration/paridad_env.sh
-  defectos: []
+  defectos:
+    - "VITE_AMBIENTE de pruebas y producción está en la CI, no en el .env, porque la web se construye en GitHub y no en la máquina; el AMBIENTE del .env de la máquina no lo lee ninguna pieza. Lo decide Carlos (revisión de 022, 4)"
+    - "E19 solo tiene prueba en el servidor (y de una variable): no la tienen el corte de la web al construir, el de Procesos ni el del compose; vite dev no exige VITE_BASE (revisión de 022, 1.4)"
+    - "Las e2e escriben las claves del dispositivo con el ambiente desarrollo fijo: con otro AMBIENTE en el .env fallan las que siembran la sesión (revisión de 022, 3.3)"
 
 RF-136:
   estado: "A validar (023): programado; falta que Carlos lo pruebe con la notebook y el celular del local, en su wifi"

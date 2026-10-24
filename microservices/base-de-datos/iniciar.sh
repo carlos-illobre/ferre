@@ -1,6 +1,7 @@
 #!/bin/sh
 # Crea una base por servicio, cada una con su usuario, que solo puede conectarse a la suya
-# (ADR-026). Corre como el administrador de la instancia, la primera vez que arranca.
+# (ADR-026). Corre como el administrador de la instancia, una sola vez: cuando arranca con el
+# volumen vacío. Cambiar después una clave en el .env no cambia la del usuario (ver DEPLOYMENT.md).
 set -eu
 : "${CLAVE_BASE_MOSTRADOR:?falta CLAVE_BASE_MOSTRADOR}"
 : "${CLAVE_BASE_PROCESOS:?falta CLAVE_BASE_PROCESOS}"
@@ -8,6 +9,7 @@ set -eu
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname postgres \
   -v clave_mostrador="$CLAVE_BASE_MOSTRADOR" -v clave_procesos="$CLAVE_BASE_PROCESOS" <<'SQL'
 REVOKE CONNECT ON DATABASE postgres FROM PUBLIC;
+REVOKE CONNECT ON DATABASE template1 FROM PUBLIC;
 CREATE ROLE mostrador LOGIN PASSWORD :'clave_mostrador';
 CREATE DATABASE mostrador OWNER mostrador;
 REVOKE CONNECT ON DATABASE mostrador FROM PUBLIC;
