@@ -173,12 +173,12 @@ function Fila({ ticket: t, alCambiar }: { ticket: Ticket | Pendiente; alCambiar?
   );
 }
 
-function Miniatura({ origen }: { origen: string | Blob }) {
+export function Miniatura({ origen }: { origen: string | Blob }) {
   const url = useFoto(origen);
   return url ? <img src={url} alt="" /> : <span className="tk-cargando-foto" aria-hidden="true" />;
 }
 
-function FotoGrande({ origen, alCerrar }: { origen: string | Blob; alCerrar: () => void }) {
+export function FotoGrande({ origen, alCerrar }: { origen: string | Blob; alCerrar: () => void }) {
   const url = useFoto(origen);
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => { const d = ref.current; if (d && typeof d.showModal === "function" && !d.open) d.showModal(); }, []);

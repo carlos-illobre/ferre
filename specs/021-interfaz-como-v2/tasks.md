@@ -54,3 +54,5 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Usuarios (computadora): «Todo lo que hizo» abre Quién hizo qué sin filtrar por la persona.
 - Duplicados (computadora y celular): la foto de cada producto de la sugerencia; queda el lugar con un ícono.
 - Duplicados (computadora): el stock y las ventas en «así queda» («16 un. y las 35 ventas»); dice solo los proveedores y de quién sale el costo.
+- Mejoras y errores (computadora y celular): en el ticket abierto, «A mí también» con quiénes lo sumaron, la charla («Lo que pasó») y la marca sobre la captura.
+- Mejoras y errores (computadora): en «Va con», el nombre del dispositivo («Compu del mostrador»); hoy dice qué es y el navegador («computadora · Chrome»).

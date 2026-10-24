@@ -28,7 +28,7 @@ import { Icono as IconoDeMas, type NombreDeIcono } from "../compu/base/ui";
 import { Deposito } from "./Deposito";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { Negocio, type Parte } from "./Negocio";
-import { Tickets } from "../Tickets";
+import { TicketsCelu } from "./pantallas/Tickets";
 import { CabezaDeUsuarios } from "./Usuarios";
 import { PESTANAS_DE_USUARIOS, PIDE_USUARIOS } from "../pestanas-de-usuarios";
 import { MisCelulares } from "./MisCelulares";
@@ -221,7 +221,7 @@ function Pantallas() {
         </div>
       )}
       {falta ? <SinPermiso falta={falta} />
-        : pestana === "mas" && parte === "tickets" ? <Tickets />
+        : pestana === "mas" && parte === "tickets" ? <TicketsCelu />
         : pestana === "mas" && parte === "configuracion" ? <Configuracion celular propio={<><MisCelulares /><VinculoPropio /></>} />
         : pestana === "mas" && parte === "sistema" ? <Sistema celular />
         : pestana === "mas" && parte === "procesos" ? <PantallaDeProcesos interfaz="celu" />

@@ -52,7 +52,7 @@ import { DE_MAS, Mas } from "./Mas";
 import { puede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { Roles } from "../Roles";
-import { Tickets } from "../Tickets";
+import { Tickets } from "./base/pantallas/Tickets";
 import { Anotadas, ParaRevisar } from "./base/pantallas/Anomalias";
 import { PESTANAS_DE_ANOMALIAS } from "../pestanas-de-anomalias";
 import { useParaRevisar } from "../../negocio/apartados";

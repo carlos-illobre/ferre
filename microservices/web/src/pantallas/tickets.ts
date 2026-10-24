@@ -89,3 +89,21 @@ export function useFoto(ruta: string | Blob): string | null {
   }, [ruta]);
   return url;
 }
+
+// La v2 (specs/021): los números de arriba de la pantalla, iguales en el celular y en la
+// computadora. «Esperan» son los abiertos de hace más de una semana; las barras, lo creado y lo
+// resuelto en cada una de las últimas cuatro semanas.
+export const DIAS_DE_ESPERA = 7;
+const DIA = 24 * 60 * 60 * 1000;
+export const diasAbierto = (t: Ticket, ahora = Date.now()) => Math.floor((ahora - new Date(t.creado_en).getTime()) / DIA);
+const MESES = ["ene.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ago.", "sep.", "oct.", "nov.", "dic."];
+export function resumenDeTickets(lista: Ticket[], ahora = new Date()) {
+  const abiertos = lista.filter((t) => t.estado === "abierto");
+  const delMes = lista.filter((t) => t.estado === "resuelto" && t.resuelto_en && new Date(t.resuelto_en).getMonth() === ahora.getMonth() && new Date(t.resuelto_en).getFullYear() === ahora.getFullYear());
+  const semanas = [3, 2, 1, 0].map((n) => {
+    const hasta = ahora.getTime() - n * 7 * DIA, desde = hasta - 7 * DIA;
+    const entre = (iso: string | null) => Boolean(iso) && new Date(iso!).getTime() > desde && new Date(iso!).getTime() <= hasta;
+    return { creados: lista.filter((t) => entre(t.creado_en)).length, resueltos: lista.filter((t) => entre(t.resuelto_en)).length };
+  });
+  return { abiertos: abiertos.length, esperan: abiertos.filter((t) => diasAbierto(t, ahora.getTime()) >= DIAS_DE_ESPERA).length, resueltosDelMes: delMes.length, mes: MESES[ahora.getMonth()]!, semanas };
+}
