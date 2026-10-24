@@ -1,7 +1,7 @@
 # Tareas: Conexión entre dispositivos
 
 - [x] T001 Especificación (paso 1), con las respuestas de Carlos del 2026-10-24 (decisión 152)
-- [ ] T002 [interfaz] Maqueta del indicador en el celular y la computadora: el puntito con cada estado y el detalle con «Probar conexión directa» (paso 2)
+- [x] T002 [interfaz] Maqueta del indicador en el celular y la computadora: el puntito con cada estado y el detalle con «Probar conexión directa» (paso 2): la variante A, aprobada por Carlos el 2026-10-24
 - [x] T003 Plan con la sección «Seguridad» y ADR-027 (paso 3); escenarios de error, borde y seguridad en la spec (paso 4); estas tareas (paso 5)
 - [ ] T004 Módulo: el paquete `microservices/conexion/` con su configuración (sin dependencias, cobertura del 100 %, capas, compilado a `dist/`), los avisos y la forma de los mensajes (E20, E21, E28) (depende de T003)
 - [ ] T005 [P] Módulo, servidor: la central, con la presencia, el paso de las tandas sin guardarlas, sus límites y el cierre de la sala (E10, E25, E26, E27) (depende de T004)

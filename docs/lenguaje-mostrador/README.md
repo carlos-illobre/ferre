@@ -208,3 +208,11 @@ carpeta para que la usen todos.
 - `recortar.py`: el recorte de fotos (rembg, modelo `isnet-general-use` o `birefnet-general-lite`).
 - `capturar.py`: captura con Playwright (`compu` 1366 × 768, `celu` 390 × 844 a escala 2, `pagina` entera):
   `uv run --with playwright==1.56.0 python capturar.py celu /ruta/index.html /ruta/captura.png`.
+
+## El puntito del vínculo (decisión 152)
+
+El estado de la conexión entre el celular y la computadora es un puntito de 12 px, lleno cuando
+la conexión anda o falla, hueco (borde de 2,5 px) cuando espera: directa `--logro` lleno, por el
+servidor `--urgente` lleno, sin conexión `--error` lleno; conectando `--texto-3` hueco, el otro
+cerrado `--borde-fuerte` hueco, en pausa `--pino` hueco. El lleno lleva un halo de 3 px de su
+color al 20 %. Detalle en `specs/023-conexion-entre-dispositivos/ux.md`.

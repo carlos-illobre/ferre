@@ -1287,3 +1287,4 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      detalle del indicador; la foto se le pide solo al celular emparejado (se saca el código QR
      para cualquier celular; sigue elegir un archivo); avisar con la aplicación cerrada y la huella
      remota quedan para una segunda etapa.
+     El indicador: la variante A, en su propio botón donde está «Vincular» (2026-10-24).

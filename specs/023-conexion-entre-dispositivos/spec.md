@@ -6,7 +6,7 @@
 
 **Status**: Aprobada (Carlos, 2026-10-24)
 
-**Maquetas**: Pendientes. Solo lleva el indicador del estado de la conexión, en el celular y la computadora; Carlos lo ve después (2026-10-24: «enfocate más que nada en la conexión, la parte gráfica después la vemos»).
+**Maquetas**: Aprobadas (Carlos, 2026-10-24): la variante A, el indicador en su propio botón; `maquetas/compu-variante-a-cerrado.png`, `maquetas/compu-variante-a-detalle.png`, `maquetas/celu-variante-a-cerrado.png`, `maquetas/celu-variante-a-detalle.png` y los estados en `maquetas/compu-estados.png` y `maquetas/celu-estados.png`.
 
 **Input**: Carlos, el 2026-10-24: «hay dos formas de comunicación, la primera es la típica
 cliente servidor […]. La segunda forma es la que usa el celular para comunicarse con la
