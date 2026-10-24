@@ -16,6 +16,7 @@ import { irA } from "../../rutas";
 import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe } from "../../unidades";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Toast, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
+import { Stock } from "./Stock";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
 import type { Producto } from "./pantallas/Productos";
 
@@ -45,127 +46,6 @@ export function Deposito({ sub }: { sub: string | null }) {
       </div>
       {actual === "pedidos" ? <Pedidos celular alIngresar={(id) => irA(`deposito/ingreso?pedido=${id}`)} /> : actual === "stock" ? <Stock /> : actual === "ingreso" ? <Ingreso /> : <Contar />}
     </main>
-  );
-}
-
-// ---------- Stock ----------
-// Inventario: cuánto hay de cada producto, explicado con sus movimientos. El dinero invertido,
-// en total y por producto, solo con «Ver el dinero invertido» (decisión 96).
-function Stock() {
-  const { catalogo, buscandoEnElServidor, buscarProductos, actualizarProducto } = useCatalogo();
-  const { datos, porId, error: fallo } = useStock();
-  const veInvertido = usePuede()("negocio.invertido");
-  // El aviso se puede cerrar; vuelve si el próximo pedido falla de nuevo.
-  const [cerrado, setCerrado] = useState<unknown>(null);
-  const error = !fallo || fallo === cerrado ? null : fallo instanceof ErrorApi ? fallo.message : "Sin conexión con el servidor.";
-  const [mensaje, setMensaje] = useState<string | null>(null);
-  const [consulta, setConsulta] = useState("");
-  const [abierto, setAbierto] = useState<string | null>(null);
-  const [escaneando, setEscaneando] = useState(false);
-
-  const filas = useMemo(() => {
-    return consulta.trim() ? buscarProductos(consulta, 100) : productosConStock(catalogo, porId).slice(0, 100);
-  }, [catalogo, consulta, buscarProductos, porId]);
-
-  return (
-    <>
-      <AvisoError texto={error} alCerrar={() => setCerrado(fallo)} />
-      <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
-      <div className="lateral">
-      <div className="columna al-costado">
-      </div>
-      <div className="columna">
-      <Buscador chico valor={consulta} alCambiar={(v) => { setConsulta(v); setAbierto(null); }} placeholder="Buscar para ver o corregir el stock" alEscanear={hayCamara() ? () => setEscaneando(true) : undefined} />
-      {escaneando && <Escaner alDetectar={(codigo) => { setEscaneando(false); setConsulta(codigo); setAbierto(null); }} alCerrar={() => setEscaneando(false)} />}
-      <p className="subtitulo">El stock es la suma de compras, ventas y ajustes desde que se usa el sistema. Hasta el conteo, lo que no se cargó no está.</p>
-      {veInvertido && datos && (
-        <div className="tarjeta dinero-invertido-stock" data-testid="dinero-invertido-stock">
-          <small>Dinero invertido</small>
-          <strong className="importe">{pesosEnteros(datos.valor_total)}</strong>
-        </div>
-      )}
-      <Lista data-testid="tabla-stock">
-        {filas.map((p) => <FilaStock key={p.id} veInvertido={veInvertido} alFoto={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} producto={p} fila={porId.get(p.id) ?? null} abierto={abierto === p.id} alAbrir={() => setAbierto(abierto === p.id ? null : p.id)} alAjustar={setMensaje} />)}
-      </Lista>
-      {consulta.trim() && filas.length === 0 && !buscandoEnElServidor && <div className="aviso-suave">Nada con "{consulta}".</div>}
-      </div>
-      </div>
-    </>
-  );
-}
-
-function FilaStock({ producto: p, fila, abierto, alAbrir, alAjustar, alFoto, veInvertido }: { veInvertido: boolean; alFoto: (foto_url: string) => void; producto: Producto; fila: StockFila | null; abierto: boolean; alAbrir: () => void; alAjustar: (mensaje: string) => void }) {
-  const corrige = usePuede()("deposito.stock");
-  const cantidad = fila ? Number(fila.stock) : 0;
-  const { movimientos: traidos, error: sinMovimientos } = useMovimientos(p.id, abierto);
-  const movimientos = traidos ?? (sinMovimientos ? [] : null);
-  const { faltaEn, corregir } = useCorregirStock(p);
-  const [corrigiendo, setCorrigiendo] = useState(false);
-  const [real, setReal] = useState("");
-  const [motivo, setMotivo] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => { if (!abierto) setCorrigiendo(false); }, [abierto]);
-
-  async function guardar() {
-    const falta = faltaEn(real, motivo);
-    if (falta?.real) { setError(TEXTOS.inventario.faltaCuantasHay.corto); return; }
-    // El motivo es obligatorio, igual que en la computadora (RF-53).
-    if (falta?.motivo) { setError(TEXTOS.inventario.faltaElMotivo.corto); return; }
-    try {
-      const { hay } = await corregir(real, motivo);
-      setCorrigiendo(false); setError(null);
-      const dif = hay - cantidad;
-      alAjustar(dif === 0 ? "Sin diferencia: el stock ya decía eso." : `Stock corregido a ${num(hay)} ${unidad} (${dif > 0 ? "+" : ""}${num(dif)} ${unidad}).`);
-    } catch (e) { setError((e as Error).message); }
-  }
-  const nombreTipo = nombreDeMovimiento;
-  const unidad = abreviarUnidad(p.unidad);
-
-  return (
-    <div className={`fila-stock ${abierto ? "abierta" : ""}`} data-testid="fila-stock">
-      <div className="con-foto-de-producto">
-      <FotoDeProducto producto={p} alCambiar={alFoto} />
-      <button type="button" className="fila" onClick={alAbrir} data-testid="stock" aria-expanded={abierto}>
-        <span className="nombre">{p.descripcion}</span>
-        <span className="derecha">
-          <strong className="importe" style={{ fontSize: 24, color: cantidad < 0 ? "var(--coral-texto)" : undefined }}>{num(cantidad)} {unidad}</strong>
-          {veInvertido && <small className="valor-stock" data-testid="valor-stock">{fila?.costo_neto == null || Number(fila.valor) <= 0 ? "—" : pesosEnteros(Number(fila.valor))}</small>}
-        </span>
-        <span className="detalle">{detalleDe(p)}{fila?.ultimo_movimiento ? ` · último ${fecha(fila.ultimo_movimiento.slice(0, 10))}` : ""}</span>
-      </button>
-      </div>
-      {abierto && (
-        <div className="detalle-stock" style={{ display: "flex", flexDirection: "column", gap: 10, animation: "aparecer .2s" }} data-testid="detalle-stock">
-          <small>Stock {num(cantidad)} {unidad} = suma de estos movimientos</small>
-          {movimientos === null ? <small>Cargando…</small> : movimientos.length === 0 ? <small>Sin movimientos.</small> : (
-            <div className="movimientos" data-testid="movimientos">
-              {movimientos.map((m) => (
-                <div key={m.id}><span style={{ color: "var(--gris)" }}>{fecha(m.fecha.slice(0, 10))}</span><span>{nombreTipo(m)}{m.nota ? ` · ${m.nota}` : ""}</span><strong className="importe" style={{ fontSize: 16, color: Number(m.cantidad) < 0 ? "var(--coral-texto)" : undefined }}>{Number(m.cantidad) > 0 ? "+" : ""}{num(Number(m.cantidad))} {unidad}</strong></div>
-              ))}
-            </div>
-          )}
-          <AvisoError texto={error} />
-          {corrigiendo ? (
-            <>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontWeight: 600 }}>Hay</span>
-                <input className="campo importe-campo" style={{ width: 90, height: 44, textAlign: "center" }} inputMode="decimal" autoFocus value={real} onChange={(e) => setReal(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void guardar(); }} data-testid="cantidad-real" />
-                <input className="campo" style={{ flex: 1, height: 44, minWidth: 0 }} placeholder="Motivo" value={motivo} onChange={(e) => setMotivo(e.target.value)} data-testid="motivo" />
-              </div>
-              <div className="motivos-de-ajuste" role="group" aria-label="Motivos frecuentes">
-                {MOTIVOS_DE_AJUSTE.map((m) => <button key={m} type="button" className={`boton chico ${motivo === m ? "tinta" : ""}`} aria-pressed={motivo === m} onClick={() => setMotivo(m)}>{m}</button>)}
-              </div>
-              <div className="cuadricula-2">
-                <button type="button" className="boton tinta" onClick={guardar} data-testid="guardar-ajuste">Guardar</button>
-                <button type="button" className="boton" onClick={() => setCorrigiendo(false)}>Cancelar</button>
-              </div>
-            </>
-          ) : corrige && <button type="button" className="boton corregir-stock" onClick={() => { setCorrigiendo(true); setReal(String(cantidad)); setMotivo(""); }} data-testid="corregir">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4ZM13.500 6.500l4 4" /></svg>Corregir el stock
-          </button>}
-        </div>
-      )}
-    </div>
   );
 }
 

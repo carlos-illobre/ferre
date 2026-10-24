@@ -48,6 +48,19 @@
   --p-sube: #2f7d5c;
   --p-barra: #6fbf98;
   --p-barra-elegida: #b6e4cc;
+  /* Los estados de la v2 (decisión 148): urgente (amarillo), error (rojo) y logro (verde), con su
+     fondo suave y su texto, como en las maquetas del director de arte. */
+  --p-urgente: #F0A20F;
+  --p-urgente-suave: #FFF3D8;
+  --p-urgente-texto: #845400;
+  --p-error: #D7372A;
+  --p-error-suave: #FCEAE7;
+  --p-error-texto: #AE281D;
+  --p-logro: #1E9E62;
+  --p-logro-suave: #E2F4EA;
+  --p-logro-texto: #11764A;
+  --p-pino-suave: #E3EEE8;
+  --p-pino-texto: #17614E;
 }
 
 /* Animaciones deshabilitadas en Configuración (RF-83): nada se mueve, en ninguna de las dos interfaces. */

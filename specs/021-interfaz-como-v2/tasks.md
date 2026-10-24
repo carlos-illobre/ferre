@@ -25,3 +25,10 @@ Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con
 - Anomalías → Anotadas (computadora): «Contados después» (cuántos de los productos con anomalías se contaron después) y su barra.
 - Anomalías → Anotadas (computadora y celular): el botón «Contar» de cada producto, con su hoja para contarlo, y la marca «Contado hoy».
 - Anomalías → Anotadas (computadora y celular): el estante de cada producto («Est. A-03-12») y la hoja de cada producto con las veces que faltó.
+- Stock (computadora y celular): el mínimo de cada producto y «Bajo el mínimo» («—»), con su porqué («31 vendidas en 90 días»).
+- Stock (computadora y celular): la estantería de cada producto («Est. B-02-01») y buscar por estantería.
+- Stock (computadora y celular): «Para revisar» cuenta solo los productos en cero o en negativo; le faltan los que están bajo el mínimo y los que espera un cliente («La espera Rosa, jue 22»).
+- Stock (computadora y celular): el filtro «Sin código» con su cuenta, y «Generar código» en el renglón.
+- Stock (computadora): «Exportar a Excel», «Etiquetas» (Alt E) y la etiqueta de un producto (la impresora del panel), apagados.
+- Stock (computadora y celular): la cuenta de «Qué pedir» («28», «a 4 proveedores»); el botón lleva a Pedidos.
+- Stock (celular): deslizar un renglón para «Etiqueta» y «Corregir»; corregir se hace tocando el producto.

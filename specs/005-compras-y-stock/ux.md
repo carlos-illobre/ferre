@@ -193,6 +193,31 @@ bajado y una corrección queda «guardada, se manda al volver internet», visibl
 hasta que el servidor la confirma); corrección rechazada por el servidor al reconectar: se
 avisa cuál y por qué; éxito: el stock y el valor nuevos a la vista.
 
+**Cómo se ve: la v2 (decisión 148, 2026-10-24).** Es la variante 1 de la maqueta del director
+de arte, «Lista y cuenta del producto» en la computadora y «La lista» en el celular.
+
+- Computadora: arriba, cinco tarjetas: con stock (verde), bajo el mínimo (amarillo), sin stock,
+  stock negativo (rojo) y dinero invertido con su candado (solo con «Ver el dinero
+  invertido»). Tocar con stock, sin stock o negativo filtra la lista. A la izquierda el
+  buscador («Buscá por nombre, código o estantería», con «/»), «Con el celular» si hay uno
+  vinculado, los filtros en pastillas (Todos, Para revisar, Negativo, Sin código, cada uno con
+  su cuenta) y los productos en renglones con foto, nombre, marca · código, y el stock en una
+  caja con su color (rojo negativo, gris en cero, verde con stock). A la derecha, fijo, el
+  producto elegido: foto, nombre, marca · proveedor, su stock grande con «Es la suma de sus N
+  movimientos», los tres últimos movimientos con su ícono, la cantidad con signo y lo que
+  queda después de cada uno («Ver N más» trae los demás), y abajo la corrección: «¿Cuántas
+  hay?» con − y +, «había N, hay M» en vivo, los motivos en pastillas y «Guardar corrección»
+  (Enter) y «Cancelar» (Esc). Teclas: «/» busca, ↑ ↓ eligen el producto, C va a «¿Cuántas
+  hay?». Arriba, al lado de las pestañas: «Exportar a Excel», «Etiquetas» y «Qué pedir».
+- Celular: tres tarjetas (bajo el mínimo, sin stock, negativo), el buscador con escanear, las
+  pastillas de filtro deslizables, y cada producto como tarjeta con foto, nombre, estantería
+  · marca y el stock en su caja de color; tocarlo abre su hoja con los movimientos y la
+  corrección. Abajo, encima del menú, la barra «Qué pedir».
+- Quedan vacíos o apagados hasta que se programen (E02): el mínimo y «bajo el mínimo» («—»),
+  la estantería, «Para revisar» cuenta solo los que están en cero o en negativo, «Sin
+  código», la etiqueta del producto, «Exportar a Excel», «Etiquetas» y la cuenta de «Qué
+  pedir» (el botón lleva a Pedidos).
+
 ## Historia 4: contar de a un sector (Administrador)
 
 **Tiene que poder:** ver los sectores; crear uno; empezar o retomar el conteo de un sector;
