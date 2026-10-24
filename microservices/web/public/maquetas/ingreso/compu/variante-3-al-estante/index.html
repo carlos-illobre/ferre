@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingreso · Del camión al estante (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../propio/ingreso.css">
+<style>
+  body { height: 100vh; overflow: hidden; }
+  /* Rompe el marco: sin lateral. Una barra blanca arriba con el camino del ingreso */
+  .barra-sup { height: 64px; display: flex; align-items: center; gap: 16px; padding: 0 24px; background: var(--superficie); border-bottom: 1px solid var(--borde); }
+  .barra-sup .logo { width: 36px; height: 36px; border-radius: 10px; background: var(--pino); color: #fff; display: grid; place-items: center; }
+  .barra-sup .donde { font-weight: 800; font-size: 18px; letter-spacing: -.01em; }
+  .barra-sup .donde span { color: var(--texto-3); font-weight: 650; }
+  .pasos { display: flex; align-items: center; gap: 6px; margin-left: 24px; }
+  .paso { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 6px; border-radius: 99px; font-weight: 700; font-size: 14px; color: var(--texto-2); background: var(--hundido); }
+  .paso b { width: 24px; height: 24px; border-radius: 99px; display: grid; place-items: center; background: #fff; font-size: 14px; }
+  .paso.hecho { background: var(--logro-suave); color: var(--logro-texto); } .paso.hecho b { background: var(--logro); color: #fff; }
+  .paso.ahora { background: var(--pino); color: #fff; } .paso.ahora b { color: var(--pino); }
+  .pasos .linea { width: 20px; height: 2px; background: var(--borde-fuerte); }
+  .partes { margin-left: auto; display: flex; gap: 4px; }
+  .partes a { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; color: var(--texto-2); cursor: pointer; }
+  .partes a.activo { background: var(--pino-suave); color: var(--pino); }
+  .principal { display: grid; grid-template-columns: 372px minmax(0, 1fr); gap: 20px; padding: 16px 24px 20px; height: calc(100vh - 64px); }
+
+  /* El ingreso como un comprobante */
+  .ticket { display: flex; flex-direction: column; padding: 16px; min-height: 0; }
+  .t-cab { display: grid; grid-template-columns: 1fr 52px; gap: 12px; align-items: center; padding-bottom: 12px; border-bottom: 1px dashed var(--borde-fuerte); }
+  .t-cab b { display: block; font-size: 18px; font-weight: 800; line-height: 24px; }
+  .t-cab small { display: block; font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 18px; }
+  .t-cab .mini { width: 52px; height: 64px; border-radius: 6px; overflow: hidden; box-shadow: var(--sombra-2); transform: rotate(3deg); cursor: zoom-in; border: 1px solid var(--borde); }
+  .t-cab .mini img { width: 100%; }
+  .lineas { padding: 6px 0; border-bottom: 1px dashed var(--borde-fuerte); }
+  .linea { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 5px 0; font-size: 14px; line-height: 20px; }
+  .linea .q { font-weight: 800; color: var(--tinta); }
+  .linea .n { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .linea .n small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-3); }
+  .linea .s { font-weight: 800; text-align: right; }
+  .linea .s small { display: block; font-weight: 700; font-size: 14px; }
+  .linea.no { color: var(--texto-3); } .linea.no .n { text-decoration: line-through; } .linea.no .q { color: var(--texto-3); }
+  .sube { color: var(--urgente-texto); } .baja { color: var(--logro-texto); } .pino-t { color: var(--pino-texto); }
+  .t-tot { display: flex; align-items: flex-end; justify-content: space-between; padding: 12px 0 8px; }
+  .t-tot .et { font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .t-tot .va { font-size: 36px; line-height: 40px; font-weight: 800; letter-spacing: -.03em; }
+  .t-ped { padding: 10px 12px; border-radius: 12px; background: var(--urgente-suave); color: var(--urgente-texto); font-size: 14px; font-weight: 650; line-height: 20px; }
+  .t-ped .barra { background: rgba(255,255,255,.7); } .t-ped .barra > b { background: var(--urgente); }
+  .t-pago { display: flex; align-items: center; justify-content: stretch; margin-top: 10px; font-size: 14px; font-weight: 650; color: var(--texto-2); }
+  .ticket .btn-accion { margin-top: auto; width: 100%; }
+  .t-pago .segmentos > * { flex: 1; justify-content: center; }
+
+  /* El plano */
+  .plano-col { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .plano-cab { display: flex; align-items: center; gap: 12px; }
+  .plano-cab .tt b { display: block; font-size: 20px; font-weight: 800; line-height: 26px; letter-spacing: -.01em; }
+  .plano-cab .tt span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .plano-cab .teclas { margin-left: auto; display: flex; gap: 6px; align-items: center; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .plano { flex: 1; min-height: 0; padding: 8px; }
+  .plano svg { width: 100%; height: 100%; display: block; }
+  .plano text { font-family: var(--letra); }
+  .pin { cursor: pointer; transition: transform var(--t) var(--rebote); transform-box: fill-box; transform-origin: center; }
+  .pin.guardado circle.c { fill: var(--logro); }
+  .paradas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .parada { display: grid; grid-template-columns: 28px 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); cursor: pointer; }
+  .parada .num { width: 28px; height: 28px; border-radius: 99px; background: var(--pino); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+  .parada .foto, .parada .foto-icono { width: 40px; height: 40px; border-radius: 10px; }
+  .parada .nom { font-size: 14px; font-weight: 750; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .parada .det { font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; }
+  .parada .det b { color: var(--tinta); }
+  .parada .ok { width: 32px; height: 32px; border-radius: 99px; border: 2px solid var(--borde-fuerte); display: grid; place-items: center; color: transparent; }
+  .parada.sigue { border-color: var(--accion); box-shadow: 0 0 0 3px rgba(232,84,28,.12); } .parada.sigue .num { background: var(--accion); }
+  .parada.guardado { background: var(--hundido); box-shadow: none; } .parada.guardado .num { background: var(--logro); } .parada.guardado .ok { background: var(--logro); border-color: var(--logro); color: #fff; }
+  .parada.sin { border-color: #F3C766; } .parada.sin .num { background: var(--urgente); color: var(--tinta); }
+  .parada .foto-icono.nuevo { background: var(--pino-suave); color: var(--pino-texto); }
+</style>
+</head>
+<body>
+<header class="barra-sup">
+  <span class="logo"><i class="i" data-i="store"></i></span>
+  <div class="donde">Depósito <span>/ Ingreso</span></div>
+  <div class="pasos">
+    <span class="paso hecho"><b><i class="i i-s" data-i="check"></i></b>Llegó: pedido 0412</span><span class="linea"></span>
+    <span class="paso ahora" data-paso-reg><b>2</b>Cotejar y registrar</span><span class="linea"></span>
+    <span class="paso" data-paso-est><b>3</b>Guardar en el estante</span>
+  </div>
+  <nav class="partes">
+    <a data-ir="vender" title="Vender"><i class="i" data-i="shopping-cart"></i></a>
+    <a data-ir="productos" title="Catálogo"><i class="i" data-i="tags"></i></a>
+    <a class="activo" data-ir="stock" title="Depósito"><i class="i" data-i="package"></i></a>
+    <a data-ir="resumen" title="Negocio"><i class="i" data-i="chart-column"></i></a>
+    <a data-mas title="Más"><i class="i" data-i="ellipsis"></i></a>
+  </nav>
+</header>
+<div class="principal">
+  <aside class="tarjeta-2 ticket">
+    <div class="t-cab">
+      <div><b>Distribuidora Oeste</b><small>Factura A · hoy 24/10 · Marcelo Ríos</small></div>
+      <div class="mini" data-ver-factura title="Ver la foto"><img src="../../propio/factura.webp" alt="Foto de la factura"></div>
+    </div>
+    <div class="lineas">
+      <div class="linea"><span class="q">4 un.</span><span class="n">Pinza universal 8" Bahco</span><span class="s"><span class="peso">$</span>39.200</span></div>
+      <div class="linea"><span class="q">6 un.</span><span class="n">Cinta métrica 5 m Stanley<small class="sube">a $5.940 · ↑ +10 %</small></span><span class="s"><span class="peso">$</span>35.640</span></div>
+      <div class="linea"><span class="q sube">6 un.</span><span class="n">Llave combinada 13 mm<small class="sube">pedí 10 · faltan 4</small></span><span class="s"><span class="peso">$</span>12.900</span></div>
+      <div class="linea"><span class="q">8 un.</span><span class="n">Puntas Phillips PH2 × 10<small class="baja">a $1.805 · ↓ −5 %</small></span><span class="s"><span class="peso">$</span>14.440</span></div>
+      <div class="linea no"><span class="q">0 un.</span><span class="n">Lámpara LED 9 W luz fría</span><span class="s">no llegó</span></div>
+      <div class="linea"><span class="q">4 un.</span><span class="n">Mecha acero rápido HSS 6 mm</span><span class="s"><span class="peso">$</span>4.400</span></div>
+      <div class="linea"><span class="q">5 un.</span><span class="n">Precinto nylon 200 × 4,8 × 100<small class="pino-t">producto nuevo</small></span><span class="s"><span class="peso">$</span>11.500</span></div>
+    </div>
+    <div class="t-tot"><div><div class="et">Total sin IVA</div><div class="t-detalle">33 un. · 2 costos cambian</div></div><div class="va"><span class="peso">$</span>118.080</div></div>
+    <div class="t-ped">Pedido 0412: llegaron 28 de 42 un. Queda <b>recibido parcial</b>: faltan 4 llaves y 10 lámparas.<div class="barra"><b style="width:67%"></b></div></div>
+    <div class="t-pago"><div class="segmentos" data-pago style="flex:1;display:flex"><button>Adelantado</button><button class="elegido">30 días · 23/11</button><button>60 días</button></div></div>
+    <button class="btn btn-accion grande" data-registrar style="margin-top:16px"><i class="i" data-i="package-check"></i>Registrar y guardar <span class="kbd">F2</span></button>
+  </aside>
+
+  <section class="plano-col">
+    <div class="plano-cab">
+      <div class="tt"><b>Dónde va cada cosa</b><span>El recorrido más corto desde la puerta: 6 paradas, unos 3 minutos.</span></div>
+      <div class="teclas"><span class="kbd">↓</span>siguiente <span class="kbd">Enter</span>guardado <span class="kbd">P</span>imprimir recorrido</div>
+    </div>
+    <div class="tarjeta plano">
+      <svg viewBox="0 0 760 360" preserveAspectRatio="xMidYMid meet" aria-label="Plano del depósito con el recorrido">
+        <defs><pattern id="rayas" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="4" height="8" fill="#E3DFD5"/></pattern></defs>
+        <!-- Estanterías -->
+        <g fill="#ECE9E1" stroke="#CEC8BA" stroke-width="1">
+          <rect x="80" y="30" width="340" height="30" rx="6"/>
+          <rect x="80" y="110" width="340" height="30" rx="6"/>
+          <rect x="80" y="190" width="340" height="30" rx="6"/>
+          <rect x="80" y="270" width="340" height="30" rx="6"/>
+          <rect x="520" y="30" width="34" height="270" rx="6"/>
+        </g>
+        <g fill="#6B706B" font-size="15" font-weight="800">
+          <text x="64" y="51" text-anchor="end">A</text><text x="64" y="131" text-anchor="end">B</text><text x="64" y="211" text-anchor="end">C</text><text x="64" y="291" text-anchor="end">D</text><text x="537" y="20" text-anchor="middle">E</text>
+        </g>
+        <!-- Mostrador y puerta -->
+        <rect x="600" y="30" width="140" height="120" rx="10" fill="url(#rayas)" stroke="#CEC8BA"/>
+        <text x="670" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="#545955">Mostrador</text>
+        <rect x="14" y="328" width="70" height="8" rx="4" fill="#E8541C"/>
+        <text x="96" y="345" font-size="15" font-weight="700" fill="#545955">Puerta del depósito · entra la mercadería</text>
+        <!-- Recorrido -->
+        <path d="M48 330 V 245 H 470 V 165 H 48 V 85 H 500 V 165" fill="none" stroke="#12382F" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round" opacity=".55"/>
+        <!-- Paradas -->
+        <g class="pin" data-pin="1"><circle class="c" cx="140" cy="245" r="15" fill="#E8541C"/><circle cx="140" cy="245" r="22" fill="none" stroke="#E8541C" stroke-opacity=".3" stroke-width="6"/><text x="140" y="250" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">1</text><text x="140" y="190" dy="-4" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1D1B" opacity="0">.</text></g>
+        <g class="pin" data-pin="2"><circle class="c" cx="250" cy="245" r="15" fill="#12382F"/><text x="250" y="250" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">2</text></g>
+        <g class="pin" data-pin="3"><circle class="c" cx="380" cy="245" r="15" fill="#12382F"/><text x="380" y="250" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">3</text></g>
+        <g class="pin" data-pin="4"><circle class="c" cx="330" cy="165" r="15" fill="#12382F"/><text x="330" y="170" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">4</text></g>
+        <g class="pin" data-pin="5"><circle class="c" cx="150" cy="165" r="15" fill="#12382F"/><text x="150" y="170" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">5</text></g>
+        <g class="pin" data-pin="6"><circle class="c" cx="500" cy="165" r="15" fill="#F0A20F"/><text x="500" y="170" text-anchor="middle" font-size="15" font-weight="800" fill="#1A1D1B">?</text></g>
+        <!-- Etiquetas de estante -->
+        <g font-size="14" font-weight="700" fill="#545955">
+          <text x="140" y="290" text-anchor="middle">D-02</text>
+          <text x="250" y="210" text-anchor="middle">C-04</text>
+          <text x="380" y="210" text-anchor="middle">C-07</text>
+          <text x="330" y="130" text-anchor="middle">B-06</text>
+          <text x="150" y="130" text-anchor="middle">B-02</text>
+          <text x="500" y="200" text-anchor="middle" fill="#845400">¿E-05?</text>
+        </g>
+      </svg>
+    </div>
+    <div class="paradas">
+      <div class="parada sigue" data-parada="1"><span class="num">1</span><div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div><div><div class="nom">Mecha HSS 6 mm</div><div class="det">D-02 · 5 → <b>9 un.</b></div></div><span class="ok"><i class="i i-s" data-i="check"></i></span></div>
+      <div class="parada" data-parada="2"><span class="num">2</span><div class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></div><div><div class="nom">Llave combinada 13 mm</div><div class="det">C-04 · 1 → <b>7 un.</b></div></div><span class="ok"><i class="i i-s" data-i="check"></i></span></div>
+      <div class="parada" data-parada="3"><span class="num">3</span><div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div><div><div class="nom">Puntas PH2 × 10</div><div class="det">C-07 · 3 → <b>11 un.</b></div></div><span class="ok"><i class="i i-s" data-i="check"></i></span></div>
+      <div class="parada" data-parada="4"><span class="num">4</span><div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div><div><div class="nom">Cinta métrica 5 m</div><div class="det">B-06 · 0 → <b>6 un.</b></div></div><span class="ok"><i class="i i-s" data-i="check"></i></span></div>
+      <div class="parada" data-parada="5"><span class="num">5</span><div class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></div><div><div class="nom">Pinza universal 8"</div><div class="det">B-02 · 2 → <b>6 un.</b></div></div><span class="ok"><i class="i i-s" data-i="check"></i></span></div>
+      <div class="parada sin" data-parada="6"><span class="num">?</span><div class="foto-icono nuevo"><i class="i" data-i="package-plus"></i></div><div><div class="nom">Precinto nylon × 100</div><div class="det" style="color:var(--urgente-texto)">Nuevo: <b style="color:inherit">¿en E-05?</b></div></div><span class="ok"><i class="i i-s" data-i="check"></i></span></div>
+    </div>
+  </section>
+</div>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="../../propio/ingreso.js"></script>
+<script>
+(function () {
+  var $ = IG.$, $$ = IG.$$;
+  var registrado = false, sigue = 1;
+  function registrar() {
+    if (registrado) return; registrado = true;
+    $("[data-paso-reg]").className = "paso hecho"; $("[data-paso-reg] b").innerHTML = '<i class="i i-s" data-i="check"></i>';
+    $("[data-paso-est]").className = "paso ahora"; IG.pintar($("[data-paso-reg]"));
+    var b = $("[data-registrar]"); b.className = "btn grande"; b.innerHTML = '<i class="i" data-i="printer"></i>Imprimir el recorrido <span class="kbd">P</span>'; b.style.width = "100%"; IG.pintar(b);
+    IG.tostada("Ingreso registrado: $118.080 · 2 costos actualizados · 1 producto nuevo", "circle-check");
+  }
+  function guardar(n) {
+    var p = $('[data-parada="' + n + '"]'); if (!p || p.classList.contains("guardado")) return;
+    if (!registrado) registrar();
+    p.classList.remove("sigue", "sin"); p.classList.add("guardado");
+    var pin = $('[data-pin="' + n + '"]');
+    if (pin) { pin.classList.add("guardado"); $("circle.c", pin).setAttribute("fill", "#1E9E62"); var h = $$("circle", pin)[1]; if (h && !h.classList.contains("c")) h.remove(); }
+    if (n === 6) { $("text", pin).textContent = "6"; $("text", pin).setAttribute("fill", "#fff"); $(".det", p).innerHTML = "E-05 · 0 → <b>5 un.</b>"; $(".num", p).textContent = "6"; }
+    IG.vibrar([10, 40, 10]);
+    var sig = $$(".parada:not(.guardado)")[0];
+    $$(".parada").forEach(function (x) { x.classList.remove("sigue"); });
+    if (sig) {
+      sig.classList.add("sigue"); sigue = Number(sig.dataset.parada);
+      $$(".pin circle.c").forEach(function (c) { var g = c.parentNode; if (!g.classList.contains("guardado") && g.dataset.pin !== "6") c.setAttribute("fill", "#12382F"); });
+      var pp = $('[data-pin="' + sigue + '"] circle.c'); if (pp && sigue !== 6) pp.setAttribute("fill", "#E8541C");
+    } else IG.tostada("Todo guardado en su estante", "package-check");
+  }
+  $("[data-registrar]").addEventListener("click", function () { if (registrado) IG.tostada("Recorrido mandado a la impresora del depósito", "printer"); else registrar(); });
+  $$(".parada").forEach(function (p) { p.addEventListener("click", function () { guardar(Number(p.dataset.parada)); }); });
+  $$(".pin").forEach(function (p) { p.addEventListener("click", function () { guardar(Number(p.dataset.pin)); }); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "F2") { e.preventDefault(); registrar(); }
+    if (e.key === "Enter" && registrado) guardar(sigue);
+    if (e.key === "p" || e.key === "P") IG.tostada("Recorrido mandado a la impresora del depósito", "printer");
+  });
+})();
+</script>
+</body>
+</html>

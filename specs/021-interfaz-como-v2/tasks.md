@@ -4,7 +4,7 @@ Las sesiones que programan las pantallas no escriben ni corren pruebas (Carlos, 
 pruebas de las pantallas quedan en pausa en el CI y se arreglan todas juntas al final (T010).
 
 - [x] T001 Especificación (paso 1), con las respuestas de Carlos del 2026-10-24 (decisión 148)
-- [ ] T002 [interfaz] Maquetas del director de arte, tres versiones por dispositivo, de las pantallas que la v2 no dibujó: Más, Ingreso, Pedidos, Más → Sistema y Vincular (paso 2)
+- [x] T002 [interfaz] Maquetas del director de arte, tres versiones por dispositivo, de las pantallas que la v2 no dibujó: Más, Ingreso, Pedidos, Más → Sistema y Vincular (paso 2)
 - [ ] T003 [interfaz] Catálogo: Listas de precios y Duplicados como la v2, en el celular y la computadora
 - [ ] T004 [interfaz] Depósito: Stock, Compras y Contar como la v2, en el celular y la computadora
 - [ ] T005 [interfaz] Negocio: Cómo va el negocio, Usuarios y Quién hizo qué como la v2, en el celular y la computadora

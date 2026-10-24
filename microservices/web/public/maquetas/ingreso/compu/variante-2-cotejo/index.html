@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingreso · Cotejar el pedido (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../propio/ingreso.css">
+<style>
+  .cuerpo { display: grid; grid-template-columns: 404px minmax(0, 1fr); gap: 24px; height: 100%; min-height: 0; }
+  /* El papel */
+  .papel-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .papel-cab { display: flex; align-items: center; gap: 8px; }
+  .papel-cab b { font-size: 16px; font-weight: 800; }
+  .papel-cab .pastilla { margin-left: auto; }
+  .papel { position: relative; flex: 1; min-height: 0; border-radius: 16px; background: var(--hundido); padding: 14px; overflow: hidden; }
+  .papel .hoja { position: relative; border-radius: 6px; overflow: hidden; box-shadow: var(--sombra-2); transform: rotate(-.6deg); }
+  .papel img { width: 100%; display: block; }
+  .regla { position: absolute; left: -2%; right: -2%; height: 4.4%; border-radius: 4px; border: 2px solid var(--pino); background: rgba(18,56,47,.08); box-shadow: 0 0 0 999px rgba(244,242,236,.35); transition: top var(--t) var(--curva); }
+  .regla::before { content: ""; position: absolute; left: -10px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 99px; background: var(--pino); }
+  .papel-pie { display: flex; gap: 8px; align-items: center; }
+  .papel-pie .t-detalle { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+
+  /* El cotejo */
+  .cot { display: flex; flex-direction: column; min-height: 0; gap: 10px; }
+  .cot-cab { display: flex; align-items: center; gap: 16px; }
+  .anillo { position: relative; width: 56px; height: 56px; flex: none; }
+  .anillo svg { width: 56px; height: 56px; transform: rotate(-90deg); }
+  .anillo span { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+  .anillo, .anillo svg { width: 48px !important; height: 48px !important; }
+  .cot-cab .tt b { display: block; font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; }
+  .cot-cab .tt span { font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .cot-cab .chips { margin-left: auto; }
+  .cot-cab .chip { height: 36px; font-size: 14px; padding: 0 12px; }
+  .lista { display: flex; flex-direction: column; gap: 5px; min-height: 0; }
+  .item { position: relative; display: grid; grid-template-columns: 40px 36px minmax(0, 1fr) 112px 156px 92px; gap: 12px; align-items: center; height: 50px; padding: 0 14px 0 6px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .marca-c { width: 36px; height: 36px; border-radius: 99px; display: grid; place-items: center; border: 0; font-weight: 800; font-size: 15px; }
+  .marca-c.ok { background: var(--logro); color: #fff; }
+  .marca-c.parcial { background: var(--urgente-suave); color: var(--urgente-texto); border: 2px solid var(--urgente); }
+  .marca-c.no { background: var(--hundido-2); color: var(--texto-2); }
+  .marca-c.falta { background: transparent; border: 2px dashed var(--borde-fuerte); color: var(--texto-3); }
+  .item .foto, .item .foto-icono { width: 36px; height: 36px; border-radius: 10px; }
+  .item .nom { font-size: 15px; font-weight: 750; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .det { font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .cuanto { font-size: 15px; font-weight: 800; }
+  .item .cuanto small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-2); line-height: 18px; }
+  .item .costo { justify-self: start; }
+  .item .sub { text-align: right; font-weight: 800; font-size: 16px; }
+  .item.no { background: var(--hundido); box-shadow: none; } .item.no .nom { color: var(--texto-2); } .item.no .foto img { opacity: .45; }
+  .item.foco { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10), var(--sombra-2); height: auto; padding-top: 8px; padding-bottom: 8px; row-gap: 8px; }
+  .teclas { grid-column: 3 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .teclas .btn { gap: 6px; }
+  .sep-sec { display: flex; align-items: center; gap: 8px; margin-top: 2px; height: 32px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .sep-sec .btn { margin-left: auto; }
+  .item .foto-icono.nuevo { background: var(--pino-suave); color: var(--pino-texto); }
+  .pie { margin-top: auto; display: flex; align-items: center; gap: 20px; padding: 10px 10px 10px 20px; flex: none; }
+  .pie .tot small { white-space: nowrap; display: block; font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 18px; }
+  .pie .tot b { font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -.02em; }
+  .pie .pago small { display: block; font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 18px; margin-bottom: 4px; }
+  .pie .btn-accion { margin-left: auto; }
+  .pie .pendiente { display: none; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender" title="Vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos" title="Catálogo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item activo" data-ir="stock" title="Depósito"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen" title="Negocio"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-mas title="Más"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="vinculo" style="padding:10px;justify-content:center" title="Celular en espejo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo</div></div>
+      <div class="usuario" style="padding:6px"><span class="avatar">MR</span><div class="txt">Marcelo Ríos</div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Depósito</div>
+      <span class="pastilla pino"><i class="i i-s" data-i="truck"></i>Distribuidora Oeste · pedido 0412 del 20/10 · llegó hoy</span>
+      <div class="acciones">
+        <button class="btn chico" data-elegir><i class="i i-s" data-i="clipboard-list"></i>Otro pedido <span class="kbd">Alt O</span></button>
+        <button class="btn chico" data-sin-pedido><i class="i i-s" data-i="plus"></i>Sin pedido <span class="kbd">Alt N</span></button>
+      </div>
+    </header>
+    <nav class="pestanas"><a data-ir="stock">Stock</a><a class="activa" data-no-ir>Ingreso</a><a data-ir="compras">Compras</a><a data-ir="contar">Contar</a></nav>
+    <section class="pantalla">
+      <div class="cuerpo">
+        <div class="papel-col">
+          <div class="papel-cab">
+            <div class="segmentos" data-comprobante><button class="elegido">Factura</button><button>Remito</button><button>Sin comprobante</button></div>
+                      </div>
+          <div class="papel" data-papel data-ver-factura-no>
+            <div class="hoja"><img src="../../propio/factura.webp" alt="Foto de la factura de Distribuidora Oeste"><span class="regla" data-regla style="top:47.2%"></span></div>
+          </div>
+          <div class="papel-pie">
+            <button class="btn chico" data-qr><i class="i i-s" data-i="qr-code"></i>Otra hoja <span class="kbd">Alt F</span></button>
+            <span class="t-detalle" style="white-space:nowrap"><span class="kbd">Re Pág</span><span class="kbd">Av Pág</span>mueven la regla</span>
+          </div>
+        </div>
+
+        <div class="cot">
+          <div class="cot-cab">
+            <div class="anillo"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--hundido-2)" stroke-width="4"/><circle data-arco cx="18" cy="18" r="15.5" fill="none" stroke="var(--logro)" stroke-width="4" stroke-linecap="round" stroke-dasharray="97.4" stroke-dashoffset="16.2"/></svg><span data-cuenta>5/6</span></div>
+            <div class="tt"><b>Cotejá lo que llegó contra el pedido</b><span>Lo que coincide va con <span class="kbd">Espacio</span>; solo se escribe lo distinto.</span></div>
+            <div class="chips" data-chips><span class="chip elegido">Todo (7)</span><span class="chip">Con diferencia (4)</span></div>
+          </div>
+          <div class="lista" data-lista>
+            <div class="item" data-it="ok" data-costo="9800" data-pedi="4" data-cant="4">
+              <button class="marca-c ok" aria-label="Llegó todo"><i class="i" data-i="check"></i></button>
+              <div class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></div>
+              <div><div class="nom">Pinza universal 8" Bahco</div><div class="det">PU-8 · Bahco</div></div>
+              <div class="cuanto">4 un.<small>llegó todo</small></div>
+              <span class="pastilla costo">Costo de lista</span>
+              <div class="sub" data-sub></div>
+            </div>
+            <div class="item" data-it="ok" data-costo="5940" data-pedi="6" data-cant="6">
+              <button class="marca-c ok" aria-label="Llegó todo"><i class="i" data-i="check"></i></button>
+              <div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div>
+              <div><div class="nom">Cinta métrica 5 m × 19 mm</div><div class="det">CM5-19 · Stanley</div></div>
+              <div class="cuanto">6 un.<small>llegó todo</small></div>
+              <span class="pastilla urgente costo"><i class="i i-s" data-i="trending-up"></i>$5.940 · +10 %</span>
+              <div class="sub" data-sub></div>
+            </div>
+            <div class="item" data-it="parcial" data-costo="2150" data-pedi="10" data-cant="6">
+              <button class="marca-c parcial" aria-label="Llegó una parte">6</button>
+              <div class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></div>
+              <div><div class="nom">Llave combinada 13 mm</div><div class="det">LC-13 · Bremen</div></div>
+              <div class="cuanto" style="color:var(--urgente-texto)">6 de 10<small>faltan 4</small></div>
+              <span class="pastilla costo">Costo de lista</span>
+              <div class="sub" data-sub></div>
+            </div>
+            <div class="item" data-it="ok" data-costo="1805" data-pedi="8" data-cant="8">
+              <button class="marca-c ok" aria-label="Llegó todo"><i class="i" data-i="check"></i></button>
+              <div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div>
+              <div><div class="nom">Puntas Phillips PH2 × 10</div><div class="det">PH2-10 · Bremen</div></div>
+              <div class="cuanto">8 un.<small>llegó todo</small></div>
+              <span class="pastilla logro costo"><i class="i i-s" data-i="trending-down"></i>$1.805 · −5 %</span>
+              <div class="sub" data-sub></div>
+            </div>
+            <div class="item no" data-it="no" data-costo="1250" data-pedi="10" data-cant="0">
+              <button class="marca-c no" aria-label="No llegó"><i class="i" data-i="minus"></i></button>
+              <div class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></div>
+              <div><div class="nom">Lámpara LED 9 W luz fría</div><div class="det">LED9-F · Philips</div></div>
+              <div class="cuanto" style="color:var(--texto-2)">0 de 10<small>no llegó</small></div>
+              <span></span>
+              <div class="sub" data-sub></div>
+            </div>
+            <div class="item foco" data-it="falta" data-costo="1100" data-pedi="4" data-cant="0">
+              <button class="marca-c falta" aria-label="Sin cotejar"><i class="i i-s" data-i="circle-dashed"></i></button>
+              <div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
+              <div><div class="nom">Mecha acero rápido HSS 6 mm</div><div class="det">MHS-060 · Ezeta · pedí 4</div></div>
+              <div class="cuanto" style="color:var(--texto-3)">¿4 un.?<small>sin cotejar</small></div>
+              <span class="pastilla costo">Costo de lista</span>
+              <div class="sub" data-sub></div>
+              <div class="teclas">
+                <button class="btn btn-oscuro chico" data-todo><span class="kbd">Espacio</span>Llegó todo</button>
+                <button class="btn chico" data-otra><span class="kbd">0–9</span>Otra cantidad</button>
+                <button class="btn chico" data-nada><span class="kbd">N</span>No llegó</button>
+                <button class="btn btn-fantasma chico" data-costo-cambio><span class="kbd">C</span>Otro costo</button>
+              </div>
+            </div>
+            <div class="sep-sec"><i class="i i-s" data-i="package-plus"></i>Vino y no estaba en el pedido<button class="btn btn-fantasma chico" data-agregar><i class="i i-s" data-i="search"></i>Buscar o escanear <span class="kbd">/</span></button></div>
+            <div class="item" data-it="ok" data-costo="2300" data-cant="5">
+              <button class="marca-c ok" aria-label="Llegó"><i class="i" data-i="check"></i></button>
+              <div class="foto-icono nuevo"><i class="i" data-i="package-plus"></i></div>
+              <div><div class="nom">Precinto nylon 200 × 4,8 mm negro × 100</div><div class="det"><b style="color:var(--pino-texto)">Producto nuevo</b> · se crea al registrar</div></div>
+              <div class="cuanto">5 un.<small>de más</small></div>
+              <span class="pastilla pino costo">$2.300 · sin lista</span>
+              <div class="sub" data-sub></div>
+            </div>
+          </div>
+
+          <div class="tarjeta-2 pie">
+            <div class="tot"><small data-detalle></small><b data-total></b></div>
+            <div class="pago"><small>Cómo se paga · <span data-vence>vence el 23/11</span></small><div class="segmentos" data-pago><button data-d="0">Adelantado</button><button class="elegido" data-d="30">30 días</button><button data-d="60">60 días</button></div></div>
+            <button class="btn btn-accion grande" data-registrar><i class="i" data-i="package-check"></i>Registrar ingreso <span class="kbd">F2</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="../../propio/ingreso.js"></script>
+<script>
+(function () {
+  var $ = IG.$, $$ = IG.$$;
+  function recalcular() {
+    var total = 0, un = 0, hechos = 0, pedidos = 0, falta = 0;
+    $$("[data-it]").forEach(function (r) {
+      var c = Number(r.dataset.cant), s = c * Number(r.dataset.costo);
+      $("[data-sub]", r).innerHTML = c ? IG.plata(s) : '<span style="color:var(--texto-3)">—</span>';
+      total += s; un += c;
+      if (r.dataset.pedi) { pedidos++; if (r.dataset.it !== "falta") hechos++; else falta++; }
+    });
+    $("[data-total]").innerHTML = IG.plata(total);
+    $("[data-detalle]").textContent = "Total sin IVA · " + un + " un." + (falta ? " · " + falta + " sin cotejar" : "");
+    $("[data-cuenta]").textContent = hechos + "/" + pedidos;
+    $("[data-arco]").setAttribute("stroke-dashoffset", String(97.4 * (1 - hechos / pedidos)));
+  }
+  recalcular();
+
+  function marcar(r, estado, cant) {
+    r.dataset.it = estado; r.dataset.cant = cant;
+    var m = $(".marca-c", r), p = Number(r.dataset.pedi);
+    m.className = "marca-c " + estado;
+    m.innerHTML = estado === "ok" ? '<i class="i" data-i="check"></i>' : estado === "no" ? '<i class="i" data-i="minus"></i>' : String(cant);
+    var q = $(".cuanto", r);
+    q.style.color = estado === "parcial" ? "var(--urgente-texto)" : estado === "no" ? "var(--texto-2)" : "";
+    q.innerHTML = estado === "ok" ? cant + " un.<small>llegó todo</small>" : estado === "no" ? "0 de " + p + "<small>no llegó</small>" : cant + " de " + p + "<small>faltan " + (p - cant) + "</small>";
+    r.classList.toggle("no", estado === "no");
+    r.classList.remove("foco"); var t = $(".teclas", r); if (t) t.remove();
+    IG.pintar(r); IG.vibrar(10);
+    m.classList.remove("ig-late"); void m.offsetWidth; m.classList.add("ig-late");
+    recalcular();
+  }
+  var foco = $(".item.foco");
+  $("[data-todo]").addEventListener("click", function () { marcar(foco, "ok", foco.dataset.pedi); });
+  $("[data-nada]").addEventListener("click", function () { marcar(foco, "no", 0); });
+  $("[data-otra]").addEventListener("click", function () { marcar(foco, "parcial", 3); });
+  $("[data-costo-cambio]").addEventListener("click", function () { IG.tostada("Escribí el costo de la factura y Enter", "pencil"); });
+  document.addEventListener("keydown", function (e) {
+    if (!foco || !foco.classList.contains("foco")) { if (e.key === "F2") { e.preventDefault(); registrar(); } return; }
+    if (e.key === " ") { e.preventDefault(); marcar(foco, "ok", foco.dataset.pedi); }
+    else if (e.key === "n" || e.key === "N") marcar(foco, "no", 0);
+    else if (/^[0-9]$/.test(e.key)) { var n = Number(e.key); marcar(foco, n >= Number(foco.dataset.pedi) ? "ok" : n === 0 ? "no" : "parcial", n); }
+    else if (e.key === "F2") { e.preventDefault(); registrar(); }
+  });
+  // La regla sobre el papel: Re Pág / Av Pág, o tocando el papel
+  var regla = $("[data-regla]"), top = 47.2;
+  function mover(d) { top = Math.max(27, Math.min(53, top + d)); regla.style.top = top + "%"; }
+  document.addEventListener("keydown", function (e) { if (e.key === "PageDown") { e.preventDefault(); mover(4.15); } if (e.key === "PageUp") { e.preventDefault(); mover(-4.15); } });
+  $("[data-papel]").addEventListener("click", function (e) { var h = $(".hoja", this).getBoundingClientRect(); top = Math.max(0, Math.min(95, (e.clientY - h.top) / h.height * 100 - 2)); regla.style.top = top + "%"; });
+
+  $("[data-qr]").addEventListener("click", function () { IG.verQR(); });
+  $("[data-pago]").addEventListener("cambio", function (e) {
+    var d = e.detail.dataset.d; $("[data-vence]").textContent = d === "0" ? "se paga hoy" : d === "30" ? "vence el 23/11" : "vence el 23/12";
+  });
+  $("[data-agregar]").addEventListener("click", function () {
+    var r = document.createElement("div");
+    r.className = "item ig-nuevo"; r.dataset.it = "ok"; r.dataset.costo = "8900"; r.dataset.cant = "2";
+    r.innerHTML = '<button class="marca-c ok"><i class="i" data-i="check"></i></button><div class="foto"><img src="../../../_comun/fotos/martillo.webp" alt=""></div><div><div class="nom">Martillo carpintero 27 mm</div><div class="det">MC27 · Bremen</div></div><div class="cuanto">2 un.<small>de más</small></div><span class="pastilla costo">Costo de lista</span><div class="sub" data-sub></div>';
+    IG.pintar(r); $("[data-lista]").appendChild(r); recalcular();
+  });
+  $("[data-elegir]").addEventListener("click", function () {
+    var d = IG.abrir(IG.cab("¿Qué pedido llegó?", "Los que están por llegar") + '<div class="ig-cuerpo"><div class="tarjeta" style="padding:6px">' +
+      '<button class="ig-op" data-cerrar><i class="i" data-i="truck"></i>Distribuidora Oeste · pedido 0412 del 20/10<span class="pastilla pino">6 renglones</span></button>' +
+      '<button class="ig-op" data-cerrar><i class="i" data-i="truck"></i>Acindar Distribución · lo que falta del 14/10<span class="pastilla urgente">3 renglones</span></button>' +
+      '<button class="ig-op" data-cerrar><i class="i" data-i="plus"></i>Sin pedido: cargar a mano</button></div></div>');
+  });
+  $("[data-sin-pedido]").addEventListener("click", function () { IG.tostada("Ingreso sin pedido: elegí el proveedor y buscá el primer producto", "plus"); });
+  function registrar() {
+    IG.tostada("Ingreso registrado: " + $("[data-total]").textContent + " · pedido 0412 queda recibido parcial", "circle-check");
+    $("[data-registrar]").disabled = true;
+  }
+  $("[data-registrar]").addEventListener("click", registrar);
+})();
+</script>
+</body>
+</html>

@@ -18,7 +18,7 @@
 /* Tramos de Sistema: segmentos que ocupan el ancho */
 .tramos { display: flex; width: 100%; }
 .tramos > * { flex: 1; justify-content: center; min-height: 40px; }
-.tramos > * { cursor: pointer; }
+.tramos > * { cursor: pointer; white-space: nowrap; padding: 0 6px; }
 
 /* ---- Hoja (celular) y diálogo (computadora) ---- */
 .velo { position: fixed; inset: 0; background: rgba(26, 29, 27, .3); opacity: 0; transition: opacity var(--t-nav) var(--curva); z-index: 40; }
@@ -49,3 +49,4 @@
 .tocable:active { transform: scale(.98); }
 
 @media (prefers-reduced-motion: reduce) { .hoja, .dialogo, .velo, .tostada-mas { transition: none !important; } }
+.celu .ajuste .fila { flex-wrap: wrap; }

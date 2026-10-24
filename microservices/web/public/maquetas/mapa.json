@@ -83,6 +83,18 @@
    "variante-3-bloqueo"
   ]
  },
+ "ingreso": {
+  "compu": [
+   "variante-1-carga",
+   "variante-2-cotejo",
+   "variante-3-al-estante"
+  ],
+  "celu": [
+   "variante-1-carga",
+   "variante-2-escaner",
+   "variante-3-a-viva-voz"
+  ]
+ },
  "listas": {
   "compu": [
    "variante-1-bandeja",
@@ -95,6 +107,18 @@
    "variante-3-remarcar"
   ]
  },
+ "mas": {
+  "compu": [
+   "variante-1-grilla",
+   "variante-2-pendientes",
+   "variante-3-ir-a"
+  ],
+  "celu": [
+   "variante-1-lista",
+   "variante-2-mosaico",
+   "variante-3-hoja"
+  ]
+ },
  "mejoras-y-errores": {
   "compu": [
    "variante-1-buzon",
@@ -105,6 +129,18 @@
    "variante-1-buzon",
    "variante-2-charla",
    "variante-3-sacudir"
+  ]
+ },
+ "pedidos": {
+  "compu": [
+   "variante-1-mesa",
+   "variante-2-una-pasada",
+   "variante-3-radar"
+  ],
+  "celu": [
+   "variante-1-lista",
+   "variante-2-el-mensaje",
+   "variante-3-sobres"
   ]
  },
  "procesos": {
@@ -141,6 +177,18 @@
    "variante-1-tablero",
    "variante-2-deslizar",
    "variante-3-conversacion"
+  ]
+ },
+ "sistema": {
+  "compu": [
+   "variante-1-renglones",
+   "variante-2-presupuesto",
+   "variante-3-en-una-frase"
+  ],
+  "celu": [
+   "variante-1-renglones",
+   "variante-2-presupuesto",
+   "variante-3-en-una-frase"
   ]
  },
  "stock": {
@@ -189,6 +237,18 @@
    "variante-1-el-dia",
    "variante-2-hoja",
    "variante-3-camara"
+  ]
+ },
+ "vincular": {
+  "compu": [
+   "variante-1-hoja",
+   "variante-2-en-la-venta",
+   "variante-3-gemelo"
+  ],
+  "celu": [
+   "variante-1-camara",
+   "variante-2-lector",
+   "variante-3-isla"
   ]
  }
 }

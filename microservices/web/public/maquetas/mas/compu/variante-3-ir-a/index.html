@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Más · Ir a… (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mas.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../mas.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { overflow: hidden; }
+  .detras { position: fixed; inset: 0; width: 1366px; height: 768px; border: 0; pointer-events: none; filter: blur(3px) saturate(.8); transform: scale(1.01); }
+  .velo-fijo { position: fixed; inset: 0; background: rgba(244, 242, 236, .55); }
+  .paleta { position: fixed; left: 50%; top: 64px; width: 880px; margin-left: -440px; display: grid; grid-template-columns: 1fr 300px; background: var(--superficie); border-radius: var(--r-hoja); box-shadow: var(--sombra-3); overflow: hidden; animation: entra var(--t-nav) var(--curva); }
+  @keyframes entra { from { opacity: 0; transform: translateY(-8px) scale(.985); } }
+  .izq { border-right: 1px solid var(--borde); }
+  .buscar { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--borde); }
+  .buscar input { flex: 1; border: 0; outline: 0; font-size: 20px; font-weight: 600; background: transparent; }
+  .buscar input::placeholder { color: var(--texto-3); }
+  .lista { padding: 8px; max-height: 556px; overflow: auto; }
+  .grupo-t { font-size: 14px; font-weight: 700; color: var(--texto-3); padding: 10px 12px 6px; }
+  .fila { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; cursor: pointer; text-decoration: none; color: inherit; }
+  .fila b { display: block; font-weight: 700; font-size: 16px; line-height: 22px; }
+  .fila small { display: block; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .fila.marca { background: var(--pino-suave); box-shadow: inset 3px 0 0 var(--accion); }
+  .fila .der { display: flex; align-items: center; gap: 8px; }
+  .fila[hidden] { display: none; }
+  .pie-p { display: flex; gap: 16px; align-items: center; padding: 10px 20px; border-top: 1px solid var(--borde); font-size: 14px; color: var(--texto-2); font-weight: 600; background: var(--fondo); }
+  .pie-p .kbd { margin-right: 4px; }
+  .der-p { padding: 20px; background: var(--fondo); display: flex; flex-direction: column; gap: 12px; }
+  .der-p .grande { display: flex; align-items: center; gap: 12px; }
+  .der-p .resumen { padding: 12px 14px; }
+  .der-p .resumen .va { font-size: 22px; line-height: 28px; }
+  .der-p .vista { transition: opacity var(--t) var(--curva); }
+  .lateral .ir { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--borde-fuerte); color: var(--texto-3); font-weight: 600; font-size: 15px; margin-top: 8px; background: var(--fondo); }
+  .lateral .ir .kbd { margin-left: auto; }
+</style>
+</head>
+<body>
+<iframe class="detras" src="../../../vender/compu/variante-1-mostrador/index.html" tabindex="-1" aria-hidden="true" title="Vender, detrás"></iframe>
+<div class="velo-fijo"></div>
+
+<div class="paleta" role="dialog" aria-label="Ir a">
+  <div class="izq">
+    <div class="buscar"><i class="i i-l" data-i="search" style="color:var(--texto-3)"></i><input id="q" placeholder="Ir a… o hacer…" autocomplete="off"><span class="kbd">Esc</span></div>
+    <div class="lista" id="lista">
+      <div class="grupo-t">Lo que estaba en Más · solo lo que tu rol te deja</div>
+      <a class="fila marca" data-ir="anomalias" data-k="anomalias no coincide stock sin mandar" data-v="an"><span class="ico-op chico urgente"><i class="i" data-i="triangle-alert"></i></span><span><b>Anomalías</b><small>5 para revisar · Ana dejó 2 ventas sin mandar</small></span><span class="der"><span class="pastilla urgente" style="height:24px">5</span><span class="kbd">Alt 6</span></span></a>
+      <a class="fila" data-ir="procesos" data-k="procesos bpmn diagrama recepcion" data-v="pr"><span class="ico-op chico"><i class="i" data-i="workflow"></i></span><span><b>Procesos</b><small>6 vigentes · Recepción en borrador</small></span><span class="der"><span class="kbd">Alt 7</span></span></a>
+      <a class="fila" data-ir="mejoras-y-errores" data-k="mejoras errores ideas avisos tickets" data-v="me"><span class="ico-op chico"><i class="i" data-i="bug"></i></span><span><b>Mejoras y errores</b><small>4 abiertos · el último, de Martín</small></span><span class="der"><span class="kbd">Alt 8</span></span></a>
+      <a class="fila" data-ir="configuracion" data-k="configuracion animaciones version huella celulares vinculo" data-v="co"><span class="ico-op chico neutro"><i class="i" data-i="settings"></i></span><span><b>Configuración</b><small>Lo tuyo, en esta computadora</small></span><span class="der"><span class="kbd">Alt 9</span></span></a>
+      <a class="fila" data-ir="sistema" data-k="sistema sesion servidor celular emparejado vinculo dias tiempos" data-v="si"><span class="ico-op chico"><i class="i" data-i="sliders-horizontal"></i></span><span><b>Sistema</b><small>Sesión <span data-ver-sesion>1 min</span> · celular <span data-ver-celular>1 min</span> · vínculo <span data-ver-dias>30 días</span></small></span><span class="der"><span class="kbd">Alt 0</span></span></a>
+      <div class="grupo-t">Hacerlo desde acá, sin ir</div>
+      <div class="fila" data-avisar="Vender" data-k="avisar error idea falla captura" data-v="av"><span class="ico-op chico"><i class="i" data-i="camera"></i></span><span><b>Avisar de un error en Vender</b><small>Con una captura de lo que tenías abierto</small></span><span class="der"><span class="kbd">Enter</span></span></div>
+      <div class="fila" data-k="animaciones apagar prender movimiento" data-v="ani"><span class="ico-op chico neutro"><i class="i" data-i="sparkles"></i></span><span><b>Animaciones de esta computadora</b><small>Se guarda al tocar</small></span><span class="der"><button class="llave si" data-llave role="switch" aria-checked="true" aria-label="Animaciones"></button></span></div>
+      <div class="fila" data-k="sesion servidor recuerda tiempo sistema" data-v="ses" style="grid-template-columns:40px 1fr"><span class="ico-op chico"><i class="i" data-i="clock"></i></span><span><b>Cuánto recuerda la sesión el servidor</b><span class="segmentos tramos" data-ajuste="sesion" style="margin-top:6px"><button data-tramo>No</button><button data-tramo>30 s</button><button data-tramo class="elegido">1 min</button><button data-tramo>5 min</button><button data-tramo>10 min</button></span></span></div>
+      <div class="fila" data-ir="entrar" data-k="salir cerrar sesion" data-v="sal"><span class="ico-op chico neutro"><i class="i" data-i="log-out"></i></span><span><b>Cerrar sesión</b><small>Carlos Illobre · en esta computadora</small></span><span></span></div>
+    </div>
+    <div class="pie-p"><span><span class="kbd">↑ ↓</span>elegir</span><span><span class="kbd">Enter</span>ir o hacer</span><span><span class="kbd">← →</span>tramo</span><span style="margin-left:auto"><span class="kbd">Ctrl K</span>desde cualquier lado</span></div>
+  </div>
+  <div class="der-p"><div id="vista" class="vista" style="display:flex;flex-direction:column;gap:12px"></div><div style="margin-top:auto"><div class="t-etiqueta" style="margin-bottom:8px">Probá escribir</div><div class="chips" style="gap:6px"><button class="chip" data-probar="sesión" style="height:32px;font-size:14px">sesión</button><button class="chip" data-probar="error" style="height:32px;font-size:14px">error</button><button class="chip" data-probar="vínculo" style="height:32px;font-size:14px">vínculo</button></div></div></div>
+</div>
+
+<div class="app" style="position:fixed;inset:0 auto 0 0;width:232px;display:block">
+  <nav class="lateral" style="height:100%">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <div class="ir" style="border-color:var(--pino);color:var(--pino);background:var(--pino-suave)"><i class="i" data-i="search"></i>Ir a…<span class="pastilla urgente" style="height:24px;margin-left:auto">5</span><span class="kbd" style="margin-left:6px">Ctrl K</span></div>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+</div>
+<script>
+(function () {
+  var V = {
+    an: '<div class="grande"><span class="ico-op urgente"><i class="i i-l" data-i="triangle-alert"></i></span><div class="t-seccion">Anomalías</div></div><div class="resumen urgente"><span class="ico"><i class="i" data-i="receipt"></i></span><div><div class="et">Sin mandar</div><div class="va"><span class="peso">$</span>68.000</div></div></div><div class="resumen"><span class="ico"><i class="i" data-i="package"></i></span><div><div class="et">Faltó stock esta semana</div><div class="va">14 un.</div></div></div><div class="t-detalle">Pide «Ver las anomalías». Enter abre «Para revisar».</div>',
+    pr: '<div class="grande"><span class="ico-op"><i class="i i-l" data-i="workflow"></i></span><div class="t-seccion">Procesos</div></div><div class="resumen logro"><span class="ico"><i class="i" data-i="circle-check"></i></span><div><div class="et">Vigentes</div><div class="va">6</div></div></div><div class="t-detalle">Recepción de mercadería, en borrador desde el lunes. Pide «Ver procesos».</div>',
+    me: '<div class="grande"><span class="ico-op"><i class="i i-l" data-i="bug"></i></span><div class="t-seccion">Mejoras y errores</div></div><div class="resumen"><span class="ico"><i class="i" data-i="message-circle"></i></span><div><div class="et">Abiertos</div><div class="va">4</div></div></div><div class="t-detalle">«La impresora corta el ticket», de Martín Sosa, hace 20 min. Para todos.</div>',
+    co: '<div class="grande"><span class="ico-op neutro"><i class="i i-l" data-i="settings"></i></span><div class="t-seccion">Configuración</div></div><div class="t-detalle">Animaciones prendidas · versión nueva cada 15 min · vinculada con Moto G54 hasta el 16/11.</div>',
+    si: '<div class="grande"><span class="ico-op"><i class="i i-l" data-i="sliders-horizontal"></i></span><div class="t-seccion">Sistema</div></div><div class="resumen"><span class="ico"><i class="i" data-i="clock"></i></span><div><div class="et">Sesión · celular · vínculo</div><div class="va" style="font-size:18px">1 min · 1 min · 30 d</div></div></div><div class="t-detalle">Vale para todos. Pide «Administrar el sistema».</div>',
+    av: '<div class="grande"><span class="ico-op"><i class="i i-l" data-i="camera"></i></span><div class="t-seccion">Avisar desde acá</div></div><div class="tarjeta" style="height:120px;overflow:hidden;position:relative"><iframe src="../../../vender/compu/variante-1-mostrador/index.html" tabindex="-1" style="width:1366px;height:768px;border:0;transform:scale(.19);transform-origin:0 0;pointer-events:none"></iframe></div><div class="t-detalle">La captura de Vender va sola. Escribís qué pasó y listo.</div>',
+    ani: '<div class="grande"><span class="ico-op neutro"><i class="i i-l" data-i="sparkles"></i></span><div class="t-seccion">Animaciones</div></div><div class="t-detalle">Solo en esta computadora. Espacio la prende o la apaga.</div>',
+    ses: '<div class="grande"><span class="ico-op"><i class="i i-l" data-i="clock"></i></span><div class="t-seccion">La sesión</div></div><div class="t-detalle">Más tiempo, menos consultas a la base. Un cambio hecho directamente en la base tarda hasta este tiempo en valer. Para todos; queda en «Quién hizo qué».</div>',
+    sal: '<div class="grande"><span class="ico-op neutro"><i class="i i-l" data-i="log-out"></i></span><div class="t-seccion">Cerrar sesión</div></div><div class="t-detalle">El celular en espejo queda dormido hasta que vuelvas a entrar.</div>'
+  };
+  var vista = document.getElementById("vista"), q = document.getElementById("q");
+  function filas() { return Array.prototype.slice.call(document.querySelectorAll("#lista .fila")).filter(function (f) { return !f.hidden; }); }
+  function mostrar(f) {
+    document.querySelectorAll("#lista .fila").forEach(function (x) { x.classList.toggle("marca", x === f); });
+    if (!f) { vista.innerHTML = '<div class="t-detalle">Nada con ese nombre en lo que tu rol te deja ver.</div>'; return; }
+    vista.style.opacity = 0;
+    setTimeout(function () { vista.innerHTML = V[f.getAttribute("data-v")] || ""; if (window.pintarIconos) pintarIconos(vista); vista.style.opacity = 1; }, MAS.quieto() ? 0 : 90);
+  }
+  mostrar(document.querySelector("#lista .fila.marca"));
+  q.addEventListener("input", function () {
+    var t = q.value.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    document.querySelectorAll("#lista .fila").forEach(function (f) { f.hidden = t && f.getAttribute("data-k").indexOf(t) < 0 && f.textContent.toLowerCase().indexOf(t) < 0; });
+    mostrar(filas()[0]);
+  });
+  document.addEventListener("click", function (e) { var c = e.target.closest("[data-probar]"); if (c) { q.value = c.getAttribute("data-probar"); q.dispatchEvent(new Event("input")); q.focus(); } });
+  document.getElementById("lista").addEventListener("mousemove", function (e) { var f = e.target.closest(".fila"); if (f && !f.classList.contains("marca")) mostrar(f); });
+  document.addEventListener("keydown", function (e) {
+    if (document.querySelector(".dialogo")) return;
+    var fs = filas(), i = fs.indexOf(document.querySelector("#lista .fila.marca"));
+    if (e.key === "ArrowDown") { e.preventDefault(); mostrar(fs[Math.min(i + 1, fs.length - 1)]); fs[Math.min(i + 1, fs.length - 1)].scrollIntoView({ block: "nearest" }); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); mostrar(fs[Math.max(i - 1, 0)]); fs[Math.max(i - 1, 0)].scrollIntoView({ block: "nearest" }); }
+    else if (e.key === "Enter" && fs[i]) { e.preventDefault(); var l = fs[i].querySelector("[data-llave]"); (l || fs[i]).click(); }
+    else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && fs[i] && fs[i].querySelector(".tramos")) {
+      e.preventDefault(); var bs = Array.prototype.slice.call(fs[i].querySelectorAll("[data-tramo]")), k = bs.findIndex(function (b) { return b.classList.contains("elegido"); });
+      var n = Math.max(0, Math.min(bs.length - 1, k + (e.key === "ArrowRight" ? 1 : -1))); if (n !== k) bs[n].click();
+    }
+    else if (e.key === "Escape") { window.irAMaqueta && window.irAMaqueta("vender"); }
+  });
+})();
+</script>
+</body>
+</html>

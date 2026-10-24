@@ -43,3 +43,4 @@
 @keyframes ig-borde { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes ig-late { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 .ig-late { animation: ig-late var(--t) var(--rebote); }
+.segmentos > * { white-space: nowrap; }

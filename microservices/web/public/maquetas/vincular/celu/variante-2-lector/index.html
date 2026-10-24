@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vincular con la computadora · celular · 2 Reinvención: lector siempre listo</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_recursos/vincular.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_recursos/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 12px; }
+  /* La ventana de la cámara, abierta sola al quedar en espejo con la compu en Vender */
+  .visor { height: 248px; border-radius: 24px; flex: none; box-shadow: var(--sombra-2); }
+  .visor .esquinas { left: 70px; right: 70px; top: 52px; height: 130px; color: #fff; }
+  .visor .linea { top: 60px; --recorrido: 110px; left: 22%; right: 22%; }
+  .visor .producto { position: absolute; left: 50%; top: 58px; width: 120px; height: 120px; margin-left: -60px; object-fit: contain; transform: rotate(14deg); filter: drop-shadow(0 10px 18px rgba(0,0,0,.6)); }
+  .visor .arriba { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; z-index: 2; }
+  .visor .abajo { position: absolute; bottom: 12px; left: 12px; right: 12px; z-index: 2; display: flex; justify-content: space-between; align-items: center; }
+  .pastilla-cristal { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 99px; background: rgba(0,0,0,.45); color: #fff; font-size: 14px; font-weight: 700; backdrop-filter: blur(8px); }
+  .pastilla-cristal .punto { width: 8px; height: 8px; border-radius: 99px; background: #4ade80; }
+  .visor .btn-cristal { width: 40px; height: 40px; }
+  .tostada.en-visor { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 3; justify-content: flex-start; animation: entrar var(--t) var(--rebote) both; }
+  .tostada .foto.chica { background: rgba(255,255,255,.14); }
+  .sec { display: flex; align-items: center; gap: 8px; }
+  .sec .t-detalle { margin-left: auto; }
+  .r { display: grid; grid-template-columns: 48px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-1); }
+  .r .foto { width: 48px; height: 48px; }
+  .r b { display: block; font-size: 15px; line-height: 20px; }
+  .r .d { font-size: 14px; color: var(--texto-2); }
+  .r .p { font-weight: 800; font-size: 17px; text-align: right; }
+  .r .p small { display: block; font-size: 14px; font-weight: 600; color: var(--texto-2); }
+  .cobrar { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+  .cobrar .tot { line-height: 1.1; }
+  .cobrar .tot .t-etiqueta { display: block; }
+  .cobrar .tot b { font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Vender</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <div class="celu-pantalla">
+    <div class="visor camara">
+      <div class="fondo"></div>
+      <div class="arriba"><span class="pastilla-cristal"><span class="punto"></span>Lector de la compu</span><button class="btn-cristal" aria-label="Linterna"><i class="i" data-i="flashlight"></i></button></div>
+      <img class="producto" src="../../../_comun/fotos/pinza.webp" alt="">
+      <div class="esquinas"></div>
+      <div class="linea"></div>
+      <div class="tostada en-visor"><span class="foto chica"><img src="../../../_comun/fotos/pinza.webp" alt=""></span><span>+1 Pinza universal, a la compu</span><i class="i" data-i="check" style="margin-left:auto;color:#4ade80"></i></div>
+    </div>
+    <div class="sec"><span class="t-seccion">La venta de la compu</span><span class="t-detalle">4 productos</span></div>
+    <div class="r recien"><span class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></span><div><b>Pinza universal 8" aislada</b><span class="d">Bahco · 1 un.</span></div><span class="p"><span class="peso">$</span>14.000</span></div>
+    <div class="r"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><b>Mecha acero HSS 8 mm</b><span class="d">Ezeta · 3 un.</span></div><span class="p"><span class="peso">$</span>21.000<small>3 × $7.000</small></span></div>
+    <div class="r"><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><b>Cinta métrica 5 m</b><span class="d">Stanley · 1 un.</span></div><span class="p"><span class="peso">$</span>17.000</span></div>
+    <div class="r"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><b>Tarugos nylon S8 × 100</b><span class="d">Fischer · 1 un.</span></div><span class="p"><span class="peso">$</span>8.000</span></div>
+  </div>
+  <div class="barra-accion cobrar"><span class="tot"><span class="t-etiqueta">Total · Efectivo</span><b><span class="peso">$</span>60.000</b></span><button class="btn btn-accion grande" style="width:176px">Cobrar</button></div>
+  <nav class="nav-inferior">
+    <a class="activo" data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">6</span></a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-ir="anomalias"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

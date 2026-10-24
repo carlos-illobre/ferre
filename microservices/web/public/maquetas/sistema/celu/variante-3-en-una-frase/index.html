@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistema · En una frase (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../sistema.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  /* Rompe el marco: sin título grande ni tarjetas; la frase es la pantalla */
+  .arriba { display: flex; align-items: center; justify-content: space-between; padding: 4px 16px 0 6px; }
+  .frase { font-size: 24px; line-height: 44px; font-weight: 650; letter-spacing: -.015em; margin: 16px 0 0; }
+  .frase .gris { color: var(--texto-2); font-weight: 500; }
+  .hueco { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px 0 14px; border-radius: 12px; background: #fff; border: 1px solid var(--borde-fuerte); box-shadow: var(--sombra-1); color: var(--pino); font-weight: 800; vertical-align: 1px; line-height: 1; }
+  .hueco .i { color: var(--texto-3); width: 18px; height: 18px; }
+  .hueco.abierto { border: 2px solid var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); }
+  .entonces { display: flex; gap: 12px; align-items: baseline; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--borde-fuerte); }
+  .entonces .va { font-size: 40px; font-weight: 800; letter-spacing: -.03em; }
+  .entonces .va small { font-size: 16px; color: var(--texto-2); font-weight: 650; letter-spacing: 0; }
+  /* La hoja que sube al tocar un hueco */
+  .velo { position: absolute; inset: 0; background: rgba(26, 29, 27, .3); z-index: 4; }
+  .hoja { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; background: #fff; border-radius: 24px 24px 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 28px; }
+  .agarre { width: 40px; height: 5px; border-radius: 99px; background: var(--hundido-2); margin: 0 auto 12px; }
+  .hoja h3 { margin: 0; font-size: 20px; font-weight: 750; }
+  .hoja .sub { font-size: 14px; color: var(--texto-2); margin: 2px 0 12px; }
+  .op { display: grid; grid-template-columns: 72px 1fr auto; gap: 10px; align-items: center; min-height: 56px; padding: 0 14px; border-radius: 14px; font-weight: 800; font-size: 17px; }
+  .op + .op { margin-top: 4px; }
+  .op span { color: var(--texto-2); font-weight: 500; font-size: 14px; }
+  .op em { font-style: normal; font-size: 15px; font-weight: 750; color: var(--texto-2); }
+  .op.elegido { background: var(--pino-suave); color: var(--pino); box-shadow: inset 0 0 0 2px var(--pino); }
+  .op.elegido em { color: var(--pino-texto); }
+  .op.caro em { color: var(--urgente-texto); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/><rect x="23.5" y="4" width="2" height="5" rx="1" fill="#1A1D1B" opacity=".4"/></svg></span></div>
+  <div class="arriba"><a class="volver" data-ir="anomalias"><i class="i" data-i="chevron-left"></i>Más</a><span class="pastilla pino"><i class="i i-s" data-i="shield-check"></i>Para todos</span></div>
+  <div class="celu-pantalla">
+    <p class="frase">
+      El servidor recuerda cada sesión <span class="hueco">1 min<i class="i" data-i="chevron-down"></i></span><span class="gris">.</span>
+      El celular emparejado pregunta cada <span class="hueco abierto">1 min<i class="i" data-i="chevron-down"></i></span><span class="gris">.</span>
+      El vínculo dura <span class="hueco">30 días<i class="i" data-i="chevron-down"></i></span><span class="gris">.</span>
+    </p>
+    <div class="entonces"><span class="va num">12,2 <small>MB por día</small></span><span class="t-detalle">de los 30 que puede la base</span></div>
+  </div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo" data-ir="anomalias"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <div class="velo"></div>
+  <div class="hoja">
+    <div class="agarre"></div>
+    <h3>El celular emparejado pregunta cada…</h3>
+    <div class="sub">Respaldo si se corta el espejo. Se guarda al tocar.</div>
+    <div class="op caro"><b>5 s</b><span>se entera ya</span><em>18,0 MB</em></div>
+    <div class="op"><b>30 s</b><span>en medio minuto</span><em>12,8 MB</em></div>
+    <div class="op elegido"><b>1 min</b><span>de arranque</span><em>12,2 MB</em></div>
+    <div class="op"><b>5 min</b><span>tarda más</span><em>11,8 MB</em></div>
+    <div class="op"><b>10 min</b><span>lo más lento</span><em>11,8 MB</em></div>
+    <div class="t-detalle" style="margin:12px 14px 0">MB por día que manda la base · último cambio: Carlos Illobre, hoy 10:41 (30 s → 1 min)</div>
+  </div>
+  <span class="home-ind" style="z-index:6"></span>
+</div>
+<script>if (location.search.includes('entera')) document.body.classList.add('entera');</script>
+</body>
+</html>

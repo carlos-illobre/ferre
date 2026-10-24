@@ -1,5 +1,4 @@
 // Más · interacciones compartidas de las seis maquetas (sin librerías). Quieta, la maqueta se ve igual.
-// - [data-sistema] abre la hoja (celular) o el diálogo (computadora) de Sistema; cada tramo se guarda al tocar.
 // - [data-avisar] abre «Avisar de un error o una idea» y al enviar muestra la tostada.
 // - [data-llave] prende y apaga una llave. [data-tramo] dentro de .tramos elige uno y avisa «Guardado».
 // - Esc, tocar afuera o la × cierran lo abierto.
@@ -44,27 +43,8 @@
     clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("ver"); }, 2600);
   };
 
-  // ---- Sistema: los tres ajustes que valen para todos (specs/020, variante A) ----
+  // Sistema es su propia pantalla (maquetas/sistema); acá solo quedan los tramos sueltos de las audaces.
   M.sistema = { sesion: "1 min", celular: "1 min", dias: 30 };
-  function seg(nombre, tramos, elegido) {
-    return '<div class="segmentos tramos" data-ajuste="' + nombre + '">' + tramos.map(function (t) {
-      return '<button data-tramo class="' + (t === elegido ? "elegido" : "") + '">' + t + "</button>";
-    }).join("") + "</div>";
-  }
-  M.htmlSistema = function () {
-    var s = M.sistema, celu = M.celu();
-    return '<div class="cab-hoja"><span class="ico-op chico"><i class="i" data-i="sliders-horizontal"></i></span><div class="t-seccion">Sistema</div>' +
-      '<span class="pastilla pino">Para todos</span>' + (celu ? "" : '<button class="btn btn-fantasma btn-icono chico" data-cerrar aria-label="Cerrar"><i class="i" data-i="x"></i></button>') + "</div>" +
-      '<div class="t-detalle" style="margin:-8px 0 8px">' + (celu ? "Vale para todos los dispositivos. Se guarda al tocar." : "Lo que fijás acá vale para todos los dispositivos del negocio, y nadie lo cambia para el suyo. Cada tramo se guarda al tocarlo y queda en «Quién hizo qué».") + "</div>" +
-      '<div class="ajuste"><div class="tt">Cuánto recuerda la sesión el servidor</div><div class="dd">' + (celu ? "Más tiempo, menos consultas a la base." : "Más tiempo, menos consultas a la base. Un cambio hecho directamente en la base tarda hasta este tiempo en valer.") + "</div>" +
-      seg("sesion", ["No", "30 s", "1 min", "5 min", "10 min"], s.sesion) + "</div>" +
-      '<div class="ajuste"><div class="tt">Cada cuánto pregunta el celular emparejado</div><div class="dd">' + (celu ? "Los pedidos de la compu llegan igual al instante." : "Lo que pide la computadora llega al instante; esta pregunta es el respaldo por si se corta la conexión entre los dos.") + "</div>" +
-      seg("celular", ["5 s", "30 s", "1 min", "5 min", "10 min"], s.celular) + "</div>" +
-      '<div class="ajuste"><div class="fila"><div><div class="tt">Cuántos días dura el vínculo</div><div class="dd" style="margin-bottom:0">De 1 a 365. Se renueva al volver a vincular.</div></div>' +
-      '<span class="cantidad"><button data-dias="-1" aria-label="Un día menos"><i class="i" data-i="minus"></i></button><span class="n" data-n-dias>' + s.dias + '</span><span class="u" style="margin-right:6px">días</span><button data-dias="1" aria-label="Un día más"><i class="i" data-i="plus"></i></button></span></div></div>' +
-      (celu ? "" : '<div class="t-detalle" style="display:flex;gap:16px;margin-top:8px"><span><span class="kbd">← →</span> elegir tramo</span><span><span class="kbd">Tab</span> siguiente ajuste</span><span><span class="kbd">Esc</span> cerrar</span></div>');
-  };
-  M.abrirSistema = function () { M.abrir(M.htmlSistema()); };
 
   M.htmlAvisar = function (donde) {
     return '<div class="cab-hoja"><span class="ico-op chico"><i class="i" data-i="bug"></i></span><div class="t-seccion">Avisar de un error o una idea</div>' +
@@ -79,7 +59,6 @@
   document.addEventListener("click", function (e) {
     var el = e.target.closest ? e.target : null; if (!el) return;
     var c;
-    if ((c = el.closest("[data-sistema]"))) { e.preventDefault(); M.abrirSistema(); return; }
     if ((c = el.closest("[data-avisar]"))) { e.preventDefault(); M.abrirAvisar(c.getAttribute("data-avisar")); return; }
     if (el.closest("[data-cerrar]")) { M.cerrar(); return; }
     if ((c = el.closest("[data-enviar]"))) { M.cerrar(); M.tostada("Aviso enviado · lo ven todos en Mejoras y errores"); return; }

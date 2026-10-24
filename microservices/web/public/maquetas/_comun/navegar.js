@@ -3,7 +3,7 @@
 // - Un elemento con data-ir="<pantalla>" lleva a esa pantalla, en la misma versión y el mismo
 //   dispositivo. Las pantallas son las carpetas: entrar, vender, ventas-de-hoy, productos, listas,
 //   duplicados, stock, compras, contar, resumen, usuarios, actividad, anomalias, procesos,
-//   mejoras-y-errores, configuracion.
+//   mejoras-y-errores, configuracion, mas, ingreso, pedidos, sistema, vincular.
 // - Si una maqueta no marcó su menú, se conectan solos los elementos cuyo texto es el nombre de
 //   una pantalla o de una parte del menú (Vender, Catálogo, Stock…). Si la maqueta marcó al menos
 //   un data-ir, no se conecta nada solo.
@@ -23,7 +23,8 @@
     "negocio": "resumen", "resumen": "resumen", "cómo va el negocio": "resumen",
     "usuarios": "usuarios",
     "quién hizo qué": "actividad", "actividad": "actividad",
-    "más": "anomalias", "anomalías": "anomalias",
+    "más": "mas", "anomalías": "anomalias",
+    "ingreso": "ingreso", "pedidos": "pedidos", "sistema": "sistema", "vincular": "vincular", "vincular el celular": "vincular",
     "procesos": "procesos",
     "mejoras y errores": "mejoras-y-errores", "mejoras": "mejoras-y-errores",
     "configuración": "configuracion", "ajustes": "configuracion",

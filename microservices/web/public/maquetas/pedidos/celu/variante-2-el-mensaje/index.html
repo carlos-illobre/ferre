@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedidos · El mensaje (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<link rel="stylesheet" href="../../propio/pedidos.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .arriba { display: flex; align-items: center; gap: 12px; padding: 4px 16px 0; }
+  .arriba .volver { width: 44px; height: 44px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--borde); display: grid; place-items: center; box-shadow: var(--sombra-1); flex: none; }
+  .arriba .ini { width: 44px; height: 44px; border-radius: 99px; background: var(--pino-suave); color: var(--pino-texto); display: grid; place-items: center; font-weight: 800; flex: none; }
+  .arriba b { display: block; font-size: 18px; font-weight: 800; line-height: 24px; }
+  .arriba span.d { font-size: 14px; color: var(--texto-2); line-height: 18px; display: flex; gap: 6px; align-items: center; }
+  .arriba .d .i { color: var(--logro-texto); }
+  .arriba .mas { margin-left: auto; }
+  .privado-tira { margin: 12px 16px 0; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 14px; background: var(--hundido); }
+  .privado-tira .i { color: var(--texto-2); }
+  .privado-tira .et { font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 18px; }
+  .privado-tira .va { font-size: 20px; font-weight: 800; line-height: 24px; }
+  .privado-tira .lleg { text-align: right; font-size: 14px; color: var(--texto-2); font-weight: 650; line-height: 18px; }
+  .privado-tira .lleg b { display: block; color: var(--tinta); font-size: 15px; }
+  .celu-pantalla { padding-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .chat { flex: 1; min-height: 0; border-radius: 20px; background: var(--hundido); padding: 12px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
+  .chat .dia { align-self: center; font-size: 14px; font-weight: 650; color: var(--texto-2); background: var(--superficie); border-radius: 99px; padding: 2px 10px; }
+  .mensaje { align-self: flex-end; width: 100%; font-size: 15px; line-height: 20px; padding: 12px 12px 26px; }
+  .mensaje ul { gap: 2px; }
+  .mensaje li { grid-template-columns: 76px 1fr; align-items: center; min-height: 44px; border-bottom: 1px dashed var(--borde); }
+  .mensaje li:last-child { border-bottom: 0; }
+  .q { display: inline-flex; align-items: center; justify-content: center; height: 34px; border-radius: 10px; background: var(--pino-suave); color: var(--pino-texto); font-weight: 800; font-size: 15px; padding: 0 8px; }
+  .q.edit { background: var(--pino); color: #fff; }
+  .mensaje li span.t { display: block; font-weight: 600; line-height: 19px; }
+  .mensaje li code { display: block; }
+  .stepper { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px; border-radius: 16px; background: var(--superficie); box-shadow: var(--sombra-3); border: 1px solid var(--borde); }
+  .stepper .btn { width: 52px; min-height: 52px; padding: 0; border-radius: 12px; }
+  .stepper .n { flex: 1; text-align: center; font-size: 26px; font-weight: 800; }
+  .stepper .n small { font-size: 15px; color: var(--texto-2); font-weight: 650; margin-left: 4px; }
+  .stepper .sug { flex-basis: 100%; padding: 2px 6px 0; font-size: 14px; font-weight: 600; color: var(--texto-2); line-height: 18px; }
+  .stepper .sug b { display: block; color: var(--tinta); font-size: 15px; font-weight: 750; }
+  .agregar { display: flex; gap: 8px; }
+  .agregar .btn { flex: 1; }
+  .barra-accion { display: grid; grid-template-columns: 1fr 56px; gap: 8px; }
+  .barra-accion .btn-accion { justify-content: flex-start; gap: 12px; }
+  .barra-accion .btn-accion span { text-align: left; line-height: 22px; }
+  .barra-accion .btn-accion small { display: block; font-size: 14px; font-weight: 600; opacity: .9; line-height: 16px; }
+  .barra-accion .copiar { min-height: 56px; padding: 0; border-radius: 14px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="arriba">
+    <span class="volver"><i class="i" data-i="arrow-left"></i></span>
+    <span class="ini">BC</span>
+    <div><b>Bulonera Centro</b><span class="d"><i class="i i-s" data-i="message-circle"></i>11 4567-8901</span></div>
+    <span class="pastilla mas">borrador</span>
+  </div>
+  <div class="privado-tira">
+    <i class="i" data-i="lock"></i>
+    <div><div class="et">Estimado · solo vos</div><div class="va"><span class="peso">$</span>237.270</div></div>
+    <div class="lleg">llegaría<b>jueves 22</b></div>
+  </div>
+  <div class="celu-pantalla">
+    <div class="chat">
+      <span class="dia">Así le llega · sin costos</span>
+      <div class="mensaje">
+        <div class="hola">Pedido de Ferrebress · lun 19/10</div>
+        <ul>
+          <li><span class="q">10 un.</span><span><span class="t">Tornillo T2 8 × 1" × 100</span><code>BC-T8100</code></span></li>
+          <li><span class="q">15 un.</span><span><span class="t">Tarugos S8 con tope × 100</span><code>BC-TS8</code></span></li>
+          <li><span class="q edit">24 un.</span><span><span class="t">Mecha HSS 8 mm</span><code>BC-HSS8</code></span></li>
+          <li><span class="q">10 kg</span><span><span class="t">Clavos punta París 2"</span><code>BC-CP2</code></span></li>
+          <li><span class="q">6 un.</span><span><span class="t">Puntas PH2 × 10</span><code>BC-PH2</code></span></li>
+        </ul>
+        <span class="hora">y 1 más</span>
+      </div>
+      <div class="stepper">
+        <span class="sug"><b>Mecha HSS 8 mm</b>Sugerido 24: cubre 4 semanas de venta</span>
+        <button class="btn"><i class="i i-l" data-i="minus"></i></button>
+        <span class="n">24<small>un.</small></span>
+        <button class="btn"><i class="i i-l" data-i="plus"></i></button>
+      </div>
+    </div>
+    <div class="agregar"><button class="btn"><i class="i" data-i="search"></i>Agregar</button><button class="btn"><i class="i" data-i="scan-barcode"></i>Escanear</button></div>
+  </div>
+  <div class="barra-accion" style="margin-top:12px"><button class="btn btn-accion grande"><i class="i i-l" data-i="send"></i><span>Mandar por WhatsApp<small>Queda «enviado» al mandarlo</small></span></button><button class="btn copiar" aria-label="Copiar el texto"><i class="i i-l" data-i="copy"></i></button></div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="activo" data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-ir="anomalias"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

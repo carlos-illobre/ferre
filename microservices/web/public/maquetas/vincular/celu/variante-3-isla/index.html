@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vincular con la computadora · celular · 3 Audaz: la isla de la venta</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_recursos/vincular.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_recursos/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-cabecera { padding-top: 8px; }
+  .celu-pantalla { display: flex; flex-direction: column; gap: 8px; }
+  .renglon { grid-template-columns: 48px 1fr auto; padding: 10px 12px; gap: 12px; }
+  .renglon + .renglon { margin-top: 0; }
+  .renglon .foto { width: 48px; height: 48px; }
+  .renglon .titulo { font-size: 15px; line-height: 20px; }
+  .velo { z-index: 5; background: rgba(26, 29, 27, .30); }
+  /* La isla: la venta en curso flota arriba en cualquier pantalla (ADR-022) */
+  .isla { position: absolute; z-index: 6; top: 48px; left: 8px; right: 8px; border-radius: 32px; background: var(--pino); color: #fff; padding: 16px; box-shadow: var(--sombra-3); display: grid; gap: 14px; transform-origin: 50% 0; animation: abrir var(--t-nav) var(--rebote) both; }
+  @keyframes abrir { from { transform: scale(.4, .12); opacity: .4; } }
+  .isla .fila1 { display: flex; align-items: center; gap: 10px; }
+  .isla .ico { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
+  .isla .quien b { display: block; font-size: 16px; line-height: 20px; }
+  .isla .quien span { font-size: 14px; color: rgba(255,255,255,.72); font-weight: 600; }
+  .vivo { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 99px; background: rgba(74, 222, 128, .16); color: #86efac; font-size: 14px; font-weight: 750; }
+  .vivo .p { width: 8px; height: 8px; border-radius: 99px; background: #4ade80; }
+  .isla .total { display: flex; align-items: flex-end; justify-content: space-between; }
+  .isla .total .t-total { color: #fff; }
+  .isla .total .t-detalle { color: rgba(255,255,255,.72); }
+  .pila { display: flex; }
+  .pila .foto { width: 44px; height: 44px; border-radius: 99px; border: 3px solid var(--pino); background: #F4F2EC; margin-left: -12px; }
+  .pila .foto:first-child { margin-left: 0; }
+  .pila .mas { width: 44px; height: 44px; border-radius: 99px; border: 3px solid var(--pino); background: var(--accion); display: grid; place-items: center; margin-left: -12px; font-weight: 800; font-size: 14px; }
+  .ultimo { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,.08); font-size: 14px; font-weight: 650; }
+  .ultimo .i-s { color: #4ade80; }
+  .ultimo span.cuando { margin-left: auto; color: rgba(255,255,255,.6); font-weight: 600; }
+  .isla .botones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-isla { min-height: 48px; border-radius: 14px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.1); color: #fff; font-weight: 750; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .isla .pista { text-align: center; font-size: 14px; color: rgba(255,255,255,.6); font-weight: 600; margin-top: -4px; }
+  .isla .agarre { width: 40px; height: 5px; border-radius: 99px; background: rgba(255,255,255,.3); justify-self: center; margin-top: -6px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Catálogo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a class="activa" data-ir="productos">Productos</a><a data-ir="listas">Listas</a><a data-ir="duplicados">Duplicados</a></nav>
+  <div class="celu-pantalla">
+    <div class="campo"><i class="i" data-i="search"></i>Producto, código o marca</div>
+    <div class="renglon"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="titulo">Tarugos nylon S8 con tope × 100</div><div class="detalle">Fischer · <b style="color:var(--logro-texto)">31 un.</b></div></div><button class="btn btn-icono" aria-label="Agregar a la venta"><i class="i" data-i="plus"></i></button></div>
+    <div class="renglon"><span class="foto"><img src="../../../_comun/fotos/tornillos.webp" alt=""></span><div><div class="titulo">Tornillos autoperforantes × 100</div><div class="detalle">Fischer · <b style="color:var(--logro-texto)">12 un.</b></div></div><button class="btn btn-icono" aria-label="Agregar a la venta"><i class="i" data-i="plus"></i></button></div>
+    <div class="renglon"><span class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><div><div class="titulo">Clavos punta París 2"</div><div class="detalle">Acindar · <b style="color:var(--logro-texto)">12,4 kg</b></div></div><button class="btn btn-icono" aria-label="Agregar a la venta"><i class="i" data-i="plus"></i></button></div>
+    <div class="renglon"><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><div><div class="titulo">Puntas Phillips PH2</div><div class="detalle">Bremen · <b style="color:var(--urgente-texto)">2 un.</b></div></div><button class="btn btn-icono" aria-label="Agregar a la venta"><i class="i" data-i="plus"></i></button></div>
+    <div class="renglon"><span class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></span><div><div class="titulo">Lámpara LED 9 W luz fría</div><div class="detalle">Philips · <b style="color:var(--logro-texto)">40 un.</b></div></div><button class="btn btn-icono" aria-label="Agregar a la venta"><i class="i" data-i="plus"></i></button></div>
+    <div class="renglon"><span class="foto"><img src="../../../_comun/fotos/pintura.webp" alt=""></span><div><div class="titulo">Látex interior mate 4 L</div><div class="detalle">Alba · <b style="color:var(--logro-texto)">9 un.</b></div></div><button class="btn btn-icono" aria-label="Agregar a la venta"><i class="i" data-i="plus"></i></button></div>
+  </div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a class="activo" data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-ir="anomalias"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+
+  <div class="velo"></div>
+  <div class="isla" role="dialog" aria-label="La venta en espejo con la compu">
+    <div class="fila1">
+      <span class="ico"><i class="i i-l" data-i="monitor"></i></span>
+      <span class="quien"><b>Compu del mostrador</b><span>Vinculada hasta el 23/11</span></span>
+      <span class="vivo"><span class="p"></span>En espejo</span>
+    </div>
+    <div class="total">
+      <div><div class="t-detalle">Venta en curso · Efectivo</div><div class="t-total"><span class="peso">$</span>46.000</div></div>
+      <div class="pila"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><span class="mas">5</span></div>
+    </div>
+    <div class="ultimo"><i class="i i-s" data-i="check"></i>Tarugos S8, desde acá<span class="cuando">hace 3 s</span></div>
+    <div class="botones">
+      <button class="btn-isla"><i class="i i-s" data-i="arrow-left-right"></i>Desconectar</button>
+      <button class="btn-isla" data-ir="vender"><i class="i i-s" data-i="scan-barcode"></i>Escanear</button>
+    </div>
+    <span class="agarre"></span>
+    <div class="pista">Deslizá arriba para achicarla</div>
+  </div>
+</div>
+</body>
+</html>

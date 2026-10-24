@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistema · En una frase (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../sistema.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  /* Rompe el marco: lateral plegado, sin tarjetas; los ajustes son una frase sobre el papel */
+  .hoja { display: grid; grid-template-columns: 1fr 340px; height: 100vh; }
+  .texto { padding: 40px 56px 32px; display: flex; flex-direction: column; min-width: 0; }
+  .ruta { font-size: 14px; color: var(--texto-2); font-weight: 650; display: flex; gap: 8px; align-items: center; }
+  .frase { font-size: 30px; line-height: 52px; font-weight: 650; letter-spacing: -.015em; color: var(--tinta); margin: 24px 0 0; max-width: 760px; }
+  .frase .gris { color: var(--texto-2); font-weight: 500; }
+  .hueco { display: inline-flex; align-items: center; gap: 6px; height: 46px; padding: 0 12px 0 16px; margin: 0 2px; border-radius: 12px; background: #fff; border: 1px solid var(--borde-fuerte); box-shadow: var(--sombra-1); color: var(--pino); font-weight: 800; vertical-align: 2px; line-height: 1; position: relative; }
+  .hueco .i { color: var(--texto-3); width: 18px; height: 18px; }
+  .hueco.abierto { border: 2px solid var(--pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); }
+  /* El desplegable de un hueco: cada tramo con lo que cuesta */
+  .lista { position: absolute; z-index: 3; top: 54px; left: -2px; width: 340px; background: #fff; border-radius: 16px; box-shadow: var(--sombra-3); border: 1px solid var(--borde); padding: 6px; font-size: 15px; letter-spacing: 0; line-height: 20px; }
+  .lista .op { display: grid; grid-template-columns: 72px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; color: var(--tinta); font-weight: 750; }
+  .lista .op span { color: var(--texto-2); font-weight: 500; font-size: 14px; }
+  .lista .op em { font-style: normal; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .lista .op.elegido { background: var(--pino-suave); color: var(--pino); }
+  .lista .op.elegido em { color: var(--pino-texto); }
+  .lista .op.caro em { color: var(--urgente-texto); }
+  .lista .pie-l { display: flex; gap: 8px; align-items: center; padding: 8px 12px 6px; font-size: 14px; color: var(--texto-2); border-top: 1px solid var(--borde); margin-top: 4px; }
+  .entonces { margin-top: auto; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; padding-top: 24px; border-top: 1px solid var(--borde-fuerte); max-width: 760px; }
+  .entonces .va { font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -.03em; }
+  .entonces .va small { font-size: 18px; color: var(--texto-2); font-weight: 650; letter-spacing: 0; }
+  .entonces p { margin: 0; font-size: 16px; line-height: 24px; color: var(--texto-2); }
+  .entonces p b { color: var(--tinta); }
+  .teclas { display: flex; gap: 16px; margin-top: 16px; font-size: 14px; color: var(--texto-2); }
+  .teclas span { display: inline-flex; gap: 6px; align-items: center; }
+  /* A la derecha: la historia de los ajustes, con deshacer */
+  .historia { background: var(--superficie); border-left: 1px solid var(--borde); padding: 32px 24px; display: flex; flex-direction: column; gap: 4px; }
+  .historia h2 { font-size: 20px; font-weight: 750; margin: 0 0 12px; }
+  .paso { display: grid; grid-template-columns: 20px 1fr; gap: 12px; position: relative; padding-bottom: 20px; }
+  .paso::before { content: ""; position: absolute; left: 9px; top: 22px; bottom: 0; width: 2px; background: var(--borde); }
+  .paso:last-of-type::before { display: none; }
+  .paso .pt { width: 20px; height: 20px; border-radius: 99px; background: var(--hundido-2); border: 4px solid #fff; box-shadow: 0 0 0 1px var(--borde-fuerte); margin-top: 2px; }
+  .paso.nuevo .pt { background: var(--logro); box-shadow: 0 0 0 1px var(--logro); }
+  .paso .qq { font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .paso .qq b { color: var(--tinta); font-weight: 750; }
+  .paso .que { font-size: 15px; font-weight: 700; color: var(--tinta); margin: 2px 0 6px; }
+  .historia .ver { margin-top: auto; color: var(--pino-texto); font-weight: 700; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo" data-ir="anomalias"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="vinculo" style="padding:10px;justify-content:center"><i class="i" data-i="smartphone"></i></div>
+      <div class="usuario" style="justify-content:center;padding:0"><span class="avatar">CI</span></div>
+    </div>
+  </nav>
+  <div class="hoja">
+    <div class="texto">
+      <div class="ruta"><a data-ir="anomalias" style="color:var(--pino-texto)">Más</a><i class="i i-s" data-i="chevron-right"></i>Sistema<span class="pastilla pino" style="margin-left:8px;height:24px"><i class="i i-s" data-i="shield-check"></i>Para todos los dispositivos</span></div>
+      <p class="frase">
+        El servidor recuerda cada sesión
+        <span class="hueco">1 minuto<i class="i" data-i="chevron-down"></i></span><span class="gris">, así no le pregunta a la base en cada pedido.</span>
+        El celular emparejado pregunta cada
+        <span class="hueco abierto">1 minuto<i class="i" data-i="chevron-down"></i>
+          <span class="lista">
+            <span class="op caro"><b>5 s</b><span>se entera ya</span><em>18,0 MB</em></span>
+            <span class="op"><b>30 s</b><span>en medio minuto</span><em>12,8 MB</em></span>
+            <span class="op elegido"><b>1 min</b><span>de arranque</span><em>12,2 MB</em></span>
+            <span class="op"><b>5 min</b><span>tarda más</span><em>11,8 MB</em></span>
+            <span class="op"><b>10 min</b><span>lo más lento</span><em>11,8 MB</em></span>
+            <span class="pie-l">MB por día, en total · <span class="kbd">↑</span><span class="kbd">↓</span> <span class="kbd">Enter</span></span>
+          </span>
+        </span><span class="gris">, por si se cortó el espejo.</span>
+        Un celular y una computadora quedan vinculados
+        <span class="hueco">30 días<i class="i" data-i="chevron-down"></i></span><span class="gris">.</span>
+      </p>
+      <div class="entonces">
+        <div class="va num">12,2 <small>MB por día</small></div>
+        <p>Así, la base manda <b>12,2 MB por día de los 30</b> que puede. Desactivar a alguien le corta <b>en el acto</b>; una foto pedida al celular llega <b>al instante</b>, o en <b>1 minuto</b> si se cortó el espejo.</p>
+      </div>
+      <div class="teclas"><span><span class="kbd">Tab</span> va al hueco siguiente</span><span><span class="kbd">Espacio</span> lo abre</span><span>Se guarda al elegir; llega a todos en menos de un minuto</span></div>
+    </div>
+    <aside class="historia">
+      <h2>Cómo fue cambiando</h2>
+      <div class="paso nuevo"><span class="pt"></span><div><div class="qq"><b>Carlos Illobre</b> · hoy 10:41</div><div class="que">Celular emparejado <span class="de-a"><s>30 s</s>→ 1 min</span></div><button class="btn btn-suave chico"><i class="i i-s" data-i="undo-2"></i>Volver a 30 s</button></div></div>
+      <div class="paso"><span class="pt"></span><div><div class="qq"><b>Marta Benítez</b> · ayer 18:40</div><div class="que">Días del vínculo <span class="de-a"><s>15</s>→ 30</span></div></div></div>
+      <div class="paso"><span class="pt"></span><div><div class="qq"><b>Carlos Illobre</b> · 23/10 12:05</div><div class="que">Sesión <span class="de-a"><s>No</s>→ 1 min</span></div></div></div>
+      <div class="paso"><span class="pt"></span><div><div class="qq"><b>Sistema</b> · 23/10</div><div class="que">Valores de arranque</div></div></div>
+      <a class="ver" data-ir="actividad">Todo en «Quién hizo qué» ›</a>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

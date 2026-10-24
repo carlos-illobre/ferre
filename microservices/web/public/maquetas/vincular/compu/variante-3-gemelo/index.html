@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vincular el celular · computadora · 3 Audaz: el gemelo del celular</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../_recursos/vincular.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../_recursos/iconos-extra.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .pantalla { padding-top: 16px; }
+  .tres { display: grid; grid-template-columns: 256px 1fr 336px; gap: 24px; height: 100%; position: relative; }
+  /* El gemelo: el celular dibujado en la compu, con lo que ve su cámara */
+  .gemelo { display: flex; flex-direction: column; gap: 12px; }
+  .telefono { position: relative; height: 436px; border-radius: 40px; background: #16191a; padding: 10px; box-shadow: var(--sombra-3); }
+  .telefono .vidrio { position: relative; height: 100%; border-radius: 31px; overflow: hidden; }
+  .telefono .isla { position: absolute; top: 10px; left: 50%; width: 84px; height: 24px; margin-left: -42px; border-radius: 99px; background: #000; z-index: 3; }
+  .vidrio.camara .esquinas { left: 34px; right: 34px; top: 120px; height: 150px; color: var(--logro); }
+  .vidrio.camara .linea { top: 128px; --recorrido: 130px; }
+  .vidrio .producto { position: absolute; left: 50%; top: 132px; width: 120px; height: 120px; margin-left: -60px; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(0,0,0,.6)); transform: rotate(-12deg); }
+  .vidrio .arriba { position: absolute; top: 44px; left: 14px; right: 14px; display: flex; justify-content: space-between; align-items: center; z-index: 2; }
+  .vidrio .leido { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; background: rgba(255,255,255,.96); color: var(--tinta); border-radius: 18px; padding: 10px 12px; display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; box-shadow: var(--sombra-3); }
+  .vidrio .leido .foto.chica { background: var(--hundido); }
+  .vidrio .leido b { display: block; font-size: 14px; line-height: 18px; }
+  .vidrio .leido span { font-size: 14px; color: var(--logro-texto); font-weight: 700; }
+  .pastilla-cristal { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 99px; background: rgba(0,0,0,.45); color: #fff; font-size: 14px; font-weight: 700; backdrop-filter: blur(8px); }
+  .pastilla-cristal .punto { width: 8px; height: 8px; border-radius: 99px; background: #4ade80; }
+  .mando { padding: 12px; display: grid; gap: 10px; }
+  .mando .linea1 { display: flex; align-items: center; gap: 8px; }
+  .mando .datos { display: flex; gap: 10px; white-space: nowrap; color: var(--texto-2); font-size: 14px; font-weight: 650; }
+  .mando .datos span { display: inline-flex; align-items: center; gap: 4px; }
+  .mando .botones { display: grid; grid-template-columns: 1fr 36px; gap: 8px; }
+  /* El renglón que vuela del celular a la venta */
+  .vuelo { position: absolute; left: 226px; top: 120px; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 6px; border-radius: 99px; background: var(--superficie); border: 1px solid var(--logro); box-shadow: var(--sombra-3); font-weight: 750; font-size: 14px; z-index: 4; animation: volar 900ms var(--curva) both; }
+  .vuelo .foto { width: 28px; height: 28px; border-radius: 99px; }
+  .vuelo::before { content: ""; position: absolute; right: 100%; top: 50%; width: 60px; height: 3px; margin-top: -1.5px; border-radius: 3px; background: linear-gradient(90deg, transparent, rgba(30,158,98,.55)); }
+  @keyframes volar { from { transform: translate(-80px, 24px) scale(.8); opacity: 0; } }
+  .lista { display: flex; flex-direction: column; min-width: 0; }
+  .sec { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .renglon.fila-venta { grid-template-columns: 56px 1fr auto; }
+  .panel-cobro { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .medios { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .medio-b { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px; border-radius: var(--r); border: 1px solid var(--borde-fuerte); font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .medio-b .p { width: 10px; height: 10px; border-radius: 99px; background: var(--c); }
+  .medio-b.elegido { border: 2px solid var(--c); background: var(--cs); }
+  .medio-b .kbd { margin-left: auto; }
+  .espejo-hilo { display: grid; gap: 6px; }
+  .espejo-hilo div { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--texto-2); font-weight: 600; }
+  .espejo-hilo .i-s { color: var(--logro-texto); }
+</style>
+</head>
+<body>
+<div class="app plegado">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item activo" data-ir="vender" aria-label="Vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos" aria-label="Catálogo"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock" aria-label="Depósito"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen" aria-label="Negocio"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item" data-ir="anomalias" aria-label="Más"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span></a>
+    <div class="pie">
+      <div class="vinculo" style="padding:12px" aria-label="Celular en espejo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo</div></div>
+      <div class="usuario" style="padding:0"><span class="avatar">CI</span></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div class="t-titulo">Vender</div>
+      <span class="pastilla logro"><span class="punto"></span>En espejo con el Moto G54 de Carlos</span>
+      <div class="acciones"><span class="pastilla logro"><span class="punto"></span>En línea · todo enviado</span><span class="t-detalle">10:42</span></div>
+    </header>
+    <nav class="pestanas"><a class="activa" data-ir="vender">Vender</a><a data-ir="ventas-de-hoy">Ventas de hoy <span class="pastilla" style="height:24px">23</span></a></nav>
+    <section class="pantalla">
+      <div class="tres">
+        <div class="gemelo">
+          <div class="telefono">
+            <span class="isla"></span>
+            <div class="vidrio camara">
+              <div class="fondo"></div>
+              <div class="arriba"><span class="pastilla-cristal"><span class="punto"></span>Leyendo</span><span class="pastilla-cristal"><i class="i i-s" data-i="flashlight"></i></span></div>
+              <img class="producto" src="../../../_comun/fotos/cinta-metrica.webp" alt="">
+              <div class="esquinas"></div>
+              <div class="linea"></div>
+              <div class="leido"><span class="foto chica"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><b>Cinta métrica PowerLock 5 m</b><span>✓ Entró en la venta</span></div></div>
+            </div>
+          </div>
+          <div class="tarjeta mando">
+            <div class="linea1"><i class="i" data-i="smartphone"></i><b style="font-size:15px;white-space:nowrap">Moto G54</b><span class="pastilla logro" style="margin-left:auto;height:24px">Juntos</span></div>
+            <div class="datos"><span><i class="i i-s" data-i="battery-medium"></i>64 %</span><span><i class="i i-s" data-i="scan-barcode"></i>14 hoy</span><span><i class="i i-s" data-i="clock"></i>23/11</span></div>
+            <div class="botones"><button class="btn chico"><i class="i i-s" data-i="arrow-left-right"></i>Desconectar <span class="kbd">Alt D</span></button><button class="btn chico btn-icono" aria-label="Más opciones del vínculo"><i class="i i-s" data-i="ellipsis"></i></button></div>
+          </div>
+        </div>
+
+        <div class="lista">
+          <div class="sec"><span class="t-seccion">Esta venta</span><span class="pastilla">3 productos</span><span style="margin-left:auto" class="btn btn-fantasma chico"><i class="i i-s" data-i="trash-2"></i>Vaciar</span></div>
+          <div class="renglon fila-venta recien"><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span><div><div class="titulo">Cinta métrica PowerLock 5 m</div><div class="detalle" style="display:flex;gap:8px;align-items:center"><span class="cinta-celu"><i class="i i-s" data-i="smartphone"></i>Del celular</span>Stanley · 1 un.</div></div><div class="precio"><span class="peso">$</span>17.000</div></div>
+          <div class="renglon fila-venta"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><div><div class="titulo">Mecha acero rápido HSS 8 mm</div><div class="detalle">Ezeta · Bulonera Centro · 3 un.</div></div><div class="precio"><span class="peso">$</span>21.000<small>3 × $7.000</small></div></div>
+          <div class="renglon fila-venta"><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span><div><div class="titulo">Tarugos nylon S8 con tope × 100</div><div class="detalle">Fischer · Ferretera del Sur · 1 un.</div></div><div class="precio"><span class="peso">$</span>8.000</div></div>
+          <div class="aviso pino" style="margin-top:auto"><i class="i" data-i="scan-barcode"></i><span>Seguí escaneando con el celular: cada código entra acá arriba. La búsqueda y las fichas que abras son de cada uno.</span></div>
+        </div>
+
+        <div class="tarjeta panel-cobro">
+          <div style="display:flex;justify-content:space-between"><span class="t-etiqueta">Total</span><span class="t-detalle">5 un.</span></div>
+          <div class="t-total"><span class="peso">$</span>46.000</div>
+          <div class="medios">
+            <div class="medio-b medio efectivo elegido"><span class="p"></span>Efectivo<span class="kbd">F5</span></div>
+            <div class="medio-b medio mp"><span class="p"></span>M. Pago<span class="kbd">F6</span></div>
+            <div class="medio-b medio tarjeta"><span class="p"></span>Tarjeta<span class="kbd">F7</span></div>
+            <div class="medio-b medio cuenta"><span class="p"></span>Cta. cte.<span class="kbd">F8</span></div>
+          </div>
+          <button class="btn btn-accion grande">Cobrar $46.000 <span class="kbd">F2</span></button>
+          <div class="espejo-hilo" style="margin-top:auto">
+            <div><i class="i i-s" data-i="check"></i>10:41 · Mecha HSS 8 mm × 3, desde la compu</div>
+            <div><i class="i i-s" data-i="check"></i>10:42 · Tarugos S8, desde el celular</div>
+            <div><i class="i i-s" data-i="check"></i>10:42 · Cinta métrica, desde el celular</div>
+          </div>
+        </div>
+        <div class="vuelo"><span class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></span>+1 Cinta métrica</div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

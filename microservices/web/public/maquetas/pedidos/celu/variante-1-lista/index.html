@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedidos · Lista (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<link rel="stylesheet" href="../../propio/pedidos.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { position: relative; }
+  .celu-pantalla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40px; background: linear-gradient(transparent, var(--fondo)); }
+  .celu-pestanas a { font-size: 15px; }
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpis .resumen { padding: 12px; display: block; }
+  .kpis .resumen .va { font-size: 22px; line-height: 28px; }
+  .kpis .resumen .sub { font-size: 14px; font-weight: 650; line-height: 18px; color: var(--texto-2); }
+  .kpis .resumen.urgente .sub { color: var(--urgente-texto); }
+  .sec { display: flex; align-items: center; justify-content: space-between; margin: 14px 2px 8px; }
+  .sec .t-seccion { font-size: 18px; }
+  .sec a { font-size: 14px; font-weight: 700; color: var(--pino-texto); }
+  .fila { display: grid; grid-template-columns: 44px minmax(0,1fr) auto; gap: 4px 12px; align-items: center; padding: 8px 12px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .fila + .fila { margin-top: 8px; }
+  .fila .ic { width: 44px; height: 44px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); font-weight: 800; font-size: 15px; }
+  .fila .ic.pino { background: var(--pino-suave); color: var(--pino-texto); }
+  .fila b { display: block; font-size: 16px; font-weight: 750; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila span.d { display: block; font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fila .avance { grid-column: 2 / -1; height: 6px; }
+  .fila .imp { text-align: right; font-weight: 800; font-size: 16px; }
+  .fila.sugerido { background: transparent; border-style: dashed; border-color: var(--borde-fuerte); box-shadow: none; }
+  .ambar { color: var(--urgente-texto) !important; font-weight: 650; }
+  .barra-accion { display: grid; grid-template-columns: 1fr 56px; gap: 8px; }
+  .barra-accion .btn-oscuro { min-height: 56px; padding: 0; border-radius: 14px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Depósito</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a data-ir="stock">Stock</a><a data-ir="compras">Compras</a><a class="activa" data-no-ir>Pedidos</a><a data-ir="contar">Contar</a></nav>
+  <div class="celu-pantalla">
+    <div class="kpis">
+      <div class="resumen urgente"><div class="et">Para pedir</div><div class="va">15</div><div class="sub">en 3 proveedores</div></div>
+      <div class="resumen"><div class="et">En camino · 2</div><div class="va"><span class="peso">$</span>256.600</div><div class="sub" style="color:var(--urgente-texto)">1 demorado</div></div>
+    </div>
+
+    <div class="sec"><span class="t-seccion">Sin mandar</span></div>
+    <div class="fila">
+      <span class="ic pino">BC</span>
+      <div><b>Bulonera Centro</b><span class="d">borrador · <span class="peso">$</span>237.270</span></div>
+      <button class="btn btn-suave chico"><i class="i i-s" data-i="send"></i>Mandar</button>
+    </div>
+
+    <div class="sec"><span class="t-seccion">Por llegar</span><a>Cerrados (4)</a></div>
+    <div class="fila">
+      <span class="ic"><i class="i" data-i="truck"></i></span>
+      <div><b>Distribuidora Oeste</b><span class="d"><span class="ambar">Demorado 3 días</span> · 9 renglones</span></div>
+      <button class="btn btn-suave chico">Llegó</button>
+    </div>
+    <div class="fila">
+      <span class="ic"><i class="i" data-i="truck"></i></span>
+      <div><b>Acindar Distribución</b><span class="d">recibido parcial · faltan 2 de 6</span></div>
+      <button class="btn btn-suave chico">Llegó</button>
+      <span class="avance"><b style="width:67%"></b></span>
+    </div>
+
+    <div class="sec"><span class="t-seccion">Para pedir</span><a>Qué pedir</a></div>
+    <div class="fila sugerido">
+      <span class="ic">EL</span>
+      <div><b>Electro Lumen</b><span class="d">5 productos bajo el mínimo</span></div>
+      <span class="imp"><span class="peso">$</span>88.400</span>
+    </div>
+    <div class="fila sugerido">
+      <span class="ic">FS</span>
+      <div><b>Ferretera del Sur</b><span class="d">4 productos · 1 para un cliente</span></div>
+      <span class="imp"><span class="peso">$</span>46.300</span>
+    </div>
+  </div>
+  <div class="barra-accion"><button class="btn btn-accion grande"><i class="i" data-i="plus"></i>Armar un pedido</button><button class="btn btn-oscuro" aria-label="Escanear"><i class="i i-l" data-i="scan-barcode"></i></button></div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="activo" data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-ir="anomalias"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

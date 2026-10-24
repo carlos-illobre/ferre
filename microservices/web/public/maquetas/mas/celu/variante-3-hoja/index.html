@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Más · Hoja sobre lo que hacías (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mas.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../mas.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .detras { position: absolute; inset: 0; width: 390px; height: 844px; border: 0; pointer-events: none; }
+  .oscuro { position: absolute; inset: 0; background: rgba(26, 29, 27, .3); }
+  .hoja-mas { position: absolute; left: 0; right: 0; bottom: 76px; background: var(--superficie); border-radius: var(--r-hoja) var(--r-hoja) 0 0; box-shadow: var(--sombra-3); padding: 8px 16px 16px; animation: sube var(--t-nav) var(--curva); }
+  @keyframes sube { from { transform: translateY(100%); } }
+  .hoja-mas .asa { width: 40px; height: 5px; border-radius: 99px; background: var(--hundido-2); margin: 4px auto 12px; }
+  .yo { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .yo .avatar { width: 40px; height: 40px; }
+  .buscar { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: var(--r); background: var(--hundido); color: var(--texto-3); font-size: 16px; }
+  .atajos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; letter-spacing: -.02em; margin: 16px 0 8px; }
+  .atajos a { display: grid; justify-items: center; gap: 6px; text-decoration: none; color: var(--tinta); font-size: 14px; font-weight: 650; text-align: center; line-height: 18px; position: relative; }
+  .atajos .ico-op { width: 56px; height: 56px; border-radius: 18px; }
+  .atajos .insignia { position: absolute; top: -4px; right: 6px; background: var(--urgente); color: #3A2500; border: 2px solid #fff; height: 24px; }
+  .acc { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--borde); text-decoration: none; color: inherit; }
+  .acc b { display: block; font-weight: 700; font-size: 16px; line-height: 22px; }
+  .acc small { display: block; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .mini { width: 40px; height: 56px; border-radius: 8px; overflow: hidden; border: 1px solid var(--borde); box-shadow: var(--sombra-1); position: relative; }
+  .mini iframe { width: 390px; height: 844px; border: 0; transform: scale(.1026); transform-origin: 0 0; pointer-events: none; }
+  .nav-fija { position: absolute; left: 0; right: 0; bottom: 0; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <iframe class="detras" src="../../../vender/celu/variante-1-mostrador/index.html" tabindex="-1" aria-hidden="true" title="Vender, detrás"></iframe>
+  <div class="oscuro" data-ir="vender"></div>
+
+  <div class="hoja-mas" role="dialog" aria-label="Más">
+    <div class="asa"></div>
+    <div class="yo"><span class="avatar">CI</span><div style="flex:1"><div style="font-weight:750">Carlos Illobre</div><div class="t-detalle">Administrador · Gerente</div></div><button class="btn btn-fantasma chico" data-ir="entrar"><i class="i i-s" data-i="log-out"></i>Salir</button></div>
+    <div class="buscar"><i class="i" data-i="search"></i>Buscá una opción o un ajuste<i class="i" data-i="mic" style="margin-left:auto;color:var(--texto-2)"></i></div>
+
+    <div class="atajos">
+      <a data-ir="anomalias"><span class="ico-op urgente"><i class="i i-l" data-i="triangle-alert"></i></span>Anomalías<span class="insignia">5</span></a>
+      <a data-ir="procesos"><span class="ico-op"><i class="i i-l" data-i="workflow"></i></span>Procesos</a>
+      <a data-ir="mejoras-y-errores"><span class="ico-op"><i class="i i-l" data-i="bug"></i></span>Mejoras</a>
+      <a data-ir="configuracion"><span class="ico-op neutro"><i class="i i-l" data-i="settings"></i></span>Config.</a>
+      <a data-ir="sistema"><span class="ico-op"><i class="i i-l" data-i="sliders-horizontal"></i></span>Sistema</a>
+    </div>
+
+    <a class="acc" href="#" data-avisar="Vender"><span class="mini"><iframe src="../../../vender/celu/variante-1-mostrador/index.html" tabindex="-1" title="Captura de Vender"></iframe></span><span><b>Avisar de un error en Vender</b><small>Va con la captura de lo que tenías</small></span><i class="i i-s" data-i="chevron-right" style="color:var(--texto-3)"></i></a>
+    <div class="acc"><span class="ico-op chico neutro"><i class="i" data-i="sparkles"></i></span><span><b>Animaciones</b><small>En este celular</small></span><button class="llave si" data-llave role="switch" aria-checked="true" aria-label="Animaciones"></button></div>
+    <div class="acc" style="grid-template-columns:40px 1fr"><span class="ico-op chico"><i class="i" data-i="clock"></i></span><span><b>Sesión del servidor</b><small>Para todos los dispositivos</small></span><span style="grid-column:1 / -1"><span class="segmentos tramos" data-ajuste="sesion"><button data-tramo>No</button><button data-tramo>30 s</button><button data-tramo class="elegido">1 min</button><button data-tramo>5 min</button><button data-tramo>10 min</button></span></span></div>
+  </div>
+
+  <nav class="nav-inferior nav-fija">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo" data-ir="vender" aria-label="Cerrar Más"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

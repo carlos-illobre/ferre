@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Más · Lista (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mas.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../mas.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { overflow: auto; padding-bottom: 16px; scrollbar-width: none; }
+  .yo { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .yo .avatar { width: 44px; height: 44px; font-size: 16px; }
+  .yo .n { font-weight: 750; font-size: 16px; line-height: 22px; }
+  .grupo-t { font-size: 14px; font-weight: 700; color: var(--texto-2); margin: 16px 4px 8px; }
+  .lista { overflow: hidden; }
+  .op { display: grid; grid-template-columns: 40px 1fr auto 16px; align-items: center; gap: 12px; padding: 12px 14px; text-decoration: none; color: inherit; min-height: 68px; }
+  .op + .op { border-top: 1px solid var(--borde); }
+  .op b { display: block; font-weight: 700; font-size: 16px; line-height: 22px; }
+  .op small { display: block; font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .op .ch { color: var(--texto-3); }
+  .op:active { background: var(--hundido); }
+  .salir b { color: var(--error-texto); }
+  .salir .ico-op { background: var(--error-suave); color: var(--error-texto); }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Más</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <div class="celu-pantalla">
+    <div class="yo tarjeta"><span class="avatar">CI</span><div style="flex:1"><div class="n">Carlos Illobre</div><div class="t-detalle">Administrador · Gerente</div></div><span class="pastilla pino">Ves todo</span></div>
+
+    <div class="grupo-t">Del negocio</div>
+    <div class="lista tarjeta">
+      <a class="op" data-ir="anomalias"><span class="ico-op chico urgente"><i class="i" data-i="triangle-alert"></i></span><span><b>Anomalías</b><small>Lo que no coincide</small></span><span class="pastilla urgente" style="height:24px">5</span><i class="i i-s ch" data-i="chevron-right"></i></a>
+      <a class="op" data-ir="procesos"><span class="ico-op chico"><i class="i" data-i="workflow"></i></span><span><b>Procesos</b><small>Cómo se trabaja, paso a paso</small></span><span></span><i class="i i-s ch" data-i="chevron-right"></i></a>
+      <a class="op" data-ir="mejoras-y-errores"><span class="ico-op chico"><i class="i" data-i="bug"></i></span><span><b>Mejoras y errores</b><small>Avisá algo que falla o una idea</small></span><span class="t-detalle">4</span><i class="i i-s ch" data-i="chevron-right"></i></a>
+    </div>
+
+    <div class="grupo-t">Ajustes</div>
+    <div class="lista tarjeta">
+      <a class="op" data-ir="configuracion"><span class="ico-op chico neutro"><i class="i" data-i="settings"></i></span><span><b>Configuración</b><small>Lo tuyo, en este celular</small></span><span></span><i class="i i-s ch" data-i="chevron-right"></i></a>
+      <a class="op" data-ir="sistema"><span class="ico-op chico"><i class="i" data-i="sliders-horizontal"></i></span><span><b>Sistema</b><small>Tiempos para todos</small></span><span class="t-detalle" data-ver-sesion>1 min</span><i class="i i-s ch" data-i="chevron-right"></i></a>
+    </div>
+
+    <div class="lista tarjeta" style="margin-top:16px">
+      <a class="op salir" data-ir="entrar"><span class="ico-op chico"><i class="i" data-i="log-out"></i></span><span><b>Salir</b><small>Cerrar la sesión en este celular</small></span><span></span><i class="i i-s ch" data-i="chevron-right"></i></a>
+    </div>
+  </div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+</body>
+</html>

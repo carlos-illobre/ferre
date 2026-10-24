@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Más · Lo pendiente (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mas.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../mas.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  .cols { display: grid; grid-template-columns: 300px 1fr; gap: 24px; height: 100%; }
+  .indice { padding: 8px; align-self: start; }
+  .indice a { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; text-decoration: none; color: inherit; }
+  .indice a + a { margin-top: 2px; }
+  .indice a:hover, .indice a.marca { background: var(--hundido); }
+  .indice a.marca { box-shadow: inset 0 0 0 2px var(--pino); }
+  .indice b { display: block; font-weight: 750; font-size: 16px; line-height: 22px; }
+  .indice small { display: block; font-size: 14px; color: var(--texto-2); line-height: 20px; }
+  .indice .sep { height: 1px; background: var(--borde); margin: 8px 12px; }
+  .resumenes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .resumenes .resumen { padding: 12px 14px; }
+  .resumenes .resumen .va { font-size: 22px; line-height: 28px; }
+  .tit { display: flex; align-items: baseline; gap: 10px; margin: 20px 2px 10px; }
+  .tit .t-detalle { margin-left: auto; }
+  .feed { display: grid; gap: 8px; }
+  .item { display: grid; grid-template-columns: 40px 1fr auto auto; align-items: center; gap: 14px; padding: 12px 16px; }
+  .item .que { font-weight: 700; font-size: 16px; line-height: 22px; }
+  .item .det { font-size: 14px; line-height: 20px; color: var(--texto-2); }
+  .item .de { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; color: var(--texto-3); margin-bottom: 2px; }
+  .item .fotos { display: flex; gap: 4px; }
+  .item .fotos .foto { width: 40px; height: 40px; border-radius: 8px; }
+  .item.hecho { opacity: 0; transform: translateX(16px); transition: opacity var(--t) var(--curva), transform var(--t) var(--curva); }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="lateral">
+    <div class="marca"><span class="logo"><i class="i" data-i="store"></i></span><b>Ferrebress</b></div>
+    <a class="nav-item" data-ir="vender"><i class="i" data-i="shopping-cart"></i><span class="txt">Vender</span><span class="insignia">5</span></a>
+    <a class="nav-item" data-ir="productos"><i class="i" data-i="tags"></i><span class="txt">Catálogo</span></a>
+    <a class="nav-item" data-ir="stock"><i class="i" data-i="package"></i><span class="txt">Depósito</span></a>
+    <a class="nav-item" data-ir="resumen"><i class="i" data-i="chart-column"></i><span class="txt">Negocio</span></a>
+    <a class="nav-item activo"><i class="i" data-i="ellipsis"></i><span class="txt">Más</span><span class="pastilla urgente" style="margin-left:auto;height:24px" id="ins-mas">5</span></a>
+    <div class="pie">
+      <div class="vinculo"><i class="i" data-i="smartphone"></i><div class="txt">Celular en espejo<small>Moto G54</small></div></div>
+      <div class="pastilla logro" style="justify-self:start"><span class="punto"></span>En línea · todo enviado</div>
+      <div class="usuario"><span class="avatar">CI</span><div class="txt"><div style="font-weight:750;font-size:15px">Carlos Illobre</div><div class="t-detalle">Administrador</div></div></div>
+    </div>
+  </nav>
+  <main class="contenido">
+    <header class="cabecera">
+      <div><div class="t-titulo">Más</div><div class="sub">Lo que te espera en cada parte, y la puerta a cada una.</div></div>
+      <div class="acciones"><button class="btn btn-accion chico" data-avisar="Más"><i class="i i-s" data-i="bug"></i>Avisar de un error o una idea <span class="kbd">Alt A</span></button></div>
+    </header>
+    <section class="pantalla" style="padding-top:20px">
+      <div class="cols">
+        <div class="indice tarjeta">
+          <a data-ir="anomalias" class="marca"><span class="ico-op chico urgente"><i class="i" data-i="triangle-alert"></i></span><span><b>Anomalías</b><small>Lo que no coincide</small></span><span class="pastilla urgente" style="height:24px">5</span></a>
+          <a data-ir="procesos"><span class="ico-op chico"><i class="i" data-i="workflow"></i></span><span><b>Procesos</b><small>Cómo se trabaja</small></span><span class="t-detalle">6</span></a>
+          <a data-ir="mejoras-y-errores"><span class="ico-op chico"><i class="i" data-i="bug"></i></span><span><b>Mejoras y errores</b><small>Lo que falla y las ideas</small></span><span class="t-detalle">4</span></a>
+          <div class="sep"></div>
+          <a data-ir="configuracion"><span class="ico-op chico neutro"><i class="i" data-i="settings"></i></span><span><b>Configuración</b><small>Solo para vos</small></span><span></span></a>
+          <a data-ir="sistema"><span class="ico-op chico"><i class="i" data-i="sliders-horizontal"></i></span><span><b>Sistema</b><small>Para todos los dispositivos</small></span><span></span></a>
+          <div class="sep"></div>
+          <div class="t-detalle" style="padding:4px 12px 8px;display:flex;gap:8px;align-items:center"><span class="kbd">↑ ↓</span>elegir <span class="kbd">Enter</span>abrir</div>
+        </div>
+
+        <div>
+          <div class="resumenes">
+            <div class="resumen urgente"><span class="ico"><i class="i" data-i="triangle-alert"></i></span><div><div class="et">Para revisar</div><div class="va" id="n-rev">5</div></div></div>
+            <div class="resumen"><span class="ico"><i class="i" data-i="bug"></i></span><div><div class="et">Avisos abiertos</div><div class="va">4</div></div></div>
+            <div class="resumen"><span class="ico"><i class="i" data-i="workflow"></i></span><div><div class="et">Procesos vigentes</div><div class="va">6 <span class="t-detalle">de 7</span></div></div></div>
+            <div class="resumen logro"><span class="ico"><i class="i" data-i="circle-check"></i></span><div><div class="et">Sistema</div><div class="va" style="font-size:18px">Al día</div></div></div>
+          </div>
+
+          <div class="tit"><span class="t-seccion">Te espera</span><span class="t-detalle">De lo más urgente a lo que puede esperar</span></div>
+          <div class="feed">
+            <div class="item tarjeta">
+              <span class="ico-op chico urgente"><i class="i" data-i="triangle-alert"></i></span>
+              <div><div class="de">Anomalías · hoy 09:14</div><div class="que">Ana Gómez dejó 2 ventas sin mandar</div><div class="det">Samsung A15 del local · $68.000 en efectivo y Mercado Pago · no cuentan hasta que las aceptes</div></div>
+              <span class="dato urgente"><span class="et">Total</span><span class="va"><span class="peso">$</span>68.000</span></span>
+              <button class="btn chico" data-ir="anomalias">Revisar</button>
+            </div>
+            <div class="item tarjeta">
+              <span class="ico-op chico urgente"><i class="i" data-i="package"></i></span>
+              <div><div class="de">Anomalías · hoy 10:31</div><div class="que">Faltó stock: 3 productos vendidos sin tener</div><div class="det">Mecha acero rápido HSS 8 mm · Puntas Phillips PH2 × 10 · Tarugos nylon S8</div></div>
+              <div class="fotos"><span class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></span><span class="foto"><img src="../../../_comun/fotos/tarugos.webp" alt=""></span></div>
+              <button class="btn chico" data-ir="anomalias">Contar</button>
+            </div>
+            <div class="item tarjeta" data-item>
+              <span class="ico-op chico"><i class="i" data-i="bug"></i></span>
+              <div><div class="de">Mejoras y errores · hace 20 min</div><div class="que">Martín Sosa: «La impresora corta el ticket»</div><div class="det">Con más de 8 renglones el ticket sale cortado por la mitad · 1 foto</div></div>
+              <span class="pastilla error">Error</span>
+              <button class="btn chico" data-resolver>Marcar resuelto</button>
+            </div>
+            <div class="item tarjeta">
+              <span class="ico-op chico"><i class="i" data-i="workflow"></i></span>
+              <div><div class="de">Procesos · desde el lunes</div><div class="que">«Recepción de mercadería» sigue en borrador</div><div class="det">Lucía Ferreyra lo dejó en el paso 4 de 7: «Controlar contra el remito»</div></div>
+              <span class="pastilla urgente">Borrador</span>
+              <button class="btn chico" data-ir="procesos">Seguir</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+document.addEventListener("click", function (e) {
+  var b = e.target.closest("[data-resolver]"); if (!b) return;
+  var it = b.closest("[data-item]"); it.classList.add("hecho");
+  setTimeout(function () { it.remove(); }, 200);
+  MAS.tostada("Resuelto · Martín ve que lo arreglaste");
+});
+document.addEventListener("keydown", function (e) {
+  if (e.altKey && (e.key === "a" || e.key === "A")) { e.preventDefault(); MAS.abrirAvisar("Más"); return; }
+  if (document.querySelector(".dialogo")) return;
+  var ops = Array.prototype.slice.call(document.querySelectorAll(".indice a")), i = ops.findIndex(function (a) { return a.classList.contains("marca"); });
+  var n = e.key === "ArrowDown" ? Math.min(i + 1, ops.length - 1) : e.key === "ArrowUp" ? Math.max(i - 1, 0) : -1;
+  if (n >= 0) { e.preventDefault(); ops[i].classList.remove("marca"); ops[n].classList.add("marca"); }
+  else if (e.key === "Enter") { e.preventDefault(); ops[i].click(); }
+});
+</script>
+</body>
+</html>

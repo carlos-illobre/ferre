@@ -83,13 +83,14 @@
 <script>
   var NOMBRES = { "entrar": "Entrar", "vender": "Vender", "ventas-de-hoy": "Ventas de hoy", "productos": "Productos", "listas": "Listas de precios",
     "duplicados": "Duplicados", "stock": "Stock", "compras": "Compras", "contar": "Contar", "resumen": "Resumen", "usuarios": "Usuarios",
-    "actividad": "Quién hizo qué", "anomalias": "Anomalías", "procesos": "Procesos", "mejoras-y-errores": "Mejoras y errores", "configuracion": "Configuración" };
+    "actividad": "Quién hizo qué", "anomalias": "Anomalías", "procesos": "Procesos", "mejoras-y-errores": "Mejoras y errores", "configuracion": "Configuración",
+    "mas": "Más", "ingreso": "Ingreso", "pedidos": "Pedidos", "sistema": "Sistema", "vincular": "Vincular" };
   var VERSIONES = { v1: "Hoy", v2: "Evolución", v3: "Reinvención", v4: "Audaz" };
   // v1 es la aplicación de hoy, la del ambiente de pruebas, abierta en la pantalla que corresponde.
   // Elige computadora o celular por el ancho, igual que en un dispositivo de verdad.
   var DE_HOY = {
-    compu: { "entrar": "", "vender": "vender", "ventas-de-hoy": "hoy", "productos": "productos", "listas": "listas", "duplicados": "duplicados", "stock": "stock", "compras": "compras", "contar": "contar", "resumen": "resumen", "usuarios": "usuarios", "actividad": "actividad", "anomalias": "anomalias", "procesos": "procesos", "mejoras-y-errores": "tickets", "configuracion": "configuracion" },
-    celu: { "entrar": "", "vender": "vender", "ventas-de-hoy": "vender/hoy", "productos": "catalogo/productos", "listas": "catalogo/listas", "duplicados": "catalogo/duplicados", "stock": "deposito/stock", "compras": "deposito/compras", "contar": "deposito/contar", "resumen": "negocio", "usuarios": "mas/usuarios", "actividad": "mas/actividad", "anomalias": "mas/anomalias", "procesos": "mas/procesos", "mejoras-y-errores": "mas/tickets", "configuracion": "mas/configuracion" }
+    compu: { "entrar": "", "vender": "vender", "ventas-de-hoy": "hoy", "productos": "productos", "listas": "listas", "duplicados": "duplicados", "stock": "stock", "compras": "compras", "contar": "contar", "resumen": "resumen", "usuarios": "usuarios", "actividad": "actividad", "anomalias": "anomalias", "procesos": "procesos", "mejoras-y-errores": "tickets", "configuracion": "configuracion", "mas": "mas", "ingreso": "compras", "pedidos": "pedidos", "sistema": "sistema", "vincular": "vender" },
+    celu: { "entrar": "", "vender": "vender", "ventas-de-hoy": "vender/hoy", "productos": "catalogo/productos", "listas": "catalogo/listas", "duplicados": "catalogo/duplicados", "stock": "deposito/stock", "compras": "deposito/compras", "contar": "deposito/contar", "resumen": "negocio", "usuarios": "mas/usuarios", "actividad": "mas/actividad", "anomalias": "mas/anomalias", "procesos": "mas/procesos", "mejoras-y-errores": "mas/tickets", "configuracion": "mas/configuracion", "mas": "mas", "ingreso": "deposito/compras", "pedidos": "deposito/pedidos", "sistema": "mas/sistema", "vincular": "vender" }
   };
   var version = (location.pathname.match(/\/(v[1234])\/?/) || [, "v2"])[1];
   var celular = matchMedia("(max-width: 699px)").matches;

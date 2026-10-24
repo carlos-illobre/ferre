@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedidos · El radar de entregas (computadora)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<link rel="stylesheet" href="../../propio/pedidos.css">
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { height: 768px; overflow: hidden; }
+  .tope { height: 56px; background: var(--pino); color: #fff; display: flex; align-items: center; gap: 16px; padding: 0 24px; }
+  .tope .logo { width: 32px; height: 32px; border-radius: 9px; background: rgba(255,255,255,.12); display: grid; place-items: center; }
+  .tope b { font-size: 17px; font-weight: 800; }
+  .tope .migas { display: flex; gap: 8px; align-items: center; font-size: 15px; font-weight: 650; color: rgba(255,255,255,.7); }
+  .tope .migas strong { color: #fff; }
+  .tope .ir { margin-left: 16px; display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px 0 12px; border-radius: 10px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.75); font-size: 14px; font-weight: 600; width: 380px; white-space: nowrap; }
+  .tope .ir .kbd, .tope .der .kbd { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); color: #fff; }
+  .tope .der { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 650; }
+  .tope .der .p { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 99px; background: rgba(255,255,255,.1); }
+  .tope .der .p .punto { width: 8px; height: 8px; border-radius: 99px; background: #5BD69A; }
+  .tope .av { width: 32px; height: 32px; border-radius: 99px; background: var(--accion-suave); color: var(--accion-texto); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+
+  .hoja { padding: 16px 24px 20px; display: flex; flex-direction: column; gap: 12px; height: calc(768px - 56px); }
+  .cab { display: flex; align-items: center; gap: 16px; }
+  .cab .t-titulo { font-size: 26px; }
+  .cab .cifras { display: flex; gap: 8px; margin-left: 8px; }
+  .cab .acciones { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  /* Línea de tiempo */
+  .radar { padding: 0; overflow: hidden; }
+  .eje, .fila { display: grid; grid-template-columns: 236px 1fr; }
+  .eje { height: 36px; border-bottom: 1px solid var(--borde); }
+  .eje .dias { position: relative; }
+  .eje .dias span { position: absolute; top: 9px; transform: translateX(-50%); font-size: 14px; font-weight: 650; color: var(--texto-3); }
+  .eje .dias span.hoy { color: #fff; background: var(--tinta); border-radius: 99px; padding: 0 8px; top: 7px; height: 22px; line-height: 22px; }
+  .fila { height: 66px; border-bottom: 1px solid var(--borde); }
+  .fila:last-child { border-bottom: 0; }
+  .fila .pv { padding: 8px 16px; display: grid; align-content: center; border-right: 1px solid var(--borde); }
+  .fila .pv b { font-size: 15px; font-weight: 750; line-height: 20px; }
+  .fila .pv span { font-size: 14px; color: var(--texto-2); line-height: 18px; white-space: nowrap; }
+  .fila.sel { background: var(--pino-suave); }
+  .pista { position: relative; background-image: repeating-linear-gradient(90deg, transparent 0 calc(100%/26 - 1px), rgba(26,29,27,.05) calc(100%/26 - 1px) calc(100%/26)); }
+  .finde { position: absolute; top: 0; bottom: 0; background: rgba(26,29,27,.025); }
+  .linea-hoy { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--tinta); opacity: .8; z-index: 2; }
+  .b { position: absolute; top: 17px; height: 32px; border-radius: 10px; display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+  .b.ok { background: var(--logro-suave); color: var(--logro-texto); }
+  .b.va { background: var(--pino); color: #fff; }
+  .b.tarde { background: repeating-linear-gradient(-45deg, var(--urgente) 0 6px, #F5B53D 6px 12px); color: var(--tinta); border-radius: 0 10px 10px 0; }
+  .b.va.pegada { border-radius: 10px 0 0 10px; }
+  .b.cerrado { background: var(--hundido-2); color: var(--texto-2); }
+  .b.cancel { background: transparent; border: 1.5px dashed var(--borde-fuerte); color: var(--texto-3); text-decoration: line-through; }
+  .b.futuro { background: var(--superficie); border: 1.5px dashed var(--pino-texto); color: var(--pino-texto); }
+  .b.sugerido { background: var(--urgente-suave); border: 1.5px dashed var(--urgente); color: var(--urgente-texto); }
+  .hito { position: absolute; top: 23px; width: 20px; height: 20px; border-radius: 99px; background: var(--superficie); border: 3px solid var(--logro); z-index: 1; transform: translateX(-50%); }
+  .hito.medio { background: linear-gradient(90deg, var(--logro) 50%, #fff 50%); }
+  .esperado { position: absolute; top: 8px; bottom: 8px; width: 0; border-left: 2px dashed var(--urgente-texto); }
+  .sel-marco { outline: 2px solid var(--pino); outline-offset: 2px; }
+
+  /* Detalle del elegido */
+  .detalle { display: grid; grid-template-columns: 330px 1fr auto; gap: 24px; padding: 16px 20px; align-items: start; flex: 1; min-height: 0; }
+  .detalle .t { white-space: nowrap; font-size: 20px; font-weight: 800; line-height: 26px; display: flex; gap: 8px; align-items: center; }
+  .anillo { display: flex; gap: 12px; align-items: center; margin-top: 10px; }
+  .anillo svg { flex: none; }
+  .anillo .t-detalle b { color: var(--tinta); }
+  .faltan { display: grid; gap: 8px; }
+  .faltan .t-etiqueta { color: var(--tinta); font-weight: 750; }
+  .fl { display: grid; grid-template-columns: 40px 1fr 168px; gap: 12px; align-items: center; padding: 8px 12px; border-radius: 12px; background: var(--hundido); }
+  .fl .foto { width: 40px; height: 40px; border-radius: 8px; background: var(--superficie); }
+  .fl b { font-size: 15px; font-weight: 700; display: block; line-height: 20px; }
+  .fl span.d { font-size: 14px; color: var(--texto-2); line-height: 18px; }
+  .fl .q { text-align: right; font-size: 14px; color: var(--texto-2); font-weight: 650; }
+  .fl .q strong { font-size: 18px; color: var(--urgente-texto); font-weight: 800; }
+  .fl .avance { height: 6px; margin-top: 4px; }
+  .botones { display: grid; gap: 8px; width: 264px; }
+  .botones .btn { justify-content: space-between; }
+  .botones .btn span { display: flex; align-items: center; gap: 8px; }
+</style>
+</head>
+<body>
+<header class="tope">
+  <span class="logo" data-ir="vender"><i class="i" data-i="store"></i></span><b data-ir="vender">Ferrebress</b>
+  <span class="migas"><a data-ir="stock">Depósito</a> <i class="i i-s" data-i="chevron-right"></i><strong data-no-ir>Pedidos</strong></span>
+  <span class="ir"><i class="i i-s" data-i="search"></i>Ir a un proveedor, pedido o producto…<span class="kbd">Ctrl K</span></span>
+  <span class="der"><span class="p"><i class="i i-s" data-i="smartphone"></i>Celular en espejo</span><span class="p"><span class="punto"></span>En línea</span><span class="av">MR</span></span>
+</header>
+<div class="hoja">
+  <div class="cab">
+    <span class="t-titulo">Pedidos a proveedores</span>
+    <span class="cifras"><span class="pastilla pino"><i class="i i-s" data-i="truck"></i>2 en camino</span><span class="pastilla urgente"><i class="i i-s" data-i="clock"></i>1 demorado</span><span class="pastilla urgente"><i class="i i-s" data-i="clipboard-list"></i>15 para pedir</span></span>
+    <div class="acciones">
+      <span class="segmentos"><button>Semana</button><button class="elegido">Octubre</button><button>3 meses</button></span>
+      <button class="btn chico"><i class="i i-s" data-i="plus"></i>Pedido nuevo <span class="kbd">Alt N</span></button>
+    </div>
+  </div>
+
+  <div class="radar tarjeta">
+    <div class="eje"><span></span><div class="dias">
+      <span style="left:1.9%">1</span><span style="left:13.4%">4</span><span style="left:25%">7</span><span style="left:36.5%">10</span><span style="left:48%">13</span><span style="left:59.6%">16</span><span class="hoy" style="left:71.2%">Hoy 19</span><span style="left:82.7%">22</span><span style="left:94.2%">25</span>
+    </div></div>
+
+    <div class="fila"><div class="pv"><b>Bulonera Centro</b><span>tarda 4 días · completo 10 de 10</span></div><div class="pista">
+      <span class="finde" style="left:7.7%;width:7.7%"></span><span class="finde" style="left:34.6%;width:7.7%"></span><span class="finde" style="left:61.5%;width:7.7%"></span><span class="finde" style="left:88.5%;width:7.7%"></span>
+      <span class="b ok" style="left:50%;width:19.2%"><i class="i i-s" data-i="circle-check"></i>recibido 18/10</span>
+      <span class="b futuro" style="left:71.2%;width:13.4%"><i class="i i-s" data-i="pencil"></i>borrador · jue 22</span>
+      <span class="linea-hoy" style="left:71.2%"></span></div></div>
+
+    <div class="fila"><div class="pv"><b>Distribuidora Oeste</b><span>tarda 2 días · completo 8 de 9</span></div><div class="pista">
+      <span class="finde" style="left:7.7%;width:7.7%"></span><span class="finde" style="left:34.6%;width:7.7%"></span><span class="finde" style="left:61.5%;width:7.7%"></span><span class="finde" style="left:88.5%;width:7.7%"></span>
+      <span class="b ok" style="left:0%;width:11.5%"><i class="i i-s" data-i="circle-check"></i>recibido</span>
+      <span class="b va pegada" style="left:50%;width:11.5%">enviado 14/10</span>
+      <span class="b tarde" style="left:61.5%;width:9.7%">+3 días</span>
+      <span class="esperado" style="left:61.5%"></span>
+      <span class="linea-hoy" style="left:71.2%"></span></div></div>
+
+    <div class="fila sel"><div class="pv"><b>Acindar Distribución</b><span>tarda 3 días · completo 5 de 7</span></div><div class="pista">
+      <span class="finde" style="left:7.7%;width:7.7%"></span><span class="finde" style="left:34.6%;width:7.7%"></span><span class="finde" style="left:61.5%;width:7.7%"></span><span class="finde" style="left:88.5%;width:7.7%"></span>
+      <span class="b va pegada sel-marco" style="left:42.3%;width:11.5%">enviado 12/10</span>
+      <span class="b tarde sel-marco" style="left:53.8%;width:17.4%;padding-left:36px">faltan 2 de 6</span>
+      <span class="hito medio" style="left:55.8%"></span>
+      <span class="linea-hoy" style="left:71.2%"></span></div></div>
+
+    <div class="fila"><div class="pv"><b>Electro Lumen</b><span>tarda 2 días · completo 6 de 6</span></div><div class="pista">
+      <span class="finde" style="left:7.7%;width:7.7%"></span><span class="finde" style="left:34.6%;width:7.7%"></span><span class="finde" style="left:61.5%;width:7.7%"></span><span class="finde" style="left:88.5%;width:7.7%"></span>
+      <span class="b cancel" style="left:0%;width:9%">cancelado</span>
+      <span class="b sugerido" style="left:71.2%;width:11.5%">5 para pedir</span>
+      <span class="linea-hoy" style="left:71.2%"></span></div></div>
+
+    <div class="fila"><div class="pv"><b>Ferretera del Sur</b><span>tarda 6 días · completo 3 de 5</span></div><div class="pista">
+      <span class="finde" style="left:7.7%;width:7.7%"></span><span class="finde" style="left:34.6%;width:7.7%"></span><span class="finde" style="left:61.5%;width:7.7%"></span><span class="finde" style="left:88.5%;width:7.7%"></span>
+      <span class="b cerrado" style="left:3.8%;width:30.8%"><i class="i i-s" data-i="ban"></i>cerrado incompleto · llegaron 7 de 8</span>
+      <span class="b sugerido" style="left:71.2%;width:23%">4 para pedir · llegarían el 26</span>
+      <span class="linea-hoy" style="left:71.2%"></span></div></div>
+  </div>
+
+  <div class="detalle tarjeta-2">
+    <div>
+      <div class="t">Acindar Distribución <span class="pastilla urgente">recibido parcial</span></div>
+      <div class="t-detalle">Lo mandó Marcelo el 12/10 por WhatsApp</div>
+      <div class="anillo">
+        <svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="23" fill="none" stroke="var(--hundido-2)" stroke-width="7"/><circle cx="28" cy="28" r="23" fill="none" stroke="var(--logro)" stroke-width="7" stroke-linecap="round" stroke-dasharray="96 145" transform="rotate(-90 28 28)"/><text x="28" y="33" text-anchor="middle" font-size="15" font-weight="800" fill="var(--tinta)" font-family="Manrope">4/6</text></svg>
+        <div class="t-detalle"><b>Llegó el 15/10</b> con el remito que fotografió Marcelo. Lo que falta: <b><span class="peso">$</span>114.000</b> estimado.</div>
+      </div>
+    </div>
+    <div class="faltan">
+      <div class="t-etiqueta">Lo que falta</div>
+      <div class="fl"><span class="foto-icono foto" style="color:var(--texto-2)"><i class="i" data-i="ruler"></i></span><div><b>Alambre galvanizado N°14 por kilo</b><span class="d">AC-AG14 · también lo vende Distribuidora Oeste</span></div><div class="q"><strong>25 kg</strong> de 25<div class="avance"><b style="width:0"></b></div></div></div>
+      <div class="fl"><span class="foto"><img src="../../../_comun/fotos/clavos.webp" alt=""></span><div><b>Clavos punta París 3" por kilo</b><span class="d">AC-CL3 · llegaron 10 kg el 15/10</span></div><div class="q"><strong>10 kg</strong> de 20<div class="avance"><b class="parcial" style="width:50%"></b></div></div></div>
+    </div>
+    <div class="botones">
+      <button class="btn btn-accion"><span><i class="i" data-i="package-plus"></i>Llegó el resto</span><span class="kbd">Alt L</span></button>
+      <button class="btn"><span><i class="i" data-i="message-circle"></i>Reclamar lo que falta</span><span class="kbd">Alt R</span></button>
+      <button class="btn"><span><i class="i" data-i="share-2"></i>Pedirlo a otro</span><span class="kbd">Alt O</span></button>
+      <button class="btn btn-fantasma"><span><i class="i" data-i="ban"></i>Cerrar incompleto</span><span class="kbd">Alt C</span></button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

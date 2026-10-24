@@ -41,5 +41,10 @@ Se hicieron con la skill `/director-de-arte` (`.claude/skills/director-de-arte/`
 | Más | Procesos | [procesos](../../microservices/web/public/maquetas/procesos/resumen.md) |
 | Más | Mejoras y errores | [mejoras-y-errores](../../microservices/web/public/maquetas/mejoras-y-errores/resumen.md) |
 | Más | Configuración | [configuracion](../../microservices/web/public/maquetas/configuracion/resumen.md) |
+| Más | Más (la lista de opciones) | [mas](../../microservices/web/public/maquetas/mas/resumen.md) |
+| Más | Sistema | [sistema](../../microservices/web/public/maquetas/sistema/resumen.md) |
+| Depósito | Ingreso de mercadería | [ingreso](../../microservices/web/public/maquetas/ingreso/resumen.md) |
+| Depósito | Pedidos a proveedores | [pedidos](../../microservices/web/public/maquetas/pedidos/resumen.md) |
+| — | Vincular el celular con la computadora | [vincular](../../microservices/web/public/maquetas/vincular/resumen.md) |
 
 El manual de uso quedó afuera a propósito.

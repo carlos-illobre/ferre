@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingreso · La carga (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../propio/iconos-extra.js"></script>
+<link rel="stylesheet" href="../../propio/ingreso.css">
+<style>
+  body { width: 390px; }
+  .celu-pestanas a { font-size: 15px; }
+  .origen { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 12px; align-items: center; padding: 10px 12px; }
+  .origen .ico { width: 44px; height: 44px; border-radius: 12px; background: var(--hundido); display: grid; place-items: center; color: var(--texto-2); }
+  .origen b { display: block; font-size: 16px; font-weight: 800; line-height: 22px; }
+  .origen small { display: block; font-size: 14px; color: var(--texto-2); font-weight: 600; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .origen .mini { width: 44px; height: 56px; border-radius: 6px; overflow: hidden; box-shadow: var(--sombra-2); border: 1px solid var(--borde); transform: rotate(3deg); position: relative; }
+  .origen .mini img { width: 100%; }
+  .buscar { display: grid; grid-template-columns: 1fr 52px; gap: 8px; margin-top: 8px; }
+  .buscar .campo { height: 52px; }
+  .buscar .btn { height: 52px; width: 52px; padding: 0; border-radius: 12px; }
+  .sec { display: flex; align-items: center; gap: 8px; margin: 14px 2px 8px; font-size: 14px; font-weight: 700; color: var(--texto-2); }
+  .sec .barra { flex: 1; margin: 0; max-width: 110px; } .sec .barra > b { background: var(--urgente); }
+  .sec b.c { color: var(--tinta); }
+  .lista { position: relative; }
+  .celu-pantalla { position: relative; }
+  .celu-pantalla::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32px; background: linear-gradient(transparent, var(--fondo)); pointer-events: none; }
+  .ren { position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; box-shadow: var(--sombra-1); }
+  .ren + .ren { margin-top: 6px; }
+  .ren .foto, .ren .foto-icono { width: 48px; height: 48px; border-radius: 10px; }
+  .ren .nom { font-size: 15px; font-weight: 750; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ren .det { font-size: 14px; line-height: 18px; color: var(--texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ren .cantidad { height: 40px; }
+  .ren .cantidad button { width: 32px; }
+  .ren .cantidad .n { min-width: 28px; }
+  .sube { color: var(--urgente-texto); font-weight: 700; } .baja { color: var(--logro-texto); font-weight: 700; } .falta { color: var(--urgente-texto); font-weight: 700; }
+  .ren.nuevo { border-color: var(--pino); box-shadow: 0 0 0 3px rgba(18,56,47,.10); }
+  .ren .foto-icono.nuevo { background: var(--pino-suave); color: var(--pino-texto); }
+  .ren.no { background: var(--hundido); box-shadow: none; } .ren.no .foto img { opacity: .5; }
+  .mas { text-align: center; margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--pino-texto); }
+  .barra-accion { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+  .barra-accion .tot small { display: block; font-size: 14px; font-weight: 650; color: var(--texto-2); line-height: 18px; white-space: nowrap; }
+  .barra-accion .tot b { font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -.02em; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Depósito</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <nav class="celu-pestanas"><a data-ir="stock">Stock</a><a class="activa" data-no-ir>Ingreso</a><a data-ir="compras">Compras</a><a data-ir="contar">Contar</a></nav>
+  <div class="celu-pantalla">
+    <div class="tarjeta origen" data-origen>
+      <span class="ico"><i class="i i-l" data-i="truck"></i></span>
+      <div><b>Distribuidora Oeste</b><small>Pedido 0412 · Factura · a 30 días</small></div>
+      <div class="mini" data-ver-factura><img src="../../propio/factura.webp" alt="Foto de la factura"></div>
+    </div>
+    <div class="buscar">
+      <div class="campo" data-buscar><i class="i" data-i="search"></i>Buscá un producto</div>
+      <button class="btn btn-oscuro" data-escanear aria-label="Escanear"><i class="i i-l" data-i="scan-barcode"></i></button>
+    </div>
+    <div class="sec"><span>Del pedido llegaron <b class="c" data-avance>28 de 42</b></span><div class="barra"><b style="width:67%" data-barra></b></div></div>
+    <div class="lista" data-lista>
+      <div class="ren nuevo" data-ren data-costo="2300">
+        <div class="foto-icono nuevo"><i class="i i-l" data-i="package-plus"></i></div>
+        <div><div class="nom">Precinto nylon 200 mm</div><div class="det"><span style="color:var(--pino-texto);font-weight:700">Nuevo</span> · $2.300</div></div>
+        <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">5</span><button><i class="i i-s" data-i="plus"></i></button></div>
+      </div>
+      <div class="ren" data-ren data-costo="2150" data-pedi="10">
+        <div class="foto"><img src="../../../_comun/fotos/llave-combinada.webp" alt=""></div>
+        <div><div class="nom">Llave combinada 13 mm</div><div class="det"><span class="falta">Faltan 4</span> · $2.150</div></div>
+        <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">6</span><button><i class="i i-s" data-i="plus"></i></button></div>
+      </div>
+      <div class="ren" data-ren data-costo="5940" data-pedi="6">
+        <div class="foto"><img src="../../../_comun/fotos/cinta-metrica.webp" alt=""></div>
+        <div><div class="nom">Cinta métrica 5 m</div><div class="det">$5.940 · <span class="sube">↑ +10 %</span></div></div>
+        <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">6</span><button><i class="i i-s" data-i="plus"></i></button></div>
+      </div>
+      <div class="ren" data-ren data-costo="1805" data-pedi="8">
+        <div class="foto"><img src="../../../_comun/fotos/puntas.webp" alt=""></div>
+        <div><div class="nom">Puntas Phillips PH2</div><div class="det">$1.805 · <span class="baja">↓ −5 %</span></div></div>
+        <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">8</span><button><i class="i i-s" data-i="plus"></i></button></div>
+      </div>
+      <div class="ren no" data-ren data-costo="1250" data-pedi="10">
+        <div class="foto"><img src="../../../_comun/fotos/lampara.webp" alt=""></div>
+        <div><div class="nom">Lámpara LED 9 W</div><div class="det"><span class="falta">No llegó</span> · pedí 10</div></div>
+        <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">0</span><button><i class="i i-s" data-i="plus"></i></button></div>
+      </div>
+      <div class="ren" data-ren data-costo="9800" data-pedi="4">
+        <div class="foto"><img src="../../../_comun/fotos/pinza.webp" alt=""></div>
+        <div><div class="nom">Pinza universal 8" Bahco</div><div class="det">$9.800 · llegó todo</div></div>
+        <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">4</span><button><i class="i i-s" data-i="plus"></i></button></div>
+      </div>
+      <div class="ren" data-ren data-costo="1100" data-pedi="4">
+        <div class="foto"><img src="../../../_comun/fotos/mecha.webp" alt=""></div>
+        <div><div class="nom">Mecha HSS 6 mm</div><div class="det">$1.100 · llegó todo</div></div>
+        <div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">4</span><button><i class="i i-s" data-i="plus"></i></button></div>
+      </div>
+    </div>
+  </div>
+  <div class="barra-accion">
+    <div class="tot"><small data-cuenta>33 un. · sin IVA</small><b data-total></b></div>
+    <button class="btn btn-accion grande" data-registrar><i class="i" data-i="package-check"></i>Registrar</button>
+  </div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender</a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a class="activo" data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a data-mas><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script src="../../../_comun/navegar.js" defer></script>
+<script src="../../propio/ingreso.js"></script>
+<script>
+(function () {
+  var $ = IG.$, $$ = IG.$$;
+  IG.recalcular = function () {
+    var t = 0, u = 0, llego = 0, pedi = 0;
+    $$("[data-ren]").forEach(function (r) {
+      var c = Number($(".n", r).textContent); t += c * Number(r.dataset.costo); u += c;
+      r.classList.toggle("no", c === 0);
+      if (r.dataset.pedi) { var p = Number(r.dataset.pedi); pedi += p; llego += Math.min(c, p); }
+    });
+    $("[data-total]").innerHTML = IG.plata(t);
+    $("[data-cuenta]").textContent = u + " un. · sin IVA";
+    $("[data-avance]").textContent = llego + " de " + pedi;
+    $("[data-barra]").style.width = Math.round(llego / pedi * 100) + "%";
+  };
+  IG.recalcular();
+  var EXTRA = [{ foto: "martillo", nom: "Martillo carpintero 27 mm", costo: 8900 }, { foto: "tarugos", nom: "Tarugos nylon S8 × 100", costo: 3950 }], k = 0;
+  function agregar(como) {
+    var p = EXTRA[k++ % EXTRA.length];
+    $$(".ren.nuevo").forEach(function (r) { r.classList.remove("nuevo"); });
+    var r = document.createElement("div");
+    r.className = "ren nuevo ig-nuevo"; r.setAttribute("data-ren", ""); r.dataset.costo = p.costo;
+    r.innerHTML = '<div class="foto"><img src="../../../_comun/fotos/' + p.foto + '.webp" alt=""></div><div><div class="nom">' + p.nom + '</div><div class="det">' + IG.plata(p.costo) + ' · = lista</div></div><div class="cantidad"><button><i class="i i-s" data-i="minus"></i></button><span class="n">1</span><button><i class="i i-s" data-i="plus"></i></button></div>';
+    IG.pintar(r); $("[data-lista]").insertBefore(r, $("[data-lista]").firstChild);
+    IG.vibrar(10); IG.recalcular();
+    if (como === "escaneo") IG.tostada("Escaneado: " + p.nom, "scan-barcode");
+  }
+  $("[data-buscar]").addEventListener("click", function () { agregar("busqueda"); });
+  $("[data-escanear]").addEventListener("click", function () {
+    var d = IG.abrir('<div style="height:420px;margin:0 16px 16px;border-radius:20px;background:linear-gradient(160deg,#6b4f33,#3b2a1b);display:grid;place-items:center;position:relative;overflow:hidden">' +
+      '<div style="width:220px;padding:14px;background:#fbfaf5;border-radius:6px;transform:rotate(-3deg);font:700 14px/1.3 monospace;color:#222">BREMEN · MARTILLO 27MM<div style="height:56px;margin-top:8px;background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 4px,#111 4px 5px,transparent 5px 8px)"></div>7 798765 432104</div>' +
+      '<div style="position:absolute;left:40px;right:40px;top:50%;height:2px;background:var(--accion);box-shadow:0 0 12px var(--accion)"></div></div>' +
+      '<div style="padding:0 16px 28px"><button class="btn grande" style="width:100%" data-cerrar>Listo</button></div>');
+    setTimeout(function () { agregar("escaneo"); }, 900);
+  });
+  $("[data-registrar]").addEventListener("click", function () {
+    var tot = $("[data-total]").textContent;
+    IG.vibrar([10, 40, 10]);
+    IG.tostada("Registrado " + tot + " · 2 costos nuevos · 1 producto nuevo", "circle-check");
+    $("[data-lista]").innerHTML = '<div style="text-align:center;padding:40px 16px;color:var(--texto-2)"><i class="i i-xl" data-i="package-open"></i><div class="t-renglon" style="color:var(--tinta);margin-top:8px">Listo para el próximo</div><div class="t-detalle">Elegí el proveedor o un pedido por llegar.</div></div>';
+    IG.pintar($("[data-lista]"));
+    $("[data-total]").innerHTML = IG.plata(0); $("[data-cuenta]").textContent = "sin renglones";
+  });
+  $("[data-origen] b").addEventListener("click", function () {
+    IG.abrir(IG.cab("¿Qué llegó?", "Pedidos por llegar") + '<div class="ig-cuerpo"><div class="tarjeta" style="padding:6px">' +
+      '<button class="ig-op" data-cerrar><i class="i" data-i="truck"></i>Distribuidora Oeste · 0412<span class="pastilla pino">6</span></button>' +
+      '<button class="ig-op" data-cerrar><i class="i" data-i="truck"></i>Acindar · lo que falta<span class="pastilla urgente">3</span></button>' +
+      '<button class="ig-op" data-cerrar><i class="i" data-i="plus"></i>Sin pedido</button></div>' +
+      '<div class="t-etiqueta" style="margin:16px 4px 8px">Cómo se paga</div><div class="segmentos" style="display:flex"><button style="flex:1;justify-content:center">Adelantado</button><button class="elegido" style="flex:1;justify-content:center">30 días</button><button style="flex:1;justify-content:center">60 días</button></div></div>');
+  });
+})();
+</script>
+</body>
+</html>

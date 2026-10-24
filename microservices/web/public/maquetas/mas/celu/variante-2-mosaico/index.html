@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Más · Mosaico (celular)</title>
+<link rel="stylesheet" href="../../../_comun/comun.css">
+<link rel="stylesheet" href="../../mas.css">
+<script src="../../../_comun/iconos.js"></script>
+<script src="../../mas.js"></script>
+<script src="../../../_comun/navegar.js" defer></script>
+<style>
+  body { width: 390px; }
+  .celu-pantalla { overflow: auto; padding-bottom: 16px; scrollbar-width: none; }
+  .espera { padding: 16px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; background: var(--urgente-suave); border-color: transparent; text-decoration: none; color: inherit; }
+  .espera .et { font-size: 14px; font-weight: 700; color: var(--urgente-texto); display: flex; gap: 6px; align-items: center; }
+  .espera .n { font-size: 32px; line-height: 36px; font-weight: 800; letter-spacing: -.02em; color: var(--urgente-texto); }
+  .espera .d { grid-column: 1 / -1; font-size: 14px; line-height: 20px; color: var(--urgente-texto); }
+  .espera .caras { display: flex; }
+  .espera .avatar { width: 40px; height: 40px; border: 2px solid var(--urgente-suave); margin-left: -10px; background: #fff; color: var(--urgente-texto); }
+  .mosaico { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .baldosa { display: flex; flex-direction: column; gap: 10px; padding: 14px; min-height: 140px; text-decoration: none; color: inherit; }
+  .baldosa .arriba { display: flex; justify-content: space-between; align-items: flex-start; }
+  .baldosa b { font-weight: 750; font-size: 16px; line-height: 22px; margin-top: auto; }
+  .baldosa .v { font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.02em; }
+  .baldosa .v small { font-size: 14px; font-weight: 600; color: var(--texto-2); letter-spacing: 0; }
+  .baldosa .d { font-size: 14px; line-height: 20px; color: var(--texto-2); margin-top: -8px; }
+  .avisar { grid-column: 1 / -1; flex-direction: row; align-items: center; min-height: 0; gap: 12px; background: var(--pino); border-color: var(--pino); color: #fff; box-shadow: var(--sombra-2); }
+  .avisar .ico-op { background: rgba(255,255,255,.14); color: #fff; }
+  .avisar b { margin: 0; }
+  .avisar small { display: block; font-size: 14px; color: rgba(255,255,255,.8); font-weight: 500; }
+  .pie-salir { display: flex; justify-content: center; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="celu">
+  <div class="barra-estado"><span>10:42</span><span class="se"><i class="i i-s" data-i="wifi"></i><svg width="26" height="13" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="#1A1D1B" opacity=".4"/><rect x="2" y="2" width="16" height="9" rx="2" fill="#1A1D1B"/></svg></span></div>
+  <div class="celu-cabecera"><span class="t-titulo">Más</span><span class="btn-vinculo"><i class="i i-s" data-i="monitor"></i>En espejo</span></div>
+  <div class="celu-estado"><span class="punto"></span>En línea · todo enviado</div>
+  <div class="celu-pantalla">
+    <a class="espera tarjeta tocable" data-ir="anomalias">
+      <span class="et"><i class="i i-s" data-i="triangle-alert"></i>Anomalías · para revisar</span><span class="caras"><span class="avatar">AG</span><span class="avatar">JP</span></span>
+      <span class="n">5</span><span></span>
+      <span class="d">Ana dejó 2 ventas sin mandar ($68.000) y faltó stock de 3 productos.</span>
+    </a>
+    <div class="mosaico">
+      <a class="baldosa tarjeta tocable" data-ir="procesos"><span class="arriba"><span class="ico-op chico"><i class="i" data-i="workflow"></i></span><span class="pastilla urgente" style="height:24px">1 borrador</span></span><span class="v">6 <small>vigentes</small></span><b>Procesos</b></a>
+      <a class="baldosa tarjeta tocable" data-ir="mejoras-y-errores"><span class="arriba"><span class="ico-op chico"><i class="i" data-i="bug"></i></span></span><span class="v">4 <small>abiertos</small></span><b>Mejoras y errores</b></a>
+      <a class="baldosa tarjeta tocable" data-ir="configuracion"><span class="arriba"><span class="ico-op chico neutro"><i class="i" data-i="settings"></i></span><button class="llave si" data-llave role="switch" aria-checked="true" aria-label="Animaciones" onclick="event.stopPropagation();event.preventDefault()"></button></span><span class="d" style="margin:0">Animaciones · guarda el catálogo</span><b>Configuración</b></a>
+      <a class="baldosa tarjeta tocable" data-ir="sistema"><span class="arriba"><span class="ico-op chico"><i class="i" data-i="sliders-horizontal"></i></span><span class="pastilla pino" style="height:24px">Para todos</span></span><span class="v" style="font-size:20px"><span data-ver-sesion>1 min</span> <small>sesión</small></span><b>Sistema</b></a>
+      <a class="baldosa tarjeta tocable avisar" href="#" data-avisar="Más"><span class="ico-op chico"><i class="i" data-i="camera"></i></span><span style="flex:1"><b>Avisar de un error</b><small>Sacudí el celular desde cualquier pantalla</small></span><i class="i" data-i="chevron-right"></i></a>
+    </div>
+    <div class="pie-salir"><button class="btn btn-fantasma" data-ir="entrar"><i class="i" data-i="log-out"></i>Salir · Carlos Illobre</button></div>
+  </div>
+  <nav class="nav-inferior">
+    <a data-ir="vender"><i class="i" data-i="shopping-cart"></i>Vender<span class="insignia">5</span></a>
+    <a data-ir="productos"><i class="i" data-i="tags"></i>Catálogo</a>
+    <a data-ir="stock"><i class="i" data-i="package"></i>Depósito</a>
+    <a data-ir="resumen"><i class="i" data-i="chart-column"></i>Negocio</a>
+    <a class="activo"><i class="i" data-i="menu"></i>Más</a>
+  </nav>
+  <span class="home-ind"></span>
+</div>
+<script>
+// La llave de Configuración se toca sin entrar: prende o apaga las animaciones ahí mismo.
+document.querySelector(".baldosa [data-llave]").addEventListener("click", function () { this.classList.toggle("si"); MAS.tostada(this.classList.contains("si") ? "Animaciones prendidas" : "Animaciones apagadas"); });
+</script>
+</body>
+</html>
