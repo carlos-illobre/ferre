@@ -14,3 +14,8 @@ pruebas de las pantallas quedan en pausa en el CI y se arreglan todas juntas al 
 - [ ] T009 Comparar cada pantalla con su v2 en capturas del celular y la computadora y mostrárselas a Carlos (depende de T007)
 - [ ] T010 Las pruebas: arreglar las unitarias de las pantallas y las de punta a punta, sacar la pausa del CI y correr todo (depende de T009)
 - [ ] T011 Revisión independiente (paso 7) (depende de T010)
+
+## Lo que la v2 trae y falta
+
+Lo que la v2 muestra y el sistema todavía no hace: el lugar quedó vacío o con «—» (E02). Una línea por cosa, con la pantalla.
+
