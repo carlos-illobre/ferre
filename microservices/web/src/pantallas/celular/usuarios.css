@@ -48,3 +48,6 @@
 .ua-boton.icono { width: 44px; padding: 0; display: grid; place-items: center; }
 .ua-menu { grid-column: 1 / -1; display: flex; gap: 8px; }
 .ua-menu .ua-boton { flex: 1; }
+
+/* «Roles y permisos», un botón dentro de Usuarios, como la v2 (decisión 148). */
+.negocio-roles { display: flex; justify-content: flex-end; margin-top: 8px; }

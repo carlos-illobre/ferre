@@ -81,7 +81,7 @@
 .dv-barras i { width: 8px; border-radius: 3px; background: var(--p-amarillo); opacity: .85; }
 .dv-barras i.vacia { background: var(--p-relleno-fuerte); opacity: 1; }
 
-.dv { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 16px; margin-top: 16px; height: calc(100dvh - 232px); min-height: 480px; }
+.dv { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 16px; margin-top: 16px; height: calc(100dvh - 232px - var(--cabeza-extra, 0px)); min-height: 480px; }
 .dv-bandeja { display: flex; flex-direction: column; min-height: 0; }
 .dv-chips { display: flex; gap: 8px; margin-bottom: 10px; }
 .dv-chip { height: 36px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font: inherit; font-size: 14px; font-weight: 650; white-space: nowrap; cursor: pointer; }

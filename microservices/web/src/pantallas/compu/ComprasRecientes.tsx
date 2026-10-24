@@ -38,7 +38,7 @@ export function ComprasRecientes() {
 
   const teclas = useCallback((e: globalThis.KeyboardEvent) => {
     if (document.querySelector("dialog[open]") || !e.altKey) return;
-    if (e.code === "KeyN" && registra) { e.preventDefault(); irA("compras"); }
+    if (e.code === "KeyN" && registra) { e.preventDefault(); irA("ingreso"); }
     else if (e.code === "KeyP" && encarga) { e.preventDefault(); irA("pedidos"); }
   }, [registra, encarga]);
   useTeclasGlobales(teclas);
@@ -48,7 +48,7 @@ export function ComprasRecientes() {
       <AlLadoDeLasPestanas>
         <div className="cv-acciones">
           {encarga && <Boton tam="chico" onClick={() => irA("pedidos")} data-testid="armar-pedido"><IconoDeDeposito nombre="send" tam={16} />{t.armarPedido.largo} <kbd className="tecla">Alt P</kbd></Boton>}
-          {registra && <Boton tam="chico" variante="principal" className="cv-registrar" onClick={() => irA("compras")} data-testid="registrar-compra"><IconoDeDeposito nombre="camera" tam={16} />{t.registrarCompra.largo} <kbd className="tecla">Alt N</kbd></Boton>}
+          {registra && <Boton tam="chico" variante="principal" className="cv-registrar" onClick={() => irA("ingreso")} data-testid="registrar-compra"><IconoDeDeposito nombre="camera" tam={16} />{t.registrarCompra.largo} <kbd className="tecla">Alt N</kbd></Boton>}
         </div>
       </AlLadoDeLasPestanas>
       <Aviso tipo="ok" testId="compra-anulada">{mensaje}</Aviso>
@@ -79,8 +79,8 @@ export function ComprasRecientes() {
               <div><h2 id="cv-foto-titulo">{t.sacaleFoto.largo}</h2><p className="detalle">{t.sacaleFotoDetalle.largo}</p></div>
             </div>
             <div className="cv-foto-botones">
-              <Boton tam="chico" disabled={!registra} onClick={() => irA("compras")}><IconoDeDeposito nombre="image" tam={16} />{t.elegirArchivo.largo}</Boton>
-              <Boton tam="chico" disabled={!registra} onClick={() => irA("compras")}><IconoDeDeposito nombre="keyboard" tam={16} />{t.cargarAMano.largo}</Boton>
+              <Boton tam="chico" disabled={!registra} onClick={() => irA("ingreso")}><IconoDeDeposito nombre="image" tam={16} />{t.elegirArchivo.largo}</Boton>
+              <Boton tam="chico" disabled={!registra} onClick={() => irA("ingreso")}><IconoDeDeposito nombre="keyboard" tam={16} />{t.cargarAMano.largo}</Boton>
             </div>
           </section>
           <section className="cv-tarjeta" aria-labelledby="cv-llegar" data-testid="por-llegar">
@@ -91,7 +91,7 @@ export function ComprasRecientes() {
                   <li key={p.id}>
                     <span className="cv-ico-chico"><IconoDeDeposito nombre="clipboard-list" tam={18} /></span>
                     <span className="cv-texto"><b>{p.proveedor}</b><span className={p.estado === "recibido_parcial" ? "cv-a-medias" : ""}>{p.estado === "recibido_parcial" ? `Llegó a medias · ${faltanDe(p) === 1 ? "falta 1" : `faltan ${faltanDe(p)}`}` : `Enviado${p.enviado_en ? ` el ${fecha(p.enviado_en).slice(0, 5)}` : ""} · ${plural(p.items.length, "renglón", "renglones")}`}</span></span>
-                    {registra && <Boton tam="chico" className="cv-llego" onClick={() => irA(`compras?pedido=${p.id}`)} data-testid="llego">{t.llego.largo}</Boton>}
+                    {registra && <Boton tam="chico" className="cv-llego" onClick={() => irA(`ingreso?pedido=${p.id}`)} data-testid="llego">{t.llego.largo}</Boton>}
                   </li>
                 ))}
               </ul>

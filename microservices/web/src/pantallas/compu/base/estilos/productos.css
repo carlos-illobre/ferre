@@ -16,7 +16,7 @@
 .productos-arriba .vmc-escanear { min-height: 38px; }
 
 .productos-v2 { padding-bottom: 12px; }
-.pv { display: grid; grid-template-columns: minmax(360px, 440px) minmax(0, 1fr); gap: 20px; align-items: stretch; height: calc(100dvh - 128px); min-height: 520px; }
+.pv { display: grid; grid-template-columns: minmax(360px, 440px) minmax(0, 1fr); gap: 20px; align-items: stretch; height: calc(100dvh - 128px - var(--cabeza-extra, 0px)); min-height: 520px; }
 .pv-lista { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
 .pv-lista .buscador { flex: none; }
 .pv-lista .buscador .buscador-caja { min-height: 48px; }

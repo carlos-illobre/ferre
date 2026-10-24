@@ -59,6 +59,13 @@ Cada una dice de dónde sale. Las que tienen ID están además en [spec.md](spec
   106 y 144). Un renglón dice «3 un. Mecha 8 mm» y, con el precio, «3 un. × $4.000».
 - Cuenta corriente va en rojo, con su fondo suave, en todas partes (decisión 144).
 
+- El marco es el de la v2 (decisiones 148 y 149): el menú Vender · Catálogo · Depósito · Negocio ·
+  Más, en el celular y en la computadora. Depósito tiene Stock · Compras · Contar (el Ingreso y los
+  Pedidos se abren desde Compras); Negocio, Resumen · Usuarios · Quién hizo qué (Roles es un botón
+  en Usuarios); Más, Anomalías, Procesos, Mejoras y errores, Configuración y Sistema. En la
+  computadora, el nombre de la parte va grande arriba de las pestañas, con las acciones de la
+  pantalla a su derecha.
+
 **Aprender y operar**
 
 - Se aprende sin manual: cada pantalla se explica sola y su estado vacío dice qué hacer

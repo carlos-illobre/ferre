@@ -29,7 +29,7 @@ import { Deposito } from "./Deposito";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { Negocio, type Parte } from "./Negocio";
 import { TicketsCelu } from "./pantallas/Tickets";
-import { CabezaDeUsuarios } from "./Usuarios";
+import { CabezaDeNegocio } from "./Usuarios";
 import { PESTANAS_DE_USUARIOS, PIDE_USUARIOS } from "../pestanas-de-usuarios";
 import { Sistema } from "../Sistema";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "../pestanas-de-negocio";
@@ -57,10 +57,13 @@ export function App() {
 
 // El mismo menú que en la computadora, en el mismo orden: primero lo que más se hace.
 // Cada parte dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
-const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "mas"; nombre: string; pide?: Permiso[] }[] = [
-  { ruta: "catalogo", nombre: "Catálogo" },
+// Como la v2 (decisión 148): Vender · Catálogo · Depósito · Negocio · Más. Negocio no tiene dirección
+// propia: sus pantallas siguen en mas/… (las direcciones de siempre) y se ven con Negocio marcado.
+const PESTANAS: { ruta: "catalogo" | "vender" | "deposito" | "negocio" | "mas"; nombre: string; pide?: Permiso[] }[] = [
   { ruta: "vender", nombre: "Vender", pide: ["ventas.registrar", "ventas.ver", "ventas.anular", "ventas.anular_cualquiera"] },
+  { ruta: "catalogo", nombre: "Catálogo" },
   { ruta: "deposito", nombre: "Depósito" },
+  { ruta: "negocio", nombre: NOMBRES.negocio, pide: [...PIDE_EL_NEGOCIO, ...PIDE_USUARIOS] },
   { ruta: "mas", nombre: "Más" },
 ];
 export const DE_MAS: { parte: Exclude<Parte, "actividad"> | "negocio" | "tickets" | "anomalias" | "configuracion" | "sistema" | "procesos"; nombre: string; detalle: string; icono: NombreDeIcono; pide?: Permiso[] }[] = [
@@ -153,7 +156,8 @@ function Pantallas() {
   const usuario = sesion.usuario;
   const permitido = (pide?: Permiso[]) => puede(usuario, ...(pide ?? []));
   const pestanas = PESTANAS.filter((p) => permitido(p.pide));
-  const deMas = DE_MAS.filter((d) => permitido(d.pide));
+  // En Más quedan las opciones que no pasaron a Negocio.
+  const deMas = DE_MAS.filter((d) => d.parte !== "negocio" && d.parte !== "usuarios" && permitido(d.pide));
   // Sin dirección, la app abre en lo primero del menú. Las direcciones viejas de Negocio siguen andando.
   const sinDireccion = location.hash.replace(/^#\/?/, "") === "";
   const nombre = sinDireccion ? "catalogo" : ruta.nombre === "negocio" ? "mas" : ruta.nombre;
@@ -169,7 +173,10 @@ function Pantallas() {
   const primeraDeAnomalias = PESTANAS_DE_ANOMALIAS.find((p) => permitido(p.pide))?.valor ?? "anomalias";
   const elegida = deUsuarios ? DE_MAS.find((d) => d.parte === "usuarios")! : deNegocio ? DE_MAS.find((d) => d.parte === "negocio")! : deAnomalias ? DE_MAS.find((d) => d.parte === "anomalias")! : DE_MAS.find((d) => d.parte === ruta.sub) ?? null;
   const parte = elegida?.parte ?? null;
-  const pestana = PESTANAS.find((p) => p.ruta === nombre)?.ruta ?? "catalogo";
+  const pestana = PESTANAS.find((p) => p.ruta === nombre && p.ruta !== "negocio")?.ruta ?? "catalogo";
+  // Negocio: Cómo va el negocio, Usuarios (con Roles) y Quién hizo qué.
+  const enNegocio = pestana === "mas" && Boolean(deUsuarios || deNegocio);
+  const primeraDeLaParteNegocio = permitido(PIDE_EL_NEGOCIO) ? primeraDeNegocio : primeraDeUsuarios;
   // Lo que pide la pantalla a la que se llegó; si no se tiene, se dice en vez de mostrarla.
   const falta = !permitido(PESTANAS.find((p) => p.ruta === pestana)?.pide) ? PESTANAS.find((p) => p.ruta === pestana)!.pide!
     : pestana === "mas" && elegida && !permitido(elegida.pide) ? elegida.pide!
@@ -177,6 +184,7 @@ function Pantallas() {
     : pestana === "mas" && deNegocio && !permitido(deNegocio.pide) ? deNegocio.pide
     : pestana === "mas" && deAnomalias && !permitido(deAnomalias.pide) ? deAnomalias.pide : null;
 
+  const activa = (r: string) => (r === "negocio" ? enNegocio : r === pestana && !(r === "mas" && enNegocio));
   return (
     <div className="app">
       {/* La línea de arriba (decisión 76): cómo está la conexión, siempre a la vista, y lo que
@@ -210,7 +218,7 @@ function Pantallas() {
       )}
       {escaneando && <Escaner alDetectar={alLeerCodigo} alCerrar={() => setEscaneando(false)} />}
       {errorDeCodigo && pestana !== "mas" && <p className="aviso-suave vincular-error" role="alert" data-testid="codigo-no-reconocido">{errorDeCodigo}</p>}
-      {pestana === "mas" && parte && (
+      {pestana === "mas" && parte && !enNegocio && (
         <div className="volver-a-mas">
           <button type="button" onClick={() => irA("mas")} data-testid="volver-a-mas">
             <Icono nombre="izquierda" tam={18} grosor={2.4} />
@@ -223,8 +231,8 @@ function Pantallas() {
         : pestana === "mas" && parte === "configuracion" ? <ConfiguracionCelu />
         : pestana === "mas" && parte === "sistema" ? <Sistema celular />
         : pestana === "mas" && parte === "procesos" ? <PantallaDeProcesos interfaz="celu" />
-        : pestana === "mas" && deUsuarios?.valor === "roles" ? <Roles cabeza={<CabezaDeUsuarios actual="roles" />} />
-        : pestana === "mas" && deUsuarios ? <Negocio parte={deUsuarios.valor as Exclude<typeof deUsuarios.valor, "roles">} cabeza={<CabezaDeUsuarios actual={deUsuarios.valor} />} />
+        : pestana === "mas" && deUsuarios?.valor === "roles" ? <Roles cabeza={<CabezaDeNegocio actual="roles" />} />
+        : pestana === "mas" && deUsuarios ? <Negocio parte={deUsuarios.valor as Exclude<typeof deUsuarios.valor, "roles">} cabeza={<CabezaDeNegocio actual={deUsuarios.valor} />} />
         : pestana === "mas" && deAnomalias?.valor === "para-revisar" ? <ParaRevisarCelu cabeza={<CabezaDeAnomalias actual="para-revisar" />} />
         : pestana === "mas" && parte === "anomalias" ? <AnotadasCelu cabeza={<CabezaDeAnomalias actual="anomalias" />} />
         : pestana === "mas" && deNegocio ? <ComoVaElNegocio seccion={deNegocio.valor} />
@@ -268,8 +276,8 @@ function Pantallas() {
 
       <nav className="nav-inferior solo-celular" aria-label="Menú">
         {pestanas.map((p) => (
-          <button key={p.ruta} type="button" data-testid={`menu-${p.ruta}`} className={pestana === p.ruta ? "activo" : ""} onClick={() => irA(p.ruta)} aria-current={pestana === p.ruta ? "page" : undefined}>
-            <Icono nombre={`menu-${p.ruta}`} tam={26} grosor={pestana === p.ruta ? 2.2 : 1.8} />
+          <button key={p.ruta} type="button" data-testid={`menu-${p.ruta}`} className={activa(p.ruta) ? "activo" : ""} onClick={() => irA(p.ruta === "negocio" ? `mas/${primeraDeLaParteNegocio}` : p.ruta)} aria-current={activa(p.ruta) ? "page" : undefined}>
+            <Icono nombre={`menu-${p.ruta}`} tam={26} grosor={activa(p.ruta) ? 2.2 : 1.8} />
             <span>{p.nombre}</span>
             {p.ruta === "vender" && enLaVenta > 0 && <b className="cuenta-menu" aria-label={`${enLaVenta} en la venta`} data-testid="cuenta-venta">{enLaVenta}</b>}
           </button>

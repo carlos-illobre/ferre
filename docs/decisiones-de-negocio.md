@@ -1224,3 +1224,18 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
        pruebas las arma al final una sola sesión, todas juntas. Mientras tanto las pruebas de las
        pantallas no corren en el CI (como en la decisión 25), para que cada subida se siga
        desplegando en el ambiente de pruebas.
+149. **El marco como la v2: Negocio en el menú y Depósito con Stock · Compras · Contar** (2026-10-24).
+     Al rediseñar todo como la v2 (decisión 148), Carlos eligió también el marco de la v2 (cambia
+     las decisiones 67, 68, 88 y 95 en lo que dicen de dónde está cada cosa):
+     - El menú, en el celular y en la computadora: Vender · Catálogo · Depósito · Negocio · Más, con
+       los íconos de la v2 (la etiqueta, las barras y los tres puntos).
+     - Negocio es una parte con Resumen · Usuarios · Quién hizo qué. Las secciones de Cómo va el
+       negocio (Ventas, Compras, Inventario) son segmentos de Resumen; Roles es un botón dentro de
+       Usuarios. Más queda con Anomalías, Procesos, Mejoras y errores, Configuración y Sistema.
+     - Depósito: Stock · Compras · Contar. Compras es el escritorio de las compras (las recientes, lo
+       que está por llegar, la foto de la factura) y desde ahí se abren el Ingreso (Alt N) y los
+       Pedidos (Alt P), que se ven con «Compras» marcada. Quien solo recibe mercadería entra a
+       Compras directo al Ingreso.
+     - En la computadora, arriba de las pestañas, el nombre de la parte en grande, con las acciones
+       de la pantalla a su derecha; las teclas de las pestañas se ven al apretar Alt, como las del
+       menú. Siguen las excepciones de la decisión 148 (el logotipo de la v1, el menú que se achica).

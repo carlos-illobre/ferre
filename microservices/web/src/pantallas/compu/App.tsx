@@ -61,6 +61,7 @@ import "./tema.css";
 import "./base/estilos/menu.css";
 import { Isotipo, Logotipo } from "../Logotipo";
 import { LUGAR_AL_LADO_DE_LAS_PESTANAS } from "../AlLadoDeLasPestanas";
+import { NOMBRES as NOMBRES_DE_TEXTOS } from "../textos";
 
 // La interfaz de computadora (menú lateral, tablas, todo con teclado), con
 // la paleta de la v5 y el menú reducido a lo de todos los días: lo
@@ -90,17 +91,33 @@ const RUTAS_DE_NEGOCIO = new Set(DE_NEGOCIO.map((p) => p.ruta));
 // Anomalías también (014): «Para revisar» y «Anotadas».
 const DE_ANOMALIAS: Pestana[] = PESTANAS_DE_ANOMALIAS.map((p) => ({ ruta: p.valor, nombre: p.nombre, icono: p.icono, pide: p.pide }));
 const RUTAS_DE_ANOMALIAS = new Set(DE_ANOMALIAS.map((p) => p.ruta));
-const SIN_ATAJO = new Set([...RUTAS_DE_USUARIOS, ...RUTAS_DE_NEGOCIO, ...RUTAS_DE_ANOMALIAS]);
+const SIN_ATAJO = new Set([...RUTAS_DE_ANOMALIAS]);
+// Negocio, como la v2 (decisión 148, 021-T007): una parte del menú con Resumen · Usuarios · Quién hizo
+// qué. Las secciones de Resumen son segmentos de su pantalla; Roles, un botón dentro de Usuarios.
+const DE_LA_PARTE_NEGOCIO: Pestana[] = [
+  { ruta: "resumen", nombre: NOMBRES_DE_TEXTOS.resumen, icono: "resumen", pide: PIDE_EL_NEGOCIO },
+  { ruta: "usuarios", nombre: NOMBRES_DE_TEXTOS.usuarios, icono: "usuarios", pide: ["admin.usuarios", "admin.roles"] },
+  { ruta: "actividad", nombre: NOMBRES_DE_TEXTOS.quienHizoQue, icono: "actividad", pide: ["negocio.actividad"] },
+];
+// Pantallas sin pestaña propia: se ven con la pestaña de la que salen marcada (Compras abre el
+// Ingreso y los Pedidos, como la v2; Resumen sus secciones; Usuarios los roles).
+const PESTANA_DE: Record<string, string> = { gastos: "resumen", invertido: "resumen", roles: "usuarios", ingreso: "compras", pedidos: "compras" };
 const MENU: Parte[] = [
-  { clave: "catalogo", nombre: "Catálogo", icono: "catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
   { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }, { ruta: "hoy", icono: "ventas", nombre: "Ventas del día", pide: ["ventas.ver", "ventas.anular", "ventas.anular_cualquiera"] }] },
-  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Inventario" }, { ruta: "compras", icono: "compras", nombre: "Ingreso", pide: ["deposito.ingresos"] }, { ruta: "contar", icono: "contar", nombre: "Estanterías", pide: ["deposito.stock"] }, { ruta: "pedidos", icono: "listas", nombre: "Pedidos", pide: ["deposito.pedidos", "deposito.ingresos"] }] },
-  // Usuarios (decisión 88) y Cómo va el negocio (decisión 95) son opciones de Más con pestañas: en el menú cuentan sus pestañas.
-  { clave: "mas", nombre: "Más", icono: "mas", pestanas: DE_MAS.flatMap((d) => (d.ruta === "usuarios" ? DE_USUARIOS : d.ruta === "resumen" ? DE_NEGOCIO : d.ruta === "anomalias" ? DE_ANOMALIAS : [{ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide }])) },
+  { clave: "catalogo", nombre: "Catálogo", icono: "menu-catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
+  // Depósito como la v2 (decisión 148): Stock · Compras · Contar; Compras abre el Ingreso y los Pedidos.
+  { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Stock" }, { ruta: "compras", icono: "compras", nombre: "Compras", pide: ["negocio.gastos", "deposito.compras", "deposito.ingresos", "deposito.pedidos"] }, { ruta: "contar", icono: "contar", nombre: "Contar", pide: ["deposito.stock"] }] },
+  { clave: "negocio", nombre: "Negocio", icono: "menu-negocio", pestanas: DE_LA_PARTE_NEGOCIO },
+  // Anomalías es una opción de Más con pestañas: en el menú cuentan sus pestañas.
+  { clave: "mas", nombre: "Más", icono: "menu-mas", pestanas: DE_MAS.flatMap((d) => (d.ruta === "anomalias" ? DE_ANOMALIAS : [{ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide }])) },
 ];
 // Pantallas que no están en el menú pero tienen dirección.
 // «anular» era la pestaña de anular, que ahora está en «Ventas de hoy» (decisión 120): lleva ahí.
-const FUERA_DEL_MENU: Pestana[] = [{ ruta: "mas", nombre: "Más", icono: "mas" }, { ruta: "anular", nombre: "Ventas del día", icono: "ventas" }];
+const FUERA_DEL_MENU: Pestana[] = [
+  { ruta: "mas", nombre: "Más", icono: "mas" }, { ruta: "anular", nombre: "Ventas del día", icono: "ventas" },
+  ...DE_NEGOCIO.filter((p) => p.ruta !== "resumen"), { ruta: "roles", nombre: NOMBRES_DE_TEXTOS.rolesYPermisos, icono: "roles", pide: ["admin.roles"] },
+  { ruta: "ingreso", nombre: "Ingreso", icono: "compras", pide: ["deposito.ingresos"] }, { ruta: "pedidos", nombre: "Pedidos", icono: "listas", pide: ["deposito.pedidos", "deposito.ingresos"] },
+];
 // La cantidad de productos en la venta, en el menú: salta cuando suma, como la maqueta (decisión 134).
 function CuentaDeLaVenta({ n }: { n: number }) {
   const ref = useRef<HTMLElement>(null);
@@ -143,7 +160,7 @@ const NOMBRES = new Map<string, string>(TODAS.map((p) => [p.ruta, p.nombre]));
 // Las partes con el nombre que comparten el celular y la computadora en espejo (decisión 60).
 const A_PARTE_COMUN: Record<string, string> = {
   productos: "catalogo", listas: "catalogo/listas", duplicados: "catalogo/duplicados", vender: "vender", hoy: "vender/hoy",
-  pedidos: "deposito/pedidos", compras: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
+  pedidos: "deposito/pedidos", compras: "deposito/compras", ingreso: "deposito/ingreso", stock: "deposito/stock", contar: "deposito/contar",
   mas: "mas", resumen: "mas/negocio", gastos: "mas/gastos", invertido: "mas/invertido", usuarios: "mas/usuarios", roles: "mas/roles", actividad: "mas/actividad", anomalias: "mas/anomalias", "para-revisar": "mas/para-revisar", tickets: "mas/tickets", configuracion: "mas/configuracion", sistema: "mas/sistema", procesos: "mas/procesos",
 };
 const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos", "vender/anular": "hoy" };
@@ -179,10 +196,12 @@ function Pantallas() {
   const deAnomalias = useMemo(() => DE_ANOMALIAS.filter((p) => puede(usuario, ...(p.pide ?? []))), [usuario]);
   // Lo que hay para revisar, para mostrar la cantidad en su pestaña (014).
   const paraRevisar = useParaRevisar(puede(usuario, "admin.usuarios")).datos?.apartados.length ?? 0;
-  const conAtajo = useMemo(() => menu.flatMap((m) => m.pestanas.map((p) => p.ruta)).filter((r) => !SIN_ATAJO.has(r) || r === deUsuarios[0]?.ruta || r === deNegocio[0]?.ruta || r === deAnomalias[0]?.ruta), [menu, deUsuarios, deNegocio, deAnomalias]);
+  const conAtajo = useMemo(() => menu.flatMap((m) => m.pestanas.map((p) => p.ruta)).filter((r) => !SIN_ATAJO.has(r) || r === deAnomalias[0]?.ruta), [menu, deAnomalias]);
+  // Adónde lleva cada pestaña: Resumen, a la primera sección que se ve (decisión 95).
+  const destinoDe = (r: string) => (r === "resumen" ? deNegocio[0]?.ruta ?? "resumen" : r);
   const atajoDe = (r: string) => { const i = conAtajo.indexOf(r); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
   const actual = sinDireccion || !NOMBRES.has(ruta.nombre) ? "productos" : ruta.nombre === "anular" ? "hoy" : ruta.nombre;
-  const pideActual = RUTAS_DE_NEGOCIO.has(actual) && !puede(usuario, ...PIDE_EL_NEGOCIO) ? PIDE_EL_NEGOCIO : TODAS.find((p) => p.ruta === actual)?.pide;
+  const pideActual = RUTAS_DE_NEGOCIO.has(actual) ? (puede(usuario, ...PIDE_EL_NEGOCIO) ? DE_NEGOCIO.find((p) => p.ruta === actual)?.pide : PIDE_EL_NEGOCIO) : TODAS.find((p) => p.ruta === actual)?.pide;
   // Sin ninguno de los permisos de Cómo va el negocio se nombran todos, como en el celular (012-E05).
   const falta = usuario && !puede(usuario, ...(pideActual ?? [])) ? pideActual! : null;
   // En espejo con el celular (decisión 60): los dos están en la misma parte. Las direcciones
@@ -388,12 +407,15 @@ function Pantallas() {
   // pidió la computadora.
   if (ruta.nombre === "foto" && codigoVinculacion) return <FotoParaLaCompu codigo={codigoVinculacion} />;
 
-  const parte = MENU.find((m) => m.pestanas.some((p) => p.ruta === actual))?.clave ?? "mas";
+  const deLaPestana = PESTANA_DE[actual] ?? actual;
+  const parte = MENU.find((m) => m.pestanas.some((p) => p.ruta === deLaPestana))?.clave ?? "mas";
   // Vender, Catálogo y Depósito tienen pestañas; con una sola a la vista no se dibujan.
   // En Más, solo Usuarios y Cómo va el negocio tienen pestañas.
-  const deLaParte = RUTAS_DE_USUARIOS.has(actual) ? deUsuarios : RUTAS_DE_NEGOCIO.has(actual) ? deNegocio : RUTAS_DE_ANOMALIAS.has(actual) ? deAnomalias : parte === "mas" ? null : (menu.find((m) => m.clave === parte)?.pestanas ?? null);
+  const deLaParte = RUTAS_DE_ANOMALIAS.has(actual) ? deAnomalias : parte === "mas" ? null : (menu.find((m) => m.clave === parte)?.pestanas ?? null);
+  // El título de la parte, grande arriba de las pestañas, como la v2 (decisión 148).
+  const titulo = parte !== "mas" ? MENU.find((m) => m.clave === parte)!.nombre : RUTAS_DE_ANOMALIAS.has(actual) ? "Anomalías" : null;
   const pestanas = deLaParte && deLaParte.length > 1 ? deLaParte : null;
-  const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? []))).map((d) => (d.ruta === "usuarios" ? { ...d, destino: deUsuarios[0]?.ruta ?? "usuarios" } : d.ruta === "resumen" ? { ...d, destino: deNegocio[0]?.ruta ?? "resumen" } : d.ruta === "anomalias" ? { ...d, destino: deAnomalias[0]?.ruta ?? "anomalias" } : d));
+  const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? []))).map((d) => (d.ruta === "anomalias" ? { ...d, destino: deAnomalias[0]?.ruta ?? "anomalias" } : d));
   const prueba = esAmbienteDePrueba();
 
   return (
@@ -409,7 +431,7 @@ function Pantallas() {
         </div>
         <nav aria-label="Menú">
           {menu.map((m) => {
-            const destino = m.clave === "mas" ? "mas" : m.pestanas[0]!.ruta;
+            const destino = m.clave === "mas" ? "mas" : destinoDe(m.pestanas[0]!.ruta);
             return (
               <button key={m.clave} type="button" aria-current={parte === m.clave ? "page" : undefined} aria-keyshortcuts={atajoDe(destino) ? `Alt+${atajoDe(destino)}` : undefined} onClick={() => irA(destino)} data-testid={`menu-${m.clave}`} aria-label={plegado ? m.nombre : undefined} title={plegado ? m.nombre : undefined}>
                 <Icono nombre={m.icono} tam={20} grosor={parte === m.clave ? 2.3 : 1.9} /><span className="txt">{m.nombre}</span>
@@ -427,31 +449,35 @@ function Pantallas() {
           <CuentaDelUsuario nombre={sesion.usuario.nombre} rol={sesion.usuario.roles?.join(", ") ?? ""} detalle={`${sesion.usuario.email} · versión ${import.meta.env.VITE_VERSION ?? "local"}`} alSalir={salir} />
         </div>
       </aside>
-      <div className={`cuerpo ${pestanas ? "con-pestanas" : ""}`}>
-        {pestanas && (
+      <div className={`cuerpo ${pestanas ? "con-pestanas" : ""} ${titulo ? "con-titulo" : ""}`}>
+        {(pestanas || titulo) && (
           <div className="pestanas-fila">
-          <nav className="pestanas" aria-label={NOMBRES.get(actual)} onKeyDown={teclasDeLasPestanas}>
+          {titulo && <div className="parte-cabeza"><h1 className="parte-titulo" data-testid="titulo-de-la-parte">{titulo}</h1>
+            {/* La acción de la pantalla, a la derecha del título, como la v2 (pedido de Carlos del 2026-10-15; decisión 148). */}
+            <div className="pestanas-acciones" id={LUGAR_AL_LADO_DE_LAS_PESTANAS} /></div>}
+          {pestanas && <nav className="pestanas" aria-label={NOMBRES.get(actual)} onKeyDown={teclasDeLasPestanas}>
             {pestanas.map((p) => (
-              <button key={p.ruta} type="button" aria-current={actual === p.ruta ? "page" : undefined} aria-keyshortcuts={atajoDe(p.ruta) && !SIN_ATAJO.has(p.ruta) ? `Alt+${atajoDe(p.ruta)}` : undefined} data-testid={`pestana-${p.ruta}`}
+              <button key={p.ruta} type="button" aria-current={deLaPestana === p.ruta ? "page" : undefined} aria-keyshortcuts={atajoDe(p.ruta) && !SIN_ATAJO.has(p.ruta) ? `Alt+${atajoDe(p.ruta)}` : undefined} data-testid={`pestana-${p.ruta}`}
                 // Al abrirla (con un clic o con Enter), la marca de las flechas queda en esta pestaña: la pantalla nueva no se la lleva.
-                onClick={() => { irA(p.ruta); dejarElFocoEn(() => document.querySelector<HTMLButtonElement>(`[data-testid="pestana-${p.ruta}"]`)); }}>
-                <Icono nombre={p.icono} tam={20} grosor={actual === p.ruta ? 2.3 : 2} />{p.nombre}{p.ruta === "para-revisar" && paraRevisar > 0 && <span className="cuenta-pestana" data-testid="cuenta-para-revisar" aria-label={`${paraRevisar} para revisar`}>{paraRevisar}</span>}{atajoDe(p.ruta) && !SIN_ATAJO.has(p.ruta) && <span className="tecla" aria-hidden="true">Alt+{atajoDe(p.ruta)}</span>}
+                onClick={() => { irA(destinoDe(p.ruta)); dejarElFocoEn(() => document.querySelector<HTMLButtonElement>(`[data-testid="pestana-${p.ruta}"]`)); }}>
+                <Icono nombre={p.icono} tam={20} grosor={deLaPestana === p.ruta ? 2.3 : 2} />{p.nombre}{p.ruta === "para-revisar" && paraRevisar > 0 && <span className="cuenta-pestana" data-testid="cuenta-para-revisar" aria-label={`${paraRevisar} para revisar`}>{paraRevisar}</span>}{atajoDe(p.ruta) && !SIN_ATAJO.has(p.ruta) && <span className="tecla" aria-hidden="true">Alt+{atajoDe(p.ruta)}</span>}
               </button>
             ))}
-          </nav>
-          {/* La acción de la pantalla, a la derecha de las pestañas (pedido de Carlos del 2026-10-15). */}
-          <div className="pestanas-acciones" id={LUGAR_AL_LADO_DE_LAS_PESTANAS} />
+          </nav>}
+          {!titulo && <div className="pestanas-acciones" id={LUGAR_AL_LADO_DE_LAS_PESTANAS} />}
           </div>
         )}
         {falta ? <SinPermiso falta={falta} />
           : actual === "mas" ? <Mas atajoDe={atajoDe} opciones={deMas} />
           : actual === "roles" ? <Roles />
-          : actual === "pedidos" ? <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`compras?pedido=${id}`)} /></main>
-          : actual === "hoy" ? <Hoy /> : actual === "productos" ? <Productos /> : actual === "compras" ? <Ingreso />
+          : actual === "pedidos" ? <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`ingreso?pedido=${id}`)} /></main>
+          : actual === "hoy" ? <Hoy /> : actual === "productos" ? <Productos /> : actual === "ingreso" ? <Ingreso />
+          // Compras, como la v2: el escritorio de las compras; quien solo recibe mercadería va directo al ingreso.
+          : actual === "compras" ? (puede(usuario, "negocio.gastos", "deposito.compras") ? <main id="contenido" className="pagina pagina-compras" tabIndex={-1}><ComprasRecientes /></main> : <Ingreso />)
           : actual === "stock" ? <Inventario /> : actual === "listas" ? <Listas /> : actual === "duplicados" ? <Duplicados />
           : actual === "contar" ? <Contar /> : actual === "resumen" ? <ResumenVentas />
           : actual === "gastos" ? <ResumenCompras recientes={(vuelta) => <ComprasRecientes key={`recientes-${vuelta}`} />} />
-          : actual === "invertido" ? <ResumenInventario invertido={(vuelta) => <DineroInvertido key={vuelta} />} /> : actual === "usuarios" ? <Usuarios />
+          : actual === "invertido" ? <ResumenInventario invertido={(vuelta) => <DineroInvertido key={vuelta} />} /> : actual === "usuarios" ? (puede(usuario, "admin.usuarios") ? <Usuarios /> : <Roles />)
           : actual === "actividad" ? <Actividad /> : actual === "tickets" ? <Tickets /> : actual === "configuracion" ? <Configuracion /> : actual === "sistema" ? <Sistema /> : actual === "procesos" ? <PantallaDeProcesos interfaz="compu" /> : actual === "anomalias" ? <Anotadas titulo={!pestanas} /> : actual === "para-revisar" ? <ParaRevisar titulo={!pestanas} /> : <Vender />}
       </div>
     </div>

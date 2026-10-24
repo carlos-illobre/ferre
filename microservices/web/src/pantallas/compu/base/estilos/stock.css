@@ -38,7 +38,7 @@ button.sv-resumen[aria-pressed="true"] { box-shadow: 0 0 0 3px rgb(23 49 43 / .1
 .sv-candado { position: absolute; top: 12px; right: 12px; color: var(--p-texto-2); }
 
 /* Las dos columnas. */
-.sv-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) 432px; gap: 20px; height: calc(100dvh - 230px); min-height: 480px; }
+.sv-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) 432px; gap: 20px; height: calc(100dvh - 230px - var(--cabeza-extra, 0px)); min-height: 480px; }
 .sv-izq { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
 .sv-izq .buscador { flex: none; gap: 10px; }
 .sv-izq .buscador .buscador-caja input { min-height: 48px; border-width: 1px; border-radius: 12px; }

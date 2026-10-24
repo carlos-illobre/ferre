@@ -26,6 +26,10 @@ export const MOTIVOS_DE_AJUSTE = ["Conté la estantería", "Rotura", "Se usó en
 // Cómo se llama cada pantalla y cada parte, igual en el menú, en el título y en las dos interfaces.
 export const NOMBRES = {
   comoVaElNegocio: "Cómo va el negocio",
+  // La parte Negocio del menú, como la v2 (decisión 148): Resumen · Usuarios · Quién hizo qué.
+  negocio: "Negocio",
+  resumen: "Resumen",
+  rolesYPermisos: "Roles y permisos",
   usuarios: "Usuarios",
   quienHizoQue: "Quién hizo qué",
   actividad: "Actividad",

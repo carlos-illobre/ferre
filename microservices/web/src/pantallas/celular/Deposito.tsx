@@ -17,6 +17,7 @@ import { cantidadValida, conUnidad, enteras, unidadDe } from "../../unidades";
 import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Lista } from "./componentes/base";
 import { Pestanas } from "./Pestanas";
 import { Stock } from "./Stock";
+import { ComprasRecientes } from "./ComprasRecientes";
 import { IconoDeDeposito } from "../IconoDeDeposito";
 import { TEXTOS } from "../textos";
 import "./contar.css";
@@ -25,12 +26,13 @@ import type { Producto } from "./pantallas/Productos";
 
 // Depósito: inventario (cantidades, sin dinero), ingreso de mercadería y conteo por sector. Tres
 // sub-pantallas con un segmento arriba (rediseño en mockups/Ferre iOS.html).
-// Primero lo que más se hace: recibir mercadería; después mirar el stock y, cada tanto, contar.
-// El orden lo eligió Carlos (decisión 68).
-const SUB = [{ valor: "stock", nombre: "Inventario" }, { valor: "ingreso", nombre: "Ingreso" }, { valor: "contar", nombre: "Estanterías" }, { valor: "pedidos", nombre: "Pedidos" }] as const;
-type Sub = (typeof SUB)[number]["valor"];
-// Lo que pide cada pestaña (RF-72). El inventario lo ve cualquiera con sesión.
-const PIDE: Partial<Record<Sub, Permiso[]>> = { pedidos: ["deposito.pedidos", "deposito.ingresos"], ingreso: ["deposito.ingresos"], contar: ["deposito.stock"] };
+// Como la v2 (decisión 148): Stock · Compras · Contar. Compras abre el Ingreso y los Pedidos, que no
+// tienen pestaña: se ven con «Compras» marcada.
+const SUB = [{ valor: "stock", nombre: "Stock" }, { valor: "compras", nombre: "Compras" }, { valor: "contar", nombre: "Contar" }] as const;
+type Sub = (typeof SUB)[number]["valor"] | "ingreso" | "pedidos";
+// Lo que pide cada pantalla (RF-72). El stock lo ve cualquiera con sesión.
+const PIDE: Partial<Record<Sub, Permiso[]>> = { compras: ["negocio.gastos", "deposito.compras", "deposito.ingresos", "deposito.pedidos"], pedidos: ["deposito.pedidos", "deposito.ingresos"], ingreso: ["deposito.ingresos"], contar: ["deposito.stock"] };
+const TODAS: Sub[] = ["stock", "compras", "contar", "ingreso", "pedidos"];
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 
 export function Deposito({ sub }: { sub: string | null }) {
@@ -38,15 +40,17 @@ export function Deposito({ sub }: { sub: string | null }) {
   const permitida = (s: Sub) => puedeEsto(...(PIDE[s] ?? []));
   // Al entrar a Depósito desde el menú se abre siempre la primera pestaña que la persona puede
   // usar (decisión 56); las demás se eligen arriba.
-  const actual: Sub = SUB.find((s) => s.valor === sub)?.valor ?? SUB.find((s) => permitida(s.valor))?.valor ?? "stock";
+  const actual: Sub = TODAS.find((s) => s === sub) ?? SUB.find((s) => permitida(s.valor))?.valor ?? "stock";
+  const pestana = actual === "ingreso" || actual === "pedidos" ? "compras" : actual;
   if (!permitida(actual)) return <SinPermiso falta={PIDE[actual]!} />;
   return (
     <main className="contenido">
       <div className="encabezado">
         <h1 className="titulo">Depósito</h1>
-        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor === "ingreso" ? "compras" : s.valor === "pedidos" ? "listas" : s.valor }))} actual={actual} alElegir={(v) => irA(`deposito/${v}`)} />
+        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor }))} actual={pestana} alElegir={(v) => irA(`deposito/${v}`)} />
       </div>
-      {actual === "pedidos" ? <Pedidos celular alIngresar={(id) => irA(`deposito/ingreso?pedido=${id}`)} /> : actual === "stock" ? <Stock /> : actual === "ingreso" ? <Ingreso /> : <Contar />}
+      {actual === "pedidos" ? <Pedidos celular alIngresar={(id) => irA(`deposito/ingreso?pedido=${id}`)} /> : actual === "stock" ? <Stock /> : actual === "ingreso" ? <Ingreso />
+        : actual === "compras" ? (puedeEsto("negocio.gastos", "deposito.compras") ? <ComprasRecientes /> : <Ingreso />) : <Contar />}
     </main>
   );
 }

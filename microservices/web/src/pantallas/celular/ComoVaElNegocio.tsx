@@ -8,7 +8,7 @@ import { MEDIOS } from "../../negocio/ventas/venta";
 import { useConsultas, useVentasDelDia } from "../../negocio/ventas/ventas-del-dia";
 import { usePuede } from "../permisos";
 import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
-import { NOMBRES } from "../textos";
+import { CabezaDeNegocio } from "./Usuarios";
 import { DineroInvertido } from "../DineroInvertido";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
@@ -40,7 +40,7 @@ export function ComoVaElNegocio({ seccion }: { seccion: SeccionDeNegocio }) {
   return (
     <main className="contenido rc" data-testid={`negocio-${seccion}`}>
       <div className="encabezado">
-        <h1 className="titulo">{NOMBRES.comoVaElNegocio}</h1>
+        <CabezaDeNegocio actual="resumen" />
         <p className="solo-lectores" data-testid="bajada-de-pestana">{actual.bajada.corto}</p>
       </div>
       {visibles.length > 1 && (

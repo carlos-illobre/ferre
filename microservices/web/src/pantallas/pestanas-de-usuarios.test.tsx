@@ -10,7 +10,7 @@ import { conPermisos, conTodosLosPermisos } from "../pruebas/sesion";
 import { PESTANAS_DE_USUARIOS } from "./pestanas-de-usuarios";
 import { DE_MAS as DE_MAS_COMPU, Mas } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
-import { CabezaDeUsuarios } from "./celular/Usuarios";
+import { CabezaDeNegocio } from "./celular/Usuarios";
 import { Usuarios } from "./compu/base/pantallas/Usuarios";
 
 // Más → Usuarios (decisión 88): una sola opción con cuatro pestañas, igual en las dos interfaces.
@@ -52,7 +52,7 @@ describe("Más → Usuarios", () => {
 
   it("en el celular se ven solo las pestañas que el rol permite, y tocar una lleva a su dirección", () => {
     conPermisos("admin.roles", "negocio.actividad");
-    render(<CabezaDeUsuarios actual="actividad" />);
+    render(<CabezaDeNegocio actual="actividad" />);
     expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Roles", "Actividad"]);
     fireEvent.click(screen.getByRole("tab", { name: "Roles" }));
     expect(location.hash).toBe("#/mas/roles");
@@ -60,7 +60,7 @@ describe("Más → Usuarios", () => {
 
   it("en el celular, con una sola pestaña a la vista no se dibujan pestañas", () => {
     conPermisos("admin.roles");
-    render(<CabezaDeUsuarios actual="roles" />);
+    render(<CabezaDeNegocio actual="roles" />);
     expect(screen.getByRole("heading", { name: "Usuarios" })).toBeTruthy();
     expect(screen.queryAllByRole("tab")).toHaveLength(0);
   });

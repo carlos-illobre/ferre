@@ -73,7 +73,7 @@ body:has(.vmc-pagina), .cuerpo:has(.vmc-pagina) { background: #F4F2EC; }
 .vmc-fila2 .vender-a-mano input { height: 30px; }
 
 /* El panel de la derecha. */
-.vmc-panel { position: sticky; top: var(--e4); display: flex; flex-direction: column; max-height: calc(100dvh - 210px); background: #fff; border: 1px solid var(--m-borde); border-radius: 16px; overflow: hidden; }
+.vmc-panel { position: sticky; top: var(--e4); display: flex; flex-direction: column; max-height: calc(100dvh - 210px - var(--cabeza-extra, 0px)); background: #fff; border: 1px solid var(--m-borde); border-radius: 16px; overflow: hidden; }
 .vmc-panel-cab { display: flex; align-items: center; gap: 4px; padding: 8px 8px 0; border-bottom: 1px solid var(--m-borde); }
 .vmc-panel-cab [role="tab"] { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 10px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; color: var(--m-texto-2); font-weight: 650; font-size: 0.875rem; }
 .vmc-panel-cab [role="tab"][aria-selected="true"] { color: var(--m-pino); border-bottom-color: var(--m-pino); font-weight: 800; }
@@ -240,7 +240,7 @@ body:has(.vmc-pagina), .cuerpo:has(.vmc-pagina) { background: #F4F2EC; }
 .vmc-item .contador option:hover, .vmc-item .contador option:focus-visible { background: #ECE9E1; outline: 0; }
 .vmc-item .contador option:checked { background: #E3EEE8; color: #12382F; font-weight: 800; }
 /* El panel de la derecha llega hasta la barra del cobro, como la maqueta (decisión 133). */
-.vmc-panel { height: calc(100dvh - 196px); max-height: none; }
+.vmc-panel { height: calc(100dvh - 196px - var(--cabeza-extra, 0px)); max-height: none; }
 .vmc-panel-cuerpo { flex: 1; }
 /* El aviso de «Quitaste…» / «Vaciaste…», como la maqueta (decisión 133). */
 .vmc-aviso { display: flex; align-items: center; gap: 12px; min-width: 0; max-width: 560px; padding: 10px 10px 10px 16px; border-radius: 14px; background: #12382F; color: #fff; font-size: 16px; font-weight: 700; box-shadow: 0 12px 32px rgb(26 29 27 / .25); z-index: 20; }

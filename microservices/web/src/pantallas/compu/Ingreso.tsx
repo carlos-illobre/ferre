@@ -104,7 +104,7 @@ export function Ingreso() {
     if (!registro) return;
     setExito({ total: registro.total, proveedor: registro.proveedor, detalle: detalleDelRegistro(registro) });
     setIntento(false); setDescartado(null);
-    if (registro.dePedido) irA("compras");
+    if (registro.dePedido) irA("ingreso");
   }
 
   function descartar() { setDescartado(ingreso.descartar()); setIntento(false); caja.current?.focus(); }

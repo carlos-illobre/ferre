@@ -12,7 +12,7 @@
 .lv-arriba .boton { min-height: 38px; border-radius: 12px; }
 
 .listas-v2 { padding-bottom: 12px; }
-.lv { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: stretch; height: calc(100dvh - 128px); min-height: 560px; }
+.lv { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: stretch; height: calc(100dvh - 128px - var(--cabeza-extra, 0px)); min-height: 560px; }
 .lv-izq { display: flex; flex-direction: column; gap: 16px; min-height: 0; overflow-y: auto; padding: 2px 4px 4px 2px; }
 .lv-izq h2 { font: inherit; }
 .lv-cab { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
