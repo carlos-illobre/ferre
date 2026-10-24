@@ -6,6 +6,8 @@
 
 **Status**: Aprobada (Carlos, 2026-10-23)
 
+**Maquetas**: Aprobada la variante A (tramos, se guarda al tocar), Carlos, 2026-10-24: `maquetas/celular-variante-a.png` y `maquetas/compu-variante-a.png`.
+
 **Input**: Carlos, el 2026-10-23, para que la base no pase los 30 MB diarios de datos que salen
 (specs/018, RNF-62): «sí, agregalo, pero quiero que esos tiempos puedan ser configurables desde
 una pantalla de administración por un usuario administrador, y que esos valores sean los mismos
@@ -34,6 +36,7 @@ dispositivo, sino que el administrador lo decide para todos».
 - Q: ¿Quién puede cambiarlos? → A: Quien tenga un permiso nuevo, «Administrar el sistema», que se asigna a un rol en Roles.
 - Q: ¿Entre qué valores se elige cuánto recuerda la sesión el servidor? → A: De 0 a 10 minutos; arranca en 1 minuto. Con 0 no la recuerda, como hoy.
 - Q: ¿Entre qué valores se elige cada cuánto pregunta el celular emparejado? → A: De 5 segundos a 10 minutos; arranca en 1 minuto.
+- Q: ¿Se escribe cualquier valor o se elige entre tramos? → A: Entre tramos, como «Buscar versión nueva», y se guarda al tocar (variante A, Carlos, 2026-10-24). La sesión: no recordarla, 30 segundos, 1, 5 o 10 minutos. El celular: 5 o 30 segundos, 1, 5 o 10 minutos; los mismos en el celular y la computadora.
 - Q: ¿Quién arranca con «Administrar el sistema»? → A: Los roles que tienen «Administrar usuarios» al actualizarse; y nunca puede quedar el sistema sin nadie con ese permiso (Carlos, al aprobar).
 
 ## User Scenarios & Testing *(mandatory)*
@@ -93,8 +96,8 @@ celular emparejado, sin tocar nada, pasa a preguntar cada 2 minutos.
 
 1. **E12** **Given** quien tiene «Administrar el sistema», **When** abre Más, **Then** está la pestaña «Sistema» con tres renglones: «Cuánto recuerda la sesión el servidor», «Cada cuánto pregunta el celular emparejado» y «Cuántos días dura el vínculo», cada uno con su valor y una línea que dice qué cambia.
 2. **E13** **Given** quien no tiene ese permiso, **When** abre Más, **Then** la pestaña no está; si pide los ajustes o intenta cambiarlos igual, el servidor lo rechaza diciendo qué permiso hace falta.
-3. **E14** **Given** la pestaña abierta, **When** se elige un valor y se guarda, **Then** queda guardado para todos y registrado en «Quién hizo qué» con quién lo cambió, el valor anterior y el nuevo.
-4. **E15** **Given** un valor fuera de rango (la sesión, de 0 a 10 minutos; el celular, de 5 segundos a 10 minutos; el vínculo, de 1 a 365 días), **When** se intenta guardar, **Then** no se guarda y dice entre qué valores puede ir; lo mismo si llega así al servidor por otro camino.
+3. **E14** **Given** la pestaña abierta, **When** se toca un tramo (o se cambian los días del vínculo), **Then** se guarda en ese momento, sin otro botón; queda guardado para todos y registrado en «Quién hizo qué» con quién lo cambió, el valor anterior y el nuevo.
+4. **E15** **Given** un valor que no es uno de los tramos (la sesión: no, 30 s, 1, 5 o 10 min; el celular: 5 s, 30 s, 1, 5 o 10 min) o unos días del vínculo fuera de 1 a 365, **When** llega al servidor por cualquier camino, **Then** no se guarda y dice qué valores puede tener. En la pantalla los tiempos solo se eligen entre los tramos, y los días que se escriben fuera de rango no se guardan y dicen «de 1 a 365».
 5. **E16** **Given** un tiempo cambiado, **When** pasa como mucho un minuto, **Then** lo usan el servidor y todos los dispositivos abiertos, sin que nadie vuelva a entrar.
 6. **E17** **Given** cualquier persona, **When** abre su Configuración, **Then** no hay ningún renglón para cambiar estos tiempos en su dispositivo.
 7. **E18** **Given** nadie cambió nada, **When** se usa la aplicación, **Then** la sesión se recuerda 1 minuto, el celular pregunta cada 1 minuto y el vínculo dura los días que dura hoy.
@@ -119,14 +122,14 @@ celular emparejado, sin tocar nada, pasa a preguntar cada 2 minutos.
 ### Functional Requirements
 
 - **RF-133**: El servidor recuerda cada sesión válida, con la persona y sus permisos, durante el
-  tiempo que fija quien administra (de 0 a 10 minutos; 1 de arranque; 0 es no recordarla), y en
+  tiempo que fija quien administra (no recordarla, 30 segundos, 1, 5 o 10 minutos; 1 minuto de arranque), y en
   ese tiempo no la vuelve a buscar en la base. Lo que cambia una sesión o sus permisos desde la
   aplicación vale en el pedido siguiente; una sesión vencida nunca pasa; lo que no es una sesión
   no se recuerda.
 - **RF-134**: El celular emparejado se entera de los pedidos de la computadora en el momento, por
   la conexión entre los dos. Además pregunta al empezar, al volver a la aplicación, al volver la
-  conexión y cada el tiempo que fija quien administra (de 5 segundos a 10 minutos; 1 minuto de
-  arranque).
+  conexión y cada el tiempo que fija quien administra (5 o 30 segundos, 1, 5 o 10 minutos; 1
+  minuto de arranque).
 - **RF-135**: Los ajustes que valen para todos los dispositivos (los dos tiempos de RF-133 y
   RF-134, y los días del vínculo, specs/007) se fijan en Más → Sistema, en el celular y en la
   computadora, solo con el permiso «Administrar el sistema». Cada cambio queda en «Quién hizo

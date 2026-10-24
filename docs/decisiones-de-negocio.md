@@ -1203,3 +1203,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      para el suyo. Van en una pestaña nueva, Más → Sistema, con los días del vínculo; con un
      permiso nuevo, «Administrar el sistema»; la sesión de 0 a 10 minutos y el celular de 5
      segundos a 10 minutos, los dos en 1 minuto de arranque (specs/020).
+147. **Más → Sistema: los tiempos se eligen entre tramos y se guardan al tocar** (2026-10-24).
+     Carlos eligió la variante A de la maqueta, como «Buscar versión nueva». La sesión: no
+     recordarla, 30 segundos, 1, 5 o 10 minutos; el celular emparejado: 5 o 30 segundos, 1, 5 o
+     10 minutos, los mismos tramos en el celular y la computadora. Los días del vínculo se
+     escriben, con − y +, de 1 a 365 (specs/020).

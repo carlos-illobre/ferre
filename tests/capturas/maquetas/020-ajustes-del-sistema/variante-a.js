@@ -43,5 +43,33 @@ const tramos = (lista, elegido) => `<div class="cfg-tramos" role="radiogroup" st
 const dias = `<div class="cfg-numero"><button type="button" class="paso" aria-label="Un día menos">−</button><input inputmode="numeric" value="30" aria-label="Días"><button type="button" class="paso" aria-label="Un día más">+</button><span class="unidad">días</span><span class="rango">de 1 a 365</span></div>`;
 main.querySelector(".cfg-lista").innerHTML =
   fila("sesion", tramos(["No", "30 s", "1 min", "5 min", "10 min"], "1 min")) +
-  fila("celular", tramos(celu ? ["5 s", "30 s", "1 min", "5 min", "10 min"] : ["5 s", "15 s", "30 s", "1 min", "5 min", "10 min"], "1 min")) +
+  fila("celular", tramos(["5 s", "30 s", "1 min", "5 min", "10 min"], "1 min")) +
   fila("vinculo", dias);
+
+// El estado que se quiere ver: ESTADO lo reemplaza quien arma cada captura.
+const estado = "ESTADO";
+const lista = main.querySelector(".cfg-lista");
+const nota = main.querySelector(".cfg-nota");
+const extra = document.createElement("style");
+extra.textContent = `.cfg-hecho { color: var(--p-verde-texto, #0f6b52); font-weight: 600; } .cfg-mal input { border-color: var(--p-error, #c0392b) !important; box-shadow: 0 0 0 1px var(--p-error, #c0392b); } .cfg-error { flex-basis: 100%; color: var(--p-error, #b3261e); font-weight: 600; } .cfg-tramos.apagados button { opacity: .5; cursor: not-allowed; } .cfg-sin-red { margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; background: var(--p-ambar-suave, #fdf1d6); color: var(--p-tinta, #18201e); font-weight: 600; }`;
+document.head.append(extra);
+if (estado === "guardado") {
+  const filas = lista.querySelectorAll(".cfg-tramos")[0].querySelectorAll("button");
+  filas.forEach((b) => b.classList.toggle("elegido", b.textContent === "5 min"));
+  nota.innerHTML = `<span class="cfg-hecho">✓ Guardado para todos: la sesión se recuerda 5 minutos.</span> ${celu ? "" : "Llega a los dispositivos abiertos en menos de un minuto."}`;
+}
+if (estado === "error") {
+  const n = lista.querySelector(".cfg-numero");
+  n.classList.add("cfg-mal");
+  n.querySelector("input").value = "400";
+  n.querySelector(".rango").remove();
+  n.insertAdjacentHTML("beforeend", `<span class="cfg-error" role="alert">Puede ir de 1 a 365 días. No se guardó: sigue en 30.</span>`);
+}
+if (estado === "sin-red") {
+  // El indicador de conexión dice lo mismo que el aviso.
+  const recorrido = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n = recorrido.nextNode(); n; n = recorrido.nextNode()) if (n.nodeValue.includes("En línea")) n.nodeValue = n.nodeValue.replace(/En línea[^]*$/, "Sin conexión");
+  lista.querySelectorAll(".cfg-tramos").forEach((t) => t.classList.add("apagados"));
+  lista.querySelectorAll(".cfg-numero input, .cfg-numero button").forEach((x) => x.setAttribute("disabled", ""));
+  lista.insertAdjacentHTML("beforebegin", `<p class="cfg-sin-red" role="status" style="max-width: ${lista.offsetWidth}px; margin-bottom: -6px">Sin conexión: para cambiar los ajustes del sistema hace falta internet. Se ve lo último que se guardó.</p>`);
+}
