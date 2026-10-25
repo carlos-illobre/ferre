@@ -15,7 +15,7 @@ export function CabezaDeLaVenta({ items, alNoLlevo, alVaciar }: { items: Item[];
       {faltan > 0 && <span className={`${css.cuenta} ${css.falta}`} data-testid="faltan-precios">Falta{faltan > 1 ? `n ${faltan} precios` : " 1 precio"}</span>}
       <span className="crece" />
       {items.length > 0 && <>
-        <Boton tam="chico" icono="prohibido" className={css.fantasma} onClick={alNoLlevo} aria-keyshortcuts="F4" data-testid="no-llevo">No llevó <kbd className="tecla">F4</kbd></Boton>
+        <Boton tam="chico" icono="prohibido" className={css.fantasma} onClick={alNoLlevo} accion="vender.no-llevo" kbd data-testid="no-llevo">No llevó{" "}</Boton>
         <Boton tam="chico" icono="basura" className={css.fantasma} onClick={alVaciar} data-testid="vaciar-venta">Vaciar</Boton>
       </>}
     </div>

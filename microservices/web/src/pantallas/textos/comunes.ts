@@ -1,11 +1,11 @@
 import type { Comprobante } from "../../negocio/deposito";
 
 export type Medio = "efectivo" | "mercado_pago" | "tarjeta" | "cuenta_corriente";
-export const MEDIOS: { valor: Medio; nombre: string; corto: string; tecla: string }[] = [
-  { valor: "efectivo", nombre: "Efectivo", corto: "Efectivo", tecla: "F5" },
-  { valor: "mercado_pago", nombre: "Mercado Pago", corto: "M. Pago", tecla: "F6" },
-  { valor: "tarjeta", nombre: "Tarjeta", corto: "Tarjeta", tecla: "F7" },
-  { valor: "cuenta_corriente", nombre: "Cuenta corriente", corto: "Cta. cte.", tecla: "F8" },
+export const MEDIOS: { valor: Medio; nombre: string; corto: string }[] = [
+  { valor: "efectivo", nombre: "Efectivo", corto: "Efectivo" },
+  { valor: "mercado_pago", nombre: "Mercado Pago", corto: "M. Pago" },
+  { valor: "tarjeta", nombre: "Tarjeta", corto: "Tarjeta" },
+  { valor: "cuenta_corriente", nombre: "Cuenta corriente", corto: "Cta. cte." },
 ];
 export type { Comprobante };
 export const COMPROBANTES: { valor: Comprobante; nombre: string; corto: string }[] = [

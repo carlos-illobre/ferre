@@ -26,8 +26,8 @@ export function DetalleDeLaVenta({ venta: v, anula, alCorregir, alAnular }: Prop
       <div className="tot"><span>{t.columnaTotal.largo}</span><b className={`importe ${anulada ? "tachado" : ""}`}>{pesosCortos(v.total)}</b></div>
       {anulada ? <Aviso tipo="alerta">{t.anuladaDetalle.largo}</Aviso> : anula && (
         <div className="acciones">
-          <Boton icono="editar" onClick={alCorregir} aria-keyshortcuts="E" data-testid="corregir">{t.corregir.largo} <kbd className="tecla">E</kbd></Boton>
-          <Boton variante="peligro" icono="prohibido" onClick={alAnular} aria-keyshortcuts="Delete" data-testid="anular">{t.anular.largo} <kbd className="tecla">Supr</kbd></Boton>
+          <Boton icono="editar" onClick={alCorregir} accion="hoy.corregir" kbd data-testid="corregir">{t.corregir.largo}{" "}</Boton>
+          <Boton variante="peligro" icono="prohibido" onClick={alAnular} accion="hoy.anular" kbd data-testid="anular">{t.anular.largo}{" "}</Boton>
         </div>
       )}
       <div className="rastro"><Icono nombre="reloj" tam={16} />{correcciones > 0 ? `Corregida ${correcciones === 1 ? "una vez" : `${correcciones} veces`}` : t.sinCorrecciones.largo}</div>

@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useComandos, type Acciones } from "../../../plataforma/comandos";
 import { useCatalogo } from "../../../negocio/catalogo";
 import { alApretarEnter, useBusquedaDeVenta, useCelularQueEscanea, useQuitarConDeshacer } from "../../../negocio/ventas";
-import { teclearCon, useTablaDeTeclas, useTeclasGlobales } from "../../../plataforma/teclado";
 import { MEDIOS, TEXTOS } from "../../textos";
-import { flechasDeLaBusqueda } from "../../comun/ventas/teclas-de-la-busqueda";
 import { useSugeridos } from "../../sugeridos";
 import { useCamaraDeLaVenta } from "./useCamaraDeLaVenta";
 import { useVentaDelCelular } from "./useVentaDelCelular";
@@ -24,14 +23,17 @@ export function useVender() {
   const celular = useCelularQueEscanea(venta.agregarPorCodigo);
   const camara = useCamaraDeLaVenta(catalogo.catalogo, venta.agregarPorCodigo, () => setBuscando(true));
   useMostrarLoRecien(camara.recien, venta.items);
-  const flechas = flechasDeLaBusqueda(busqueda.resultados.length > 0, busqueda.mover);
   const alEnter = () => alApretarEnter(busqueda.consulta, busqueda.resultados, busqueda.elegido, { producto: venta.elegirSugerencia, codigo: venta.agregarPorCodigo, libre: (t) => venta.agregar(null, t) });
-  const alTeclear = (e: React.KeyboardEvent<HTMLInputElement>) => teclearCon({ ...flechas, Enter: alEnter }, e);
-  useTablaDeTeclas({ ...Object.fromEntries(MEDIOS.map((m) => [m.tecla, () => venta.elegirMedio(m.valor)])), F2: () => void venta.cobrar() });
-  useTeclasGlobales(useCallback((e: KeyboardEvent) => { if (document.activeElement !== caja.current) teclearCon(flechas, e); }, [flechas]), caja.current);
+  // Elegir uno de lo encontrado; sin resultados a la vista no es para eso.
+  const mover = (paso: 1 | -1) => () => (busqueda.resultados.length > 0 ? busqueda.mover(paso) : false);
+  useComandos({
+    ...Object.fromEntries(MEDIOS.map((m) => [`vender.medio.${m.valor}`, () => venta.elegirMedio(m.valor)])), "vender.cobrar": () => void venta.cobrar(),
+    "vender.busqueda.siguiente": mover(1), "vender.busqueda.anterior": mover(-1),
+  });
+  const enLaCaja: Acciones = { "lista.siguiente": mover(1), "lista.anterior": mover(-1), "lista.elegir": alEnter };
   const { ultimos } = useSugeridos(catalogo.catalogo, venta.items.length === 0);
   const renglon = venta.items.find((i) => i.clave === renglonAbierto) ?? null;
-  return { catalogo, busqueda, caja, buscando, setBuscando, cerrarBusqueda, hoja, setHoja, renglon, setRenglonAbierto, venta, deshacer, celular, camara, alTeclear, ultimos };
+  return { catalogo, busqueda, caja, buscando, setBuscando, cerrarBusqueda, hoja, setHoja, renglon, setRenglonAbierto, venta, deshacer, celular, camara, enLaCaja, ultimos };
 }
 export type EstadoDeVender = ReturnType<typeof useVender>;
 

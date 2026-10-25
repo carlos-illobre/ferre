@@ -14,7 +14,7 @@ export function BuscarProducto({ v }: { v: EstadoDeVender }) {
   return (
     <Hoja alCerrar={v.cerrarBusqueda} testId="hoja-buscar" clase={css.hoja}>
       <div className={css.cab}>
-        <Buscador valor={busqueda.consulta} alCambiar={busqueda.setConsulta} placeholder="Producto, código o marca" onKeyDown={v.alTeclear} cajaRef={v.caja} autoFoco />
+        <Buscador valor={busqueda.consulta} alCambiar={busqueda.setConsulta} placeholder="Producto, código o marca" acciones={v.enLaCaja} cajaRef={v.caja} autoFoco />
         <button type="button" className={css.cancelar} onClick={v.cerrarBusqueda} data-testid="cancelar-busqueda">Cancelar</button>
       </div>
       <AvisoError texto={catalogo.error} />

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { pesosCortos } from "../../../negocio/formato";
 import type { Cliente } from "../../../negocio/catalogo";
-import { teclearCon } from "../../../plataforma/teclado";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
 import { TEXTOS } from "../../textos";
 import { Boton, Hoja, Pastilla, Vacio } from "../base/ui";
 
@@ -26,13 +26,14 @@ function BuscarCliente({ clientes, elegido, alElegir }: { clientes: Cliente[]; e
   const f = filtro.trim().toLowerCase();
   const visibles = clientes.filter((c) => !f || c.nombre.toLowerCase().includes(f));
   useEffect(() => { setMarcado(0); }, [filtro]);
-  const teclas = {
-    ArrowDown: () => setMarcado((i) => Math.min(i + 1, visibles.length - 1)), ArrowUp: () => setMarcado((i) => Math.max(i - 1, 0)),
-    Enter: () => (visibles[marcado] ? alElegir(visibles[marcado]!.id) : false),
-  };
+  const caja = useRef<HTMLInputElement>(null);
+  useAccionesDelLugar(caja, {
+    "lista.siguiente": () => setMarcado((i) => Math.min(i + 1, visibles.length - 1)), "lista.anterior": () => setMarcado((i) => Math.max(i - 1, 0)),
+    "lista.elegir": () => (visibles[marcado] ? alElegir(visibles[marcado]!.id) : false),
+  });
   return (
     <>
-      <input className="entrada" type="search" autoFocus value={filtro} onChange={(e) => setFiltro(e.target.value)} placeholder="Escribí el nombre del cliente" aria-label="Buscar cliente por nombre" autoComplete="off" data-testid="buscar-cliente" onKeyDown={(e) => teclearCon(teclas, e)} />
+      <input ref={caja} className="entrada" type="search" autoFocus value={filtro} onChange={(e) => setFiltro(e.target.value)} placeholder="Escribí el nombre del cliente" aria-label="Buscar cliente por nombre" autoComplete="off" data-testid="buscar-cliente" />
       {visibles.length === 0 && <p className="detalle">Ningún cliente con «{filtro}». Probá con menos letras.</p>}
       <ul className="lista">
         {visibles.map((c, i) => (

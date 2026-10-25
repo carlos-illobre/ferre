@@ -18,7 +18,7 @@ Cada etapa se sube con todas las pruebas en verde y sin cambiar nada a la vista 
 - [ ] T012 Teclado aparte de las pantallas (decisión 159, ADR-029): las pantallas ofrecen acciones con nombre y el teclado, en `src/teclado/`, tiene las tablas de qué tecla pide cada una; nada fuera del teclado sabe de teclas (depende de T016 a T020)
 - [x] T016 La base del teclado: el registro de acciones (`plataforma/comandos/`), el motor y lo que no depende de la pantalla (flechas, Alt + letra, foco del menú) en `src/teclado/`, instalado desde `app/`, y la regla de capas (depende de T011)
 - [x] T017 `ui/` y el marco de cada interfaz, sin código de teclas: ofrecen sus acciones y muestran la etiqueta de la tecla que les dé el teclado (depende de T016)
-- [ ] T018 Ventas sin código de teclas (depende de T017)
+- [x] T018 Ventas sin código de teclas (depende de T017)
 - [ ] T019 Catálogo sin código de teclas (depende de T017)
 - [ ] T020 Depósito, compras, negocio, anomalías, mejoras y errores, configuración, sistema y el manual sin código de teclas (depende de T017)
 - [ ] T013 Cierre: la lista de excepciones vacía, ADR-018 y `001/ux.md` al día con las carpetas, y la documentación de `tests/capturas/` (depende de T012)

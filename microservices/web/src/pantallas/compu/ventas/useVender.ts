@@ -6,8 +6,7 @@ import { useEntrada } from "./useEntrada";
 import { usePanel } from "./usePanel";
 import { useQuitarConAnimacion } from "./useQuitarConAnimacion";
 import { useRenglonElegido } from "./useRenglonElegido";
-import { flechasDeLaBusqueda } from "../../comun/ventas/teclas-de-la-busqueda";
-import { teclasDeLaCaja, useFlechasFueraDeLaCaja, useTeclasDeVender } from "./useTeclasDeVender";
+import { accionesDeLaCaja, useAccionesDeVender } from "./useAccionesDeVender";
 import { useVentaDeLaCompu } from "./useVentaDeLaCompu";
 
 // Todo lo que usa Vender en la computadora, armado con las piezas del negocio.
@@ -28,14 +27,13 @@ export function useVender() {
     producto: (p) => conEntrada(() => venta.elegirSugerencia(p)), codigo: (c) => conEntrada(() => venta.agregarPorCodigo(c)),
     libre: (t) => conEntrada(() => venta.agregar(null, t)), vacia: () => void venta.cobrar(),
   });
-  const activas = !venta.cobro && !eligiendoCliente;
-  const flechas = flechasDeLaBusqueda(busqueda.resultados.length > 0, busqueda.mover);
-  useFlechasFueraDeLaCaja(flechas, caja, activas);
-  useTeclasDeVender({
-    activas, caja, consulta: busqueda.consulta, items: venta.items, renglon: elegido.renglon, elegirMedio: venta.elegirMedio, cobrar: venta.cobrar,
+  const deVender = {
+    activas: !venta.cobro && !eligiendoCliente, caja, consulta: busqueda.consulta, items: venta.items, renglon: elegido.renglon,
+    hayResultados: busqueda.resultados.length > 0, mover: busqueda.mover, elegirMedio: venta.elegirMedio, cobrar: venta.cobrar,
     alternarPanel: panel.alternar, elegirCliente: () => setEligiendoCliente(true), noLlevo: venta.noLlevo, cambiarItem: venta.cambiarItem, quitar: quitar.quitar,
-  });
-  const alTeclear = teclasDeLaCaja(flechas, alEnter, busqueda.consulta, () => busqueda.setConsulta(""));
-  return { catalogo, busqueda, caja, lista, venta, entrada, conEntrada, celular, quitar, elegido, panel, alTeclear, eligiendoCliente, setEligiendoCliente };
+  };
+  useAccionesDeVender(deVender);
+  const enLaCaja = accionesDeLaCaja(deVender, alEnter, () => busqueda.setConsulta(""));
+  return { catalogo, busqueda, caja, lista, venta, entrada, conEntrada, celular, quitar, elegido, panel, enLaCaja, eligiendoCliente, setEligiendoCliente };
 }
 export type EstadoDeVender = ReturnType<typeof useVender>;

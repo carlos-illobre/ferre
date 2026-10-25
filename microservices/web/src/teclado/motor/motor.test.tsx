@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
 import { olvidarLasOfertas, useComandos, type Acciones } from "../../plataforma/comandos";
-import { teclaDe } from "./tecla";
+import { nombresDe, teclaDe } from "./tecla";
 import { teclear, type Linea } from "./tabla";
 
 const evento = (p: Partial<KeyboardEventInit> & { code?: string }, objetivo: HTMLElement = document.body) => {
@@ -18,6 +18,11 @@ describe("el nombre de una tecla", () => {
     expect(teclaDe(evento({ code: "F2", key: "F2" }))).toBe("F2");
     expect(teclaDe(evento({ code: "Equal", key: "+", shiftKey: true }))).toBe("+");
     expect(teclaDe(evento({ code: "KeyB", key: "b", ctrlKey: true }))).toBe("Ctrl+B");
+  });
+
+  it("también por lo que escribe: la «/» de un teclado en español es Mayús+7", () => {
+    expect(nombresDe(evento({ code: "Digit7", key: "/", shiftKey: true }))).toEqual(["Mayús+7", "/"]);
+    expect(nombresDe(evento({ code: "KeyF", key: "f" }))).toEqual(["F"]);
   });
 });
 

@@ -16,7 +16,7 @@ export function CabezaDelDia({ l }: { l: ListaDelDia }) {
     <AlLadoDeLasPestanas><div className="fila">
       <span className={css.fecha} data-testid="dia-que-se-mira">{mayuscula(nombreDelDia(r.dia))}{r.esHoy ? ` · ${t.hasta.largo.toLowerCase()} ${hora(new Date().toISOString())}` : ""}</span>
       {!r.esHoy && <button type="button" className="enlace" onClick={() => l.setDia(null)} data-testid="volver-a-hoy">{t.volverAHoy.largo}</button>}
-      <Boton icono="calendario" onClick={() => l.setOtroDia(true)} aria-keyshortcuts="F" data-testid="cambiar-fecha">{t.otroDia.largo} <kbd className="tecla">F</kbd></Boton>
+      <Boton icono="calendario" onClick={() => l.setOtroDia(true)} accion="hoy.otro-dia" kbd data-testid="cambiar-fecha">{t.otroDia.largo}{" "}</Boton>
     </div></AlLadoDeLasPestanas>
   );
 }

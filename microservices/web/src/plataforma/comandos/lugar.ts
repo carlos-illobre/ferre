@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef } from "react";
 import type { Acciones } from "./registro";
 
 // Acciones de un lugar de la pantalla (una cantidad, un renglón, una búsqueda): valen con el foco
@@ -6,7 +6,7 @@ import type { Acciones } from "./registro";
 // suyas sin pisarse con los otros.
 const lugares = new WeakMap<Element, () => Acciones>();
 
-export function useAccionesDelLugar(lugar: RefObject<Element>, acciones: Acciones): void {
+export function useAccionesDelLugar(lugar: { readonly current: Element | null }, acciones: Acciones): void {
   const actuales = useRef(acciones);
   actuales.current = acciones;
   useEffect(() => {

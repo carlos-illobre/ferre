@@ -13,5 +13,13 @@ export function teclaDe(e: Evento): string {
   return [...modificadores(e, conMayus), base].filter(Boolean).join("+");
 }
 
+// Los nombres con que se puede buscar una tecla: el de la tecla física («Mayús+7») y el de lo que
+// escribe («/»), que en otro teclado sale de otra tecla.
+export function nombresDe(e: Evento): string[] {
+  const fisico = teclaDe(e);
+  const escrito = e.key.length === 1 ? [...modificadores(e, false), e.key.toUpperCase()].filter(Boolean).join("+") : fisico;
+  return escrito === fisico ? [fisico] : [fisico, escrito];
+}
+
 export const esCampo = (el: EventTarget | null): boolean =>
   el instanceof HTMLElement && (el.isContentEditable || ["INPUT", "SELECT", "TEXTAREA"].includes(el.tagName));

@@ -3,7 +3,8 @@ import { pesosCortos } from "../../../negocio/formato";
 import { useCorrigiendo, type Correccion, type VentaDelDia } from "../../../negocio/ventas";
 import { TEXTOS } from "../../textos";
 import { signo } from "../../comun/ventas/textos-del-dia";
-import { Aviso, Boton, Icono, Pastilla } from "../base/ui";
+import { Atajo, Aviso, Boton, Icono, Pastilla } from "../base/ui";
+import { useEtiqueta } from "../../../plataforma/comandos";
 import { AgregarProducto } from "./AgregarProducto";
 import { ComoSeResuelve } from "./ComoSeResuelve";
 import { ElegirCliente } from "./ElegirCliente";
@@ -25,6 +26,7 @@ export function CorrigiendoLaVenta({ venta: v, c, l }: { venta: VentaDelDia; c: 
   const { setHojaAbierta } = l;
   useEffect(() => { setHojaAbierta(eligiendoCliente); }, [eligiendoCliente, setHojaAbierta]);
   l.guardarRef.current = () => { void g.guardar(); };
+  const teclas = { descartar: useEtiqueta("hoy.descartar"), guardar: useEtiqueta("hoy.guardar") };
   return (
     <div className="corregir" data-testid="corrigiendo">
       <ul className="renglones">
@@ -38,9 +40,9 @@ export function CorrigiendoLaVenta({ venta: v, c, l }: { venta: VentaDelDia; c: 
       <ComoSeResuelve k={k} />
       <Aviso tipo="error">{g.error}</Aviso>
       <div className="acciones">
-        <Boton className={css.fantasma} onClick={l.descartar} aria-keyshortcuts="Escape" title="Esc" data-testid="descartar">{t.descartar.largo}</Boton>
-        <Boton variante="principal" disabled={g.guardando} aria-disabled={Boolean(k.falta)} className={k.falta ? "apagado" : ""} onClick={() => void g.guardar()} aria-keyshortcuts="Control+Enter" data-testid="guardar-correccion">
-          {g.guardando ? "Guardando…" : <>{t.guardarCorreccion.corto}{k.diferencia ? ` · ${signo(k.diferencia)}` : ""} <kbd className="tecla">Ctrl Enter</kbd></>}
+        <Boton className={css.fantasma} onClick={l.descartar} aria-keyshortcuts={teclas.descartar} title={teclas.descartar} data-testid="descartar">{t.descartar.largo}</Boton>
+        <Boton variante="principal" disabled={g.guardando} aria-disabled={Boolean(k.falta)} className={k.falta ? "apagado" : ""} onClick={() => void g.guardar()} aria-keyshortcuts={teclas.guardar} data-testid="guardar-correccion">
+          {g.guardando ? "Guardando…" : <>{t.guardarCorreccion.corto}{k.diferencia ? ` · ${signo(k.diferencia)}` : ""} <Atajo accion="hoy.guardar" kbd /></>}
         </Boton>
       </div>
       {eligiendoCliente && <ElegirCliente clientes={k.clientes} elegido={c.clienteId ?? ""} alCerrar={() => setEligiendoCliente(false)} alElegir={(id) => { k.elegirCliente(id); setEligiendoCliente(false); }} />}

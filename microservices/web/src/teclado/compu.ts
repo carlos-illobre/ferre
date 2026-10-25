@@ -7,6 +7,7 @@ import { instalarFlechaAlMenu } from "./compu/flecha-al-menu";
 import { instalarGrillaDeMas } from "./compu/grilla-de-mas";
 import { instalarMenuYPestanas } from "./compu/menu-y-pestanas";
 import { TABLA_DE_LA_COMPU } from "./tablas/compu";
+import { etiquetar } from "../plataforma/comandos";
 
 const ZONAS = ".lateral, .pestanas";
 
@@ -31,5 +32,7 @@ export function instalarTecladoDeLaCompu(): void {
   zonasConTeclasPropias(ZONAS);
   instalarTabla(TABLA_DE_LA_COMPU, ZONAS);
   instalarFlechas(DISPOSICION);
+  // Las flechas por las filas no son una acción de la pantalla: sus etiquetas, para las ayudas.
+  etiquetar({ "filas.siguiente": "↓", "filas.anterior": "↑" });
   instalarAtajos({ alFinal: ".lateral" });
 }

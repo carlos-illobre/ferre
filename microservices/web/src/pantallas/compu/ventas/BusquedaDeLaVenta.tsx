@@ -11,7 +11,7 @@ export function BusquedaDeLaVenta({ v }: { v: EstadoDeVender }) {
   return (
     <div className={css.fila}>
       <div className={css.caja}>
-        <Buscador valor={busqueda.consulta} alCambiar={busqueda.setConsulta} cajaRef={v.caja} autoFoco onKeyDown={v.alTeclear}
+        <Buscador valor={busqueda.consulta} alCambiar={busqueda.setConsulta} cajaRef={v.caja} autoFoco acciones={v.enLaCaja}
           placeholder="Buscá por nombre o código, o escaneá" etiqueta="Buscar un producto para agregarlo a la venta"
           controla="vender-sugerencias" activo={marcado ? `sug-${marcado.id}` : undefined} />
         {busqueda.resultados.length > 0 && (

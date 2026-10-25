@@ -10,7 +10,7 @@ import { ListaYVentaElegida } from "./ListaYVentaElegida";
 import { OtroDia } from "./OtroDia";
 import { ResumenDelDia } from "./ResumenDelDia";
 import { useListaDelDia, type ListaDelDia } from "./useListaDelDia";
-import { useTeclasDelDia } from "./useTeclasDelDia";
+import { useAccionesDelDia } from "./useAccionesDelDia";
 import css from "./VentasDelDia.module.css";
 
 // «Ventas de hoy» en la computadora: la v2 del director de arte, «El día y la venta» (decisión 135,
@@ -23,7 +23,7 @@ const t = TEXTOS.hoy;
 export function VentasDelDia() {
   const l = useListaDelDia();
   const [campo, setCampo] = useState<HTMLInputElement | null>(null);
-  useTeclasDelDia(l, campo);
+  useAccionesDelDia(l, campo);
   const { r } = l;
   const error = errorDeLaLista(r);
   return (

@@ -1,11 +1,12 @@
+import { Atajo } from "../base/ui";
 import css from "./TeclasDeVender.module.css";
 
 // Las teclas que no están en ningún botón, con el aspecto de la v2.
 export function TeclasDeVender() {
   return (
     <p className={`${css.teclas} detalle`} data-testid="teclas">
-      <span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> eligen el renglón</span>
-      <span><kbd className="tecla">+</kbd><kbd className="tecla">−</kbd> cantidad</span><span><kbd className="tecla">Supr</kbd> quita</span><span><kbd className="tecla">F1</kbd> panel</span>
+      <span><Atajo accion="lista.elegir" kbd /> agrega</span><span><Atajo accion="filas.anterior" kbd /><Atajo accion="filas.siguiente" kbd /> eligen el renglón</span>
+      <span><Atajo accion="vender.renglon.sumar" kbd /><Atajo accion="vender.renglon.restar" kbd /> cantidad</span><span><Atajo accion="vender.renglon.quitar" kbd /> quita</span><span><Atajo accion="vender.panel" kbd /> panel</span>
     </p>
   );
 }

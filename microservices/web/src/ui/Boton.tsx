@@ -8,8 +8,12 @@ type VarianteBoton = "principal" | "marino" | "peligro" | "sobre-marino";
 const clasesDelBoton = (b: { variante?: VarianteBoton; tam?: string; ancho?: boolean; soloIcono: boolean; className?: string }) =>
   ["boton", b.variante, b.tam, b.ancho && "ancho", b.soloIcono && "solo-icono", b.className].filter(Boolean).join(" ");
 
-export function Boton({ children, variante, tam, icono, ancho, accion, className, ...resto }: {
-  children?: ReactNode; variante?: VarianteBoton; tam?: "chico" | "grande"; icono?: NombreDeIcono; ancho?: boolean; accion?: string; className?: string;
+// La tecla al lado del texto: como una tecla («Ctrl Enter») o como la marca chica de la computadora.
+const MarcaDeTecla = ({ tecla, kbd }: { tecla: string; kbd?: boolean }) =>
+  (kbd ? <kbd className="tecla">{tecla}</kbd> : <span className="tecla solo-compu" aria-hidden="true">{tecla}</span>);
+
+export function Boton({ children, variante, tam, icono, ancho, accion, kbd, className, ...resto }: {
+  children?: ReactNode; variante?: VarianteBoton; tam?: "chico" | "grande"; icono?: NombreDeIcono; ancho?: boolean; accion?: string; kbd?: boolean; className?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const tecla = useEtiqueta(accion ?? "");
   const clases = clasesDelBoton({ variante, tam, ancho, soloIcono: Boolean(icono) && (children === undefined || children === null), className });
@@ -17,7 +21,7 @@ export function Boton({ children, variante, tam, icono, ancho, accion, className
     <button type="button" className={clases} aria-keyshortcuts={tecla} {...resto}>
       {icono && <Icono nombre={icono} tam={tam === "chico" ? 16 : 20} />}
       {children}
-      {tecla && <span className="tecla solo-compu" aria-hidden="true">{tecla}</span>}
+      {tecla && <MarcaDeTecla tecla={tecla} kbd={kbd} />}
     </button>
   );
 }
