@@ -1,11 +1,10 @@
 import { hoyLocal } from "../../../negocio/formato";
 
 // «Quién hizo qué» en palabras, igual en el celular y en la computadora (decisión 47; la v2,
-// decisión 148): el nombre de cada acción con el ícono de su tipo, el detalle en una línea y
+// decisión 148): el nombre de cada acción con el ícono de su grupo, el detalle en una línea y
 // cada dato con su nombre legible.
 type Contenido = Record<string, unknown>;
-export { CATEGORIAS, TIPOS, queFue, type Que } from "./que-fue";
-export { detalleDe } from "./detalle-del-evento";
+export { CATEGORIAS, detalleDe, queFue, type Que } from "./que-fue";
 
 // El período del registro: hoy, ayer, esta semana o los días que se elijan (sin días, todo).
 export type { Periodo } from "../../../negocio/actividad";

@@ -9,7 +9,7 @@
 - [x] T007 Comercial: los eventos con sus palabras por el kit, las uniones de productos en su tabla, sin `/auditoria` ni la tabla de eventos (depende de T005)
 - [x] T008 Procesos: sus eventos por el kit (depende de T005)
 - [x] T009 La puerta reparte `/auditoria` a Auditoría; compose y CI (depende de T006)
-- [ ] T010 La web: cada acción con lo que trae; el filtro «qué» con los grupos; sin Auditoría, no disponible (E01, E04, E12) (depende de T006)
+- [x] T010 La web: cada acción con lo que trae; el filtro «qué» con los grupos; sin Auditoría, no disponible (E01, E04, E12) (depende de T006)
 - [ ] T011 Integración `tests/integration/auditoria.sh` y e2e en Docker (depende de T007–T010)
 - [ ] T012 Documentación y `proyecto/estado.yml` (depende de T011)
 - [ ] T013 Revisión independiente (paso 7) (depende de T012)

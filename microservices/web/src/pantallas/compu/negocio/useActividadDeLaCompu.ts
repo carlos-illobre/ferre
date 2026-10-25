@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAccionesDelLugar } from "../../../plataforma/comandos";
-import { AL_ABRIR_EL_REGISTRO, useActividad, type Evento, type FiltrosDelRegistro } from "../../../negocio/actividad";
+import { AL_ABRIR_EL_REGISTRO, conFiltros, useActividad, useGrupos, type Evento, type FiltrosDelRegistro } from "../../../negocio/actividad";
 import { useUsuarios } from "../../../negocio/usuarios";
 import { CATEGORIAS } from "../../comun/negocio/actividad-en-palabras";
 import { ventanaDelRegistro } from "../../comun/negocio/registro";
@@ -29,19 +29,17 @@ export function useActividadDeLaCompu() {
   useAccionesDelLugar(tabla, { "lista.siguiente": mover(1), "lista.anterior": mover(-1), "lista.elegir": () => (elegido ? setAbierto(elegido) : false) });
   return {
     enLinea: useEnLinea(), filtros, setFiltros, filtrar, pagina, setPagina, rango, setRango, registro, datos: registro.datos, cargando: registro.cargando,
-    error: registro.error ? textoDeError(registro.error, "No se pudo traer el registro") : null, usuarios: useUsuarios().datos ?? [], todas, porTipo,
+    error: registro.error ? textoDeError(registro.error, "No se pudo traer el registro") : null, usuarios: useUsuarios().datos ?? [], grupos: useGrupos(), todas, porTipo,
     eventos, elegido, setMarcado, abierto, setAbierto, tabla, conFiltros: conFiltros(filtros),
     quitarFiltros: () => { setFiltros(AL_ABRIR_EL_REGISTRO); setPagina(1); setRango(false); },
   };
 }
 export type ActividadDeLaCompu = ReturnType<typeof useActividadDeLaCompu>;
 
-const conFiltros = (f: FiltrosDelRegistro) => Boolean(f.usuario || f.tipo || f.periodo !== "hoy");
-
 // La página pedida y, para «Qué pasó», el total y el de cada tipo, con la persona elegida.
 function useRegistro(filtros: FiltrosDelRegistro, pagina: number) {
   const { usuario, desde, hasta } = ventanaDelRegistro(filtros);
-  const registro = useActividad({ pagina, usuario, tipo: filtros.tipo || undefined, desde, hasta });
+  const registro = useActividad({ pagina, usuario, grupo: filtros.grupo || undefined, tipo: filtros.tipo || undefined, desde, hasta });
   const todas = useActividad({ pagina: 1, usuario, desde, hasta }).datos?.total ?? null;
   const porTipo = CATEGORIAS.map((c) => useActividad({ pagina: 1, usuario, tipo: c.tipo, desde, hasta }).datos?.total ?? null); // eslint-disable-line react-hooks/rules-of-hooks
   return { registro, todas, porTipo };

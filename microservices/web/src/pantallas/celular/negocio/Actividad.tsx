@@ -1,5 +1,5 @@
-import { primerNombre, rangoDeLaPagina, type Evento, type Periodo } from "../../../negocio/actividad";
-import type { UsuarioFila } from "../../../negocio/usuarios";
+import { textoDeError } from "../../../negocio/del-servidor";
+import { conFiltros, nombreDe, primerNombre, rangoDeLaPagina, type Evento, type Periodo } from "../../../negocio/actividad";
 import { Iniciales } from "../../iconos-de-negocio";
 import { horaDe, queFue } from "../../comun/negocio/actividad-en-palabras";
 import { importeYDetalle } from "../../comun/negocio/registro";
@@ -24,21 +24,20 @@ export function Actividad() {
       <TresNumeros x={x} periodo={periodo} />
       <FiltrosDelCelular x={x} periodo={periodo} />
       <Cuenta x={x} />
-      <div className={css.lista}>{(datos?.eventos ?? []).map((e) => <EventoDelCelular key={e.id} e={e} usuarios={x.usuarios} alAbrir={() => x.setAbierto(e)} />)}</div>
+      <div className={css.lista}>{(datos?.eventos ?? []).map((e) => <EventoDelCelular key={e.id} e={e} alAbrir={() => x.setAbierto(e)} />)}</div>
       {datos && datos.total > 0 && <Paginador x={x} />}
-      {x.abierto && <HojaDelEventoDelCelular evento={x.abierto} usuarios={x.usuarios} alCerrar={() => x.setAbierto(null)} />}
+      {x.abierto && <HojaDelEventoDelCelular evento={x.abierto} alCerrar={() => x.setAbierto(null)} />}
     </div>
   );
 }
 
 // Cuántas acciones hay con los filtros puestos o, si no hay ninguna, por qué.
 function Cuenta({ x: { datos, error, filtros: f } }: { x: ActividadDelCelular }) {
-  if (!datos) return <div className={css.total} role="status" data-testid="cuenta"><span>{error ? "No se pudo traer el registro. Revisá internet." : "Trayendo el registro…"}</span></div>;
-  const conFiltros = Boolean(f.usuario || f.tipo || f.periodo !== "hoy");
+  if (!datos) return <div className={css.total} role="status" data-testid="cuenta"><span>{error ? textoDeError(error, "No se pudo traer el registro") : "Trayendo el registro…"}</span></div>;
   return (
     <>
       <div className={css.total} role="status" data-testid="cuenta"><b>{datos.total.toLocaleString("es-AR")} {datos.total === 1 ? "acción" : "acciones"}</b><span>la más nueva primero</span></div>
-      {datos.total === 0 && <div className="aviso-suave">{conFiltros ? "No hay acciones con esos filtros. Probá con otro día, otra persona u otro tipo." : "Hoy todavía no hay acciones. Apenas alguien venda, compre o cambie un precio, queda anotado acá."}</div>}
+      {datos.total === 0 && <div className="aviso-suave">{conFiltros(f) ? "No hay acciones con esos filtros. Probá con otro día, otra persona u otro tipo." : "Hoy todavía no hay acciones. Apenas alguien venda, compre o cambie un precio, queda anotado acá."}</div>}
     </>
   );
 }
@@ -49,19 +48,19 @@ function TresNumeros({ x, periodo }: { x: ActividadDelCelular; periodo: string }
   return (
     <div className={css.res}>
       <div className={css.num}><span>{periodo}</span><b>{x.todas ?? "—"}</b></div>
-      <button type="button" className={`${css.num} rojo ${soloAnuladas ? "puesto" : ""}`} aria-pressed={soloAnuladas} onClick={() => x.filtrar({ tipo: soloAnuladas ? "" : "venta.anulada" })}><span>Anuladas</span><b>{x.anuladas ?? "—"}</b></button>
+      <button type="button" className={`${css.num} rojo ${soloAnuladas ? "puesto" : ""}`} aria-pressed={soloAnuladas} onClick={() => x.filtrar({ tipo: soloAnuladas ? "" : "venta.anulada", grupo: "" })}><span>Anuladas</span><b>{x.anuladas ?? "—"}</b></button>
       <div className={`${css.num} ambar`} title="Todavía no se sabe qué hay para revisar"><span>A revisar</span><b>—</b></div>
     </div>
   );
 }
 
-function EventoDelCelular({ e, usuarios, alAbrir }: { e: Evento; usuarios: UsuarioFila[]; alAbrir: () => void }) {
+function EventoDelCelular({ e, alAbrir }: { e: Evento; alAbrir: () => void }) {
   const que = queFue(e);
-  const { importe, detalle } = importeYDetalle(e, usuarios);
+  const { importe, detalle } = importeYDetalle(e);
   return (
     <button type="button" className={`${css.ac} ${que.tono === "error" ? "rojo" : ""}`} onClick={alAbrir} data-testid="evento">
       <span className={`${css.tipo} ${que.tono ?? ""}`}><Icono nombre={que.icono} /></span>
-      <span className={css.texto}><span className={css.q}>{que.nombre}{importe}</span><span className={css.d}><Iniciales nombre={e.nombre ?? "Sistema"} clave={e.email ?? "sistema"} tam="s" />{primerNombre(e.nombre)}{detalle && ` · ${detalle}`}</span></span>
+      <span className={css.texto}><span className={css.q}>{que.nombre}{importe}</span><span className={css.d}><Iniciales nombre={nombreDe(e) ?? "Sistema"} clave={e.quien?.id ?? "sistema"} tam="s" />{primerNombre(nombreDe(e))}{detalle && ` · ${detalle}`}</span></span>
       <span className={css.h}>{horaDe(e.fecha)}</span>
     </button>
   );

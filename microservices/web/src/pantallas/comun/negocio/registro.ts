@@ -1,5 +1,4 @@
 import type { Evento, FiltrosDelRegistro } from "../../../negocio/actividad";
-import type { UsuarioFila } from "../../../negocio/usuarios";
 import { detalleDe, diasDelPeriodo, inicioDelDia } from "./actividad-en-palabras";
 
 // Lo que se le pide al registro con los filtros puestos: la persona y los días, del primer
@@ -11,8 +10,8 @@ export function ventanaDelRegistro(f: FiltrosDelRegistro) {
 
 // En la tarjeta del celular el importe va en el título («Venta · $12.500») y el detalle sigue con
 // lo demás («5 productos · efectivo»).
-export function importeYDetalle(e: Evento, usuarios: UsuarioFila[]): { importe: string; detalle: string } {
+export function importeYDetalle(e: Evento): { importe: string; detalle: string } {
   const importe = typeof e.contenido.total === "number" ? ` · $${Math.round(e.contenido.total).toLocaleString("es-AR")}` : "";
-  const todo = detalleDe(e, usuarios);
+  const todo = detalleDe(e);
   return { importe, detalle: importe ? todo.split(" · ").filter((p) => !p.startsWith("$")).join(" · ") : todo };
 }

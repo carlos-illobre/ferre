@@ -1,19 +1,36 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-// «Quién hizo qué» dice con palabras del mostrador un cambio en los ajustes del sistema (specs/020, E14).
-const EVENTO = { id: "e1", tipo: "sistema.ajustes_cambiados", fecha: "2026-10-24T13:00:00Z", dispositivo_id: null, email: "carlos@ferre.test", nombre: "Carlos", contenido: { antes: { sesion_segundos: 60, vinculo_dias: 30 }, despues: { sesion_segundos: 300, vinculo_dias: 45 } } };
-vi.mock("../../../negocio/actividad", async (original) => ({ ...(await original<typeof import("../../../negocio/actividad")>()), useActividad: () => ({ datos: { eventos: [EVENTO], total: 1, pagina: 1, por_pagina: 50 }, cargando: false, error: null }), paginasDe: () => 1 }));
+// «Quién hizo qué» muestra lo que manda cada servicio, sin conocer sus tipos (specs/027).
+const EVENTO = {
+  id: "e1", servicio: "turnos", tipo: "turno.dado", fecha: "2026-10-24T13:00:00Z", dispositivo: "Celular de Ana", quien: { id: "u1", nombre: "Carlos Pérez" },
+  titulo: "Turno dado", detalle: "Martes 10 h · Cliente nuevo", grupo: "Turnos", importancia: "revisar", referencias: [], contenido: { hora: "10" },
+};
+const respuesta = vi.hoisted(() => ({ actual: {} as { datos: unknown; error: unknown } }));
+vi.mock("../../../negocio/actividad", async (original) => ({
+  ...(await original<typeof import("../../../negocio/actividad")>()),
+  useActividad: () => ({ ...respuesta.actual, cargando: false }), useGrupos: () => ["Turnos", "Ventas"], paginasDe: () => 1,
+}));
 vi.mock("../../../negocio/usuarios", () => ({ useUsuarios: () => ({ datos: [] }) }));
+import { ErrorApi } from "../../../datos/conexion";
 import { Actividad } from "./Actividad";
 
 describe("«Quién hizo qué»", () => {
-  it("020-E14: un cambio de ajustes dice qué ajuste, de cuánto a cuánto, y se puede filtrar", () => {
+  beforeEach(() => { respuesta.actual = { datos: { eventos: [EVENTO], total: 1, pagina: 1, por_pagina: 10 }, error: null }; });
+
+  it("027-E12: la acción de un servicio que la web no conoce se ve con su título, su detalle y su importancia, y su grupo se puede filtrar", () => {
     render(<Actividad />);
-    const evento = screen.getByTestId("evento").textContent!;
-    expect(evento).toContain("Cambio en los ajustes del sistema");
-    expect(evento).toContain("Sesión recordada: de 1 min a 5 min");
-    expect(evento).toContain("Días del vínculo: de 30 a 45");
-    expect(screen.getByRole("option", { name: "Ajustes del sistema" })).toBeTruthy();
+    const evento = screen.getByTestId("evento");
+    expect(evento.textContent).toContain("Turno dado");
+    expect(evento.textContent).toContain("Martes 10 h · Cliente nuevo");
+    expect(evento.textContent).toContain("Carlos");
+    expect(evento.querySelector(".urgente")).toBeTruthy();
+    expect(screen.getByRole("option", { name: "Turnos" })).toBeTruthy();
+  });
+
+  it("027-E04: sin Auditoría, dice que no está disponible", () => {
+    respuesta.actual = { datos: null, error: new ErrorApi(502, "Quién hizo qué no está disponible ahora. Probá de nuevo en un rato") };
+    render(<Actividad />);
+    expect(document.body.textContent).toContain("Quién hizo qué no está disponible ahora");
   });
 });

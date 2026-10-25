@@ -1,5 +1,5 @@
+import { CATEGORIAS } from "../../comun/negocio/actividad-en-palabras";
 import type { Periodo } from "../../../negocio/actividad";
-import { TIPOS } from "../../comun/negocio/actividad-en-palabras";
 import { Icono } from "../../../ui/iconos";
 import type { ActividadDeLaCompu } from "./useActividadDeLaCompu";
 import deUsuarios from "./Usuarios.module.css";
@@ -25,11 +25,13 @@ export function FiltrosDelRegistro({ x }: { x: ActividadDeLaCompu }) {
           {PERIODOS.map((p) => <button key={p.valor} type="button" className={filtros.periodo === p.valor ? "elegido" : ""} aria-pressed={filtros.periodo === p.valor} onClick={() => { x.setRango(false); filtrar({ periodo: p.valor }); }} data-testid={`periodo-${p.valor}`}>{p.nombre}</button>)}
           <button type="button" className={filtros.periodo === "rango" ? "elegido" : ""} aria-pressed={filtros.periodo === "rango"} aria-expanded={x.rango} onClick={() => { x.setRango((r) => !r); filtrar({ periodo: "rango" }); }} data-testid="periodo-rango"><Icono nombre="calendar" tam={16} />Desde… hasta</button>
         </div>
-        <label className={`${css.selector} ${filtros.tipo ? "puesto" : ""}`}>
+        <label className={`${css.selector} ${filtros.grupo || filtros.tipo ? "puesto" : ""}`}>
           <span className={css.et}>Qué</span>
-          <select value={filtros.tipo} onChange={(e) => filtrar({ tipo: e.target.value })} data-testid="filtro-tipo">
+          <select value={filtros.grupo || (filtros.tipo ? "tipo" : "")} onChange={(e) => filtrar({ grupo: e.target.value, tipo: "" })} data-testid="filtro-tipo">
             <option value="">Todo</option>
-            {TIPOS.map((t) => <option key={t.valor} value={t.valor}>{t.nombre}</option>)}
+            {/* Lo elegido en «Qué pasó» (un tipo) se muestra, pero no se elige desde acá. */}
+            {filtros.tipo && !filtros.grupo && <option value="tipo" disabled>{CATEGORIAS.find((c) => c.tipo === filtros.tipo)?.nombre ?? filtros.tipo}</option>}
+            {x.grupos.map((g) => <option key={g} value={g}>{g}</option>)}
           </select>
           <Icono nombre="chevron-down" tam={16} />
         </label>

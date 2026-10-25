@@ -16,7 +16,7 @@ export function QuePaso({ x }: { x: ActividadDeLaCompu }) {
       <h3 id="av2-que-paso">Qué pasó {enPalabras(filtros)}<small>tocá para filtrar</small></h3>
       <div className={css.barras}>
         {CATEGORIAS.map((c, i) => (
-          <button key={c.tipo} type="button" className={`${css.b} ${c.tono ?? ""} ${filtros.tipo === c.tipo ? "puesto" : ""}`} aria-pressed={filtros.tipo === c.tipo} onClick={() => x.filtrar({ tipo: filtros.tipo === c.tipo ? "" : c.tipo })}>
+          <button key={c.tipo} type="button" className={`${css.b} ${c.tono ?? ""} ${filtros.tipo === c.tipo ? "puesto" : ""}`} aria-pressed={filtros.tipo === c.tipo} onClick={() => x.filtrar({ tipo: filtros.tipo === c.tipo ? "" : c.tipo, grupo: "" })}>
             <Icono nombre={c.icono} tam={16} /><span>{c.nombre}</span><i style={{ width: ancho(porTipo[i] ?? null, max) }} /><b>{porTipo[i] ?? "—"}</b>
           </button>
         ))}

@@ -44,7 +44,7 @@ export function Actividad() {
           {x.elegido && <AccionElegida x={x} elegido={x.elegido} />}
         </div>
       </div>
-      {x.abierto && <HojaDelEvento evento={x.abierto} usuarios={x.usuarios} alCerrar={() => x.setAbierto(null)} />}
+      {x.abierto && <HojaDelEvento evento={x.abierto} alCerrar={() => x.setAbierto(null)} />}
     </Pagina>
   );
 }

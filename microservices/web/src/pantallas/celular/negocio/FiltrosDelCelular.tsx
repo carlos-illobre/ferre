@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { primerNombre, type Periodo } from "../../../negocio/actividad";
-import { TIPOS } from "../../comun/negocio/actividad-en-palabras";
+import { CATEGORIAS } from "../../comun/negocio/actividad-en-palabras";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 import type { ActividadDelCelular } from "./useActividadDelCelular";
 import css from "./Actividad.module.css";
@@ -14,7 +14,7 @@ function Pastilla({ icono, texto, clase, children }: { icono: NombreDeIcono; tex
 
 function textosDeLasPastillas({ filtros: f, usuarios }: ActividadDelCelular) {
   const quien = f.usuario ? primerNombre(usuarios.find((u) => u.id === f.usuario)?.nombre ?? null) : "Todos";
-  const tipo = f.tipo ? TIPOS.find((t) => t.valor === f.tipo)?.nombre ?? "Tipo" : "Todo tipo";
+  const tipo = f.grupo || (f.tipo ? CATEGORIAS.find((c) => c.tipo === f.tipo)?.nombre ?? "Tipo" : "Todo tipo");
   return { quien, tipo };
 }
 
@@ -40,8 +40,8 @@ export function FiltrosDelCelular({ x, periodo }: { x: ActividadDelCelular; peri
         <Pastilla icono="users" clase={f.usuario ? "puesto" : ""} texto={quien}>
           <select aria-label="Quién" value={f.usuario} onChange={(e) => filtrar({ usuario: e.target.value })} data-testid="filtro-usuario"><option value="">Todos</option>{usuarios.map((u) => <option key={u.id} value={u.id}>{u.nombre}{u.activo ? "" : " (desactivado)"}</option>)}</select>
         </Pastilla>
-        <Pastilla icono="list-filter" clase={f.tipo ? "puesto" : ""} texto={tipo}>
-          <select aria-label="Qué" value={f.tipo} onChange={(e) => filtrar({ tipo: e.target.value })} data-testid="filtro-tipo"><option value="">Todo tipo</option>{TIPOS.map((t) => <option key={t.valor} value={t.valor}>{t.nombre}</option>)}</select>
+        <Pastilla icono="list-filter" clase={f.grupo || f.tipo ? "puesto" : ""} texto={tipo}>
+          <select aria-label="Qué" value={f.grupo} onChange={(e) => filtrar({ grupo: e.target.value, tipo: "" })} data-testid="filtro-tipo"><option value="">Todo tipo</option>{x.grupos.map((g) => <option key={g} value={g}>{g}</option>)}</select>
         </Pastilla>
       </div>
       {f.periodo === "rango" && <Rango x={x} />}

@@ -1,4 +1,4 @@
-import { primerNombre } from "../../../negocio/actividad";
+import { nombreDe, primerNombre } from "../../../negocio/actividad";
 import { detalleDe, horaDe, queFue } from "../../comun/negocio/actividad-en-palabras";
 import { Iniciales } from "../../iconos-de-negocio";
 import { Icono } from "../../../ui/iconos";
@@ -16,9 +16,9 @@ export function TablaDelRegistro({ x }: { x: ActividadDeLaCompu }) {
         return (
           <button key={e.id} type="button" className={`${css.fila} ${e === x.elegido ? "elegida" : ""}`} aria-pressed={e === x.elegido} onClick={() => x.setMarcado(i)} onDoubleClick={() => x.setAbierto(e)} data-testid="evento" title={fechaCompleta(e.fecha)}>
             <span className={css.hora}>{horaDe(e.fecha)}</span>
-            <span className={css.quien} title={e.email ?? undefined}><Iniciales nombre={e.nombre ?? "Sistema"} clave={e.email ?? "sistema"} tam="s" />{primerNombre(e.nombre)}</span>
+            <span className={css.quien} title={nombreDe(e) ?? undefined}><Iniciales nombre={nombreDe(e) ?? "Sistema"} clave={e.quien?.id ?? "sistema"} tam="s" />{primerNombre(nombreDe(e))}</span>
             <span className={css.que}><span className={`${css.tipo} ${que.tono ?? ""}`}><Icono nombre={que.icono} tam={16} /></span>{que.nombre}</span>
-            <span className={css.det}>{detalleDe(e, x.usuarios) || "—"}</span>
+            <span className={css.det}>{detalleDe(e) || "—"}</span>
             <Icono nombre="chevron-right" className={css.mas} />
           </button>
         );
