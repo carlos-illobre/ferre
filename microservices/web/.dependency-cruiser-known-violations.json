@@ -141,20 +141,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/negocio/catalogo/catalogo.ts",
-    "to": "src/plataforma/busqueda/busqueda.ts",
-    "unresolvedTo": "../../plataforma/busqueda/busqueda",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/negocio/catalogo/ficha.ts",
     "to": "src/negocio/precios/vista-previa.ts",
     "unresolvedTo": "../precios/vista-previa",

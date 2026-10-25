@@ -49,6 +49,12 @@ export function crearRutasPorHash(opciones: OpcionesDeRutas) {
   // La navegación animada se activa aparte: una misma aplicación puede animar en una interfaz y no en otra.
   function animar(si: boolean): void { animada = si; }
 
+  // Se anima si el navegador puede, nadie pidió quietud y la aplicación lo deja.
+  function seAnima(): boolean {
+    const sinMovimiento = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return !sinMovimiento && (opciones.sePuedeAnimar ? opciones.sePuedeAnimar() : true) && "startViewTransition" in document;
+  }
+
   // Va a un camino («catalogo/listas», «foto?codigo=…»). Se puede llamar desde cualquier lado,
   // también fuera de la aplicación (un aviso, el espejo con el otro dispositivo).
   function irA(camino: string): void {
@@ -56,8 +62,7 @@ export function crearRutasPorHash(opciones: OpcionesDeRutas) {
     const destino = `/${camino}`;
     const { pathname, search } = r.state.location;
     if (pathname + search === destino) return;
-    const sinMovimiento = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const conTransicion = animada && !sinMovimiento && (opciones.sePuedeAnimar ? opciones.sePuedeAnimar() : true) && "startViewTransition" in document;
+    const conTransicion = animada && seAnima();
     if (conTransicion && opciones.movimiento) document.documentElement.dataset.nav = opciones.movimiento(`#${pathname}${search}`, `#${destino}`);
     void r.navigate(destino, { viewTransition: conTransicion });
   }

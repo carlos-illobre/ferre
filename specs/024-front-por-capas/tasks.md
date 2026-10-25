@@ -18,3 +18,4 @@ Cada etapa se sube con todas las pruebas en verde y sin cambiar nada a la vista 
 - [ ] T012 Teclado: `plataforma/teclado/` ejecuta la tabla de teclas de cada pantalla, con T147 de `proyecto/tasks.md` (depende de T004 a T011)
 - [ ] T013 Cierre: la lista de excepciones vacía, ADR-018 y `001/ux.md` al día con las carpetas, y la documentación de `tests/capturas/` (depende de T012)
 - [ ] T014 Revisión independiente (paso 7) (depende de T013)
+- [ ] T015 La lista de excepciones, sin lo que no espera a las teclas: el manual, los textos, las piezas sueltas de `pantallas/`, lo que queda del negocio y de `plataforma/` (incluido el teclado, partido en piezas sin cambiar ninguna tecla), y `rutas` y `espejo` a su capa (depende de T011)

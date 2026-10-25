@@ -1626,7 +1626,7 @@ RF-139:
 RF-140:
   estado: "Hecho (023): Carlos lo probó en el local el 2026-10-25"
   pruebas:
-    - microservices/web/src/espejo.test.tsx
+    - microservices/web/src/espejo/espejo.test.tsx
     - microservices/web/src/pantallas/FotoDeFactura.test.tsx
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
     - tests/e2e/escritorio/10-escaner.spec.ts

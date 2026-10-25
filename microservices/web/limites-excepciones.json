@@ -1,8 +1,4 @@
 [
- "src/datos/almacenamiento/descarga.ts",
- "src/espejo.ts",
- "src/negocio/catalogo/catalogo.ts",
- "src/negocio/deposito/ingreso.ts",
  "src/pantallas/Calendario.tsx",
  "src/pantallas/CodigoDeBarras.tsx",
  "src/pantallas/DineroInvertido.tsx",
@@ -14,14 +10,5 @@
  "src/pantallas/compu/base/pantallas/manual/Catalogo.tsx",
  "src/pantallas/compu/base/pantallas/manual/CatalogoCelular.tsx",
  "src/pantallas/compu/base/pantallas/manual/Entrar.tsx",
- "src/pantallas/textos.ts",
- "src/plataforma/almacenamiento/base-local.ts",
- "src/plataforma/busqueda/busqueda.ts",
- "src/plataforma/camara/Escaner.tsx",
- "src/plataforma/navegacion/rutas-por-hash.tsx",
- "src/plataforma/servidor/cliente.ts",
- "src/plataforma/sin-conexion/cola.ts",
- "src/plataforma/teclado/atajos.ts",
- "src/plataforma/teclado/flechas.ts",
- "src/plataforma/teclado/teclas.ts"
+ "src/pantallas/textos.ts"
 ]

@@ -18,14 +18,18 @@ const deLasPantallas = new Set<Manejador>();
 let porDefecto: ((e: KeyboardEvent) => void) | null = null;
 let escuchando = false;
 
+const TECLAS_DE_LA_ZONA = /^(Arrow|Enter$|Escape$|Tab$| $|Home$|End$)/;
+const esCampo = (el: HTMLElement | null) => Boolean(el && (el.tagName === "INPUT" || el.tagName === "SELECT" || el.tagName === "TEXTAREA" || el.isContentEditable));
+
+// Con el foco en el menú o en las pestañas, las flechas (y Enter, Esc, Tab, espacio) son para
+// recorrerlos: no mueven también la lista de la pantalla. Las letras sí llegan a la pantalla: al
+// tocar una pestaña el foco queda en ella, y la E de «Corregir» tiene que andar igual.
+const esDeLaZona = (e: KeyboardEvent, objetivo: HTMLElement | null) => TECLAS_DE_LA_ZONA.test(e.key) && zonasPropias !== null && Boolean(objetivo?.closest?.(zonasPropias));
+
 function alTeclear(e: KeyboardEvent) {
   const objetivo = e.target as HTMLElement | null;
-  // Con el foco en el menú o en las pestañas, las flechas (y Enter, Esc, Tab, espacio) son para
-  // recorrerlos: no mueven también la lista de la pantalla. Las letras sí llegan a la pantalla: al
-  // tocar una pestaña el foco queda en ella, y la E de «Corregir» tiene que andar igual.
-  const deLaZona = /^(Arrow|Enter$|Escape$|Tab$| $|Home$|End$)/.test(e.key);
-  if (e.defaultPrevented || (deLaZona && zonasPropias && objetivo?.closest?.(zonasPropias))) return;
-  const enCampo = Boolean(objetivo && (objetivo.tagName === "INPUT" || objetivo.tagName === "SELECT" || objetivo.tagName === "TEXTAREA" || objetivo.isContentEditable));
+  if (e.defaultPrevented || esDeLaZona(e, objetivo)) return;
+  const enCampo = esCampo(objetivo);
   for (const m of [...deLasPantallas]) { if (!enCampo || objetivo === m.excepto) m.manejar(e); }
   if (!e.defaultPrevented) porDefecto?.(e);
 }

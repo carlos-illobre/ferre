@@ -35,52 +35,76 @@ async function leerDescarga(): Promise<Descarga | null> {
 
 // ---------- Bajar ----------
 
+type Avance = { hechos: number; marca: string; calculo: string };
+
+const paginaDeProductos = (desdeLaMarca: string | null, desde: string) => {
+  const q = new URLSearchParams({ limite: String(POR_PAGINA), ...(desdeLaMarca ? { marca: desdeLaMarca } : {}), ...(desde ? { desde } : {}) });
+  return api<DescargaDeProductos>(`/productos/descarga?${q}`);
+};
+
+// Cambió la cuenta del precio (o lo guardado no dice con cuál se hizo), o la base es otra (una
+// nueva, restaurada u otro ambiente: la marca dice de cuál es, 022-E23): lo bajado no sirve, se
+// baja todo desde el principio.
+const yaNoSirve = (d: DescargaDeProductos, anterior: Descarga | null, desdeLaMarca: string | null) => desdeLaMarca !== null && (d.calculo !== anterior?.calculo || deQueBase(d.marca) !== deQueBase(desdeLaMarca));
+
+async function guardarPagina(b: Avance, d: DescargaDeProductos, total: number): Promise<void> {
+  b.calculo ||= d.calculo;
+  // La marca de la primera página: lo que cambie mientras se baja el resto llega la próxima vez.
+  b.marca ||= d.marca;
+  await guardarVarios("catalogo", d.productos, d.quitados);
+  b.hechos += d.productos.length + d.quitados.length;
+  poner({ avance: { hechos: b.hechos, total: Math.max(total, b.hechos) } });
+}
+
+// Los productos, página por página: desde la marca de lo ya bajado si sirve; si no, todos.
+async function bajarProductos(anterior: Descarga | null, total: number): Promise<Avance & { desdeLaMarca: string | null }> {
+  const b: Avance = { hechos: 0, marca: "", calculo: "" };
+  let desde = "";
+  let desdeLaMarca = anterior?.productos ?? null;
+  if (!desdeLaMarca) await reemplazarTodo("catalogo", []);
+  for (;;) {
+    const d = await paginaDeProductos(desdeLaMarca, desde);
+    if (yaNoSirve(d, anterior, desdeLaMarca)) {
+      desdeLaMarca = null; b.hechos = 0; b.marca = "";
+      await reemplazarTodo("catalogo", []);
+      continue;
+    }
+    await guardarPagina(b, d, total);
+    if (!d.hay_mas || !d.siguiente) break;
+    desde = d.siguiente;
+  }
+  return { ...b, desdeLaMarca };
+}
+
+// El stock, desde su marca si los productos se bajaron desde la suya; si no, entero. Y los clientes.
+async function bajarStockYClientes(anterior: Descarga | null, desdeLaMarca: string | null): Promise<string> {
+  const stock = await api<StockQueCambio>(`/stock/cambios${desdeLaMarca ? `?marca=${anterior!.stock}` : ""}`);
+  const filas = Object.entries(stock.stock).map(([id, s]) => ({ id, stock: s }));
+  if (desdeLaMarca) await guardarVarios("stock", filas); else await reemplazarTodo("stock", filas);
+  await reemplazarTodo("clientes", await api<Cliente[]>("/clientes"));
+  return stock.marca;
+}
+
+async function bajarTodo(): Promise<void> {
+  poner({ error: null, avance: { hechos: 0, total: 0 } });
+  const anterior = await leerDescarga();
+  // La primera vez, cuántos son, para decir cuánto lleva.
+  const total = anterior ? 0 : (await api<ResumenDelCatalogo>("/productos/resumen")).productos;
+  poner({ avance: { hechos: 0, total } });
+  const { marca, calculo, desdeLaMarca } = await bajarProductos(anterior, total);
+  const marcaDelStock = await bajarStockYClientes(anterior, desdeLaMarca);
+  const cuantos = (await leerTodo<{ id: string }>("catalogo")).length;
+  const nueva: Descarga = { productos: marca, stock: marcaDelStock, cuando: new Date().toISOString(), cuantos, calculo };
+  await guardarMeta("descarga", nueva);
+  bajado = null;
+  poner({ descarga: nueva, avance: null });
+}
+
 let enCurso: Promise<void> | null = null;
 export function descargar(): Promise<void> {
-  enCurso ??= (async () => {
-    poner({ error: null, avance: { hechos: 0, total: 0 } });
-    try {
-      const anterior = await leerDescarga();
-      // La primera vez, cuántos son, para decir cuánto lleva.
-      const total = anterior ? 0 : (await api<ResumenDelCatalogo>("/productos/resumen")).productos;
-      poner({ avance: { hechos: 0, total } });
-      let hechos = 0, marca = "", desde = "", calculo = "";
-      let desdeLaMarca = anterior?.productos ?? null;
-      if (!desdeLaMarca) await reemplazarTodo("catalogo", []);
-      for (;;) {
-        const q = new URLSearchParams({ limite: String(POR_PAGINA), ...(desdeLaMarca ? { marca: desdeLaMarca } : {}), ...(desde ? { desde } : {}) });
-        const d = await api<DescargaDeProductos>(`/productos/descarga?${q}`);
-        // Cambió la cuenta del precio (o lo guardado no dice con cuál se hizo), o la base es otra (una
-        // nueva, restaurada u otro ambiente: la marca dice de cuál es, 022-E23): lo bajado no sirve, se
-        // baja todo desde el principio.
-        if (desdeLaMarca && (d.calculo !== anterior?.calculo || deQueBase(d.marca) !== deQueBase(desdeLaMarca))) {
-          desdeLaMarca = null; hechos = 0; marca = "";
-          await reemplazarTodo("catalogo", []);
-          continue;
-        }
-        calculo ||= d.calculo;
-        // La marca de la primera página: lo que cambie mientras se baja el resto llega la próxima vez.
-        marca ||= d.marca;
-        await guardarVarios("catalogo", d.productos, d.quitados);
-        hechos += d.productos.length + d.quitados.length;
-        poner({ avance: { hechos, total: Math.max(total, hechos) } });
-        if (!d.hay_mas || !d.siguiente) break;
-        desde = d.siguiente;
-      }
-      // El stock, desde su marca si los productos se bajaron desde la suya; si no, entero.
-      const stock = await api<StockQueCambio>(`/stock/cambios${desdeLaMarca ? `?marca=${anterior!.stock}` : ""}`);
-      const filas = Object.entries(stock.stock).map(([id, s]) => ({ id, stock: s }));
-      if (desdeLaMarca) await guardarVarios("stock", filas); else await reemplazarTodo("stock", filas);
-      await reemplazarTodo("clientes", await api<Cliente[]>("/clientes"));
-      const cuantos = (await leerTodo<{ id: string }>("catalogo")).length;
-      const nueva: Descarga = { productos: marca, stock: stock.marca, cuando: new Date().toISOString(), cuantos, calculo };
-      await guardarMeta("descarga", nueva);
-      bajado = null;
-      poner({ descarga: nueva, avance: null });
-    } catch (e) {
-      poner({ avance: null, error: esFaltaDeRed(e) ? SIN_CONEXION_PARA_BAJAR : (e as Error).message });
-    } finally { enCurso = null; }
-  })();
+  enCurso ??= bajarTodo()
+    .catch((e) => poner({ avance: null, error: esFaltaDeRed(e) ? SIN_CONEXION_PARA_BAJAR : (e as Error).message }))
+    .finally(() => { enCurso = null; });
   return enCurso;
 }
 

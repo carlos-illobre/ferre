@@ -25,56 +25,67 @@ export type OpcionesDeCliente = {
   alContestar?: (respuesta: Response) => void;
 };
 
+async function fallar(respuesta: Response): Promise<never> {
+  const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string };
+  throw new ErrorDelServidor(respuesta.status, cuerpo.error ?? `Error ${respuesta.status}`);
+}
+
+// Las cabeceras de un pedido: el token de sesión, si existe, y JSON salvo en una subida de
+// archivos (un FormData fija su propio Content-Type con el separador).
+function cabecerasDe(pedido: RequestInit, token: string | null): Headers {
+  const cabeceras = new Headers(pedido.headers);
+  if (!(pedido.body instanceof FormData)) cabeceras.set("Content-Type", "application/json");
+  if (token) cabeceras.set("Authorization", `Bearer ${token}`);
+  return cabeceras;
+}
+
+// Dispara la descarga de un archivo ya bajado.
+function guardarArchivo(blob: Blob, nombre: string): void {
+  const direccion = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = direccion;
+  a.download = nombre;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(direccion), 10_000);
+}
+
+const esDeLectura = (pedido: RequestInit) => !pedido.method || pedido.method === "GET";
+
 export function crearCliente(opciones: OpcionesDeCliente) {
   const url = (ruta: string): string => `${opciones.origen}${ruta}`;
-
   function leerToken(): string | null {
     try { return localStorage.getItem(opciones.claveDelToken); } catch { return null; }
   }
-  function guardarToken(token: string): void { localStorage.setItem(opciones.claveDelToken, token); }
-  function borrarToken(): void { localStorage.removeItem(opciones.claveDelToken); }
-
-  async function fallar(respuesta: Response): Promise<never> {
-    const cuerpo = (await respuesta.json().catch(() => ({}))) as { error?: string };
-    throw new ErrorDelServidor(respuesta.status, cuerpo.error ?? `Error ${respuesta.status}`);
+  const guardarToken = (token: string): void => localStorage.setItem(opciones.claveDelToken, token);
+  const borrarToken = (): void => localStorage.removeItem(opciones.claveDelToken);
+  // Un 401 significa que la sesión ya no vale: se borra y se avisa.
+  function revisar(respuesta: Response, token: string | null): void {
+    opciones.alContestar?.(respuesta);
+    if (respuesta.status === 401 && token) { borrarToken(); opciones.alPerderLaSesion?.(token); }
   }
 
-  // Todas las llamadas llevan el token de sesión si existe. Un 401 significa que la sesión ya
-  // no vale: se borra y se avisa.
-  async function pedir<T>(ruta: string, opcionesDelPedido: RequestInit = {}): Promise<T> {
-    const cabeceras = new Headers(opcionesDelPedido.headers);
-    // Un FormData (subida de archivos) fija su propio Content-Type con el separador.
-    if (!(opcionesDelPedido.body instanceof FormData)) cabeceras.set("Content-Type", "application/json");
+  // Todas las llamadas llevan el token de sesión si existe.
+  async function pedir<T>(ruta: string, pedido: RequestInit = {}): Promise<T> {
     const token = leerToken();
-    if (token) cabeceras.set("Authorization", `Bearer ${token}`);
-    const respuesta = await fetch(url(ruta), { ...opcionesDelPedido, headers: cabeceras });
-    opciones.alContestar?.(respuesta);
-    if (respuesta.status === 401 && token) {
-      borrarToken();
-      opciones.alPerderLaSesion?.(token);
-    }
+    const respuesta = await fetch(url(ruta), { ...pedido, headers: cabecerasDe(pedido, token) });
+    revisar(respuesta, token);
     if (!respuesta.ok) await fallar(respuesta);
-    if (opcionesDelPedido.method && opcionesDelPedido.method !== "GET") opciones.alGuardar?.(ruta);
+    if (!esDeLectura(pedido)) opciones.alGuardar?.(ruta);
     return respuesta.status === 204 ? (undefined as T) : ((await respuesta.json()) as T);
   }
 
   // Bajar un archivo con la sesión puesta. Un enlace común no sirve: el token va en la
   // cabecera, no en una cookie. Se pide, se arma un blob y se dispara la descarga.
   async function descargar(ruta: string, nombre: string): Promise<void> {
-    const cabeceras = new Headers();
     const token = leerToken();
+    const cabeceras = new Headers();
     if (token) cabeceras.set("Authorization", `Bearer ${token}`);
     const respuesta = await fetch(url(ruta), { headers: cabeceras });
     opciones.alContestar?.(respuesta);
     if (!respuesta.ok) await fallar(respuesta);
-    const direccion = URL.createObjectURL(await respuesta.blob());
-    const a = document.createElement("a");
-    a.href = direccion;
-    a.download = nombre;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(direccion), 10_000);
+    guardarArchivo(await respuesta.blob(), nombre);
   }
 
   return { url, pedir, descargar, leerToken, guardarToken, borrarToken };

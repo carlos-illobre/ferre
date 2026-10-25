@@ -1,19 +1,21 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api, ErrorApi } from "../../datos/conexion";
-import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../catalogo";
+import { productoEnMemoria, traerPorIds, useCatalogo } from "../catalogo";
 import { contarAlEspejo, useEspejar } from "../../espejo";
 import { hoyLocal } from "../formato";
 import type { Producto } from "../catalogo";
 import { useProveedoresActivos, type Proveedor } from "../proveedores";
 import { ingresoParaElEspejo, renglonesDeIngresoDelEspejo, type IngresoEnEspejo } from "./ingreso-en-espejo";
 import type { ItemDePedido, Pedido } from "@servidor/pedidos";
-import type { CompraEntrada, CompraRegistrada, CompraRepetida, TipoDeComprobante } from "@servidor/compras";
+import type { CompraEntrada, CompraRegistrada, CompraRepetida } from "@servidor/compras";
+import { leerBorrador, useGuardarBorrador, type Borrador } from "./ingreso-borrador";
+import { useRenglonesDelIngreso } from "./ingreso-renglones";
 
 // El ingreso de mercadería, una sola vez para el celular y la computadora (RNF-60): proveedor y
 // comprobante, los renglones que llegaron y registrar. Suma stock y, si el comprobante trae
 // otro costo, ese pasa a ser el vigente. Las pantallas solo muestran y deciden dónde va el foco.
-export type Comprobante = TipoDeComprobante;
-export type Renglon = { clave: string; producto: Producto | null; descripcion: string; cantidad: number; costo: number | null; costoTexto: string; costoLista: number | null };
+export type { Comprobante, Renglon } from "./tipos-del-ingreso";
+import type { Comprobante, Renglon } from "./tipos-del-ingreso";
 export type { Proveedor };
 
 // El pedido del que viene la mercadería (RF-55): el ingreso arranca con su proveedor y con lo que falta llegar.
@@ -31,15 +33,6 @@ export type OpcionesDeIngreso = {
   // Con una clave, lo cargado se guarda en el dispositivo y sobrevive a una recarga hasta registrarlo o descartarlo.
   borrador?: string;
 };
-
-type Borrador = { proveedorId: string; comprobante: Comprobante; foto: string | null; fechaCompra: string; renglones: Renglon[] };
-function leerBorrador(clave: string | undefined): Borrador | null {
-  if (!clave) return null;
-  try {
-    const b = JSON.parse(localStorage.getItem(clave) ?? "null") as Borrador | null;
-    return b && Array.isArray(b.renglones) && b.renglones.length > 0 ? b : null;
-  } catch { return null; }
-}
 
 // Cuánto cambió el costo contra la lista, en porcentaje; `null` si no hay con qué comparar.
 export const diferenciaConLaLista = (r: Renglon): number | null => (r.costo !== null && r.costoLista !== null && r.costoLista > 0 ? ((r.costo - r.costoLista) / r.costoLista) * 100 : null);
@@ -59,29 +52,24 @@ export function renglonesDelPedido(pedido: PedidoAIngresar, catalogo: Producto[]
   });
 }
 
-export function useIngreso(opciones: OpcionesDeIngreso) {
-  const { costoATexto, pedido } = opciones;
-  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
-  const [borrador] = useState(() => leerBorrador(opciones.borrador));
-  const proveedores = useProveedoresActivos();
-  const [proveedorId, setProveedorId] = useState(borrador?.proveedorId ?? "");
-  const [comprobante, setComprobante] = useState<Comprobante>(borrador?.comprobante ?? "factura");
-  const [foto, setFoto] = useState<string | null>(borrador?.foto ?? null);
-  const [fechaCompra, setFechaCompra] = useState(borrador?.fechaCompra ?? hoyLocal());
-  const [consulta, setConsulta] = useState("");
-  const [renglones, setRenglones] = useState<Renglon[]>(borrador?.renglones ?? []);
-  const [error, setError] = useState<string | null>(null);
-  const [ocupado, setOcupado] = useState(false);
-  const lista = useRef(renglones);
-  lista.current = renglones;
+type Cabecera = Omit<Borrador, "renglones">;
 
-  // En espejo (decisión 60): el ingreso es uno solo, lo cargue quien lo cargue.
-  useEspejar<IngresoEnEspejo>("ingreso", useMemo(() => ingresoParaElEspejo(proveedorId, comprobante, foto, fechaCompra, renglones), [proveedorId, comprobante, foto, fechaCompra, renglones]), (v) => {
-    setProveedorId(v.proveedorId); setComprobante(v.comprobante as Comprobante); setFoto(v.foto); setFechaCompra(v.fecha);
-    setRenglones((previos) => renglonesDeIngresoDelEspejo(v, catalogo, previos, costoATexto));
-  }, true);
+// Proveedor, comprobante, foto y fecha: los del borrador, si había.
+function cabeceraInicial(b: Borrador | null): Cabecera {
+  if (!b) return { proveedorId: "", comprobante: "factura", foto: null, fechaCompra: hoyLocal() };
+  return { proveedorId: b.proveedorId ?? "", comprobante: b.comprobante ?? "factura", foto: b.foto ?? null, fechaCompra: b.fechaCompra ?? hoyLocal() };
+}
+function useCabecera(borrador: Borrador | null) {
+  const [inicial] = useState(() => cabeceraInicial(borrador));
+  const [proveedorId, setProveedorId] = useState(inicial.proveedorId);
+  const [comprobante, setComprobante] = useState<Comprobante>(inicial.comprobante);
+  const [foto, setFoto] = useState<string | null>(inicial.foto);
+  const [fechaCompra, setFechaCompra] = useState(inicial.fechaCompra);
+  return { proveedorId, setProveedorId, comprobante, setComprobante, foto, setFoto, fechaCompra, setFechaCompra };
+}
 
-  // Los productos del pedido se piden al servidor antes de armar los renglones (specs/018).
+// Los productos del pedido se piden al servidor antes de armar los renglones (specs/018).
+function useDelPedido(pedido: PedidoAIngresar | null, costoATexto: (costo: number) => string, setProveedorId: (id: string) => void, setRenglones: (r: Renglon[]) => void) {
   useEffect(() => {
     if (!pedido) return;
     let vigente = true;
@@ -93,83 +81,49 @@ export function useIngreso(opciones: OpcionesDeIngreso) {
     return () => { vigente = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pedido]);
+}
 
-  const claveDelBorrador = opciones.borrador;
-  useEffect(() => {
-    if (!claveDelBorrador) return;
-    try {
-      if (renglones.length) localStorage.setItem(claveDelBorrador, JSON.stringify({ proveedorId, comprobante, foto, fechaCompra, renglones } satisfies Borrador));
-      else localStorage.removeItem(claveDelBorrador);
-    } catch { /* sin lugar o sin permiso: se sigue sin borrador */ }
-  }, [claveDelBorrador, proveedorId, comprobante, foto, fechaCompra, renglones]);
-  // Lo que respondió el servidor deja de valer en cuanto se toca lo cargado.
-  useEffect(() => { setError(null); }, [proveedorId, comprobante, foto, fechaCompra, renglones]);
-
-  const proveedor = proveedores?.find((p) => p.id === proveedorId) ?? null;
-
-  // Primero los productos del proveedor elegido; después el resto. El servidor ya los ordena así
-  // sobre todo lo encontrado; acá se ordena lo que llegó.
-  const resultados = useMemo(() => {
+// Primero los productos del proveedor elegido; después el resto. El servidor ya los ordena así
+// sobre todo lo encontrado; acá se ordena lo que llegó.
+function useResultados(buscarProductos: (consulta: string, maximo?: number, primero?: string | null) => Producto[], consulta: string, proveedor: Proveedor | null) {
+  return useMemo(() => {
     if (!consulta.trim()) return [];
     const todos = buscarProductos(consulta, 16, proveedor?.id);
     return proveedor ? [...todos.filter((p) => p.proveedor === proveedor.nombre), ...todos.filter((p) => p.proveedor !== proveedor.nombre)].slice(0, 8) : todos.slice(0, 8);
   }, [buscarProductos, consulta, proveedor]);
+}
 
-  // Un producto que ya está suma uno a su renglón; sin producto, es uno nuevo con la descripción tipeada.
-  const agregar = useCallback((p: Producto | null, libre?: string): { clave: string; cantidad: number } => {
-    const ya = p ? lista.current.find((r) => r.producto?.id === p.id) : undefined;
-    const clave = ya?.clave ?? crypto.randomUUID();
-    const costoLista = p && p.costo_neto !== null ? Number(p.costo_neto) : null;
-    setRenglones((l) => ya
-      ? l.map((r) => (r.clave === clave ? { ...r, cantidad: r.cantidad + 1 } : r))
-      : [...l, { clave, producto: p, descripcion: p?.descripcion ?? libre ?? "", cantidad: 1, costo: costoLista, costoTexto: costoLista === null ? "" : costoATexto(costoLista), costoLista }]);
-    setConsulta("");
-    return { clave, cantidad: ya ? ya.cantidad + 1 : 1 };
-  }, [costoATexto]);
-
-  // Lo leído con la cámara: `null` si ese código no está en el catálogo; rechaza si no se pudo buscar.
-  const agregarPorCodigo = useCallback(async (codigo: string): Promise<{ producto: Producto; clave: string; cantidad: number } | null> => {
-    const producto = await traerPorCodigo(codigo);
-    return producto ? { producto, ...agregar(producto) } : null;
-  }, [agregar]);
-
-  const cambiar = (clave: string, c: Partial<Renglon>) => setRenglones((l) => l.map((r) => (r.clave === clave ? { ...r, ...c } : r)));
-  // El costo tal como se tipea: solo dígitos, coma o punto. Vacío o ilegible, el renglón queda sin costo.
-  const cambiarCosto = (clave: string, tipeado: string) => {
-    const texto = tipeado.replace(/[^\d,.]/g, "");
-    const valor = Number(texto.replace(",", "."));
-    cambiar(clave, { costoTexto: texto, costo: texto === "" || !Number.isFinite(valor) ? null : valor });
-  };
-  const quitar = (clave: string) => setRenglones((l) => l.filter((r) => r.clave !== clave));
-  const cambiarFoto = (r: Renglon, fotoUrl: string) => {
-    if (!r.producto) return;
-    cambiar(r.clave, { producto: { ...r.producto, foto_url: fotoUrl } });
-    actualizarProducto(r.producto.id, { foto_url: fotoUrl }).catch(() => undefined);
-  };
-  // Descartar devuelve lo que había, para poder deshacerlo con `reponer`.
-  const descartar = (): Renglon[] => { const habia = lista.current; setRenglones([]); return habia; };
-
+function cuentas(proveedorId: string, renglones: Renglon[]) {
   const total = renglones.reduce((s, r) => s + (r.costo ?? 0) * r.cantidad, 0);
   const incompletos = renglones.filter(incompleto).length;
   const falta: Falta | null = !proveedorId ? "proveedor" : renglones.length === 0 ? "productos" : incompletos ? "renglones" : null;
+  return { total, incompletos, falta };
+}
 
-  // Registra si no falta nada. Devuelve lo registrado, o `null` si faltaba algo o el servidor
-  // no lo aceptó (el motivo queda en `error`); lo cargado se conserva para corregir.
-  async function registrar(): Promise<Registro | null> {
+const compraDe = (c: Cabecera, renglones: Renglon[], pedido: PedidoAIngresar | null): CompraEntrada => ({
+  id: crypto.randomUUID(), proveedor_id: c.proveedorId, fecha: c.fechaCompra, comprobante_tipo: c.comprobante, foto: c.comprobante === "sin_comprobante" ? null : c.foto,
+  pedido_id: pedido?.id ?? null,
+  items: renglones.map((x) => ({ producto_id: x.producto?.id ?? null, descripcion: x.descripcion.trim(), cantidad: x.cantidad, costo_unitario: x.costo! })),
+});
+
+const registroDe = (r: CompraRegistrada | CompraRepetida, proveedor: Proveedor | null, renglones: number, dePedido: boolean): Registro => (
+  { total: r.total, proveedor: proveedor?.nombre ?? "", renglones, costosActualizados: "repetida" in r ? 0 : r.costos_actualizados, productosNuevos: "repetida" in r ? 0 : r.productos_nuevos, dePedido });
+
+type ParaRegistrar = { cabecera: Cabecera; renglones: Renglon[]; proveedor: Proveedor | null; falta: Falta | null; opciones: OpcionesDeIngreso; alRegistrar: () => void };
+
+// Registra si no falta nada. Devuelve lo registrado, o `null` si faltaba algo o el servidor
+// no lo aceptó (el motivo queda en `error`); lo cargado se conserva para corregir.
+function useRegistrar() {
+  const [error, setError] = useState<string | null>(null);
+  const [ocupado, setOcupado] = useState(false);
+  async function registrar({ cabecera, renglones, proveedor, falta, opciones, alRegistrar }: ParaRegistrar): Promise<Registro | null> {
     if (ocupado || falta) return null;
     setOcupado(true); setError(null);
     try {
-      const r = await api<CompraRegistrada | CompraRepetida>("/compras", {
-        method: "POST",
-        body: JSON.stringify({
-          id: crypto.randomUUID(), proveedor_id: proveedorId, fecha: fechaCompra, comprobante_tipo: comprobante, foto: comprobante === "sin_comprobante" ? null : foto,
-          pedido_id: pedido?.id ?? null,
-          items: renglones.map((x) => ({ producto_id: x.producto?.id ?? null, descripcion: x.descripcion.trim(), cantidad: x.cantidad, costo_unitario: x.costo! })),
-        } satisfies CompraEntrada),
-      });
-      setRenglones([]); setFoto(null);
+      const r = await api<CompraRegistrada | CompraRepetida>("/compras", { method: "POST", body: JSON.stringify(compraDe(cabecera, renglones, opciones.pedido)) });
+      alRegistrar();
       contarAlEspejo(`Ingreso de ${proveedor?.nombre ?? "mercadería"} registrado en ${opciones.lado === "celular" ? "el celular" : "la computadora"}`);
-      return { total: r.total, proveedor: proveedor?.nombre ?? "", renglones: renglones.length, costosActualizados: "repetida" in r ? 0 : r.costos_actualizados, productosNuevos: "repetida" in r ? 0 : r.productos_nuevos, dePedido: pedido !== null };
+      return registroDe(r, proveedor, renglones.length, opciones.pedido !== null);
     } catch (e) {
       setError(e instanceof ErrorApi ? e.message : opciones.textoSinConexion);
       return null;
@@ -177,10 +131,33 @@ export function useIngreso(opciones: OpcionesDeIngreso) {
       setOcupado(false);
     }
   }
+  return { error, setError, ocupado, registrar };
+}
 
-  return {
-    catalogo, errorCatalogo, proveedores, proveedor, proveedorId, setProveedorId, comprobante, setComprobante, foto, setFoto, fechaCompra, setFechaCompra,
-    consulta, setConsulta, resultados, renglones, agregar, agregarPorCodigo, cambiar, cambiarCosto, quitar, cambiarFoto, descartar, reponer: setRenglones,
-    total, incompletos, falta, error, setError, ocupado, registrar,
-  };
+export function useIngreso(opciones: OpcionesDeIngreso) {
+  const { costoATexto, pedido } = opciones;
+  const { catalogo, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
+  const [borrador] = useState(() => leerBorrador(opciones.borrador));
+  const proveedores = useProveedoresActivos();
+  const c = useCabecera(borrador);
+  const r = useRenglonesDelIngreso(borrador?.renglones ?? [], costoATexto, actualizarProducto);
+  const reg = useRegistrar();
+  const { proveedorId, comprobante, foto, fechaCompra } = c;
+
+  // En espejo (decisión 60): el ingreso es uno solo, lo cargue quien lo cargue.
+  useEspejar<IngresoEnEspejo>("ingreso", useMemo(() => ingresoParaElEspejo(proveedorId, comprobante, foto, fechaCompra, r.renglones), [proveedorId, comprobante, foto, fechaCompra, r.renglones]), (v) => {
+    c.setProveedorId(v.proveedorId); c.setComprobante(v.comprobante as Comprobante); c.setFoto(v.foto); c.setFechaCompra(v.fecha);
+    r.setRenglones((previos) => renglonesDeIngresoDelEspejo(v, catalogo, previos, costoATexto));
+  }, true);
+  useDelPedido(pedido, costoATexto, c.setProveedorId, r.setRenglones);
+  useGuardarBorrador(opciones.borrador, { proveedorId, comprobante, foto, fechaCompra, renglones: r.renglones });
+  // Lo que respondió el servidor deja de valer en cuanto se toca lo cargado.
+  useEffect(() => { reg.setError(null); }, [proveedorId, comprobante, foto, fechaCompra, r.renglones]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const proveedor = proveedores?.find((p) => p.id === proveedorId) ?? null;
+  const resultados = useResultados(buscarProductos, r.consulta, proveedor);
+  const { total, incompletos, falta } = cuentas(proveedorId, r.renglones);
+  const registrar = () => reg.registrar({ cabecera: { proveedorId, comprobante, foto, fechaCompra }, renglones: r.renglones, proveedor, falta, opciones, alRegistrar: () => { r.setRenglones([]); c.setFoto(null); } });
+  const { setRenglones: _, ...renglones } = r;
+  return { catalogo, errorCatalogo, proveedores, proveedor, ...c, ...renglones, resultados, total, incompletos, falta, error: reg.error, setError: reg.setError, ocupado: reg.ocupado, registrar };
 }

@@ -42,53 +42,67 @@ export function botonesALaVista(): HTMLElement[] {
   return alFinal ? [...todos.filter((b) => !b.closest(alFinal!)), ...todos.filter((b) => b.closest(alFinal!))] : todos;
 }
 
+// La letra de un botón, dibujada arriba a la izquierda de él.
+function marcaDe(b: HTMLElement, letra: string): HTMLElement {
+  const r = b.getBoundingClientRect();
+  const marca = document.createElement("kbd");
+  marca.className = "atajo-letra";
+  marca.dataset.atajo = letra;
+  marca.dataset.de = b.dataset.testid ?? "";
+  marca.textContent = letra.toUpperCase();
+  marca.style.left = `${Math.max(2, r.left - 6)}px`;
+  marca.style.top = `${Math.max(2, r.top - 8)}px`;
+  return marca;
+}
+
+// La capa con las letras de los botones a la vista, y qué botón acciona cada letra.
+function capaDeLetras(): { capa: HTMLDivElement; porLetra: Map<string, HTMLElement> } {
+  const botones = botonesALaVista();
+  const letras = repartirLetras(botones.map(nombreDe), botones.map((b) => b.dataset.atajo?.toLowerCase() ?? null));
+  const capa = document.createElement("div");
+  capa.className = "atajos-capa";
+  capa.setAttribute("aria-hidden", "true");
+  const porLetra = new Map<string, HTMLElement>();
+  botones.forEach((b, i) => {
+    const letra = letras[i];
+    if (!letra) return;
+    porLetra.set(letra, b);
+    capa.appendChild(marcaDe(b, letra));
+  });
+  return { capa, porLetra };
+}
+
+// Alt + una letra sola (sin Ctrl ni Cmd): la letra, en minúscula.
+const letraConAlt = (e: KeyboardEvent) => (!e.altKey || e.ctrlKey || e.metaKey ? undefined : /^Key([A-Z])$/.exec(e.code)?.[1]?.toLowerCase());
+
+// Las letras a la vista mientras Alt está apretado; null cuando no se ven.
+function crearLetras() {
+  let actual: ReturnType<typeof capaDeLetras> | null = null;
+  // Con Alt apretado, la página lleva `con-alt`: así se ven también los números de Alt + número.
+  const ocultar = () => { actual?.capa.remove(); actual = null; document.documentElement.classList.remove("con-alt"); };
+  const mostrar = () => { ocultar(); actual = capaDeLetras(); document.body.appendChild(actual.capa); document.documentElement.classList.add("con-alt"); };
+  const botonDe = (letra: string | undefined) => (letra && actual ? actual.porLetra.get(letra) : undefined);
+  return { ocultar, mostrar, botonDe };
+}
+
 export function useAtajos(activos: boolean, opciones?: { alFinal?: string }): void {
   if (opciones) alFinal = opciones.alFinal ?? null;
   useEffect(() => {
     if (!activos) return;
-    let capa: HTMLDivElement | null = null;
-    let porLetra = new Map<string, HTMLElement>();
-    // Con Alt apretado, la página lleva `con-alt`: así se ven también los números de Alt + número.
-    const ocultar = () => { capa?.remove(); capa = null; porLetra = new Map(); document.documentElement.classList.remove("con-alt"); };
-    const mostrar = () => {
-      ocultar();
-      const botones = botonesALaVista();
-      const letras = repartirLetras(botones.map(nombreDe), botones.map((b) => b.dataset.atajo?.toLowerCase() ?? null));
-      capa = document.createElement("div");
-      capa.className = "atajos-capa";
-      capa.setAttribute("aria-hidden", "true");
-      botones.forEach((b, i) => {
-        const letra = letras[i];
-        if (!letra) return;
-        porLetra.set(letra, b);
-        const r = b.getBoundingClientRect();
-        const marca = document.createElement("kbd");
-        marca.className = "atajo-letra";
-        marca.dataset.atajo = letra;
-        marca.dataset.de = b.dataset.testid ?? "";
-        marca.textContent = letra.toUpperCase();
-        marca.style.left = `${Math.max(2, r.left - 6)}px`;
-        marca.style.top = `${Math.max(2, r.top - 8)}px`;
-        capa!.appendChild(marca);
-      });
-      document.body.appendChild(capa);
-      document.documentElement.classList.add("con-alt");
-    };
+    const letras = crearLetras();
     const alApretar = (e: KeyboardEvent) => {
-      if (e.key === "Alt") { if (!e.repeat) mostrar(); return; }
-      if (!e.altKey || e.ctrlKey || e.metaKey || !capa) return;
-      const letra = /^Key([A-Z])$/.exec(e.code)?.[1]?.toLowerCase();
-      const boton = letra ? porLetra.get(letra) : undefined;
+      if (e.key === "Alt") { if (!e.repeat) letras.mostrar(); return; }
+      const boton = letras.botonDe(letraConAlt(e));
       if (!boton) return;
       e.preventDefault(); e.stopPropagation();
-      ocultar();
+      letras.ocultar();
       boton.focus();
       boton.click();
     };
-    const alSoltar = (e: KeyboardEvent) => { if (e.key === "Alt") { e.preventDefault(); ocultar(); } };
+    const alSoltar = (e: KeyboardEvent) => { if (e.key === "Alt") { e.preventDefault(); letras.ocultar(); } };
     window.addEventListener("keydown", alApretar, true);
     window.addEventListener("keyup", alSoltar, true);
-    window.addEventListener("blur", ocultar);
-    return () => { ocultar(); window.removeEventListener("keydown", alApretar, true); window.removeEventListener("keyup", alSoltar, true); window.removeEventListener("blur", ocultar); };
+    window.addEventListener("blur", letras.ocultar);
+    return () => { letras.ocultar(); window.removeEventListener("keydown", alApretar, true); window.removeEventListener("keyup", alSoltar, true); window.removeEventListener("blur", letras.ocultar); };
   }, [activos]);
 }

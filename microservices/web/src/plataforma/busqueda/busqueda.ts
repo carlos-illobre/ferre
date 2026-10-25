@@ -29,33 +29,50 @@ export function indexar<T extends Buscable>(items: T[]): Indice<T> {
 // descripción o marca ("mad" encuentra "madera", "6" encuentra "6" y "6mm" pero no
 // "17060e"), o de algún código. Puntaje: código exacto primero, después palabra exacta,
 // después comienzo de palabra; a igual puntaje, la descripción más corta primero.
+function puntajeEnCodigos(codigos: string[], q: string): number {
+  let mejor = 0;
+  for (const c of codigos) {
+    if (c === q) return 100;
+    if (c.startsWith(q)) mejor = 5;
+  }
+  return mejor;
+}
+
+// La primera palabra pesa el doble.
+function puntajeEnPalabras(palabras: string[], q: string): number {
+  let mejor = 0;
+  palabras.forEach((p, j) => {
+    if (p === q) mejor = Math.max(mejor, j === 0 ? 20 : 10);
+    else if (p.startsWith(q)) mejor = Math.max(mejor, j === 0 ? 4 : 2);
+  });
+  return mejor;
+}
+
+const puntajeDe = (codigos: string[], palabras: string[], q: string) => {
+  const enCodigos = puntajeEnCodigos(codigos, q);
+  return enCodigos === 100 ? 100 : Math.max(enCodigos, puntajeEnPalabras(palabras, q));
+};
+
+// El puntaje del elemento para toda la consulta; null si alguna palabra no está.
+function puntajeDelItem(codigos: string[], palabras: string[], consulta: string[]): number | null {
+  let puntaje = 0;
+  for (const q of consulta) {
+    const mejor = puntajeDe(codigos, palabras, q);
+    if (mejor === 0) return null;
+    puntaje += mejor;
+  }
+  return puntaje;
+}
+
 export function buscar<T extends Buscable>(indice: Indice<T>, consulta: string, maximo = 50): T[] {
   const consultaPalabras = normalizar(consulta).split(" ").filter(Boolean);
   if (consultaPalabras.length === 0) return [];
   const puntuados: { item: T; puntaje: number; largo: number }[] = [];
-  for (let i = 0; i < indice.items.length; i++) {
+  indice.items.forEach((item, i) => {
     const palabras = indice.palabras[i]!;
-    const codigos = indice.codigos[i]!;
-    let puntaje = 0;
-    let todas = true;
-    for (const q of consultaPalabras) {
-      let mejor = 0;
-      for (const c of codigos) {
-        if (c === q) { mejor = 100; break; }
-        if (c.startsWith(q)) mejor = Math.max(mejor, 5);
-      }
-      if (mejor < 100) {
-        for (let j = 0; j < palabras.length; j++) {
-          const p = palabras[j]!;
-          if (p === q) { mejor = Math.max(mejor, j === 0 ? 20 : 10); }
-          else if (p.startsWith(q)) mejor = Math.max(mejor, j === 0 ? 4 : 2);
-        }
-      }
-      if (mejor === 0) { todas = false; break; }
-      puntaje += mejor;
-    }
-    if (todas) puntuados.push({ item: indice.items[i]!, puntaje, largo: palabras.length });
-  }
+    const puntaje = puntajeDelItem(indice.codigos[i]!, palabras, consultaPalabras);
+    if (puntaje !== null) puntuados.push({ item, puntaje, largo: palabras.length });
+  });
   puntuados.sort((a, b) => b.puntaje - a.puntaje || a.largo - b.largo);
   return puntuados.slice(0, maximo).map((p) => p.item);
 }
