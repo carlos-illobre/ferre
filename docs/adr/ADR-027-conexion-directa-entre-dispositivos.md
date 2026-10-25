@@ -129,3 +129,10 @@ un comentario en cada pieza que dice qué hace; y la cobertura de sus pruebas un
 - Si en el local la directa casi nunca se puede (el indicador lo muestra): el respaldo alcanza y
   la directa sobra.
 - Si hace falta avisar al celular con la aplicación cerrada (segunda etapa): notificaciones push.
+
+## Enmienda (2026-10-25): el vínculo va por el canal único
+
+Con ADR-030 la sala del vínculo es un tema del canal único del dispositivo, y la central pasa a
+ser parte de los canales del servidor. Armada la directa, cada lado suelta el tema y el canal se
+cierra si nadie más lo usa: el servidor solo sirve para encontrarse y de respaldo. Con la
+aplicación oculta, el canal se cierra; la directa armada sigue.

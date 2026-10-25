@@ -2,8 +2,6 @@
 
 **Spec**: [spec.md](spec.md) · **Decisión**: 160 · **ADR**: ADR-030 (se escribe con este paso)
 
-Borrador escrito junto con la especificación, para que Carlos vea el diseño; se confirma cuando
-apruebe la spec.
 
 ## La idea en una línea
 

@@ -4,9 +4,9 @@
 
 **Created**: 2026-10-25
 
-**Status**: Borrador, para que Carlos lo apruebe
+**Status**: Aprobada (Carlos, 2026-10-25)
 
-**Maquetas**: No hacen falta: ninguna pantalla cambia de aspecto.
+**Maquetas**: No lleva pantallas: ninguna pantalla cambia de aspecto.
 
 **Input**: Carlos, el 2026-10-25, después de sacar el timer de la versión nueva (decisión 157) y
 el de la sesión cerrada (decisión 158): «rediseñemos lo de ese temporizador […] poné foco en
