@@ -130,7 +130,9 @@ La base vive en la máquina y no se alcanza desde internet: el monitor no la con
 ## Respaldo y recuperación
 
 **Todavía no hay copias de la base** (etapa 1 del almacenamiento, decisión 150): si se pierde el
-disco de la máquina, se pierde la base. Llegan por etapas (`proyecto/tasks.md`, «Almacenamiento de
+disco de la máquina, se pierde la base. Es aceptado mientras no haya datos reales: las copias se
+arman antes de empezar a usar producción, después de la prueba con el empleado (decisión 163;
+la propuesta está en `proyecto/tasks.md`, T140). Llegan por etapas (`proyecto/tasks.md`, «Almacenamiento de
 datos»): la copia por noche fuera de Oracle en la etapa 2; la copia continua, la prueba de
 restauración y los avisos en la etapa 4; la copia semanal en otro proveedor en la etapa 5.
 

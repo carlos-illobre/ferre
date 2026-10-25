@@ -1370,3 +1370,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      el `.env` de la máquina. Es la única excepción a «todo lo que cambia entre ambientes va
      en el `.env`». No se deduce el ambiente de la carpeta: el código tendría que saber cuál
      carpeta es producción.
+
+163. **Las copias de la base esperan al uso en producción** (2026-10-25). Carlos fijó tres fases
+     de uso del sistema: (1) desarrollo, la de ahora; (2) prueba con el empleado, que usa el
+     ambiente de pruebas y da su opinión, hasta corregir los defectos que encuentre; (3) uso en
+     producción. Recién en la tercera hay datos que cuidar, así que la etapa 2 del
+     almacenamiento (copias por noche, guía de restauración probada y Tickets en su servicio)
+     queda documentada y se hace antes de empezar a usar producción, no ahora. Hasta entonces,
+     perder la base no pierde nada real.
