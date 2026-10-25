@@ -279,8 +279,7 @@ Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con 
 - [ ] T144 [agente] Usuarios y acceso en su propio servicio con su base, cuando un tercer servicio necesite iniciar sesión (depende de T143)
 - [ ] T145 [agente] Etapa 6: réplica en caliente en una segunda máquina y archivos para análisis (Parquet con DuckDB) (depende de T143)
 - [ ] T146 [carlos] Crear las cuentas gratuitas de Cloudflare R2, Backblaze B2 y Healthchecks.io (antes de T140)
-- [ ] T147 [carlos] [alta] En la máquina, para la base propia (022): agregar al .env de pruebas y de producción AMBIENTE, CLAVE_BASE_ADMIN, CLAVE_BASE_MOSTRADOR, CLAVE_BASE_PROCESOS y PUERTO_BASE (deployment/oracle-single/<ambiente>/.env.oracle), quitar DATABASE_URL, reinstalar el script de despliegue (deployment/oracle-single/maquina/instalar.sh) y borrar en GitHub los secretos BASE_PRODUCCION y BASE_PRUEBAS. Hasta entonces el despliegue de pruebas vuelve solo a la versión anterior (depende de T139)
-- [ ] T148 [agente] [alta] Las pruebas de punta a punta quedaron atrás de la interfaz v2 (021): 37 fallan igual en master antes de 022 (2026-10-24, 05d796a), porque buscan botones, textos y títulos que la v2 cambió (por ejemplo «mas-usuarios», que ya no existe, o los títulos de Listas). Ponerlas al día con la v2 en celular y computadora
+- [ ] T150 [carlos] [alta] En la máquina, para la base propia (022): agregar al .env de pruebas y de producción AMBIENTE, CLAVE_BASE_ADMIN, CLAVE_BASE_MOSTRADOR, CLAVE_BASE_PROCESOS y PUERTO_BASE (deployment/oracle-single/<ambiente>/.env.oracle), quitar DATABASE_URL, reinstalar el script de despliegue (deployment/oracle-single/maquina/instalar.sh) y borrar en GitHub los secretos BASE_PRODUCCION y BASE_PRUEBAS. Hasta entonces el despliegue de pruebas vuelve solo a la versión anterior (depende de T139)
 
 ## Sin etapa
 

@@ -1532,7 +1532,7 @@ RNF-64:
     - microservices/api/src/rutas/stock.test.ts
     - microservices/web/src/datos/almacenamiento/descarga.test.tsx
   defectos:
-    - "Carlos tiene que agregar las claves de la base al .env de cada ambiente en la máquina y borrar los secretos BASE_PRODUCCION y BASE_PRUEBAS (T147)"
+    - "Carlos tiene que agregar las claves de la base al .env de cada ambiente en la máquina y borrar los secretos BASE_PRODUCCION y BASE_PRUEBAS (T150)"
     - "La prueba de E07 comprueba que migrar de nuevo no aplica nada, no que la aplicación responda sin productos ni ventas con la base vacía (revisión de 022, 1.5)"
 
 RNF-65:

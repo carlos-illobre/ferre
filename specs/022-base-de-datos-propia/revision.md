@@ -176,7 +176,7 @@ seguir).
   usan su propio usuario.
 - **Las tres claves en el `.env`, que no se sube: se cumple** (`.gitignore:13`). Las plantillas
   traen marcadores y la imagen no lleva claves, porque `iniciar.sh` las lee al arrancar. Los
-  secretos de Supabase en GitHub quedan como tarea de Carlos (T147, anotada en `estado.yml`): no
+  secretos de Supabase en GitHub quedan como tarea de Carlos (T150, anotada en `estado.yml`): no
   lo pude comprobar.
 - **Quién hizo qué: se cumple, con el matiz de la hora** del punto 1.6: los eventos ahora se
   fechan con el reloj del proceso, no con el de la base.
