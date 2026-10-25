@@ -1,4 +1,4 @@
-import { mandarAlOtro } from "../enlace";
+import { mandarAlOtro } from "../../datos/vinculo";
 import { enEspejo, oyentesDeAvisos } from "./estado";
 
 // Contarle al otro lado algo que terminó acá: se le muestra un momento y no se guarda.

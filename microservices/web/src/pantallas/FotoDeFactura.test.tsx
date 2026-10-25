@@ -6,7 +6,7 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a), reducirImagen: async (f: File) => f }));
 
 const falso = vi.hoisted(() => ({ enlace: null as unknown as ReturnType<typeof import("../pruebas/enlace-falso")["crearEnlaceFalso"]> }));
-vi.mock("../enlace", async () => { const { crearEnlaceFalso } = await import("../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
+vi.mock("../datos/vinculo/enlace", async () => { const { crearEnlaceFalso } = await import("../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
 
 import { FotoDeFactura } from "./FotoDeFactura";
 import { FotoParaLaCompu } from "./FotoParaLaCompu";

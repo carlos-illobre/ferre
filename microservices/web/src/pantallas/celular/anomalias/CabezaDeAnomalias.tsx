@@ -1,4 +1,4 @@
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { useParaRevisar } from "../../../negocio/apartados";
 import { usePuede } from "../../permisos";
 import { PESTANAS_DE_ANOMALIAS, type PestanaDeAnomalias } from "../../pestanas-de-anomalias";

@@ -1,6 +1,6 @@
 // La venta en curso, su búsqueda y lo que comparten el celular y la computadora al vender.
 export * from "./venta";
-export { agregarALaVenta, ventaActual, useVentaEnCurso, type Item } from "./venta-en-curso";
+export { agregarALaVenta, vaciarVenta, ventaActual, useVentaEnCurso, type Item } from "./venta-en-curso";
 export * from "./llegados-del-celular";
 export * from "./busqueda-de-venta";
 export * from "./celular-que-escanea";
@@ -14,3 +14,4 @@ export { aEntrada, conCantidad, conPrecio, empezarCorreccion, subtotalCorregido,
 export { aEntradaDeCambio, diferenciaDelCambio, paraVolver, paraVolverDeLaBusqueda, resolucionDelCambio, sePuedeCambiar, useRegistrarCambio, useVentasParaCambio, valorQueVuelve, type ParaVolver, type SeLleva, type VentaParaCambio, type Vuelve } from "./cambio";
 export * from "./tablero";
 export { useVentaEnEspejo } from "./venta-en-espejo";
+export { precioDe as precioDelSugerido, useSugeridos, type Sugeridos } from "./sugeridos";

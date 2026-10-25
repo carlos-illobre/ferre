@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { EVENTO_EMPAREJAMIENTO, puestoLocal, puestoRemoto } from "../../puesto";
-import { escucharPuesto, pedirLector } from "../../codigos-del-celular";
+import { EVENTO_EMPAREJAMIENTO, puestoLocal, puestoRemoto } from "../../datos/vinculo";
+import { escucharPuesto, pedirLector } from "../../datos/vinculo";
 
 // Los códigos que lee el celular vinculado a este puesto entran a la venta. El emparejamiento
 // puede llegar después de abrir la pantalla (se pone al día con el servidor) o soltarse.

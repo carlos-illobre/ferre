@@ -1,5 +1,5 @@
 import { useVentaEnCurso } from "../../../negocio/ventas";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { Icono } from "../componentes/base";
 import type { MenuDelCelular } from "./menu-del-celular";
 

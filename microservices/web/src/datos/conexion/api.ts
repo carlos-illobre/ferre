@@ -1,5 +1,5 @@
-import { crearCliente, ErrorDelServidor, esFaltaDeRed } from "../../plataforma/servidor/cliente";
-import { reducirImagen } from "../../plataforma/imagenes/reducir";
+import { crearCliente, ErrorDelServidor, esFaltaDeRed } from "../../plataforma/servidor";
+import { reducirImagen } from "../../plataforma/imagenes";
 import type { FotoSubida } from "@servidor/productos";
 import { deEsteAmbiente } from "../../plataforma/ambiente";
 

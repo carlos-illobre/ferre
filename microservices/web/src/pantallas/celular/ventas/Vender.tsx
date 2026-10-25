@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { usePuede } from "../../permisos";
 import { BarraDeCobro } from "./BarraDeCobro";
 import { CabezaDeVender } from "./CabezaDeVender";

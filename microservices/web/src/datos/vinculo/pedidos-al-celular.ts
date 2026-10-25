@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { alMensajeDelOtro, arrancarEnlace, mandarAlOtro } from "./enlace";
 import { puestoLocal } from "./puesto";
-import { reducirImagen } from "./datos/conexion";
+import { reducirImagen } from "../conexion";
 
 // Lo que la computadora le pide a su celular emparejado (decisiones 59 y 152): que haga de lector
 // o una foto (la factura de un ingreso, un producto, la captura de un ticket). Viaja por el

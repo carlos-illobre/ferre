@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, ErrorApi } from "../../datos/conexion";
 import { productoEnMemoria, traerPorIds, useCatalogo } from "../catalogo";
-import { contarAlEspejo, useEspejar } from "../../espejo";
+import { contarAlEspejo, useEspejar } from "../espejo";
 import { hoyLocal } from "../formato";
 import type { Producto } from "../catalogo";
 import { useProveedoresActivos, type Proveedor } from "../proveedores";

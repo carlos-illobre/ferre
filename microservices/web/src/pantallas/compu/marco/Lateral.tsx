@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useEtiqueta } from "../../../plataforma/comandos";
 import { saltar } from "../../../plataforma/animacion";
-import { useEspejo } from "../../../espejo";
+import { useEspejo } from "../../../negocio/espejo";
 import { VERSION } from "../../../plataforma/ambiente";
 import { useSesionPropia } from "../../../negocio/usuarios";
 import { useVentaEnCurso } from "../../../negocio/ventas";

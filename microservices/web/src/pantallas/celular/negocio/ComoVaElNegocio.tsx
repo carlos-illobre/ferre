@@ -1,4 +1,4 @@
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { usePuede } from "../../permisos";
 import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../../pestanas-de-negocio";
 import { CabezaDeNegocio } from "./CabezaDeNegocio";

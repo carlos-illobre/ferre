@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { destinoDelCodigo } from "../../../negocio/entrada";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 
 // Vincular con la computadora sin salir de la aplicación: la cámara se abre acá adentro y lee
 // el código que la computadora muestra en «Vincular el celular» (o en su entrada).

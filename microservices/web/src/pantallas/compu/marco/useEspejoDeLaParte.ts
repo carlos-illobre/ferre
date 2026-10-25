@@ -1,4 +1,4 @@
-import { useEspejar } from "../../../espejo";
+import { useEspejar } from "../../../negocio/espejo";
 import { irA, type Ruta } from "../base/rutas";
 import { A_PARTE_COMUN, DE_PARTE_COMUN, type Parte } from "./menu";
 

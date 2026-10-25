@@ -1,7 +1,7 @@
-import type { MensajeDelEnlace } from "../enlace";
+import type { MensajeDelEnlace } from "../datos/vinculo";
 
 // Un enlace con el otro dispositivo, de mentira: guarda lo que se manda y deja hacer llegar
-// mensajes del otro lado. Se usa con `vi.mock("../enlace", () => enlaceFalso.modulo)`.
+// mensajes del otro lado. Se usa con `vi.mock("../datos/vinculo", () => enlaceFalso.modulo)`.
 export function crearEnlaceFalso() {
   const mandados: MensajeDelEnlace[] = [];
   const oyentes = new Set<(m: MensajeDelEnlace) => void>();

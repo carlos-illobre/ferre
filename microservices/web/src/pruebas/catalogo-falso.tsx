@@ -2,7 +2,7 @@ import { useMemo, useReducer, useState } from "react";
 import { vi } from "vitest";
 import type { Producto } from "../negocio/catalogo";
 import type { ConsultaDeLista } from "../negocio/catalogo";
-import { buscar, indexar } from "../plataforma/busqueda/busqueda";
+import { buscar, indexar } from "../plataforma/busqueda";
 
 // Un catálogo en memoria con la misma búsqueda que la app, y `actualizarProducto` espiado.
 export function producto(extra: Partial<Producto> & { id: string; descripcion: string }): Producto {

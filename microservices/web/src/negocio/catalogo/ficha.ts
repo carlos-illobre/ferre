@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, ErrorApi } from "../../datos/conexion";
-import { precioDeVenta, preciosDeUnProducto } from "../precios/vista-previa";
+import { precioDeVenta, preciosDeUnProducto } from "../precios";
 import type { OrigenDeLista } from "@servidor/listas";
 import type { Producto } from "../../datos/almacenamiento";
 

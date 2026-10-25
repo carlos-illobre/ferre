@@ -1,4 +1,4 @@
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { TEXTOS } from "../../textos";
 import { Hoja, Icono } from "../componentes/base";
 import { BuscarProducto } from "./BuscarProducto";

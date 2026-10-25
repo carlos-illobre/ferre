@@ -1,4 +1,4 @@
-import { alCambiarElVinculo, alMensajeDelOtro, arrancarEnlace, elOtroEsta, estadoDelVinculo, mandarAlOtro, type Lado, type MensajeDelEnlace } from "../enlace";
+import { alCambiarElVinculo, alMensajeDelOtro, arrancarEnlace, elOtroEsta, estadoDelVinculo, mandarAlOtro, type Lado, type MensajeDelEnlace } from "../../datos/vinculo";
 
 // El espejo entre el celular y la computadora emparejados (decisión 60). Con la aplicación
 // abierta en los dos, están en la misma parte y comparten el trabajo en curso (la venta).

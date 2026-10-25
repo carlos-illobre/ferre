@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useCodigoParaVincular } from "../../../negocio/vinculo";
-import { guardarPuestoLocal, puestoLocal } from "../../../puesto";
+import { guardarPuestoLocal, puestoLocal } from "../../../negocio/vinculo";
 
 // Cuando Vender del celular se ve en una pantalla ancha: "Vincular celular" muestra un QR; cuando
 // el celular lo lee, quedan vinculados y esta pantalla lo indica. La regla está en negocio/vinculo.ts.

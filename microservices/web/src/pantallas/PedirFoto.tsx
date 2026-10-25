@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { pedirFotoAlCelular } from "../pedidos-al-celular";
-import { puestoLocal } from "../puesto";
+import { pedirFotoAlCelular } from "../negocio/vinculo";
+import { puestoLocal } from "../negocio/vinculo";
 import "./foto-de-factura.css";
 
 // La computadora no tiene cámara: donde haga falta una foto se la pide al celular emparejado, que

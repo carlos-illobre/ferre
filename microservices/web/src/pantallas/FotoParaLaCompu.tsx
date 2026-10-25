@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { fotoPedida, mandarFotoALaCompu } from "../pedidos-al-celular";
+import { fotoPedida, mandarFotoALaCompu } from "../negocio/vinculo";
 import "./foto-de-factura.css";
 
 type Estado = "lista" | "subiendo" | "enviada" | "vencido";

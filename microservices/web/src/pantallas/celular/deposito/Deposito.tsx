@@ -2,7 +2,7 @@ import { pantallaDeCompras } from "../../../negocio/compras";
 import { Pedidos } from "../../comun/deposito/Pedidos";
 import { usePuede, type Permiso } from "../../permisos";
 import { SinPermiso } from "../../SinPermiso";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { Pestanas } from "../Pestanas";
 import { ComprasRecientes } from "../compras/ComprasRecientes";
 import { Contar } from "./Contar";

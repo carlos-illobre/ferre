@@ -3,7 +3,7 @@ import { useComandos, type Acciones } from "../../../plataforma/comandos";
 import { useCatalogo } from "../../../negocio/catalogo";
 import { alApretarEnter, useBusquedaDeVenta, useCelularQueEscanea, useQuitarConDeshacer } from "../../../negocio/ventas";
 import { MEDIOS, TEXTOS } from "../../textos";
-import { useSugeridos } from "../../sugeridos";
+import { useSugeridos } from "../../../negocio/ventas";
 import { useCamaraDeLaVenta } from "./useCamaraDeLaVenta";
 import { useVentaDelCelular } from "./useVentaDelCelular";
 

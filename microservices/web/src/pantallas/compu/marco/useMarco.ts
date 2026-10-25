@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useEspejo } from "../../../espejo";
-import { sincronizarEmparejamiento } from "../../../puesto";
+import { useEspejo } from "../../../negocio/espejo";
+import { sincronizarEmparejamiento } from "../../../negocio/vinculo";
 import type { UsuarioDeLaSesion } from "../../../negocio/usuarios";
 import type { Ruta } from "../base/rutas";
 import { useEspejoDeLaParte } from "./useEspejoDeLaParte";

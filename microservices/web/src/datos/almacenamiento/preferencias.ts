@@ -1,4 +1,4 @@
-import { crearPreferencias } from "../../plataforma/preferencias/preferencias";
+import { crearPreferencias } from "../../plataforma/preferencias";
 
 // Las preferencias de Ferrebress en este dispositivo (RF-83). El mecanismo es tecnología de la
 // plataforma; acá se dice cuáles son:

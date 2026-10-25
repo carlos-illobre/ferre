@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Acciones } from "../../../plataforma/comandos";
 import { busquedaAlDia, esperarBusqueda } from "../../../negocio/catalogo";
 import { detalleDelRegistro, useIngreso } from "../../../negocio/deposito";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { usePedidoAIngresar } from "../../../negocio/deposito";
 
 // El estado del Ingreso en el celular. Si se viene de un pedido (RF-55), arranca con su proveedor y

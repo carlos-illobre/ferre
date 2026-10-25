@@ -1,7 +1,7 @@
 import { api, ErrorApi, EVENTO_SESION_CERRADA, urlApi } from "../conexion";
 import { abrirBase, guardarMeta } from "./almacen";
 import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "./guardado";
-import { crearCola, type Cambio } from "../../plataforma/sin-conexion/cola";
+import { crearCola, type Cambio } from "../../plataforma/sin-conexion";
 import { idDelUsuarioDeEsteDispositivo } from "../sesion";
 import { deEsteAmbiente } from "../../plataforma/ambiente";
 

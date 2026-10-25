@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "../datos/conexion";
-import { leerTodo } from "../datos/almacenamiento";
-import { traerPorIds } from "../negocio/catalogo";
-import type { Producto } from "../negocio/catalogo";
-import { precioDelProducto } from "../negocio/catalogo/precio";
+import { api } from "../../datos/conexion";
+import { leerTodo } from "../../datos/almacenamiento";
+import { traerPorIds } from "../catalogo";
+import type { Producto } from "../catalogo";
+import { precioDelProducto } from "../catalogo";
 import type { UltimosProductos } from "@servidor/ventas";
 
 // Para que la venta nueva no arranque vacía (decisión 133): los productos de las últimas cuatro

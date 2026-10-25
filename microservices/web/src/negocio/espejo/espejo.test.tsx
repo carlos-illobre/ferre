@@ -3,8 +3,8 @@ import { act, render } from "@testing-library/react";
 
 // El espejo sobre la conexión entre los dos (specs/023): al encontrarse, cada lado le cuenta al
 // otro lo que tiene, y las reglas de quién sigue a quién no cambian (decisiones 60 y 71).
-const falso = vi.hoisted(() => ({ enlace: null as unknown as ReturnType<typeof import("../pruebas/enlace-falso")["crearEnlaceFalso"]> }));
-vi.mock("../enlace", async () => { const { crearEnlaceFalso } = await import("../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
+const falso = vi.hoisted(() => ({ enlace: null as unknown as ReturnType<typeof import("../../pruebas/enlace-falso")["crearEnlaceFalso"]> }));
+vi.mock("../../datos/vinculo/enlace", async () => { const { crearEnlaceFalso } = await import("../../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
 
 type Espejo = typeof import(".");
 let espejo: Espejo;

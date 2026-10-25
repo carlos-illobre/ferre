@@ -6,8 +6,8 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { ErrorApi } from "../../../datos/conexion";
 import { EntrarEnLaCompu } from "./EntrarEnLaCompu";
-import { alAvisoDelEspejo } from "../../../espejo";
-import { irA } from "../../../rutas";
+import { alAvisoDelEspejo } from "../../../negocio/espejo";
+import { irA } from "../rutas";
 import { destinoDelCodigo, Entrar } from "./Entrar";
 
 const huella = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());

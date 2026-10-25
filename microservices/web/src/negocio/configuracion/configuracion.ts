@@ -4,8 +4,8 @@ import { apartados, pendientes } from "../../datos/almacenamiento";
 import { cambiarPreferencia } from "../../datos/almacenamiento";
 import { guardaEnElDispositivo } from "../../datos/almacenamiento";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../datos/credenciales";
-import { pausarEspejo, useEspejo } from "../../espejo";
-import { puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../puesto";
+import { pausarEspejo, useEspejo } from "../espejo";
+import { puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../datos/vinculo";
 
 // Configuración como la v2 (specs/009, decisión 148): lo que hacen las dos interfaces, una sola vez.
 // Cada interfaz dibuja su pantalla con esto.

@@ -11,7 +11,7 @@ import { PESTANAS_DE_USUARIOS } from "./pestanas-de-usuarios";
 import { DE_MAS as DE_MAS_COMPU } from "./compu/marco/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
 import { CabezaDeNegocio } from "./celular/negocio/CabezaDeNegocio";
-import { irA } from "../rutas";
+import { irA } from "./celular/rutas";
 import { Usuarios } from "./compu/negocio/Usuarios";
 
 // Más → Usuarios (decisión 88): una sola opción con cuatro pestañas, igual en las dos interfaces.

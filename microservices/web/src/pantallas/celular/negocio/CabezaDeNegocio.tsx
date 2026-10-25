@@ -1,4 +1,4 @@
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { usePuede } from "../../permisos";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "../../pestanas-de-negocio";
 import { type PestanaDeUsuarios } from "../../pestanas-de-usuarios";

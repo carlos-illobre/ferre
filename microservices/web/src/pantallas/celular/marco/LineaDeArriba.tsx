@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCatalogo } from "../../../negocio/catalogo";
-import { alAvisoDelEspejo } from "../../../espejo";
+import { alAvisoDelEspejo } from "../../../negocio/espejo";
 import { EstadoDeConexion } from "../componentes/EstadoDeConexion";
 
 // Buscando en el servidor (RF-85): mientras una consulta está en curso, se dice arriba.

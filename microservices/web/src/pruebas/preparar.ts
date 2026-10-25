@@ -2,7 +2,7 @@ import "fake-indexeddb/auto";
 import { afterEach, beforeAll, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 // Directo al archivo y no al index: el index cargaría la API antes de que cada prueba la reemplace.
-import { consultas } from "../datos/conexion/consultas";
+import { consultas } from "../datos/conexion";
 import { conTodosLosPermisos, usuarioDePrueba } from "./sesion";
 import { instalarLasTablasParaLasPruebas } from "../teclado";
 
@@ -46,5 +46,5 @@ window.alert = () => undefined;
 // La venta se trae después de que cada prueba pone sus vi.mock: importarla acá arriba cargaría
 // antes los módulos de los datos (cada index.ts trae todo su módulo).
 let vaciarVenta = () => {};
-beforeAll(async () => { ({ vaciarVenta } = await import("../negocio/ventas/venta-en-curso")); });
+beforeAll(async () => { ({ vaciarVenta } = await import("../negocio/ventas")); });
 afterEach(() => { cleanup(); localStorage.clear(); consultas.clear(); conTodosLosPermisos(); vaciarVenta(); });

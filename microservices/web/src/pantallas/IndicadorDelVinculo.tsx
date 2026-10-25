@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { alCambiarElVinculo, estadoDelVinculo, probarDirecta, type EstadoDelVinculo } from "../enlace";
-import { alAvisoDelEspejo, pausarEspejo, useEspejo } from "../espejo";
-import { puestoRemoto } from "../puesto";
+import { alCambiarElVinculo, estadoDelVinculo, probarDirecta, type EstadoDelVinculo } from "../negocio/vinculo";
+import { alAvisoDelEspejo, pausarEspejo, useEspejo } from "../negocio/espejo";
+import { puestoRemoto } from "../negocio/vinculo";
 import { useComandos } from "../plataforma/comandos";
 import { TEXTOS, TEXTOS_DEL_VINCULO, texto, type Texto } from "./textos";
 

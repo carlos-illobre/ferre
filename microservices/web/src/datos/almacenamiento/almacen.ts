@@ -1,5 +1,5 @@
 import { guardaEnElDispositivo } from "./guardado";
-import { crearBaseLocal } from "../../plataforma/almacenamiento/base-local";
+import { crearBaseLocal } from "../../plataforma/almacenamiento";
 import { deEsteAmbiente } from "../../plataforma/ambiente";
 
 // Lo que el mostrador necesita sin conexión (ADR-005): catálogo, stock, clientes, ventas de los

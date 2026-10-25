@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { preferencias, recargarPreferencias } from "./datos/almacenamiento";
-import { Configuracion } from "./pruebas/configuracion";
+import { preferencias, recargarPreferencias } from "../datos/almacenamiento";
+import { Configuracion } from "../pruebas/configuracion";
 
 // Configuración ya no tiene nada sobre la versión nueva: se busca sin timer (decisión 157, RF-96).
 describe("Configuración · sin «Buscar versión nueva»", () => {

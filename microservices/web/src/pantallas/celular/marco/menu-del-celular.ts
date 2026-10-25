@@ -1,4 +1,4 @@
-import type { Ruta } from "../../../rutas";
+import type { Ruta } from "../rutas";
 import type { UsuarioDeLaSesion } from "../../../negocio/usuarios";
 import { puede, type Permiso } from "../../permisos";
 import { PESTANAS_DE_USUARIOS } from "../../pestanas-de-usuarios";

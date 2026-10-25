@@ -42,7 +42,7 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
 - **La navegación es de React Router**, por hash (`#/catalogo/listas`), en
   `plataforma/navegacion/rutas-por-hash.tsx`: React Router lleva la dirección, el historial y la
   transición animada, y una sola ruta comodín muestra la aplicación, que elige la pantalla con
-  `useRuta`. Cada interfaz tiene su configuración (`src/rutas.ts` el celular, que anima;
+  `useRuta`. Cada interfaz tiene su configuración (`pantallas/celular/rutas.ts` el celular, que anima;
   `pantallas/compu/base/rutas.ts` la computadora, que no) y va envuelta en su `ConRutas`. `irA`
   se puede llamar desde cualquier lado (el espejo, un aviso).
 - **La forma de las respuestas la escribe el servidor**, en `microservices/api/src/contratos/`,

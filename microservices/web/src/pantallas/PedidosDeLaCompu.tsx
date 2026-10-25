@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fotoDejada, lectorAtendido, usePedidosDeLaCompu } from "../pedidos-al-celular";
+import { fotoDejada, lectorAtendido, usePedidosDeLaCompu } from "../negocio/vinculo";
 import "./pedidos-de-la-compu.css";
 
 // En el celular emparejado (decisiones 58 y 59): cuando la computadora pide una foto (la

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { pedirLector } from "../../../codigos-del-celular";
+import { pedirLector } from "../../../negocio/vinculo";
 import { Boton, Pastilla } from "../base/ui";
 import { HojaParaVincular } from "./HojaParaVincular";
 

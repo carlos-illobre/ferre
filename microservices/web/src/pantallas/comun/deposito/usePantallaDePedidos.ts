@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePedidos, type Borrador } from "../../../negocio/deposito";
-import { useEspejar } from "../../../espejo";
+import { useEspejar } from "../../../negocio/espejo";
 import { usePuede } from "../../permisos";
 
 // Los pedidos, el abierto o el borrador nuevo, y el aviso de lo último que se hizo (siete segundos).

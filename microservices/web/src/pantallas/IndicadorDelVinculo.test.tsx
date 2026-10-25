@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 
 // El indicador de la conexión entre el celular y la computadora (specs/023, variante A).
 const falso = vi.hoisted(() => ({ enlace: null as unknown as ReturnType<typeof import("../pruebas/enlace-falso")["crearEnlaceFalso"]> }));
-vi.mock("../enlace", async () => { const { crearEnlaceFalso } = await import("../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
+vi.mock("../datos/vinculo/enlace", async () => { const { crearEnlaceFalso } = await import("../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
 import { IndicadorDelVinculo } from "./IndicadorDelVinculo";
 
 beforeEach(() => falso.enlace.olvidar());

@@ -1,6 +1,6 @@
 import { comoVieneElPedido, type Pedido } from "../../../negocio/compras";
 import { fecha } from "../../../negocio/formato";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../../../ui/iconos";
 import css from "./Compras.module.css";

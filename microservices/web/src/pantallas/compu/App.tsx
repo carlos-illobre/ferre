@@ -1,4 +1,4 @@
-import "../../plataforma/animacion/animacion.css";
+import "../../plataforma/animacion";
 // Las hojas de las piezas que comparten las pantallas, antes que los módulos de cada pantalla:
 // un módulo pisa lo de ellas con el mismo peso (specs/024).
 import "../medios.css";

@@ -1,4 +1,4 @@
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { usePuede } from "../../permisos";
 import { SinPermiso } from "../../SinPermiso";
 import { EstadoDeConexion } from "../componentes/EstadoDeConexion";

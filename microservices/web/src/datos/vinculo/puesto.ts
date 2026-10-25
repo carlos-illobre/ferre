@@ -1,6 +1,6 @@
-import { api } from "./datos/conexion";
+import { api } from "../conexion";
 import type { VinculoDeLaSesion, VinculosDeLaSesion } from "@servidor/puestos";
-import { deEsteAmbiente } from "./plataforma/ambiente";
+import { deEsteAmbiente } from "../../plataforma/ambiente";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). La computadora es un "puesto";
 // el celular emparejado le manda cada código escaneado y recibe sus pedidos de foto, por el

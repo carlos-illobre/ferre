@@ -1,7 +1,7 @@
 import { api, reducirImagen } from "../datos/conexion";
 import { consultas } from "../datos/conexion";
 import { useDelServidor } from "./del-servidor";
-import { stockCambio } from "./deposito/inventario";
+import { stockCambio } from "./deposito";
 import type { AnulacionDeCompra, CompraReciente, FotoDeComprobante, GastosDeLaSemana } from "@servidor/compras";
 import type { Pedido } from "@servidor/pedidos";
 

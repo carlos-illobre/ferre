@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { productoEnMemoria, traerPorIds, useCatalogo } from "../catalogo";
-import { useEspejar, useEspejo } from "../../espejo";
+import { useEspejar, useEspejo } from "../espejo";
 import { marcarLoQueEntro } from "./llegados-del-celular";
 import type { MedioDePago } from "@servidor/ventas";
 import { cambiarVenta, useVentaEnCurso, ventaActual } from "./venta-en-curso";

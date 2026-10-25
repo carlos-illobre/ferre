@@ -1,7 +1,7 @@
 import { crearEnlace, type Enlace, type EstadoDelEnlace } from "conexion-entre-dispositivos/navegador";
-import { leerToken, urlApi } from "./datos/conexion";
+import { leerToken, urlApi } from "../conexion";
 import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, guardarPuestoRemoto, puestoLocal, puestoRemoto } from "./puesto";
-import { EVENTO_SESION_ABIERTA } from "./datos/sesion";
+import { EVENTO_SESION_ABIERTA } from "../sesion";
 
 // La conexión entre el celular y la computadora emparejados (specs/023, ADR-027). Un solo enlace
 // por aplicación, el del vínculo que tenga este dispositivo: directo entre los dos si la red lo

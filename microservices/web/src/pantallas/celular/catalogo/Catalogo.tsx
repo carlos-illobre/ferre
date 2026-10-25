@@ -1,7 +1,7 @@
 import { Pestanas } from "../Pestanas";
 import { usePuede, type Permiso } from "../../permisos";
 import { SinPermiso } from "../../SinPermiso";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { Duplicados } from "./Duplicados";
 import { Listas } from "./Listas";
 import { Productos } from "./Productos";

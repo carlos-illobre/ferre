@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { hayCamara } from "../../../plataforma/camara";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { Icono, Lista, type NombreDeIcono } from "../componentes/base";
 import { destinoDeMas, type MenuDelCelular } from "./menu-del-celular";
 import type { VincularDesdeAca } from "./useVincularDesdeAca";

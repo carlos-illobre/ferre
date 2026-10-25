@@ -1,5 +1,5 @@
-import { useEspejar } from "../../../espejo";
-import { irA, type Ruta } from "../../../rutas";
+import { useEspejar } from "../../../negocio/espejo";
+import { irA, type Ruta } from "../rutas";
 
 // Depósito sin pestaña elegida es Inventario, y se lo nombra así: es como lo nombra la
 // computadora. Si cada uno nombrara distinto la misma pantalla, la computadora le devolvería

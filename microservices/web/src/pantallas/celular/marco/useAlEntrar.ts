@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { irA, type Ruta } from "../../../rutas";
+import { irA, type Ruta } from "../rutas";
 
 type EstadoDeLaSesion = "cargando" | "sin-sesion" | "con-sesion";
 

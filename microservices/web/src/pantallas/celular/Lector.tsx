@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import { puestoRemoto } from "../../puesto";
-import { enviarCodigoAlPuesto } from "../../codigos-del-celular";
-import { irA } from "../../rutas";
+import { puestoRemoto } from "../../negocio/vinculo";
+import { enviarCodigoAlPuesto } from "../../negocio/vinculo";
+import { irA } from "./rutas";
 import { Escaner } from "../../plataforma/camara";
 import "./entrada/entrar.css";
 

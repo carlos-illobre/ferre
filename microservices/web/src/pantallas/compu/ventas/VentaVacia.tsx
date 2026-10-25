@@ -1,6 +1,6 @@
 import type { Producto } from "../../../negocio/catalogo";
 import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
-import { precioDe, useSugeridos } from "../../sugeridos";
+import { precioDelSugerido as precioDe, useSugeridos } from "../../../negocio/ventas";
 import { Icono } from "../base/ui";
 import { MiniaturaDeProducto } from "./MiniaturaDeProducto";
 import css from "./VentaVacia.module.css";

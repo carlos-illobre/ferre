@@ -1,4 +1,4 @@
-import { barrasEan13, esGuarda } from "../plataforma/imagenes/ean13";
+import { barrasEan13, esGuarda } from "../plataforma/imagenes";
 
 // Las barras de un código EAN-13, dibujadas al lado del número (la v2 de la ficha, decisión 145).
 // Un código de otro largo no se dibuja.

@@ -4,11 +4,11 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 // Lo que la computadora le pide al celular emparejado llega por la conexión entre los dos
 // (specs/023): sin preguntar al servidor y sin leer ningún código.
 const falso = vi.hoisted(() => ({ enlace: null as unknown as ReturnType<typeof import("../pruebas/enlace-falso")["crearEnlaceFalso"]> }));
-vi.mock("../enlace", async () => { const { crearEnlaceFalso } = await import("../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
+vi.mock("../datos/vinculo/enlace", async () => { const { crearEnlaceFalso } = await import("../pruebas/enlace-falso"); falso.enlace = crearEnlaceFalso(); return falso.enlace.modulo; });
 const apiFalsa = vi.hoisted(() => vi.fn(async () => ({})));
 vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: apiFalsa }));
 import { PedidosDeLaCompu } from "./PedidosDeLaCompu";
-import { olvidarPedidos } from "../pedidos-al-celular";
+import { olvidarPedidos } from "../datos/vinculo/pedidos-al-celular";
 
 beforeEach(() => { olvidarPedidos(); falso.enlace.olvidar(); apiFalsa.mockClear(); });
 

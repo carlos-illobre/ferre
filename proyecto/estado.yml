@@ -1285,7 +1285,7 @@ RF-96:
   estado: "Hecho (009-T008): sin timer; se busca al abrir, al volver a la vista, al volver la conexión y cuando la API contesta otra versión en X-Version; nada en Configuración"
   pruebas:
     - microservices/web/src/negocio/buscar-version.test.ts
-    - microservices/web/src/version-nueva-sin-timer.test.tsx
+    - microservices/web/src/pantallas/version-nueva-sin-timer.test.tsx
     - microservices/api/src/salud.test.ts
   defectos: []
 RF-106:
@@ -1624,7 +1624,7 @@ RF-139:
 RF-140:
   estado: "Hecho (023): Carlos lo probó en el local el 2026-10-25"
   pruebas:
-    - microservices/web/src/espejo/espejo.test.tsx
+    - microservices/web/src/negocio/espejo/espejo.test.tsx
     - microservices/web/src/pantallas/FotoDeFactura.test.tsx
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
     - tests/e2e/escritorio/10-escaner.spec.ts
@@ -1645,7 +1645,7 @@ RNF-68:
     - microservices/conexion/src/comun/mensajes.test.ts
     - microservices/conexion/src/servidor/central.test.ts
     - microservices/conexion/src/navegador/enlace.test.ts
-    - microservices/web/src/conexion-modulo.test.ts
+    - microservices/web/src/datos/vinculo/conexion-modulo.test.ts
   defectos: []
 RNF-69:
   estado: "Nuevo (024): especificación aprobada"

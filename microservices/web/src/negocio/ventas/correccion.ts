@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type { CorreccionEntrada, VentaCorregida, VentaDelDia } from "@servidor/ventas";
 import { api } from "../../datos/conexion";
 import { consultas } from "../../datos/conexion";
-import { subtotalDeRenglon } from "../precios/vista-previa";
+import { subtotalDeRenglon } from "../precios";
 import { ventasCambiaron } from "./ventas-del-dia";
 import type { Medio } from "./venta";
 

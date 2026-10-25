@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { totalDelPedido, useBorrador, type Borrador, type ProveedorDelPedido, type RenglonDelPedido } from "../../../negocio/deposito";
 import { traerPorCodigo, type Producto } from "../../../negocio/catalogo";
-import { contarAlEspejo, useEspejar } from "../../../espejo";
+import { contarAlEspejo, useEspejar } from "../../../negocio/espejo";
 import { BuscarParaPedir } from "./BuscarParaPedir";
 import { MandarPedido } from "./MandarPedido";
 import { RenglonesDelPedido } from "./RenglonesDelPedido";

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Producto } from "../negocio/catalogo";
 import { ultimaLectura } from "../negocio/catalogo";
-import { puestoLocal } from "../puesto";
-import { escucharPuesto } from "../codigos-del-celular";
+import { puestoLocal } from "../negocio/vinculo";
+import { escucharPuesto } from "../negocio/vinculo";
 import { hayCamara } from "../plataforma/camara";
 import { copiarTexto } from "../plataforma/portapapeles";
 import { TEXTOS } from "./textos";

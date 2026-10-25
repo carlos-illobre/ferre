@@ -1,4 +1,4 @@
-import { crearRutasPorHash } from "../../../plataforma/navegacion/rutas-por-hash";
+import { crearRutasPorHash } from "../../../plataforma/navegacion";
 import type { NombreDeIcono } from "./ui";
 
 // Enrutamiento por hash (#/productos, #/vincular-celular?codigo=…): el cliente se publica

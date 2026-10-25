@@ -62,6 +62,7 @@ src/
     almacenamiento/   las bases de IndexedDB de Ferrebress: lo bajado, la cola de envíos, lo guardado, las preferencias
     sesion/           quién entró y su token; avisa cuando la sesión termina
     credenciales/     entrar y vincular con la huella
+    vinculo/          el emparejamiento con el otro dispositivo y el enlace por donde se hablan
   ui/             las piezas de «Mostrador» (botón, hoja, aviso, pestañas, lista, buscador,
                   un solo juego de íconos, la paleta); no saben qué es una venta
   negocio/<capacidad>/   las reglas en funciones puras y los hooks que traen y guardan los

@@ -1,11 +1,11 @@
-import { esMargenBoton, preciosDeUnProducto, type Explicado } from "../precios/vista-previa";
+import { esMargenBoton, preciosDeUnProducto, type Explicado } from "../precios";
 import type { Producto } from "../../datos/almacenamiento";
 
 // El precio de un producto, una sola vez para todas las pantallas (RNF-60). Lo calcula el
 // servidor y llega con el producto (ADR-018). La cuenta del front (la vista previa) se usa solo
 // cuando el precio del servidor no corresponde al margen que hay ahora: recién cambiado acá y
 // todavía sin confirmar, o un catálogo guardado de antes. Las dos cuentas son idénticas.
-export { IVA_SI_NO_SE_SABE } from "../precios/vista-previa";
+export { IVA_SI_NO_SE_SABE } from "../precios";
 
 export function precioDelProducto(p: Producto): { costo: number | null; iva: number; calculo: Explicado | null; valor: number | null; delServidor: boolean } {
   const vista = preciosDeUnProducto(p);

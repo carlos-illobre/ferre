@@ -1,5 +1,5 @@
 import { useSesion, useVincularConCodigo } from "../../../negocio/entrada";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import { AvisoError } from "../componentes/base";
 import { BotonGoogle } from "./BotonesDeEntrada";
 

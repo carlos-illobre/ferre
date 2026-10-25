@@ -8,7 +8,7 @@ import { TEXTOS_DE_ENTRADA } from "../../comun/entrada/textos-de-entrada";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 import { BotonGoogle, BotonHuella } from "./BotonesDeEntrada";
 import { PieConOnda } from "./PieConOnda";
-import { irA } from "../../../rutas";
+import { irA } from "../rutas";
 import "./entrar.css";
 
 export { destinoDelCodigo };

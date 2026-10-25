@@ -1,4 +1,4 @@
-import { crearRutasPorHash, type Ruta } from "./plataforma/navegacion/rutas-por-hash";
+import { crearRutasPorHash, type Ruta } from "../../plataforma/navegacion";
 
 // Las direcciones de Ferrebress. La navegación en sí es tecnología de la plataforma; acá se
 // dice qué pantalla abre sin dirección, qué direcciones viejas siguen andando y qué movimiento

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
-import { api, ErrorApi } from "../datos/conexion";
-import { dispositivoId, guardarPuestoLocal, guardarPuestoRemoto } from "../puesto";
+import { api, ErrorApi } from "../../datos/conexion";
+import { dispositivoId, guardarPuestoLocal, guardarPuestoRemoto } from "../../datos/vinculo";
 import type { ClienteDeGoogle, EntradaConGoogle, SesionNueva } from "@servidor/sesiones";
 import type { EstadoDelPuesto, PuestoNuevo, PuestoParaVincular, Vinculacion, Vinculado } from "@servidor/puestos";
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { api, ErrorApi } from "../../datos/conexion";
 import { useSesion } from "../../datos/sesion";
-import { dispositivoId, guardarPuestoLocal } from "../../puesto";
+import { dispositivoId, guardarPuestoLocal } from "../../datos/vinculo";
 import { describirDispositivo } from "../../plataforma/dispositivo";
 import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
 
