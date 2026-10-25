@@ -40,7 +40,7 @@
   --gris-pastilla: #e4e9f1;
   /* Sobre marino o negro: los mismos estados, más claros. */
   --verde-vivo: #45d08f;
-  --verde-claro: #6fe0a8;
+  --verde-claro: var(--p-verde-claro);
   --rojo-claro: #ffc2b5;
   --coral: #ff7a59;
 

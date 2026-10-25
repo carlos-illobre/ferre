@@ -8,12 +8,13 @@ import { urlDeFoto } from "../../../datos/conexion";
 import { MARGENES } from "../../../negocio/precios/vista-previa";
 import { UNIDADES, type Unidad } from "../../../negocio/catalogo";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
+import { Boton, Buscador, Contador, Exito, Segmentos, Toast, useDialogo } from "../../../ui";
 
 // Piezas de Ferrebress v2. Todas las pantallas arman con estas y con las clases de
 // estilos/base.css; ninguna inventa su botón ni su ventana.
 
 // Los íconos son uno solo para toda la aplicación (ADR-028).
-export { Icono, type NombreDeIcono };
+export { Icono, type NombreDeIcono, Toast, Boton, useDialogo, Exito, Segmentos, Contador, Buscador };
 
 // La marca: una tuerca ámbar con la F calada, y el nombre en Archivo ancha.
 export function Marca({ tam = 30, soloSimbolo }: { tam?: number; soloSimbolo?: boolean }) {
@@ -21,20 +22,6 @@ export function Marca({ tam = 30, soloSimbolo }: { tam?: number; soloSimbolo?: b
   return <span className="marca" style={{ fontSize: Math.round(tam * 0.85) }}>{soloSimbolo ? <Isotipo lado={tam} /> : <Logotipo />}</span>;
 }
 
-type VarianteBoton = "principal" | "marino" | "peligro" | "sobre-marino";
-export function Boton({ children, variante, tam, icono, ancho, tecla, className, ...resto }: {
-  children?: ReactNode; variante?: VarianteBoton; tam?: "chico" | "grande"; icono?: NombreDeIcono; ancho?: boolean; tecla?: string; className?: string;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  const soloIcono = icono && (children === undefined || children === null);
-  const clases = ["boton", variante, tam, ancho && "ancho", soloIcono && "solo-icono", className].filter(Boolean).join(" ");
-  return (
-    <button type="button" className={clases} aria-keyshortcuts={tecla} {...resto}>
-      {icono && <Icono nombre={icono} tam={tam === "chico" ? 16 : 20} />}
-      {children}
-      {tecla && <span className="tecla solo-compu" aria-hidden="true">{tecla}</span>}
-    </button>
-  );
-}
 
 // Encabezado y cuerpo de una pantalla. `acciones` va a la derecha del título.
 export function Pagina({ titulo, bajada, acciones, children, className, testId }: { titulo: string; bajada?: ReactNode; acciones?: ReactNode; children: ReactNode; className?: string; testId?: string }) {
@@ -73,33 +60,7 @@ export function Hoja({ titulo, alCerrar, children, pie, ancha, testId, alTeclear
   );
 }
 
-// Abre el <dialog> como modal al montarse y avisa al cerrarse (Escape incluido).
-export function useDialogo(alCerrar: () => void) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const cerrar = useRef(alCerrar);
-  cerrar.current = alCerrar;
-  useEffect(() => {
-    const d = ref.current;
-    if (!d) return;
-    const anterior = document.activeElement as HTMLElement | null;
-    if (typeof d.showModal === "function") { if (!d.open) d.showModal(); } else d.setAttribute("open", "");
-    const alCancelar = (e: Event) => { e.preventDefault(); cerrar.current(); };
-    d.addEventListener("cancel", alCancelar);
-    return () => { d.removeEventListener("cancel", alCancelar); if (typeof d.close === "function" && d.open) d.close(); anterior?.focus?.(); };
-  }, []);
-  return ref;
-}
 
-export function Toast({ texto, alCerrar, testId = "mensaje" }: { texto: string | null; alCerrar: () => void; testId?: string }) {
-  if (!texto) return null;
-  return (
-    <div className="toast" role="status" data-testid={testId}>
-      <Icono nombre="ok" />
-      <span>{texto}</span>
-      <button type="button" onClick={alCerrar} aria-label="Cerrar aviso"><Icono nombre="cerrar" tam={18} /></button>
-    </div>
-  );
-}
 
 // Aviso en el lugar. "error" y "alerta" se anuncian; desaparece cuando quien lo muestra
 // deja de pasarle texto (al corregirse la causa).
@@ -125,46 +86,7 @@ export function Vacio({ icono, titulo, children, accion }: { icono: NombreDeIcon
   );
 }
 
-// `extra`: un botón más al lado del buscador (los filtros del Catálogo, 015).
-export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, autoFoco, disabled, onKeyDown, cajaRef, testId = "busqueda", controla, activo, extra }: {
-  valor: string; alCambiar: (v: string) => void; placeholder: string; etiqueta?: string; alEscanear?: () => void; autoFoco?: boolean; disabled?: boolean;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void; cajaRef?: React.RefObject<HTMLInputElement>; testId?: string;
-  controla?: string; activo?: string; // id de la lista de resultados y del resultado marcado
-  extra?: React.ReactNode;
-}) {
-  const propia = useRef<HTMLInputElement>(null);
-  const caja = cajaRef ?? propia;
-  // Como autoFocus, pero también al habilitarse (la caja espera deshabilitada a que baje el
-  // catálogo) y sin quitarle el foco a lo que la persona eligió con el teclado (el menú, una
-  // pestaña): la caja puede aparecer o habilitarse tarde, cuando llegan los datos (decisión 82).
-  useLayoutEffect(() => {
-    const foco = document.activeElement;
-    if (autoFoco && !disabled && !(foco instanceof HTMLElement && foco !== document.body && foco.matches(":focus-visible"))) caja.current?.focus();
-    // Solo al aparecer y al habilitarse.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
-  return (
-    <div className="buscador" role="search">
-      <div className="buscador-caja">
-        <Icono nombre="buscar" tam={22} grosor={2.2} />
-        <input ref={caja} type="search" value={valor} onChange={(e) => alCambiar(e.target.value)} placeholder={placeholder} aria-label={etiqueta ?? placeholder}
-          autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="search" disabled={disabled} onKeyDown={onKeyDown} data-testid={testId}
-          {...(controla ? { role: "combobox", "aria-controls": controla, "aria-expanded": Boolean(activo), "aria-activedescendant": activo, "aria-autocomplete": "list" as const } : {})} />
-        {valor && <button type="button" className="borrar" aria-label="Borrar la búsqueda" onClick={() => { alCambiar(""); caja.current?.focus(); }}><Icono nombre="cerrar" tam={18} /></button>}
-      </div>
-      {alEscanear && <Boton icono="escanear" variante="marino" aria-label="Escanear el código de barras" onClick={alEscanear} data-testid="escanear" />}
-      {extra}
-    </div>
-  );
-}
 
-export function Segmentos<T extends string>({ opciones, actual, alElegir, etiqueta }: { opciones: { valor: T; nombre: string }[]; actual: T; alElegir: (v: T) => void; etiqueta: string }) {
-  return (
-    <div className="segmentos" role="group" aria-label={etiqueta}>
-      {opciones.map((o) => <button key={o.valor} type="button" aria-pressed={o.valor === actual} onClick={() => alElegir(o.valor)}>{o.nombre}</button>)}
-    </div>
-  );
-}
 
 // Los cinco márgenes de un toque. Es un grupo de opciones: Tab entra una vez y las flechas
 // izquierda y derecha pasan de un margen a otro y lo eligen.
@@ -189,42 +111,6 @@ export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", ata
   );
 }
 
-// Cantidad: enteros por unidad, hasta un decimal por kilo, metro o litro. Sin cero a la izquierda.
-export function Contador({ valor, entera, alCambiar, min = entera ? 1 : 0.1, unidad, alCambiarUnidad, etiqueta = "Cantidad", testId = "cantidad", sinBotones }: {
-  valor: number; entera: boolean; alCambiar: (v: number) => void; min?: number; unidad?: Unidad; alCambiarUnidad?: (u: Unidad) => void; etiqueta?: string; testId?: string; sinBotones?: boolean;
-}) {
-  const paso = entera ? 1 : 0.5;
-  const redondear = (v: number) => (entera ? Math.floor(v) : Math.round(v * 10) / 10);
-  // Mientras se tipea se muestra lo tipeado («2,» camino a «2,5»); el valor sale ya ajustado.
-  const [texto, setTexto] = useState<string | null>(null);
-  const mostrado = texto ?? (valor === 0 ? "" : String(valor).replace(".", ","));
-  return (
-    <div className="contador">
-      {!sinBotones && <button type="button" aria-label="Uno menos" onClick={() => { setTexto(null); alCambiar(Math.max(min, redondear(valor - paso))); }}><Icono nombre="menos" tam={18} grosor={2.4} /></button>}
-      <input inputMode={entera ? "numeric" : "decimal"} aria-label={etiqueta} value={mostrado} onFocus={(e) => e.target.select()}
-        onChange={(e) => {
-          const limpio = e.target.value.replace(/[^\d.,]/g, "").replace(/([.,]\d).*$/, "$1");
-          const v = Number(limpio.replace(",", "."));
-          const ajustado = !Number.isFinite(v) || v <= 0 ? 0 : redondear(v);
-          setTexto(entera ? (ajustado === 0 ? "" : String(ajustado)) : limpio);
-          alCambiar(ajustado);
-        }}
-        // Flecha arriba y abajo suman y restan, como los botones.
-        onKeyDown={(e) => {
-          if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
-          e.preventDefault(); e.stopPropagation(); setTexto(null);
-          alCambiar(e.key === "ArrowUp" ? redondear(valor + paso) : Math.max(min, redondear(valor - paso)));
-        }}
-        onBlur={() => { setTexto(null); if (valor === 0) alCambiar(min); }} data-testid={testId} />
-      {!sinBotones && <button type="button" aria-label="Uno más" onClick={() => { setTexto(null); alCambiar(redondear(valor + paso)); }}><Icono nombre="mas" tam={18} grosor={2.4} /></button>}
-      {unidad && alCambiarUnidad && (
-        <select value={unidad} onChange={(e) => alCambiarUnidad(e.target.value as Unidad)} aria-label="Unidad: por unidad, kilo, metro o litro" data-testid="unidad">
-          {UNIDADES.map((u) => <option key={u.valor} value={u.valor}>{u.nombre}</option>)}
-        </select>
-      )}
-    </div>
-  );
-}
 
 // Todo número calculado se toca y dice de dónde sale. La señal es el «?» en un círculo.
 // `conCosto`: los pasos dejan ver el costo; quien no tiene «Ver costos» ve el número sin explicación.
@@ -296,20 +182,6 @@ export function Progreso({ texto, fraccion }: { texto: string; fraccion?: number
   );
 }
 
-// Éxito a pantalla completa: el importe grande, cómo se pagó y un solo botón para seguir.
-export function Exito({ que, importe, medio, detalle, boton, alCerrar }: { que: string; importe: string; medio: string; detalle: string; boton: string; alCerrar: () => void }) {
-  const ref = useDialogo(alCerrar);
-  return (
-    <dialog ref={ref} className="exito" aria-label={que} data-testid="exito">
-      <div className="tilde"><Icono nombre="tilde" tam={48} grosor={3} /></div>
-      <h2>{que}</h2>
-      <div className="importe">{importe}</div>
-      <div className="medio">{medio}</div>
-      <p className="detalle">{detalle}</p>
-      <Boton variante="principal" tam="grande" autoFocus onClick={alCerrar} data-testid="cerrar-exito" tecla="Enter">{boton}</Boton>
-    </dialog>
-  );
-}
 
 // Foto chica del producto; al tocarla se amplía con una transición y desde ahí se saca otra.
 export function FotoProducto({ id, url: urlCruda, descripcion, alSubir }: { id: string; url: string | null; descripcion: string; alSubir?: (archivo: File) => Promise<void> }) {

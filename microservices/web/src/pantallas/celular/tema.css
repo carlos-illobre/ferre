@@ -109,8 +109,8 @@ body { background: var(--p-fondo); }
 .segmentos button.activo { background: #fff; color: #12382F; font-weight: 800; box-shadow: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03); }
 
 /* Campos y búsqueda: blancos con borde, para que se note dónde se escribe. */
-.buscador .caja { border: 1.500px solid var(--p-borde-fuerte); box-shadow: none; }
-.buscador .caja:focus-within { border-color: var(--p-verde); box-shadow: 0 0 0 2px var(--p-verde); }
+.buscador .buscador-caja { border: 1.500px solid var(--p-borde-fuerte); box-shadow: none; }
+.buscador .buscador-caja:focus-within { border-color: var(--p-verde); box-shadow: 0 0 0 2px var(--p-verde); }
 .campo, .contador, .chip-margen { background: #fff; border: 1.500px solid var(--p-borde-fuerte); }
 .campo.falta, .chip-margen.falta { background: var(--p-naranja-suave); border-color: var(--p-naranja); }
 .contador button { color: var(--p-verde); }
@@ -155,8 +155,8 @@ body { background: var(--p-fondo); }
 .item { border: 1px solid var(--p-borde); border-left: 6px solid var(--p-naranja); box-shadow: 0 1px 2px rgb(23 49 43 / 0.06); }
 .item > * + * { border-top-color: var(--p-borde-suave); }
 /* La búsqueda no empuja al botón de escanear fuera de la pantalla cuando aparece la «×». */
-.buscador .caja { min-width: 0; }
-.buscador .caja input { min-width: 0; }
+.buscador .buscador-caja { min-width: 0; }
+.buscador .buscador-caja input { min-width: 0; }
 
 /* Vender sin colores propios: los atajos y los productos de la venta son tarjetas blancas con
    el borde de siempre, como en las demás pantallas. Se distinguen por su título de sección. */

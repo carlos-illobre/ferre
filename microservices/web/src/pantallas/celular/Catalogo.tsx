@@ -164,7 +164,7 @@ function FilaProducto({ producto: p, stock, elegida, alAbrir, alAgregar }: { pro
   return (
     <div className={`tarjeta-producto ${alAgregar ? "con-agregar" : ""}`}>
     <button type="button" className={`fila con-foto ${elegida ? "elegida" : ""}`} onClick={alAbrir} data-testid="producto" aria-selected={elegida}>
-      <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : <Icono nombre="catalogo" tam={22} grosor={1.6} />}</span>
+      <span className="miniatura">{p.foto_url ? <img src={p.foto_url.startsWith("/") ? `${import.meta.env.VITE_API_URL}${p.foto_url}` : p.foto_url} alt="" /> : <Icono nombre="camara" tam={22} grosor={1.6} />}</span>
       <span className="nombre"><span className={`stock-texto ${stock.hay ? "hay" : "no"}`} data-testid="stock">{stock.hay ? `${stock.texto} ${TEXTOS.catalogo.enStock.corto}` : stock.texto}</span>{p.descripcion}</span>
       <span className="derecha">
         {precio === null ? <strong className="sin-precio">{TEXTOS.catalogo.sinPrecioTitulo.corto}</strong> : <strong className="importe">{pesosCortos(precio)}</strong>}

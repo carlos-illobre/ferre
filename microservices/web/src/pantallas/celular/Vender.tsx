@@ -211,7 +211,7 @@ export function Vender({ pestanas = null }: { pestanas?: ReactNode }) {
           ? <Escaner className="vm-camara" seguido alDetectar={alDetectar} alCerrar={cerrarCamara} ultimo={ultimoEscaneo} />
           : (
             <div className="buscador">
-              <button type="button" className="caja vm-abrir-busqueda" onClick={() => setBuscando(true)} data-testid="abrir-busqueda">
+              <button type="button" className="buscador-caja vm-abrir-busqueda" onClick={() => setBuscando(true)} data-testid="abrir-busqueda">
                 <Icono nombre="buscar" tam={20} grosor={2.2} className="lupa" /><span>Producto, código o marca</span>
               </button>
               {hayCamara() && <button type="button" className="escanear" aria-label="Escanear" onClick={() => setEscaneando(true)} data-testid="escanear"><Icono nombre="escanear" tam={22} /></button>}

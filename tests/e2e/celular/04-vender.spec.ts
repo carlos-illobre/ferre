@@ -63,7 +63,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   // Cantidad 3; la flechita suma de a 1 (enteras, sin decimales); 2,7 por unidad es 2.
   await mecha.getByTestId("cantidad").fill("3");
   await expect(page.getByTestId("total")).toContainText("$9.000");
-  await mecha.getByRole("button", { name: "Más", exact: true }).click();
+  await mecha.getByRole("button", { name: "Uno más", exact: true }).click(); // el contador es el mismo que en la computadora
   await expect(mecha.getByTestId("cantidad")).toHaveValue("4");
   await mecha.getByTestId("cantidad").fill("2.7");
   await expect(mecha.getByTestId("cantidad")).toHaveValue("2");

@@ -20,7 +20,7 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .vm-espejo { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 99px; border: 1.5px solid var(--m-logro); background: var(--m-logro-suave); color: var(--m-logro-texto); font-weight: 700; font-size: 15px; }
 
 /* La búsqueda y la cámara, del mismo alto de arranque. */
-.vm .buscador .caja { background: var(--m-superficie); border: 1px solid var(--m-borde-fuerte); box-shadow: var(--m-sombra-1); border-radius: 14px; }
+.vm .buscador .buscador-caja { background: var(--m-superficie); border: 1px solid var(--m-borde-fuerte); box-shadow: var(--m-sombra-1); border-radius: 14px; }
 .vm .buscador .escanear { background: var(--m-pino); border-radius: 14px; }
 
 /* La cámara arriba: empuja la venta hacia abajo, que se sigue viendo (decisión 119). */
@@ -164,7 +164,7 @@ body:has(.vm), body:has(.vm-hoy) { background: #F4F2EC; }
 .hoja.vm-busca { min-height: 92dvh; background: #F4F2EC; display: flex; flex-direction: column; gap: 10px; }
 .vm-busca-cab { display: flex; align-items: center; gap: 8px; }
 .vm-busca-cab .buscador { flex: 1; min-width: 0; }
-.vm-busca-cab .caja { background: #fff; border: 1.5px solid #12382F; box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); border-radius: 12px; }
+.vm-busca-cab .buscador-caja { background: #fff; border: 1.5px solid #12382F; box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); border-radius: 12px; }
 .vm-cancelar { height: 44px; padding: 0 6px; font-weight: 700; font-size: 16px; color: #545955; }
 .vm-busca-rotulo { margin: 2px 2px 0; font-size: 14px; font-weight: 650; color: #545955; }
 .vm-busca-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; overflow: auto; }

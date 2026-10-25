@@ -57,7 +57,7 @@ describe("Vender", () => {
     const cantidad = within(item("MECHA")).getByTestId("cantidad") as HTMLInputElement;
     fireEvent.change(cantidad, { target: { value: "2.7" } });
     expect(cantidad.value).toBe("2");
-    fireEvent.click(within(item("MECHA")).getByRole("button", { name: "Más" }));
+    fireEvent.click(within(item("MECHA")).getByRole("button", { name: "Uno más" }));
     expect(cantidad.value).toBe("3");
     fireEvent.change(cantidad, { target: { value: "" } });
     expect(cantidad.value).toBe("");
@@ -78,7 +78,7 @@ describe("Vender", () => {
     expect(cantidad.value).toBe("1,6");
     // 1,6 kg × $3.000 = $4.800: el renglón se redondea para arriba a $1.000 para no dar vuelto (RF-19)
     expect(screen.getByTestId("total").textContent).toBe("$5.000");
-    fireEvent.click(within(item("MECHA")).getByRole("button", { name: "Más" }));
+    fireEvent.click(within(item("MECHA")).getByRole("button", { name: "Uno más" }));
     expect(cantidad.value).toBe("2,1");
     expect(item("MECHA").textContent).toContain("el kg");
   });

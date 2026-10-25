@@ -31,6 +31,7 @@ import { Aviso, Boton, Buscador, Contador, Exito, Explicado, FotoProducto, Hoja,
 import "./base/estilos/vender.css";
 import "./base/estilos/vender-mostrador.css";
 import { AlLadoDeLasPestanas } from "../AlLadoDeLasPestanas";
+import { SelectorDeUnidad } from "../comun/SelectorDeUnidad";
 
 // La venta, en el orden del mostrador: buscar → costo, margen y precio → cantidad → cobro.
 // Nada obligatorio que el cuaderno no tenga. En la computadora todo sale con el teclado:
@@ -522,7 +523,7 @@ function RenglonDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
           : <input className="entrada" value={it.descripcion} placeholder="¿Qué se lleva?" aria-label="Descripción del ítem libre" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
         <div className="detalle">{producto ? <>{detalleDe(producto)}<>{detalleDe(producto) ? " · " : ""}{(stock ?? 0) <= 0 ? <Pastilla tipo="alerta" sinPunto>sin stock</Pastilla> : noAlcanza ? <Pastilla tipo="alerta" sinPunto>{`hay ${numero(stock!)}: no alcanza`}</Pastilla> : <Pastilla tipo="ok" sinPunto>{numero(stock!)} {abreviarUnidad(it.unidad)}</Pastilla>}</></> : "Ítem libre: no está en ninguna lista"}</div>
       </div>
-      <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} unidad={it.unidad} alCambiarUnidad={alCambiarUnidad} etiqueta={`Cantidad de ${it.descripcion}`} />
+      <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} etiqueta={`Cantidad de ${it.descripcion}`}><SelectorDeUnidad unidad={it.unidad} alCambiar={alCambiarUnidad} /></Contador>
       <div className="vmc-sub" data-testid="subtotal">
         {renglon ? <span className="importe vmc-rueda" ref={rueda}>{pesosCortos(renglon.valor)}</span> : <span className="falta-texto" data-testid="sin-precio">Sin precio</span>}
         <small>{sinPrecio ? (producto && p.costo !== null ? "elegí el margen" : "poné el precio") : `${conUnidad(it.cantidad, it.unidad)} × ${pesosCortos(p.unitario!)}`}</small>
@@ -624,7 +625,7 @@ function TarjetaDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegir
         <span data-testid="subtotal">{renglon ? <Explicado conCosto className="importe" valor={pesosCortos(renglon.valor)} pasos={[...p.pasos, ...renglon.pasos]} etiqueta={`Subtotal ${pesosCortos(renglon.valor)}`} /> : !producto ? <PrecioAMano item={it} alCambiar={alCambiar} falta /> : <span className="falta-texto" data-testid="sin-precio">sin precio</span>}</span>
       </div>
       <div className="vender-item-pie">
-        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })} unidad={it.unidad} alCambiarUnidad={alCambiarUnidad} />
+        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })}><SelectorDeUnidad unidad={it.unidad} alCambiar={alCambiarUnidad} /></Contador>
         <span className="crece" />
         {producto && p.costo !== null && !sinPrecio && (
           <Boton onClick={() => alCambiar({ abierto: !it.abierto })} aria-expanded={abierto} data-testid="margen">{margenTexto}<Icono nombre={abierto ? "arriba" : "abajo"} tam={16} grosor={2.4} /></Boton>
