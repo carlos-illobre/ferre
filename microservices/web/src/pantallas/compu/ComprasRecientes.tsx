@@ -6,7 +6,7 @@ import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { fecha, pesos } from "../../formato";
 import { Aviso, Boton, Explicado, Hoja, pesosCortos } from "./base/ui";
 import { irA } from "./base/rutas";
-import { mensajeDe, plural, useEnLinea } from "./base/pantallas/deposito-comun";
+import { mensajeDe, plural, useEnLinea } from "./deposito/deposito-comun";
 import { AlLadoDeLasPestanas } from "../AlLadoDeLasPestanas";
 
 import { TEXTOS } from "../textos";

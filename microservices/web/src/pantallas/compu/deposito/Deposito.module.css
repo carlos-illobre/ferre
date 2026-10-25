@@ -1,0 +1,36 @@
+/* Lo que comparten Stock, Compras y Contar. */
+/* base.css tiene una clase .principal de la estructura (columna) que le cambia la dirección al
+   botón principal: acá se la devuelve. Sale cuando se arregle en base.css. */
+.buscador { position: relative; display: flex; flex-direction: column; gap: var(--e2); min-width: 0; }
+.sugerencias > li { cursor: pointer; }
+.sugerencias > li:hover { background: var(--superficie-2); }
+.sugerencias > li[aria-selected="true"]:hover { background: var(--azul-suave); }
+.nada { padding: var(--e3) var(--e4); border-radius: var(--r-tarjeta); border: 1px dashed var(--borde-fuerte); color: var(--texto-2); }
+
+@media (min-width: 900px) {
+  /* Flotan debajo de la caja y se van cuando el foco sale del buscador. */
+  .sugerencias, .buscador > .nada { position: absolute; top: calc(100% + var(--e1)); left: 0; right: 0; z-index: var(--z-desplegado); box-shadow: var(--sombra-2); animation: aparecer var(--rapido) ease-out; }
+  .sugerencias { max-height: 60dvh; overflow-y: auto; }
+  .buscador > .nada { background: var(--superficie); border-style: solid; border-color: var(--borde); }
+  .buscador:not(:focus-within) > .sugerencias, .buscador:not(:focus-within) > .nada { display: none; }
+  .sugerencias > :global(.renglon) { min-height: 48px; padding-block: var(--e2); }
+}
+
+/* Barra con la acción principal: en el celular queda fija sobre la barra de pestañas; en la
+   computadora se pega al borde de abajo de la ventana mientras se recorre la pantalla. */
+.pie { position: sticky; bottom: 0; z-index: var(--z-pegado); display: flex; align-items: center; gap: var(--e4); padding: var(--e3) var(--e4); background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--r-tarjeta); box-shadow: var(--sombra-2); }
+@media (max-width: 899px) {
+  .pie { position: fixed; inset: auto 0 calc(64px + env(safe-area-inset-bottom)) 0; border-radius: 0; border-width: 1px 0 0; gap: var(--e3); }
+  /* Lugar para que la barra fija no tape el final de la pantalla. */
+  .conPie { padding-bottom: 96px; }
+}
+@media (min-width: 900px) { .pie { bottom: var(--e4); } }
+
+/* Diferencias: lo que falta en rojo, lo que sobra en verde, lo que coincide apagado. */
+.dif { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dif:global(.falta) { color: var(--rojo); }
+.dif:global(.sobra) { color: var(--verde); }
+.dif:global(.igual) { color: var(--texto-3); }
+
+/* Las animaciones de otras hojas que usa esta: el módulo renombra las que nombra. */
+@keyframes aparecer { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }

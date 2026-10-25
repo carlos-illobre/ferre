@@ -424,7 +424,7 @@ RF-50:
     - microservices/api/src/rutas/compras.test.ts
     - tests/e2e/escritorio/05-compras.spec.ts
     - tests/e2e/celular/05-compras.spec.ts
-    - microservices/web/src/pantallas/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
   defectos:
     - "Los pedidos de foto (el código QR) viven en la memoria del servidor: si el servidor se reinicia mientras se espera una foto, hay que pedir el código de nuevo"
     - "La foto del comprobante reemplaza al número tipeado"
@@ -455,7 +455,7 @@ RF-52:
   pruebas:
     - tests/e2e/escritorio/07-contar.spec.ts
     - tests/e2e/celular/07-contar.spec.ts
-    - microservices/web/src/pantallas/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
   defectos:
     - "En el celular la cantidad contada solo acepta enteros, aunque el producto se venda a granel (RF-12)"
     - "Crear un sector, empezar un conteo y cerrarlo exigen conexión; solo contar un producto funciona sin internet. Qué exige la regla está preguntado en la spec (historia 4, escenario 13)"
@@ -472,7 +472,7 @@ RF-53:
   pruebas:
     - tests/e2e/escritorio/06-stock.spec.ts
     - tests/e2e/celular/06-stock.spec.ts
-    - microservices/web/src/pantallas/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
   defectos:
     - "En Inventario tampoco se muestra el costo de cada producto; no está dicho si el Comprador debe verlo ahí"
     - "El motivo al corregir el stock a mano es opcional y la regla lo pide"
@@ -579,7 +579,7 @@ RF-65:
   pruebas:
     - tests/e2e/celular/05-compras.spec.ts
     - tests/e2e/escritorio/05-compras.spec.ts
-    - microservices/web/src/pantallas/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
     - microservices/web/src/pantallas/celular/Negocio.test.tsx
   defectos:
     - "Que una compra anulada no sume al gasto no tiene prueba"
@@ -644,7 +644,7 @@ RF-72:
     - microservices/api/src/rutas/usuarios.test.ts
     - microservices/web/src/pantallas/celular/Negocio.test.tsx
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
-    - microservices/web/src/pantallas/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
     - tests/e2e/celular/13-roles.spec.ts
     - tests/e2e/escritorio/13-roles.spec.ts
@@ -1341,7 +1341,7 @@ RF-101:
   pruebas:
     - microservices/api/src/rutas/secciones-de-negocio.test.ts
     - microservices/api/src/rutas/roles.test.ts
-    - microservices/web/src/pantallas/celular/Deposito.test.tsx
+    - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
     - tests/e2e/escritorio/06-stock.spec.ts
     - tests/e2e/celular/06-stock.spec.ts
     - tests/e2e/escritorio/13-roles.spec.ts

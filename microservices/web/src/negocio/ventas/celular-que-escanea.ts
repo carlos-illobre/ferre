@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EVENTO_EMPAREJAMIENTO, puestoLocal, puestoRemoto } from "../../puesto";
-import { escucharPuesto } from "../../codigos-del-celular";
+import { escucharPuesto, pedirLector } from "../../codigos-del-celular";
 
 // Los códigos que lee el celular vinculado a este puesto entran a la venta. El emparejamiento
 // puede llegar después de abrir la pantalla (se pone al día con el servidor) o soltarse.
@@ -48,4 +48,11 @@ export function useLoQueLeeElCelular(alCodigo: (codigo: string) => void, activo:
     return escucharPuesto(emparejado, (codigo) => manejar.current(codigo));
   }, [activo, emparejado]);
   return emparejado;
+}
+
+// Pedirle al celular vinculado que abra el lector: si el aviso llegó o no, por 20 segundos.
+export function usePedirLector() {
+  const [lectorPedido, setLectorPedido] = useState<boolean | null>(null);
+  useEffect(() => { if (lectorPedido === null) return; const x = setTimeout(() => setLectorPedido(null), 20000); return () => clearTimeout(x); }, [lectorPedido]);
+  return { lectorPedido, pedirLector: () => void pedirLector().then(setLectorPedido) };
 }

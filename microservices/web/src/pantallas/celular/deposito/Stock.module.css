@@ -1,0 +1,78 @@
+/* Stock en el celular como la v2 (decisión 148): «La lista», la variante 1 de la maqueta del
+   director de arte. Los colores, de la paleta compartida (paleta.css). */
+:global(.st) { display: flex; flex-direction: column; gap: 12px; }
+.resumenes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.res { display: grid; gap: 2px; padding: 10px 12px; border-radius: 14px; border: 1px solid transparent; text-align: left; font: inherit; min-width: 0; }
+.res .et { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; white-space: nowrap; overflow: hidden; }
+.res .va { font-size: 24px; line-height: 28px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.res:global(.urgente) { background: var(--p-urgente-suave); color: var(--p-urgente-texto); }
+.res:global(.neutro) { background: var(--p-superficie); border-color: var(--p-borde); color: var(--p-texto-2); }
+.res:global(.neutro) .va { color: var(--p-tinta); }
+.res:global(.error) { background: var(--p-error-suave); color: var(--p-error-texto); }
+.res[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--p-verde); }
+.dinero { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 14px; border-radius: 14px; background: var(--p-superficie); border: 1px solid var(--p-borde); color: var(--p-texto-2); font-size: 15px; font-weight: 600; }
+.dinero strong { font-size: 20px; font-weight: 800; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+
+.buscar :global(.buscador) :global(.buscador-caja) { height: 52px; border-radius: 12px; border: 1px solid var(--p-borde-fuerte); box-shadow: 0 1px 2px rgb(26 29 27 / .05); }
+.buscar :global(.buscador) :global(.escanear) { width: 52px; height: 52px; border-radius: 12px; background: var(--p-verde); }
+
+.chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); font: inherit; font-weight: 650; font-size: 14px; color: var(--p-tinta); white-space: nowrap; }
+.chip:global(.elegido) { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
+.chip:disabled { color: var(--p-texto-2); }
+
+.lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.r { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 10px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05); }
+.r :global(.foto-chica) { width: 56px; height: 56px; flex: none; border-radius: 12px; background: var(--p-relleno); border: 0; }
+.rBoton { flex: 1; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; }
+.rTexto { display: flex; flex-direction: column; min-width: 0; }
+.t { font-weight: 700; font-size: 15px; line-height: 20px; color: var(--p-tinta); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.d { font-size: 14px; line-height: 20px; color: var(--p-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dato { display: grid; gap: 2px; min-width: 76px; padding: 6px 12px; border-radius: 12px; background: var(--p-relleno); }
+.dato .et { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--p-texto-2); }
+.dato .va { font-size: 19px; line-height: 24px; font-weight: 800; color: var(--p-tinta); white-space: nowrap; }
+.dato:global(.logro) { background: var(--p-logro-suave); } .dato:global(.logro) .va { color: var(--p-logro-texto); }
+.dato:global(.error) { background: var(--p-error-suave); } .dato:global(.error) .va { color: var(--p-error-texto); }
+
+/* «Qué pedir», al pulgar, encima del menú de abajo. */
+.pedir { position: sticky; bottom: calc(65px + env(safe-area-inset-bottom)); z-index: 5; margin: 4px -16px 0; padding: 12px 16px; display: flex; align-items: center; gap: 12px; background: rgb(255 255 255 / .94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--p-borde); box-shadow: 0 -8px 24px -12px rgb(26 29 27 / .15); }
+.pedirTxt { flex: 1; display: flex; flex-direction: column; font-size: 14px; line-height: 18px; font-weight: 600; color: var(--p-texto-2); }
+.pedirTxt b { font-size: 16px; line-height: 22px; font-weight: 800; color: var(--p-tinta); }
+.pedirBoton { display: inline-flex; align-items: center; gap: 8px; min-height: 56px; padding: 0 20px; border: 0; border-radius: 14px; background: var(--p-naranja); color: #fff; font: inherit; font-size: 18px; font-weight: 700; box-shadow: 0 8px 20px -8px rgb(216 63 14 / .55); }
+
+/* La hoja del producto. */
+.hojaQuien { margin: -8px 0 0; font-size: 15px; color: var(--p-texto-2); }
+.saldo { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--p-relleno); }
+.total { font-size: 44px; line-height: 46px; font-weight: 800; letter-spacing: -0.03em; color: var(--p-tinta); white-space: nowrap; }
+.total:global(.negativo) { color: var(--p-error-texto); }
+.total small { font-size: 18px; font-weight: 700; color: var(--p-texto-2); margin-left: 4px; letter-spacing: 0; }
+.cuenta { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--p-texto-2); }
+.cuenta b { color: var(--p-tinta); }
+.movsCab { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; color: var(--p-texto-2); }
+.movsCab b { color: var(--p-tinta); font-weight: 750; }
+.movs { list-style: none; margin: -8px 0 0; padding: 0; }
+.mov { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto 40px; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--p-borde); font-size: 14px; line-height: 18px; }
+.movs li:last-child { border-bottom: 0; }
+.movIc { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: var(--p-relleno); color: var(--p-texto-2); }
+.movIc:global(.compra) { background: var(--p-logro-suave); color: var(--p-logro-texto); }
+.movIc:global(.ajuste) { background: var(--p-urgente-suave); color: var(--p-urgente-texto); }
+.movTexto { display: flex; flex-direction: column; min-width: 0; color: var(--p-texto-2); }
+.movTexto b { color: var(--p-tinta); }
+.movTexto span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.movQ { font-weight: 800; font-size: 15px; text-align: right; }
+.movQ:global(.mas) { color: var(--p-logro-texto); }
+.movQueda { text-align: right; color: var(--p-texto-2); font-weight: 700; }
+.masMovs { min-height: 44px; padding: 0; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 700; color: var(--p-pino-texto); }
+.corregir { display: flex; flex-direction: column; gap: 10px; border-top: 1px dashed var(--p-borde-fuerte); padding-top: 12px; }
+.filaC { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.etC { font-size: 16px; font-weight: 700; color: var(--p-tinta); }
+.cantidad { display: inline-flex; align-items: center; height: 52px; border: 1px solid var(--p-borde-fuerte); border-radius: 14px; background: var(--p-superficie); overflow: hidden; }
+.cantidad button { width: 52px; height: 100%; border: 0; background: transparent; display: grid; place-items: center; color: var(--p-tinta); }
+.cantidad input { width: 72px; height: 100%; border: 0; text-align: center; font: inherit; font-size: 22px; font-weight: 800; color: var(--p-tinta); background: transparent; }
+.vista { margin: -4px 0 0; font-size: 15px; font-weight: 600; color: var(--p-texto-2); }
+.vista b { color: var(--p-tinta); }
+.motivos { display: flex; flex-wrap: wrap; gap: 8px; }
+.motivos .chip { height: 44px; }
+.guardar { min-height: 56px; border: 0; border-radius: 14px; background: var(--p-verde); color: #fff; font: inherit; font-size: 18px; font-weight: 700; }
+.guardar:disabled { opacity: .6; }

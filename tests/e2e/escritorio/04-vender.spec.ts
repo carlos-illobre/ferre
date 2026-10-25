@@ -318,11 +318,11 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   const filasDeStock = page.getByTestId("fila-stock");
   await expect(filasDeStock.nth(0)).toHaveAttribute("aria-selected", "true");
   await expect(page.locator(".cuerpo input[type='search'], .cuerpo input[type='text']").first()).toBeFocused();
-  await expect(page.locator(".sv-filas [aria-selected='true']")).toHaveCount(1);
+  await expect(page.locator("[data-testid=tabla-stock] [aria-selected='true']")).toHaveCount(1);
   if ((await filasDeStock.count()) > 1) {
     await page.keyboard.press("ArrowDown");
     await expect(filasDeStock.nth(1)).toHaveAttribute("aria-selected", "true");
-    await expect(page.locator(".sv-filas [aria-selected='true']")).toHaveCount(1);
+    await expect(page.locator("[data-testid=tabla-stock] [aria-selected='true']")).toHaveCount(1);
     await page.keyboard.press("ArrowUp");
     await expect(filasDeStock.nth(0)).toHaveAttribute("aria-selected", "true");
   }

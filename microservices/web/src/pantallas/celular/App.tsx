@@ -28,7 +28,7 @@ import { destinoDelCodigo, Entrar } from "./Entrar";
 import { VincularCelular } from "./pantallas/VincularCelular";
 import { Catalogo } from "./catalogo/Catalogo";
 import { Icono as IconoDeMas, type NombreDeIcono } from "../compu/base/ui";
-import { Deposito } from "./Deposito";
+import { Deposito } from "./deposito/Deposito";
 import { Negocio, type Parte } from "./Negocio";
 import { TicketsCelu } from "./pantallas/Tickets";
 import { CabezaDeNegocio } from "./Usuarios";
