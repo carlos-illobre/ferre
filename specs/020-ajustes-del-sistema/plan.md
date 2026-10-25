@@ -41,7 +41,7 @@ arquitectura; guarda tres valores en la tabla de ajustes que ya existe.
 
 ## Technical Context
 
-- Servidor (`microservices/api`): un tema nuevo, `sistema/` (ajustes en memoria, `datos.ts`,
+- Servidor (`microservices/comercial`): un tema nuevo, `sistema/` (ajustes en memoria, `datos.ts`,
   `reglas.ts`), su ruta y el recuerdo de sesiones en el tema de acceso.
 - Cliente (`microservices/web`): la pantalla, sus entradas en Más (celular y computadora), la
   pregunta del celular emparejado y la sesión actual.

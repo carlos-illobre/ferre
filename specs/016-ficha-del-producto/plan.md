@@ -24,7 +24,7 @@
 
 ## Technical Context
 
-- Servidor: `microservices/api` (migración, esquema del cambio de producto, catálogo, listas).
+- Servidor: `microservices/comercial` (migración, esquema del cambio de producto, catálogo, listas).
 - Cliente: `microservices/web` (negocio compartido, las dos pantallas, textos).
 - El cambio de producto ya se manda en cola sin conexión: la hora de la lectura viaja en él.
 

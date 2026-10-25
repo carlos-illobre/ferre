@@ -23,7 +23,7 @@ computadora). Lo demás va en unitarias, que son más rápidas (pedido de Carlos
 
 ## Qué prueba la máquina
 
-Unitarias (corren en cada subida, en segundos; las de la aplicación en `microservices/web/src/`, las del servidor en `microservices/api/src/`) y de punta a punta (`tests/e2e/`, en Docker):
+Unitarias (corren en cada subida, en segundos; las de la aplicación en `microservices/web/src/`, las del servidor en `microservices/comercial/src/`) y de punta a punta (`tests/e2e/`, en Docker):
 
 | Casos | Prueba |
 |---|---|

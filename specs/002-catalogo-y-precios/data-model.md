@@ -1,6 +1,6 @@
 # Modelo de datos: catálogo y precios
 
-Entidades de esta capacidad en la base de datos. El servicio `gestion-del-local` es el
+Entidades de esta capacidad en la base de datos. El servicio `comercial` es el
 único dueño de la base (ADR-003). El esquema cambia con una migración nueva; nunca se edita
 una aplicada.
 

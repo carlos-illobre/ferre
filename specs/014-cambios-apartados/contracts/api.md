@@ -1,6 +1,6 @@
 # API: Lo apartado de alguien a quien desactivaron
 
-Servicio `gestion-del-local`. La decisión técnica, en ADR-021.
+Servicio `comercial`. La decisión técnica, en ADR-021.
 
 | Método | Ruta | Qué exige | Para qué sirve |
 |---|---|---|---|

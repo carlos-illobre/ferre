@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 const RAIZ = fileURLToPath(new URL('..', import.meta.url));
 // Cada paquete: su carpeta, el tsconfig que cubre todos sus archivos y si corre ESLint.
 const PAQUETES = [
-  { carpeta: 'microservices/api', tsconfig: 'tsconfig.pruebas.json', eslint: false },
+  { carpeta: 'microservices/comercial', tsconfig: 'tsconfig.pruebas.json', eslint: false },
   { carpeta: 'microservices/web', tsconfig: 'tsconfig.json', eslint: false },
 ];
 const EXTENSIONES = /\.(ts|tsx|mts|cts|js|jsx|mjs)$/;

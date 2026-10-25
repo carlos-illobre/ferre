@@ -5,7 +5,7 @@
 - **Base:** PostgreSQL en Supabase, por cadena de conexión (ADR-002). En desarrollo y en la CI,
   el servicio `db` del compose (`postgres:17-alpine`), solo con el perfil `local`. El monitor
   diario consulta las bases de Supabase desde GitHub.
-- **Servicios con base:** `gestion-del-local` (el mostrador, en `microservices/api`) y
+- **Servicios con base:** `comercial` (el mostrador, en `microservices/comercial`) y
   `procesos` (en `microservices/procesos/servidor`), que usa la misma base en el esquema
   `procesos` (ADR-019).
 - **Acceso a datos en el mostrador:** cada tema tiene su `datos.ts` (17 archivos, unas 1.250

@@ -39,7 +39,7 @@ docker compose up -d --wait >/dev/null 2>&1
 
 # 022-E09: en una base sin nadie, la primera persona se da de alta con el comando y recibe todos los roles.
 correo="primera-$RANDOM@ferre.test"
-docker compose exec -T gestion-del-local node dist/crear-usuario.js "$correo" "Primera" >/dev/null || falla "el comando no dio de alta a la primera persona"
+docker compose exec -T comercial node dist/crear-usuario.js "$correo" "Primera" >/dev/null || falla "el comando no dio de alta a la primera persona"
 [[ "$(como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "SELECT (SELECT count(*) FROM usuario_rol ur JOIN usuario u ON u.id = ur.usuario_id WHERE u.email = '$correo') = (SELECT count(*) FROM rol)")" == "t" ]] || falla "la primera persona no recibió todos los roles"
 como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "DELETE FROM evento WHERE contenido->>'email' = '$correo'; DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '$correo'); DELETE FROM usuario WHERE email = '$correo'" >/dev/null
 exit 0

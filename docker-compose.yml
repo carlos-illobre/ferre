@@ -35,15 +35,15 @@ services:
       # y agota el cupo de Let's Encrypt.
       - caddy-data:/data
     depends_on:
-      gestion-del-local:
+      comercial:
         condition: service_healthy
 
-  gestion-del-local:
-    image: ${REGISTRO:?falta REGISTRO en el .env}/gestion-del-local:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+  comercial:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/comercial:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
     build:
       # Contexto en la raíz por el workspace compartido (ADR-010).
       context: .
-      dockerfile: microservices/api/Dockerfile
+      dockerfile: microservices/comercial/Dockerfile
     restart: unless-stopped
     logging: *logs
     depends_on:
@@ -91,7 +91,7 @@ services:
       start_period: 15s
 
   # Procesos (ADR-019): un módulo aparte que se lleva a otros proyectos. Tiene su propia base en la
-  # misma instancia (ADR-026) y solo lo alcanza gestion-del-local por la red interna: no publica puertos.
+  # misma instancia (ADR-026) y solo lo alcanza comercial por la red interna: no publica puertos.
   procesos:
     image: ${REGISTRO:?falta REGISTRO en el .env}/procesos:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
     build:

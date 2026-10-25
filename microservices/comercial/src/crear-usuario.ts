@@ -4,7 +4,7 @@ import { base, cerrar } from "./persistencia/conexion.js";
 import { anotarEvento } from "./persistencia/eventos.js";
 
 // Alta de la primera persona, desde el contenedor:
-//   docker compose exec gestion-del-local node dist/crear-usuario.js correo@gmail.com "Nombre"
+//   docker compose exec comercial node dist/crear-usuario.js correo@gmail.com "Nombre"
 // Sin más, recibe todos los roles que existen (es quien después arma el resto desde la app).
 // Con un tercer dato, solo esos roles, separados por coma: "Vendedor,Recepción".
 // Los nombres viejos siguen valiendo: dueño y admin son todos los roles; mostrador, Vendedor.

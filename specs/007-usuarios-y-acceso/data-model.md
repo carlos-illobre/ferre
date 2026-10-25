@@ -2,7 +2,7 @@
 
 > Vigente desde el 2026-10-11 (RF-72 y RF-75, decisión 50): un usuario tiene uno o más roles, y cada rol es un grupo de permisos.
 
-Contrato de datos del servicio `gestion-del-local` para esta capacidad. Valen las reglas
+Contrato de datos del servicio `comercial` para esta capacidad. Valen las reglas
 generales del modelo: nada se borra físicamente y `evento` solo recibe filas nuevas.
 
 ```mermaid

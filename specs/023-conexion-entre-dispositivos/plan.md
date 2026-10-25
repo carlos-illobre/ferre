@@ -116,9 +116,9 @@ ni al revés. Se compila a `dist/` con `tsc` (`prepare` y `build`).
 
 - Paquete nuevo: `microservices/conexion/` (TypeScript, sin dependencias de ejecución; de
   desarrollo, `typescript`, `vitest`, `@vitest/coverage-v8` y `dependency-cruiser`).
-- `pnpm-workspace.yaml` lo suma; `gestion-del-local` y `gestion-del-local-web` lo usan
+- `pnpm-workspace.yaml` lo suma; `comercial` y `gestion-del-local-web` lo usan
   (`workspace:*`). La imagen del servidor copia la carpeta antes de instalar y la compila con el
-  `build` de las dependencias (`pnpm --filter gestion-del-local... build`).
+  `build` de las dependencias (`pnpm --filter comercial... build`).
 - Pruebas de punta a punta: dos ventanas del mismo Chromium. Para que la directa se pueda armar
   entre ellas, el navegador de las pruebas corre sin ocultar las direcciones locales
   (`--disable-features=WebRtcHideLocalIpsWithMdns`); para el respaldo, una ventana sin

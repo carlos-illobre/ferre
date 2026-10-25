@@ -81,7 +81,7 @@ class Lectura:
 @dataclass(frozen=True)
 class ConfiguracionProveedor:
     """Lo que el proveedor no dice en la planilla y hay que saber para calcular el costo.
-    Viene de la tabla `proveedor` de gestion-del-local (issue #11)."""
+    Viene de la tabla `proveedor` de comercial (issue #11)."""
 
     precios_incluyen_iva: bool = False
     descuento_general: Decimal = Decimal("0")  # 0.25 = 25 %

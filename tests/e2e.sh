@@ -85,7 +85,7 @@ sin_recordar_la_sesion() {
   [ "$("${psql[@]}" "SELECT valor FROM configuracion WHERE clave = 'sesion.recordar_segundos'")" = "0" ] && return
   "${psql[@]}" "UPDATE configuracion SET valor = '0' WHERE clave = 'sesion.recordar_segundos'" >/dev/null
   # shellcheck disable=SC2068
-  docker compose $@ restart gestion-del-local >/dev/null && docker compose $@ up -d --wait >/dev/null
+  docker compose $@ restart comercial >/dev/null && docker compose $@ up -d --wait >/dev/null
 }
 
 # El stack del compose y el cliente contra su API: lo que usa el CI y la computadora.

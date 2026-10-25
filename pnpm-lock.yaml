@@ -15,7 +15,7 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.20.2)(jsdom@25.0.1)(terser@5.51.2)
 
-  microservices/api:
+  microservices/comercial:
     dependencies:
       '@hono/node-server':
         specifier: ^1.13.0

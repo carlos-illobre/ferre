@@ -1,6 +1,6 @@
 // Datos de mentira para las pantallas de Más: Cómo va el negocio, Usuarios (con las sesiones y los
 // celulares de cada persona),
-// Quién hizo qué. Mismas formas que el servidor real (microservices/api/src/rutas).
+// Quién hizo qué. Mismas formas que el servidor real (microservices/comercial/src/rutas).
 import deA from "./rutas-u-mas-a.mjs";
 
 const ahora = Date.now();

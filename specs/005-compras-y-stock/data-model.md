@@ -1,6 +1,6 @@
 # Modelo de datos: compras y stock
 
-Las tablas del servicio `gestion-del-local` que usa esta capacidad. El modelo completo está
+Las tablas del servicio `comercial` que usa esta capacidad. El modelo completo está
 en [001-base-del-sistema/data-model.md](../001-base-del-sistema/data-model.md).
 
 Reglas que valen acá: ids UUID (el de la compra lo genera el cliente, así un reintento no

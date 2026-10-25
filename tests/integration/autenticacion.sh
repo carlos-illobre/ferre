@@ -17,8 +17,8 @@ psql "DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email
 psql "UPDATE lista_importada SET cargada_por = NULL, aplicada_por = NULL WHERE cargada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test') OR aplicada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
 psql "DELETE FROM usuario WHERE email LIKE 'prueba-%@ferre.test'" >/dev/null
 
-docker compose exec -T gestion-del-local node dist/crear-usuario.js prueba-dueno@ferre.test "Dueño de prueba" dueño >/dev/null || { echo "no se pudo crear el dueño"; exit 1; }
-docker compose exec -T gestion-del-local node dist/crear-usuario.js prueba-empleado@ferre.test "Empleado de prueba" mostrador >/dev/null
+docker compose exec -T comercial node dist/crear-usuario.js prueba-dueno@ferre.test "Dueño de prueba" dueño >/dev/null || { echo "no se pudo crear el dueño"; exit 1; }
+docker compose exec -T comercial node dist/crear-usuario.js prueba-empleado@ferre.test "Empleado de prueba" mostrador >/dev/null
 
 # Token conocido, guardado hasheado como hace la API.
 TOKEN_DUENO=token-de-prueba-dueno; TOKEN_EMPLEADO=token-de-prueba-empleado

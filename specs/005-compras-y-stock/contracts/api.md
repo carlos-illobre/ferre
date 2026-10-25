@@ -1,6 +1,6 @@
 # API de compras y stock
 
-Servicio `gestion-del-local`.
+Servicio `comercial`.
 
 **Qué exige cada ruta.** Todas exigen sesión (`Authorization: Bearer <token>`; sin sesión
 válida, 401 «Hay que iniciar sesión»). Donde la tabla dice «cualquiera con sesión», la ruta

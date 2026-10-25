@@ -6,14 +6,14 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
-COPY microservices/api/package.json microservices/api/
+COPY microservices/comercial/package.json microservices/comercial/
 # La conexión entre dispositivos es un paquete del workspace que se compila al instalar (ADR-027).
 COPY microservices/conexion microservices/conexion
-RUN pnpm install --frozen-lockfile --filter gestion-del-local...
+RUN pnpm install --frozen-lockfile --filter comercial...
 
 FROM deps AS build
-COPY microservices/api microservices/api
-RUN pnpm --filter gestion-del-local... build && pnpm --filter gestion-del-local --prod deploy --legacy /out
+COPY microservices/comercial microservices/comercial
+RUN pnpm --filter comercial... build && pnpm --filter comercial --prod deploy --legacy /out
 
 FROM node:22-alpine AS runtime
 ENV NODE_ENV=production
@@ -22,9 +22,9 @@ ENV NODE_ENV=production
 RUN addgroup -g 10001 app && adduser -u 10001 -G app -D app
 WORKDIR /app
 COPY --from=build --chown=app:app /out ./
-COPY --from=build --chown=app:app /app/microservices/api/dist ./dist
+COPY --from=build --chown=app:app /app/microservices/comercial/dist ./dist
 # Las migraciones van al lado del migrador compilado, donde las busca (src/persistencia/migrar.ts).
-COPY --from=build --chown=app:app /app/microservices/api/src/persistencia/migraciones ./dist/persistencia/migraciones
+COPY --from=build --chown=app:app /app/microservices/comercial/src/persistencia/migraciones ./dist/persistencia/migraciones
 RUN mkdir -p /app/datos/listas && chown app:app /app/datos/listas
 USER app
 EXPOSE 8080

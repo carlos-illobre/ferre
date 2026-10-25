@@ -110,7 +110,7 @@ entorno `ferre`») con para qué hace falta.
 ## Revisión al editar
 
 Después de cada edición de un archivo de código, `tests/revisar-al-editar.mjs` corre solo (`.claude/settings.json`,
-PostToolUse) el control de tipos del paquete, de forma incremental (`microservices/api` y `microservices/web`). Si hay
+PostToolUse) el control de tipos del paquete, de forma incremental (`microservices/comercial` y `microservices/web`). Si hay
 errores, el agente los ve en ese momento: se corrigen los que causó la tarea antes de seguir.
 Tarda unos segundos por edición. No reemplaza las compuertas de antes de subir.
 

@@ -1,6 +1,6 @@
 # Contrato de la API: Ventas
 
-Servicio `gestion-del-local`, rutas `/ventas` y `/consultas`.
+Servicio `comercial`, rutas `/ventas` y `/consultas`.
 
 **Rol que exigen:** una sesión válida de cualquier rol; sin sesión responden 401 «Hay que
 iniciar sesión».

@@ -38,13 +38,13 @@ Estructura y nombres:
 
 | Carpeta | Responsabilidad de negocio |
 |---|---|
-| `microservices/gestion-del-local` | Todo lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base y de las migraciones |
+| `microservices/comercial` | Todo lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base y de las migraciones |
 | `microservices/listas-de-proveedores` | Recibir listas de proveedores por cualquier canal y convertirlas en precios |
 | `clientes/gestion-del-local-web` | La pantalla del empleado y del dueño. Publicada en GitHub Pages |
 | `libraries/calculo-de-precios` | Costo neto, margen y precio, siempre con su explicación |
 
 Regla de nombres: los servicios por la parte del negocio; los clientes por el servicio
-que muestran más la plataforma (`gestion-del-local-android` mañana); nada de "backend",
+que muestran más la plataforma (`comercial-android` mañana); nada de "backend",
 "api", "web", "app".
 
 Mecánica:

@@ -64,7 +64,7 @@ Hoy el código está repartido en la raíz, mezclado con la documentación:
 
 ```
 clientes/gestion-del-local-web     el front
-microservices/gestion-del-local    el servidor
+microservices/comercial    el servidor
 microservices/listas-de-proveedores  lector de planillas (Python)
 libraries/calculo-de-precios       librería compartida
 tests/  infrastructure/  deployment/   pruebas y despliegue
@@ -76,7 +76,7 @@ Propuesta, con todo el código bajo `microservices/`:
 ```
 microservices/
   web/          el front (hoy clientes/gestion-del-local-web)
-  api/          el servidor (hoy microservices/gestion-del-local)
+  api/          el servidor (hoy microservices/comercial)
   listas/       el lector de planillas (ver nota)
 docs/  specs/  proyecto/            documentación, sin código
 tests/  deployment/                 pruebas de punta a punta y despliegue

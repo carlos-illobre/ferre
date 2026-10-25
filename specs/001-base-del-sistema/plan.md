@@ -75,7 +75,7 @@ specs/001-base-del-sistema/
 La estructura y los nombres los fija ADR-010.
 
 ```text
-microservices/api/       Lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base y de sus migraciones
+microservices/comercial/       Lo que pasa dentro del local: catálogo y precios, ventas, cuenta corriente, compras, stock. Dueño de la base y de sus migraciones
 microservices/listas/   Recibe listas de proveedores por cualquier canal y las convierte en precios
 microservices/web/        Las pantallas, en sus dos interfaces. Se publica como sitio estático
 deployment/reverse-proxy/          Proxy para desarrollo y CI
@@ -87,7 +87,7 @@ docs/                                  ADR, operación, sistema visual, decision
 **Structure Decision**: servicios, clientes y librerías en carpetas propias, nombradas por
 la parte del negocio que resuelven y nunca por su rol técnico («backend», «api», «web»,
 «app»). Un cliente se llama por el servicio que muestra más el dineroforma
-(`gestion-del-local-android`). Un workspace de pnpm en la raíz enlaza la librería
+(`comercial-android`). Un workspace de pnpm en la raíz enlaza la librería
 compartida; cada servicio se empaqueta solo con lo suyo (ADR-010).
 
 ## Contexto
@@ -121,7 +121,7 @@ C4Context
 
 | Componente | Responsabilidad | Tecnología | ADR |
 |---|---|---|---|
-| `gestion-del-local` | Todo lo que pasa dentro del local: catálogo y precios (los calcula, con su explicación paso a paso), ventas, cuenta corriente, compras, stock, usuarios y sesiones. Dueño de la base y de sus migraciones. Expone la API | Node, Hono, TypeScript | 001, 003, 010, 011 |
+| `comercial` | Todo lo que pasa dentro del local: catálogo y precios (los calcula, con su explicación paso a paso), ventas, cuenta corriente, compras, stock, usuarios y sesiones. Dueño de la base y de sus migraciones. Expone la API | Node, Hono, TypeScript | 001, 003, 010, 011 |
 | `listas-de-proveedores` | Recibe una lista de un proveedor y devuelve filas normalizadas. Sin base y sin estado | Python | 001, 003 |
 | `gestion-del-local-web` | Las pantallas, en dos interfaces que comparten todo lo que no es pantalla: tarjetas y pestañas para el celular, tablas y teclado para la computadora. Funciona sin conexión | React, Vite, TypeScript, PWA | 001, 005, 010, 014 |
 | Base de datos | PostgreSQL administrado, uno por ambiente, usado por cadena de conexión | PostgreSQL | 002 |
@@ -132,12 +132,12 @@ C4Context
 
 ## Límites y comunicación
 
-- **La API es la única puerta a los datos.** `gestion-del-local` es el único dueño de la
+- **La API es la única puerta a los datos.** `comercial` es el único dueño de la
   base; ningún otro servicio ni cliente la toca (ADR-003).
 - **La API está documentada con OpenAPI.** Ese documento, junto con
   [data-model.md](data-model.md), es el contrato entre el servidor y cualquier pantalla
   (ADR-001, ADR-003).
-- **Entre servicios, token de servicio.** `gestion-del-local` llama a
+- **Entre servicios, token de servicio.** `comercial` llama a
   `listas-de-proveedores` por HTTP con un token compartido que el otro verifica en cada
   llamada. `listas-de-proveedores` solo es alcanzable en la red interna de su ambiente
   (ADR-003).
@@ -175,8 +175,8 @@ flowchart LR
     sitio["Sitio estático (GitHub Pages)<br/>raíz = producción, /pruebas/ = pruebas"] -. "abre" .-> pwa["Cliente web en el navegador<br/>copia local y cola (IndexedDB)"]
     pwa -- "HTTPS + CORS" --> proxy["Reverse proxy de la máquina<br/>HTTPS"]
     subgraph maquina["Máquina (arm64), usuario sin privilegios, Docker rootless, sin datos"]
-        proxy -- "127.0.0.1:8081" --> gdlp["gestion-del-local<br/>producción"]
-        proxy -- "127.0.0.1:8082" --> gdlt["gestion-del-local<br/>pruebas"]
+        proxy -- "127.0.0.1:8081" --> gdlp["comercial<br/>producción"]
+        proxy -- "127.0.0.1:8082" --> gdlt["comercial<br/>pruebas"]
         gdlp -- "token de servicio" --> ldpp["listas-de-proveedores"]
         gdlt -- "token de servicio" --> ldpt["listas-de-proveedores"]
         escucha["Servicio de despliegue<br/>escucha avisos y despliega"]

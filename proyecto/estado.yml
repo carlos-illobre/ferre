@@ -27,7 +27,7 @@ RF-01b:
   estado: "Hecho"
   pruebas:
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
-    - microservices/api/src/rutas/listas.test.ts
+    - microservices/comercial/src/rutas/listas.test.ts
   defectos: []
 
 RF-02:
@@ -63,7 +63,7 @@ RF-06:
   pruebas:
     - tests/e2e/escritorio/11-duplicados.spec.ts
     - tests/e2e/celular/11-duplicados.spec.ts
-    - microservices/api/src/persistencia/duplicados.test.ts
+    - microservices/comercial/src/persistencia/duplicados.test.ts
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
   defectos:
     - "Solo se sugieren duplicados con la misma descripción (sin acentos, símbolos ni espacios, de 8 caracteres o más); no por descripción similar"
@@ -93,7 +93,7 @@ RF-08:
     - tests/e2e/escritorio/10-escaner.spec.ts
     - tests/e2e/celular/10-escaner.spec.ts
     - microservices/web/src/pantallas/CodigoDeBarras.test.tsx
-    - microservices/api/src/rutas/puestos.test.ts
+    - microservices/comercial/src/rutas/puestos.test.ts
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
@@ -114,10 +114,10 @@ RF-09:
   pruebas:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
-    - microservices/api/src/rutas/productos.test.ts
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/.dependency-cruiser.cjs
-    - microservices/api/src/sql-con-parametros.test.ts
+    - microservices/comercial/src/rutas/productos.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/.dependency-cruiser.cjs
+    - microservices/comercial/src/sql-con-parametros.test.ts
   defectos:
     - "La forma de los datos llega del servidor solo en las ventas (`contratos/ventas.ts`); producto y los demás temas siguen escritos a mano en el front. Zod, el cliente tipado de Hono y React Router, aprobados en ADR-018, no se adoptaron todavía (010-T016, 010-T017 y 010-T018)"
     - "Pedidos a proveedores, roles, tickets, el vínculo en Más → Usuarios, la foto pedida a la compu, anomalías y dinero invertido son pantallas compartidas que todavía le piden al servidor desde la pantalla, sin pasar por `negocio/`"
@@ -142,8 +142,8 @@ RF-10:
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
     - microservices/web/src/teclado/motor/motor.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
-    - microservices/api/src/rutas/productos.test.ts
-    - microservices/api/src/precios.test.ts
+    - microservices/comercial/src/rutas/productos.test.ts
+    - microservices/comercial/src/precios.test.ts
   defectos:
     - "En el celular el producto sin margen dice «sin margen»; la regla dice «sin precio»"
     - "Un cambio guardado en el dispositivo que el servidor rechaza al reconectar se descarta sin avisar"
@@ -164,7 +164,7 @@ RF-11:
 RF-12:
   estado: "Hecho"
   pruebas:
-    - microservices/api/src/rutas/productos.test.ts
+    - microservices/comercial/src/rutas/productos.test.ts
     - microservices/web/src/negocio/catalogo/unidades.test.ts
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
   defectos: []
@@ -172,7 +172,7 @@ RF-12:
 RF-13:
   estado: "Hecho (#47)"
   pruebas:
-    - microservices/api/src/precios.test.ts
+    - microservices/comercial/src/precios.test.ts
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
@@ -214,8 +214,8 @@ RF-18:
 RF-19:
   estado: "Hecho en parte (#60): el precio a mano se redondea en vez de respetarse y avisar"
   pruebas:
-    - microservices/api/src/precios.test.ts
-    - microservices/api/src/rutas/ventas.test.ts
+    - microservices/comercial/src/precios.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
   defectos:
@@ -233,10 +233,10 @@ RF-20:
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
     - microservices/web/src/negocio/catalogo/unidades.test.ts
     - microservices/web/src/datos/almacenamiento/cola.test.ts
-    - microservices/api/src/precios.test.ts
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/.dependency-cruiser.cjs
-    - microservices/api/src/sql-con-parametros.test.ts
+    - microservices/comercial/src/precios.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/.dependency-cruiser.cjs
+    - microservices/comercial/src/sql-con-parametros.test.ts
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "En la computadora la venta se cobra con F2; el Enter final no la cierra, como pide la regla"
@@ -254,7 +254,7 @@ RF-20b:
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
-    - microservices/api/src/precios.test.ts
+    - microservices/comercial/src/precios.test.ts
   defectos:
     - "Sin prueba que mida que el cambio de margen responde en menos de 100 ms (RNF-07)"
     - "La explicación del subtotal paso por paso solo tiene prueba en el celular"
@@ -266,9 +266,9 @@ RF-21:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/.dependency-cruiser.cjs
-    - microservices/api/src/sql-con-parametros.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/.dependency-cruiser.cjs
+    - microservices/comercial/src/sql-con-parametros.test.ts
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "Cobrar sin elegir el medio de pago frena la venta con el aviso «Elegí cómo paga»; el relevamiento y el pedido original dicen que saltearlo no debe frenar (regla a confirmar por Carlos)"
@@ -280,9 +280,9 @@ RF-22:
   estado: "Hecho en parte (#17): se vende como ítem libre. Falta darlo de alta ahí mismo"
   pruebas:
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/.dependency-cruiser.cjs
-    - microservices/api/src/sql-con-parametros.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/.dependency-cruiser.cjs
+    - microservices/comercial/src/sql-con-parametros.test.ts
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "El ítem libre no se puede dar de alta como producto desde la venta"
@@ -378,9 +378,9 @@ RF-40:
   estado: "Hecho en parte (#15): se vende a cuenta corriente, sin prueba del camino completo. Falta la pantalla para marcarla pagada (#57)"
   pruebas:
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/.dependency-cruiser.cjs
-    - microservices/api/src/sql-con-parametros.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/.dependency-cruiser.cjs
+    - microservices/comercial/src/sql-con-parametros.test.ts
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "No hay forma de cargar un cliente desde la aplicación: la ruta para crearlo existe, pero ninguna interfaz la usa"
@@ -421,7 +421,7 @@ RF-50:
   pruebas:
     - tests/e2e/escritorio/15-foto-con-celular.spec.ts
     - microservices/web/src/pantallas/FotoDeFactura.test.tsx
-    - microservices/api/src/rutas/compras.test.ts
+    - microservices/comercial/src/rutas/compras.test.ts
     - tests/e2e/escritorio/05-compras.spec.ts
     - tests/e2e/celular/05-compras.spec.ts
     - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
@@ -488,8 +488,8 @@ RF-59:
   pruebas:
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/src/rutas/anomalias.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/src/rutas/anomalias.test.ts
     - microservices/web/src/pantallas/Anomalias.test.tsx
   defectos:
     - "En la computadora el renglón de la venta no avisa que el stock no alcanza; en el celular sí"
@@ -505,7 +505,7 @@ RF-54:
 RF-55:
   estado: "Hecho en parte (#36): se arma desde cero y se manda como texto; faltan la sugerencia, el correo y el PDF"
   pruebas:
-    - microservices/api/src/rutas/pedidos.test.ts
+    - microservices/comercial/src/rutas/pedidos.test.ts
     - microservices/web/src/pantallas/comun/deposito/Pedidos.test.tsx
     - tests/e2e/celular/16-pedidos.spec.ts
     - tests/e2e/escritorio/16-pedidos.spec.ts
@@ -601,11 +601,11 @@ RF-70:
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/integration/autenticacion.sh
-    - microservices/api/src/rutas/sesiones.test.ts
-    - microservices/api/src/rutas/usuarios.test.ts
-    - microservices/api/src/rutas/credenciales.test.ts
-    - microservices/api/src/rutas/entrar-con-google.test.ts
-    - microservices/api/src/autenticacion.test.ts
+    - microservices/comercial/src/rutas/sesiones.test.ts
+    - microservices/comercial/src/rutas/usuarios.test.ts
+    - microservices/comercial/src/rutas/credenciales.test.ts
+    - microservices/comercial/src/rutas/entrar-con-google.test.ts
+    - microservices/comercial/src/autenticacion.test.ts
     - microservices/web/src/pantallas/entrar-simulado.test.tsx
     - microservices/web/src/datos/sesion/sesion.test.tsx
     - docs/pruebas-manuales/entrar.md
@@ -617,7 +617,7 @@ RF-70b:
   pruebas:
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
-    - microservices/api/src/rutas/credenciales.test.ts
+    - microservices/comercial/src/rutas/credenciales.test.ts
     - microservices/web/src/pantallas/entrar-simulado.test.tsx
   defectos:
     - "En la computadora, la lista de celulares vinculados está dentro de la administración: quien no administra no tiene desde dónde ver ni quitar los suyos"
@@ -628,10 +628,10 @@ RF-70b:
 RF-71:
   estado: "Hecho en parte (#41): consulta paginada. Faltan los filtros en pantalla (#58)"
   pruebas:
-    - microservices/api/src/rutas/auditoria.test.ts
+    - microservices/comercial/src/rutas/auditoria.test.ts
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - tests/integration/autenticacion.sh
-    - microservices/api/src/rutas/credenciales.test.ts
+    - microservices/comercial/src/rutas/credenciales.test.ts
     - tests/e2e/celular/01-login.spec.ts
   defectos:
     - "Los filtros por usuario, fecha y tipo existen en la API pero ninguna pantalla los ofrece (#58)"
@@ -640,8 +640,8 @@ RF-71:
 RF-72:
   estado: "Hecho (#59, #64): permisos fijos, varios roles por usuario, y la aplicación muestra solo lo que cada uno puede usar"
   pruebas:
-    - microservices/api/src/rutas/roles.test.ts
-    - microservices/api/src/rutas/usuarios.test.ts
+    - microservices/comercial/src/rutas/roles.test.ts
+    - microservices/comercial/src/rutas/usuarios.test.ts
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
     - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
@@ -659,7 +659,7 @@ RF-72:
 RF-76:
   estado: "Hecho (#72): la computadora entra leyendo su código con el celular, sin paso de confirmar"
   pruebas:
-    - microservices/api/src/rutas/sesiones.test.ts
+    - microservices/comercial/src/rutas/sesiones.test.ts
     - microservices/web/src/pantallas/celular/entrada/EntrarEnLaCompu.test.tsx
     - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
     - tests/e2e/celular/01-login.spec.ts
@@ -674,7 +674,7 @@ RF-76:
 RF-77:
   estado: "Hecho (#75, #101): navegación, venta, ingreso y pedido en espejo, con presencia, separar y juntar, y avisos; el vínculo es de los dispositivos y sobrevive al cierre de sesión"
   pruebas:
-    - microservices/api/src/rutas/puestos.test.ts
+    - microservices/comercial/src/rutas/puestos.test.ts
     - microservices/web/src/negocio/ventas/venta-en-espejo.test.ts
     - microservices/web/src/negocio/deposito/ingreso-en-espejo.test.ts
     - tests/e2e/celular/17-espejo.spec.ts
@@ -722,7 +722,7 @@ RF-85:
 RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
   pruebas:
-    - microservices/api/src/rutas/roles.test.ts
+    - microservices/comercial/src/rutas/roles.test.ts
     - microservices/web/src/pantallas/comun/negocio/Roles.test.tsx
     - tests/e2e/celular/13-roles.spec.ts
     - tests/e2e/escritorio/13-roles.spec.ts
@@ -732,7 +732,7 @@ RF-75:
 RF-73:
   estado: "Hecho (#41), fuera de esta etapa: reemplazado por RF-72"
   pruebas:
-    - microservices/api/src/rutas/usuarios.test.ts
+    - microservices/comercial/src/rutas/usuarios.test.ts
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - tests/integration/autenticacion.sh
   defectos:
@@ -746,8 +746,8 @@ RF-74:
     - tests/integration/autenticacion.sh
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - microservices/web/src/pantallas/acceso-de-usuarios.test.tsx
-    - microservices/api/src/rutas/sesiones.test.ts
-    - microservices/api/src/rutas/usuarios.test.ts
+    - microservices/comercial/src/rutas/sesiones.test.ts
+    - microservices/comercial/src/rutas/usuarios.test.ts
     - microservices/web/src/datos/sesion/sesion.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
   defectos:
@@ -759,7 +759,7 @@ RF-80:
     - tests/e2e/escritorio/14-tickets.spec.ts
     - tests/e2e/celular/14-tickets.spec.ts
     - microservices/web/src/pantallas/Tickets.test.tsx
-    - microservices/api/src/rutas/tickets.test.ts
+    - microservices/comercial/src/rutas/tickets.test.ts
   defectos:
     - "La foto de un ticket por enviar se guarda en el dispositivo sin tope de espacio"
 
@@ -769,7 +769,7 @@ RF-81:
     - tests/e2e/escritorio/14-tickets.spec.ts
     - tests/e2e/celular/14-tickets.spec.ts
     - microservices/web/src/pantallas/Tickets.test.tsx
-    - microservices/api/src/rutas/tickets.test.ts
+    - microservices/comercial/src/rutas/tickets.test.ts
   defectos:
     - "Cualquier usuario puede marcar resuelto o reabrir: no hay un permiso para eso"
 
@@ -821,7 +821,7 @@ RF-111:
 RF-112:
   estado: "A validar (016): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
-    - microservices/api/src/rutas/ficha-del-producto.test.ts
+    - microservices/comercial/src/rutas/ficha-del-producto.test.ts
     - microservices/web/src/negocio/catalogo/ficha.test.tsx
     - microservices/web/src/pantallas/CodigoDeBarras.test.tsx
     - tests/e2e/celular/10-escaner.spec.ts
@@ -849,7 +849,7 @@ RF-114:
 RF-115:
   estado: "A validar (016): programado y probado; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
-    - microservices/api/src/rutas/ficha-del-producto.test.ts
+    - microservices/comercial/src/rutas/ficha-del-producto.test.ts
     - microservices/web/src/negocio/catalogo/ficha.test.tsx
     - microservices/web/src/pantallas/celular/catalogo/FichaProducto.test.tsx
     - microservices/web/src/pantallas/compu/catalogo/FichaAlLado.test.tsx
@@ -993,9 +993,9 @@ RNF-10:
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - microservices/web/src/datos/almacenamiento/cola.test.ts
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/.dependency-cruiser.cjs
-    - microservices/api/src/sql-con-parametros.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/.dependency-cruiser.cjs
+    - microservices/comercial/src/sql-con-parametros.test.ts
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "Sin prueba: corregir stock y cargar un renglón de conteo sin conexión"
@@ -1025,7 +1025,7 @@ RNF-13:
   pruebas:
     - tests/integration/health.sh
     - tests/integration/migraciones.sh
-    - microservices/api/src/persistencia/migrar.test.ts
+    - microservices/comercial/src/persistencia/migrar.test.ts
     - microservices/listas/tests/test_health.py
     - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
   defectos:
@@ -1042,9 +1042,9 @@ RNF-20:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/web/src/datos/almacenamiento/cola.test.ts
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/.dependency-cruiser.cjs
-    - microservices/api/src/sql-con-parametros.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/.dependency-cruiser.cjs
+    - microservices/comercial/src/sql-con-parametros.test.ts
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "Un cambio encolado que el servidor rechaza al reconectar se descarta sin avisar, si la pantalla que lo pidió ya no está abierta"
@@ -1087,7 +1087,7 @@ RNF-30:
 RNF-31:
   estado: "Hecho (#47)"
   pruebas:
-    - microservices/api/src/rutas/ventas.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
     - tests/e2e/escritorio/04-vender.spec.ts
     - tests/e2e/celular/04-vender.spec.ts
   defectos:
@@ -1138,7 +1138,7 @@ RNF-50:
   pruebas: []
   defectos:
     - "No hay ningún documento OpenAPI de la API (contra ADR-001 y ADR-003)"
-    - "microservices/api/public conserva un cliente compilado anterior a ADR-010 que nada sirve"
+    - "microservices/comercial/public conserva un cliente compilado anterior a ADR-010 que nada sirve"
     - "Sin prueba: que el precio calculado en el dispositivo sea idéntico al del servidor"
 
 RNF-51:
@@ -1210,10 +1210,10 @@ RNF-60:
     - microservices/web/src/negocio/catalogo/listas.test.tsx
     - microservices/web/src/negocio/usuarios.test.tsx
     - microservices/web/src/negocio/precios/vista-previa.test.ts
-    - microservices/api/src/rutas/productos.test.ts
-    - microservices/api/src/rutas/ventas.test.ts
-    - microservices/api/.dependency-cruiser.cjs
-    - microservices/api/src/sql-con-parametros.test.ts
+    - microservices/comercial/src/rutas/productos.test.ts
+    - microservices/comercial/src/rutas/ventas.test.ts
+    - microservices/comercial/.dependency-cruiser.cjs
+    - microservices/comercial/src/sql-con-parametros.test.ts
   defectos:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "El precio del servidor engorda el catálogo que baja la computadora (la explicación de cada precio viaja con cada producto); no se midió todavía con los 11.000 productos reales"
@@ -1275,8 +1275,8 @@ RF-95:
   estado: "Hecho (011-T004): «Ver procesos» y «Dibujar procesos», controlados en Ferrebress y en el servicio; los dos en el rol Gerente"
   pruebas:
     - microservices/procesos/servidor/src/rutas.test.ts
-    - microservices/api/src/rutas/procesos.test.ts
-    - microservices/api/src/rutas/roles.test.ts
+    - microservices/comercial/src/rutas/procesos.test.ts
+    - microservices/comercial/src/rutas/roles.test.ts
     - microservices/web/src/pantallas/Procesos.test.tsx
     - tests/e2e/escritorio/18-procesos.spec.ts
   defectos: []
@@ -1286,7 +1286,7 @@ RF-96:
   pruebas:
     - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
     - microservices/web/src/pantallas/version-nueva-sin-timer.test.tsx
-    - microservices/api/src/salud.test.ts
+    - microservices/comercial/src/salud.test.ts
   defectos: []
 RF-106:
   estado: "Hecho (009-T006): en Configuración, mis celulares con huella y mi vínculo, en el celular y en la computadora; sin pestaña Sesiones"
@@ -1321,9 +1321,9 @@ RF-98:
 RF-99:
   estado: "Hecho (013-T004 a 013-T007): cada sección y cada dato con su permiso, en las pantallas y en el servidor"
   pruebas:
-    - microservices/api/src/rutas/secciones-de-negocio.test.ts
+    - microservices/comercial/src/rutas/secciones-de-negocio.test.ts
     - microservices/web/src/pantallas/secciones-de-negocio.test.tsx
-    - microservices/api/src/rutas/roles.test.ts
+    - microservices/comercial/src/rutas/roles.test.ts
     - tests/e2e/escritorio/13-roles.spec.ts
     - tests/e2e/celular/13-roles.spec.ts
   defectos: []
@@ -1331,7 +1331,7 @@ RF-99:
 RF-100:
   estado: "Hecho (013-T004): la migración 0022 da los tres permisos nuevos a los roles que tenían «Ver los números del negocio» y lo quita"
   pruebas:
-    - microservices/api/src/rutas/secciones-de-negocio.test.ts
+    - microservices/comercial/src/rutas/secciones-de-negocio.test.ts
     - tests/e2e/escritorio/13-roles.spec.ts
     - tests/e2e/celular/13-roles.spec.ts
   defectos: []
@@ -1339,8 +1339,8 @@ RF-100:
 RF-101:
   estado: "Hecho (013-T004, 013-T012): el servidor manda el valor del stock solo con «Ver el dinero invertido», y Depósito → Inventario lo muestra (total y por producto) a quien lo tiene"
   pruebas:
-    - microservices/api/src/rutas/secciones-de-negocio.test.ts
-    - microservices/api/src/rutas/roles.test.ts
+    - microservices/comercial/src/rutas/secciones-de-negocio.test.ts
+    - microservices/comercial/src/rutas/roles.test.ts
     - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
     - tests/e2e/escritorio/06-stock.spec.ts
     - tests/e2e/celular/06-stock.spec.ts
@@ -1351,7 +1351,7 @@ RF-101:
 RF-102:
   estado: "Hecho (014)"
   pruebas:
-    - microservices/api/src/rutas/apartados.test.ts
+    - microservices/comercial/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
@@ -1360,7 +1360,7 @@ RF-102:
 RF-103:
   estado: "Hecho (014)"
   pruebas:
-    - microservices/api/src/rutas/apartados.test.ts
+    - microservices/comercial/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
@@ -1369,7 +1369,7 @@ RF-103:
 RF-104:
   estado: "Hecho (014)"
   pruebas:
-    - microservices/api/src/rutas/apartados.test.ts
+    - microservices/comercial/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
@@ -1378,7 +1378,7 @@ RF-104:
 RF-105:
   estado: "Hecho (014)"
   pruebas:
-    - microservices/api/src/rutas/apartados.test.ts
+    - microservices/comercial/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
@@ -1395,7 +1395,7 @@ RNF-61:
 RF-122:
   estado: "A validar (018): cada pantalla pide al servidor lo que muestra, de a 50; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
-    - microservices/api/src/rutas/productos.test.ts
+    - microservices/comercial/src/rutas/productos.test.ts
     - microservices/web/src/negocio/catalogo/catalogo.test.tsx
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
     - microservices/web/src/negocio/deposito/inventario.test.tsx
@@ -1413,15 +1413,15 @@ RF-123:
 RF-124:
   estado: "A validar (018): la copia del catálogo en el servidor, al día con los avisos de la base; medido en una base real con 2.500 productos"
   pruebas:
-    - microservices/api/src/productos/copia.test.ts
-    - microservices/api/src/productos/al-dia.test.ts
+    - microservices/comercial/src/productos/copia.test.ts
+    - microservices/comercial/src/productos/al-dia.test.ts
     - tests/integration/avisos-del-catalogo.sh
   defectos: []
 
 RF-125:
   estado: "Hecho (022-T007): la salud del servidor dice si la base responde (cambiado por 022); sin Supabase no hay consulta diaria"
   pruebas:
-    - microservices/api/src/salud.test.ts
+    - microservices/comercial/src/salud.test.ts
   defectos: []
 
 RF-126:
@@ -1430,7 +1430,7 @@ RF-126:
     - microservices/web/src/pantallas/celular/ventas/VentasDelDia.test.tsx
     - microservices/web/src/pantallas/compu/ventas/VentasDelDia.test.tsx
     - microservices/web/src/negocio/ventas/correccion.test.ts
-    - microservices/api/src/rutas/ventas-corregir.test.ts
+    - microservices/comercial/src/rutas/ventas-corregir.test.ts
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos: []
 
@@ -1440,21 +1440,21 @@ RF-127:
     - microservices/web/src/pantallas/celular/ventas/VentasDelDia.test.tsx
     - microservices/web/src/pantallas/compu/ventas/VentasDelDia.test.tsx
     - microservices/web/src/negocio/ventas/correccion.test.ts
-    - microservices/api/src/rutas/ventas-corregir.test.ts
+    - microservices/comercial/src/rutas/ventas-corregir.test.ts
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos: []
 
 RF-128:
   estado: "Hecho en parte: el servidor guarda lo de antes y lo de ahora y lo anota en Actividad, y la venta se ve «corregida»; falta mostrar lo anterior tachado en la venta guardada (019-T011)"
   pruebas:
-    - microservices/api/src/rutas/ventas-corregir.test.ts
+    - microservices/comercial/src/rutas/ventas-corregir.test.ts
     - microservices/web/src/pantallas/compu/ventas/VentasDelDia.test.tsx
   defectos: []
 
 RF-129:
   estado: "Hecho en parte: el cambio y la devolución en el servidor y en el celular (019-T008, T010); falta la computadora (T009)"
   pruebas:
-    - microservices/api/src/rutas/ventas-cambio.test.ts
+    - microservices/comercial/src/rutas/ventas-cambio.test.ts
     - microservices/web/src/negocio/ventas/cambio.test.ts
     - microservices/web/src/pantallas/celular/ventas/VentasDelDia.test.tsx
     - tests/e2e/celular/04-vender.spec.ts
@@ -1463,7 +1463,7 @@ RF-129:
 RF-130:
   estado: "Hecho en parte: la diferencia del cambio se cobra, se devuelve o cambia la deuda, en el servidor y en el celular (019-T008, T010); falta la computadora (T009)"
   pruebas:
-    - microservices/api/src/rutas/ventas-cambio.test.ts
+    - microservices/comercial/src/rutas/ventas-cambio.test.ts
     - microservices/web/src/negocio/ventas/cambio.test.ts
     - tests/e2e/celular/04-vender.spec.ts
   defectos: []
@@ -1489,15 +1489,15 @@ RNF-62:
 RF-133:
   estado: "A validar (020): programado; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
-    - microservices/api/src/acceso/sesion-recordada.test.ts
-    - microservices/api/src/rutas/sistema.test.ts
+    - microservices/comercial/src/acceso/sesion-recordada.test.ts
+    - microservices/comercial/src/rutas/sistema.test.ts
   defectos: []
 
 RF-134:
   estado: "Reemplazado por RF-138 (023): ya no hay pregunta del celular ni su ajuste"
   pruebas:
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
-    - microservices/api/src/rutas/sistema.test.ts
+    - microservices/comercial/src/rutas/sistema.test.ts
   defectos: []
 
 RF-135:
@@ -1505,8 +1505,8 @@ RF-135:
   pruebas:
     - microservices/web/src/pantallas/Sistema.test.tsx
     - microservices/web/src/pantallas/compu/negocio/Actividad.test.tsx
-    - microservices/api/src/rutas/sistema.test.ts
-    - microservices/api/src/rutas/roles.test.ts
+    - microservices/comercial/src/rutas/sistema.test.ts
+    - microservices/comercial/src/rutas/roles.test.ts
   defectos:
     - "Guardar varios ajustes en un mismo pedido no es todo o nada: si fallan los días, los tiempos ya quedaron (la pantalla manda uno por vez; revisión de 020, D5)"
 
@@ -1515,7 +1515,7 @@ RNF-63:
   pruebas:
     - tests/integration/base-propia.sh
     - tests/integration/paridad_env.sh
-    - microservices/api/src/persistencia/migrar.test.ts
+    - microservices/comercial/src/persistencia/migrar.test.ts
     - microservices/procesos/servidor/src/persistencia/migrar.test.ts
   defectos:
     - "Sin copias hasta la etapa 2 (T140): perder el disco de la máquina pierde la base"
@@ -1527,10 +1527,10 @@ RNF-64:
   pruebas:
     - tests/integration/base-propia.sh
     - tests/integration/paridad_env.sh
-    - microservices/api/src/persistencia/conexion.test.ts
-    - microservices/api/src/productos/copia.test.ts
-    - microservices/api/src/rutas/productos.test.ts
-    - microservices/api/src/rutas/stock.test.ts
+    - microservices/comercial/src/persistencia/conexion.test.ts
+    - microservices/comercial/src/productos/copia.test.ts
+    - microservices/comercial/src/rutas/productos.test.ts
+    - microservices/comercial/src/rutas/stock.test.ts
     - microservices/web/src/datos/almacenamiento/descarga.test.tsx
   defectos:
     - "La prueba de E07 comprueba que migrar de nuevo no aplica nada, no que la aplicación responda sin productos ni ventas con la base vacía (revisión de 022, 1.5)"
@@ -1538,11 +1538,11 @@ RNF-64:
 RNF-65:
   estado: "Hecho (022-T004, 022-T006): src/persistencia/ en el mostrador y en Procesos, todo por Kysely, una sola forma de cada cosa, tipos generados; pnpm capas lo controla"
   pruebas:
-    - microservices/api/.dependency-cruiser.cjs
+    - microservices/comercial/.dependency-cruiser.cjs
     - microservices/procesos/servidor/.dependency-cruiser.cjs
-    - microservices/api/src/persistencia/transaccion.test.ts
-    - microservices/api/src/persistencia/archivos.test.ts
-    - microservices/api/src/persistencia/tablas.test.ts
+    - microservices/comercial/src/persistencia/transaccion.test.ts
+    - microservices/comercial/src/persistencia/archivos.test.ts
+    - microservices/comercial/src/persistencia/tablas.test.ts
     - microservices/procesos/servidor/src/persistencia/tablas.test.ts
   defectos:
     - "Procesos conserva su almacén en memoria para las pruebas de reglas y rutas, que repite las reglas de unicidad de la base: se reordena con las reglas, más adelante"
@@ -1553,17 +1553,17 @@ RNF-65:
 RNF-66:
   estado: "Hecho (022-T005, 022-T006): las pruebas de la capa de datos corren contra PostgreSQL 17 y cubren el 100 % de líneas, ramas y funciones; la CI corta si baja"
   pruebas:
-    - microservices/api/vitest.config.ts
+    - microservices/comercial/vitest.config.ts
     - microservices/procesos/servidor/vitest.config.ts
-    - microservices/api/src/persistencia/acceso.test.ts
-    - microservices/api/src/persistencia/ventas.test.ts
+    - microservices/comercial/src/persistencia/acceso.test.ts
+    - microservices/comercial/src/persistencia/ventas.test.ts
     - microservices/procesos/servidor/src/persistencia/procesos.test.ts
   defectos: []
 
 RNF-67:
   estado: "Hecho (022-T009): AMBIENTE en el .env y VITE_AMBIENTE al construir la web en la CI (decisión 162); sin valores por omisión; lo guardado en el dispositivo lleva el ambiente"
   pruebas:
-    - microservices/api/src/config.test.ts
+    - microservices/comercial/src/config.test.ts
     - microservices/web/src/plataforma/ambiente/ambiente.test.ts
     - tests/integration/paridad_env.sh
   defectos:
@@ -1592,7 +1592,7 @@ RF-137:
     - microservices/conexion/src/servidor/canales.test.ts
     - tests/e2e/escritorio/20-conexion.spec.ts
     - tests/e2e/celular/20-conexion.spec.ts
-    - microservices/api/src/rutas/canal.test.ts
+    - microservices/comercial/src/rutas/canal.test.ts
   defectos:
     - "Un dato recibido y todavía no confirmado antes de que la página recargue puede llegar dos veces (revisión 1.6)"
     - "Si falla un POST al servidor, las señales de la directa, «sin directa» y «probar» que iban en él no se reenvían (revisión 3.5)"
@@ -1606,7 +1606,7 @@ RF-138:
   pruebas:
     - microservices/conexion/src/navegador/enlace.test.ts
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
-    - microservices/api/src/rutas/sistema.test.ts
+    - microservices/comercial/src/rutas/sistema.test.ts
     - microservices/web/src/pantallas/Sistema.test.tsx
   defectos:
     - "Cada pedido a la sala comprueba la sesión y el vínculo en la base (la sesión, con lo que recuerda el servidor, RF-133)"
@@ -1665,7 +1665,7 @@ RF-141:
     - tests/e2e/celular/10-escaner.spec.ts
     - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
     - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
-    - microservices/api/src/rutas/canal.test.ts
+    - microservices/comercial/src/rutas/canal.test.ts
     - microservices/conexion/src/navegador/central.test.ts
     - microservices/conexion/src/navegador/canal.test.ts
   defectos: []
@@ -1675,8 +1675,8 @@ RF-142:
   pruebas:
     - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
     - microservices/web/src/datos/sesion/sesion.test.tsx
-    - microservices/api/src/salud.test.ts
-    - microservices/api/src/rutas/canal.test.ts
+    - microservices/comercial/src/salud.test.ts
+    - microservices/comercial/src/rutas/canal.test.ts
   defectos: []
 
 RF-143:
@@ -1701,7 +1701,7 @@ RF-145:
     - tests/e2e/celular/20-conexion.spec.ts
     - microservices/conexion/src/navegador/enlace.test.ts
     - microservices/conexion/src/servidor/canales.test.ts
-    - microservices/api/src/rutas/canal.test.ts
+    - microservices/comercial/src/rutas/canal.test.ts
   defectos: []
 
 RNF-70:

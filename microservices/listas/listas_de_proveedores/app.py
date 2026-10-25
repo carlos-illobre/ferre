@@ -10,7 +10,7 @@ app = FastAPI(title="listas-de-proveedores", version="0.1.0")
 
 
 def exigir_token(x_token_servicio: str = Header(default="")) -> None:
-    # Solo gestion-del-local llama acá (ADR-003). Sin token, nada.
+    # Solo comercial llama acá (ADR-003). Sin token, nada.
     if x_token_servicio != TOKEN_SERVICIO:
         raise HTTPException(401, "Falta o no coincide el token de servicio")
 

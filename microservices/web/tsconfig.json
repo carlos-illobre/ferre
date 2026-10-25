@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx", "lib": ["ES2022", "DOM", "DOM.Iterable"], "noEmit": true,
-    "paths": { "@servidor/*": ["../api/src/contratos/*"] }
+    "paths": { "@servidor/*": ["../comercial/src/contratos/*"] }
   },
   "include": ["src"]
 }

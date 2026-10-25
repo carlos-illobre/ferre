@@ -69,7 +69,7 @@ PostgreSQL común para poder irse con un volcado.
   un reinicio en esos segundos obliga a generar otro QR.
 
 ### Lo que no cambia
-El token de servicio entre `gestion-del-local` y `listas-de-proveedores` sigue aparte.
+El token de servicio entre `comercial` y `listas-de-proveedores` sigue aparte.
 
 ## Cuándo revisar esta decisión
 

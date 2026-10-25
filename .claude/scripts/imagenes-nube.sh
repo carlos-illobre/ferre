@@ -16,14 +16,14 @@ trap 'rm -rf "$T"' EXIT
 mkdir "$T/cert" && cp "$CERT_ORIGEN" "$T/cert/ca-bundle.crt"
 CERT='COPY --from=cert ca-bundle.crt /etc/ssl/certs/proxy-ca.crt\nENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/proxy-ca.crt SSL_CERT_FILE=/etc/ssl/certs/proxy-ca.crt REQUESTS_CA_BUNDLE=/etc/ssl/certs/proxy-ca.crt UV_NATIVE_TLS=1'
 # El certificado va en la etapa que baja dependencias; la imagen final no lo lleva.
-sed "/^FROM node:22-alpine AS base/a $CERT" microservices/api/Dockerfile > "$T/api.Dockerfile"
+sed "/^FROM node:22-alpine AS base/a $CERT" microservices/comercial/Dockerfile > "$T/api.Dockerfile"
 sed "/^FROM node:22-alpine AS base/a $CERT" microservices/procesos/servidor/Dockerfile > "$T/procesos.Dockerfile"
 sed "/^FROM .* AS build/a $CERT" microservices/listas/Dockerfile > "$T/listas.Dockerfile"
 for f in "$T"/*.Dockerfile; do grep -q proxy-ca.crt "$f" || { echo "No se pudo agregar el certificado a $(basename "$f"): cambió su primer FROM; actualizá este script."; exit 1; }; done
 
 cat > "$T/override.yml" <<EOF
 services:
-  gestion-del-local:
+  comercial:
     build: { dockerfile: $T/api.Dockerfile, additional_contexts: { cert: $T/cert } }
   procesos:
     build: { dockerfile: $T/procesos.Dockerfile, additional_contexts: { cert: $T/cert } }

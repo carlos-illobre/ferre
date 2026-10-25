@@ -1,6 +1,6 @@
 # API de catálogo y precios
 
-Rutas del servicio `gestion-del-local` que usa esta capacidad, y las del servicio interno
+Rutas del servicio `comercial` que usa esta capacidad, y las del servicio interno
 `listas-de-proveedores`.
 
 **Roles.** La API usa los roles de RF-73. En la columna «Rol»:
@@ -74,7 +74,7 @@ celular de ese puesto.
 
 ## Servicio interno `listas-de-proveedores`
 
-No se llama desde el cliente: solo lo usa `gestion-del-local`, con el encabezado
+No se llama desde el cliente: solo lo usa `comercial`, con el encabezado
 `X-Token-Servicio` (ADR-003). Sin ese token, 401.
 
 | Método | Ruta | Exige | Para qué sirve |

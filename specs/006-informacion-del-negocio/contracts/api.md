@@ -1,6 +1,6 @@
 # API: Información del negocio
 
-Servicio `gestion-del-local`.
+Servicio `comercial`.
 
 ## Ruta propia de esta capacidad
 

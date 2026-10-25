@@ -162,8 +162,8 @@ la había.
 Una vez por ambiente, con su usuario:
 
 ```bash
-cd ~/ferre/produccion && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre"   # ferre-produccion
-cd ~/ferre/pruebas && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre"      # ferre-pruebas
+cd ~/ferre/produccion && docker compose exec comercial node dist/crear-usuario.js tu@gmail.com "Tu nombre"   # ferre-produccion
+cd ~/ferre/pruebas && docker compose exec comercial node dist/crear-usuario.js tu@gmail.com "Tu nombre"      # ferre-pruebas
 ```
 
 Después se entra con Google y se da de alta al empleado desde la app (roles: `dueño`, `admin`, `mostrador`):
@@ -219,7 +219,7 @@ journalctl --user -u ferre-despliegue --since today
 ~/ferre/bin/desplegar.sh
 
 # logs de un servicio
-cd ~/ferre/produccion && docker compose logs -f --tail 100 gestion-del-local
+cd ~/ferre/produccion && docker compose logs -f --tail 100 comercial
 
 # recursos y disco
 docker stats --no-stream

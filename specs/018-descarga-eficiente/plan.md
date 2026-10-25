@@ -85,7 +85,7 @@ versión sacaba «Trabajar sin conexión» de Configuración, y Carlos pidió lo
 
 ## Technical Context
 
-- Servidor (`microservices/api`): Node, Hono, `pg`. La conexión de producción es el «Session
+- Servidor (`microservices/comercial`): Node, Hono, `pg`. La conexión de producción es el «Session
   pooler» de Supabase, que deja usar `LISTEN`.
 - Cliente (`microservices/web`): React; lo bajado vive en IndexedDB (ADR-005).
 - Volumen: once mil productos, unos 10 MB en memoria. Buscar en memoria recorre la lista una vez:

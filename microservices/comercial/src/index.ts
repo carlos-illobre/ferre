@@ -18,5 +18,5 @@ await leerTiempos();
 console.log("copia del catálogo lista");
 
 serve({ fetch: app.fetch, port: config.port }, (info) => {
-  console.log(`gestion-del-local escuchando en :${info.port}`);
+  console.log(`comercial escuchando en :${info.port}`);
 });

@@ -45,7 +45,7 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
   `useRuta`. Cada interfaz tiene su configuración (`pantallas/celular/rutas.ts` el celular, que anima;
   `pantallas/compu/base/rutas.ts` la computadora, que no) y va envuelta en su `ConRutas`. `irA`
   se puede llamar desde cualquier lado (el espejo, un aviso).
-- **La forma de las respuestas la escribe el servidor**, en `microservices/api/src/contratos/`,
+- **La forma de las respuestas la escribe el servidor**, en `microservices/comercial/src/contratos/`,
   un archivo por tema y solo con tipos. El servidor arma su respuesta con ese tipo y el front
   lo lee como `@servidor/<tema>`; como son solo tipos, al compilar desaparecen y al navegador
   no llega nada del servidor. Donde el servidor devuelve una fecha de la base, el contrato dice
@@ -58,7 +58,7 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
 
 ## Cómo se aplica en el servidor
 
-Cada tema tiene su carpeta en `microservices/api/src/` (ventas, clientes, compras, pedidos,
+Cada tema tiene su carpeta en `microservices/comercial/src/` (ventas, clientes, compras, pedidos,
 conteos, deposito, catalogo, productos, listas, duplicados, administracion, acceso, tickets,
 anomalias, actividad):
 
@@ -89,7 +89,7 @@ anomalias, actividad):
 - Mientras dure la unificación de cada proceso no se cambian sus pantallas.
 - Reemplaza la parte de [ADR-010](ADR-010-servicios-clientes-y-librerias.md) que justificaba `libraries/`; esa
   carpeta se eliminó en la etapa 4. El cálculo del precio está en el servidor
-  (`microservices/api/src/precios.ts`); el front tiene la misma cuenta solo para la vista previa
+  (`microservices/comercial/src/precios.ts`); el front tiene la misma cuenta solo para la vista previa
   de un margen o un precio tipeado y para vender sin conexión
   (`microservices/web/src/negocio/precios/vista-previa.ts`), y una prueba del front falla si
   las dos cuentas dejan de ser idénticas. La búsqueda es tecnología genérica y está en

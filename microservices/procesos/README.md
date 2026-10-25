@@ -29,7 +29,7 @@ llevarlo a otro proyecto: no usa nada de Ferrebress. Por qué está armado así:
 | `X-Puede` | `ver`, `dibujar` o `ver,dibujar`. `dibujar` incluye ver |
 
   El servicio no se publica: solo lo alcanza la aplicación, por la red interna.
-  En Ferrebress lo hace `microservices/api/src/rutas/procesos.ts`, que además anota cada
+  En Ferrebress lo hace `microservices/comercial/src/rutas/procesos.ts`, que además anota cada
   cambio en su registro de eventos.
 
 ### A las pantallas

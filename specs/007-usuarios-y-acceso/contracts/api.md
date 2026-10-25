@@ -2,7 +2,7 @@
 
 > Vigente desde el 2026-10-11 (RF-72 y RF-75, decisión 50): cada ruta exige un **permiso**; los roles son grupos de permisos que arma el negocio.
 
-Servicio `gestion-del-local`.
+Servicio `comercial`.
 
 ## Reglas comunes
 

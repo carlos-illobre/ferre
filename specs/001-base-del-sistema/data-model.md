@@ -1,6 +1,6 @@
 # Data Model: Base del sistema
 
-Modelo de datos completo de `gestion-del-local`, único dueño de la base del mostrador (ADR-003, ADR-026). Es
+Modelo de datos completo de `comercial`, único dueño de la base del mostrador (ADR-003, ADR-026). Es
 contrato: el servidor se conserva y cualquier pantalla nueva trabaja contra estos datos a
 través de la API. Coincide columna por columna con las migraciones del servicio; si hay una
 diferencia, mandan las migraciones y este documento se corrige.
