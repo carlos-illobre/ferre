@@ -1309,3 +1309,8 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      sus límites (8 caminos por función, unas 150 líneas por archivo y 40 por componente, nada
      copiado); los estilos, «lo estándar, lo que se usa profesionalmente»: CSS Modules
      (specs/024, ADR-028).
+156. **Al encontrarse, nunca hay dos ventas distintas** (2026-10-25). Carlos: «es imposible que
+     los dos tengan una venta distinta, la venta es con un cliente, el cliente no va a ser atendido
+     por dos personas a la vez». Queda como está: de cada trabajo en curso vale el que cambió
+     último, y en empate el de la computadora (specs/023). Probó la conexión entre el celular y la
+     computadora en el local y anda.

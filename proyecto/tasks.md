@@ -323,3 +323,4 @@ Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con 
 - [ ] T147 [carlos] Rehacer todas las teclas (Alt + letra y las de cada pantalla): hoy funcionan mal y sin consistencia; incluye las Alt nuevas de la v2 que hacen otra cosa y las Alt D, E y F que la decisión 80 prohíbe (revisión de specs/021, 1 y 2; decisión 153)
 - [ ] T148 [carlos] Redefinir los mínimos de tamaño del celular (letra y lugar para tocar): hoy el menú de abajo, «Roles y permisos» y las llaves de Configuración no cumplen los de E06 de specs/021 (revisión, 5; decisión 153)
 - [ ] T149 [agente] Ordenar el front por capas y en piezas chicas (specs/024, ADR-028, decisión 155)
+- [ ] T151 [agente] [baja] Volver a grabar los capítulos del manual de uso que muestran la foto con código QR: desde specs/023 la foto se le pide al celular emparejado (Carlos, 2026-10-25: queda para más adelante)

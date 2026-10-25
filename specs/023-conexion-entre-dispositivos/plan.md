@@ -95,8 +95,9 @@ ni al revés. Se compila a `dist/` con `tsc` (`prepare` y `build`).
   - Al encontrarse, cada lado le manda al otro lo que tiene (la parte, cada trabajo en curso y si
     está en pausa), que antes guardaba el servidor. Las reglas de quién sigue a quién no cambian:
     la parte es siempre la de la computadora (decisión 71); de cada trabajo en curso, el que lo
-    tiene se lo pasa al que no lo tiene (el que acaba de abrir viene vacío); si los dos tienen uno
-    distinto, manda la computadora. Si uno está en pausa, quedan en pausa.
+    tiene se lo pasa al que no lo tiene (el que acaba de abrir viene vacío): vale el que cambió
+    último, y en empate el de la computadora. Dos ventas distintas no pasan: un cliente no lo
+    atienden dos personas a la vez (decisión 156). Si uno está en pausa, quedan en pausa.
   - Los cambios se mandan solo con el otro presente: si no está, se cuentan al encontrarse.
 - **`puesto.ts`**: `enviarCodigoAlPuesto`, `pedirLector` y `escucharPuesto` pasan por el enlace.
   Un código que se manda con la computadora cerrada espera en el celular y llega al abrirla.
