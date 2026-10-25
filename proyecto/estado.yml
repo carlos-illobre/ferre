@@ -1718,3 +1718,33 @@ RNF-71:
     - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
     - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
   defectos: []
+
+RF-146:
+  estado: "Nuevo (027): especificación en borrador"
+  pruebas: []
+  defectos: []
+
+RNF-72:
+  estado: "Nuevo (026): especificación en borrador"
+  pruebas: []
+  defectos: []
+
+RNF-73:
+  estado: "Nuevo (026): especificación en borrador"
+  pruebas: []
+  defectos: []
+
+RNF-74:
+  estado: "Nuevo (027): especificación en borrador"
+  pruebas: []
+  defectos: []
+
+RNF-75:
+  estado: "Nuevo (028): especificación en borrador"
+  pruebas: []
+  defectos: []
+
+RNF-76:
+  estado: "Nuevo (029): especificación en borrador"
+  pruebas: []
+  defectos: []

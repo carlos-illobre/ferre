@@ -226,6 +226,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-143 | Los indicadores de conexión no preguntan: dicen lo que muestran las respuestas, el navegador y los canales | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
 | RF-144 | Lo pendiente se manda cuando vuelve la red o el servidor contesta, sin reintentos a ritmo fijo | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
 | RF-145 | Un solo canal por dispositivo; el vínculo lo usa para armar la directa y, armada, lo cierra | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
+| RF-146 | «Quién hizo qué» muestra en una sola lista lo de todos los servicios, con los filtros de hoy y el texto que trae cada evento | [027-auditoria](027-auditoria/spec.md) |
 
 ## Requerimientos no funcionales
 
@@ -303,6 +304,11 @@ Los que son reglas generales están además en la constitución.
 | RNF-69 | El front está en capas (técnica, piezas visuales, negocio y las pantallas de cada interfaz), sin código repetido, en piezas chicas y con poca complejidad, controlado en cada subida | [024-front-por-capas](024-front-por-capas/spec.md) |
 | RNF-70 | Esperar algo del otro lado, saber si hay conexión y mandar lo pendiente salen de una sola pieza reutilizable: un caso nuevo se declara, sin código de red | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
 | RNF-71 | Sin temporizadores que consulten la red: una aplicación sin usar, sin código QR y sin vínculo por el servidor no gasta datos | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
+| RNF-72 | La aplicación habla con el servidor por una sola puerta que reparte por ruta y pregunta quién es la persona; sumar un servicio cambia solo su configuración | [026-gateway-y-comercial](026-gateway-y-comercial/spec.md) |
+| RNF-73 | Cada servicio se llama igual en todos lados y por lo que hace: el del mostrador es Comercial | [026-gateway-y-comercial](026-gateway-y-comercial/spec.md) |
+| RNF-74 | Los servicios le mandan a Auditoría lo que hizo cada persona con un formato único; es opcional, ninguno depende de Auditoría y no se pierde ningún evento | [027-auditoria](027-auditoria/spec.md) |
+| RNF-75 | Los tickets viven en su propio servicio, con su base y sus fotos | [028-tickets-aparte](028-tickets-aparte/spec.md) |
+| RNF-76 | Quién es cada uno y qué puede vive en su propio servicio; la puerta le pregunta en cada pedido | [029-acceso-aparte](029-acceso-aparte/spec.md) |
 
 ## De dónde vino cada cosa
 
