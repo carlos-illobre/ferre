@@ -1,0 +1,44 @@
+/* Cada renglón, una tarjeta como la de la v2 (decisión 126; las medidas son las de su maqueta). */
+/* La lista no es una caja: entre tarjeta y tarjeta se ve el fondo gris cálido, como la v2. */
+:global(.pagina) :global(.lista).items { display: flex; flex-direction: column; gap: 8px; background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; overflow: visible; }
+.item { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto 112px auto; grid-template-rows: auto auto; column-gap: 14px; row-gap: 10px; align-items: center; min-width: 0; padding: 12px; background: #fff; border: 1px solid var(--m-borde); border-radius: 16px; box-shadow: var(--m-sombra-1); }
+.item > * { min-width: 0; }
+.item.elegido, .item[data-flecha] { border-color: var(--m-pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .10), var(--m-sombra-1); }
+.item.sinPrecio { border-color: #F3C766; background: linear-gradient(90deg, var(--m-urgente-suave), #fff 40%); }
+.item.marcada { border-color: var(--rojo); }
+/* La marca de las flechas (flechas.css la pinta de amarillo con !important) acá es el borde verde
+   de la maqueta; el ámbar es solo del que no tiene precio. */
+:global(.pagina) .item[data-flecha] { border-color: var(--m-pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .10), var(--m-sombra-1); outline: 0; background: #fff !important; }
+:global(.pagina) .item.sinPrecio[data-flecha] { background: linear-gradient(90deg, var(--m-urgente-suave), #fff 40%) !important; }
+.foto { grid-row: 1 / span 2; align-self: start; }
+.foto :global(.miniatura), .foto button { width: 56px; height: 56px; border-radius: 12px; background: #ECE9E1; }
+.tacho { width: 40px; height: 40px; border: 0; border-radius: 12px; background: none; color: var(--m-texto-3); display: grid; place-items: center; cursor: pointer; transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 120ms; }
+.tacho:hover { background: #FDE7E2; color: #A3301A; }
+.tacho:focus-visible { outline: 3px solid var(--m-pino); outline-offset: 1px; }
+.tacho:active { transform: scale(.97); }
+
+/* La cantidad, con la unidad adentro. */
+.item :global(.contador) { display: inline-flex; align-items: center; height: 40px; border: 1px solid #CEC8BA; border-radius: 12px; background: #fff; overflow: hidden; }
+.item :global(.contador) button { width: 40px; height: 100%; border: 0; border-radius: 0; background: none; color: var(--m-texto-2); display: grid; place-items: center; transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 120ms; }
+.item :global(.contador) button:hover { background: #ECE9E1; color: var(--m-tinta); }
+.item :global(.contador) button:active { transform: scale(.9); }
+.item :global(.contador) input { width: 44px; height: 100%; border: 0; border-radius: 0; background: none; text-align: center; font-size: 16px; font-weight: 800; padding: 0; }
+.item :global(.contador):focus-within { border-color: var(--m-pino); box-shadow: 0 0 0 3px rgba(18, 56, 47, .12); }
+.item :global(.contador) :focus-visible { box-shadow: none; outline: 0; background: #ECE9E1; }
+/* La unidad: el desplegable con el estilo de la pantalla (los navegadores que no lo admiten muestran el de siempre). */
+.item :global(.contador) select { display: flex; align-items: center; gap: 4px; height: 100%; min-width: 64px; border: 0; border-radius: 0; background-color: transparent; padding: 0 10px 0 8px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); cursor: pointer; }
+.item :global(.contador) select, .item :global(.contador) select::picker(select) { appearance: base-select; }
+.item :global(.contador) select::picker-icon { color: var(--m-texto-3); font-size: 12px; }
+.item :global(.contador) select::picker(select) { margin-top: 6px; padding: 6px; border: 1px solid #E6E2D8; border-radius: 12px; background: #fff; box-shadow: 0 12px 32px rgb(26 29 27 / .16), 0 2px 6px rgb(26 29 27 / .08); }
+.item :global(.contador) option { display: flex; align-items: center; min-height: 36px; padding: 0 12px; border-radius: 8px; color: #1A1D1B; font-size: 15px; font-weight: 600; background: none; }
+.item :global(.contador) option::checkmark { display: none; }
+.item :global(.contador) option:hover, .item :global(.contador) option:focus-visible { background: #ECE9E1; outline: 0; }
+.item :global(.contador) option:checked { background: #E3EEE8; color: #12382F; font-weight: 800; }
+
+/* «Llegó del celular»: una etiqueta sobre el borde de arriba del renglón, unos segundos (decisión 127). */
+.llego { position: absolute; top: -11px; left: 84px; z-index: 1; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 8px; background: #E3F3EA; color: #0F6B52; font-size: 14px; font-weight: 700; animation: asoma .2s ease-out both; }
+@keyframes asoma { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .llego { animation: none; }
+  .tacho:active, .item :global(.contador) button:active { transform: none; }
+}

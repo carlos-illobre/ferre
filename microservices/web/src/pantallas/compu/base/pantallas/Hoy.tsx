@@ -8,7 +8,7 @@ import { precioDelProducto } from "../../../../negocio/catalogo/precio";
 import { useCatalogo, pedirClientes } from "../../../../negocio/catalogo";
 import { usePuede } from "../../../permisos";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
-import { ElegirCliente } from "../../Vender";
+import { ElegirCliente } from "../../ventas/ElegirCliente";
 import { diaAnterior, nombreDelDia, resumenDelDia, useResumenDelDia, type Comparacion } from "../../../../negocio/ventas/resumen-del-dia";
 import { Calendario } from "../../../Calendario";
 import { abreviarUnidad, conUnidad } from "../../../../negocio/catalogo";

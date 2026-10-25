@@ -1,0 +1,6 @@
+.filas { margin: 8px 0 0; }
+.filas > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px dashed #CEC8BA; }
+.filas dt { color: #545955; font-size: 15px; line-height: 1.35; }
+.filas dd { margin: 0; color: #1A1D1B; font-size: 16px; font-weight: 800; white-space: nowrap; }
+.total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 16px; color: #545955; font-size: 15px; font-weight: 600; }
+.total :global(.importe) { font-size: 28px; font-weight: 800; color: var(--m-tinta); }

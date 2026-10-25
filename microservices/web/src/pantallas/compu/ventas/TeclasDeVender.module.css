@@ -1,0 +1,2 @@
+.teclas { display: flex; flex-wrap: wrap; gap: var(--e2) var(--e5); margin-top: calc(var(--e2) * -1); }
+.teclas span { display: inline-flex; align-items: center; gap: 5px; }

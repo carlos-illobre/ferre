@@ -20,7 +20,7 @@ const DISPOSICION: DisposicionParaFlechas = {
   sinCaja: () => document.getElementById("contenido"),
   arribaDeLaLista: () => document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']"),
 };
-import { VincularParaEscanear } from "./Vender";
+import { VincularParaEscanear } from "./ventas/VincularParaEscanear";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { VERSION } from "../../plataforma/ambiente";
 import { ProveedorDeSesion, useSesion } from "../../datos/sesion";
@@ -45,7 +45,7 @@ import { Usuarios } from "./base/pantallas/Usuarios";
 import { Sistema } from "../Sistema";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
 import { Actividad } from "./base/pantallas/Actividad";
-import { Vender } from "./Vender";
+import { Vender } from "./ventas/Vender";
 import { DE_MAS, Mas } from "./Mas";
 import { puede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
@@ -341,7 +341,7 @@ function Pantallas() {
     // En Vender el cursor va siempre a la búsqueda, se llegue como se llegue (Carlos, 2026-10-20; decisión 127).
     // Y si se abrió con la marca del teclado, el cursor va a la caja de texto de la pantalla nueva, si tiene (decisión 137).
     const caja = () => porLaMarca.current ? document.querySelector<HTMLInputElement>(".cuerpo input[type='search']:not(:disabled), .cuerpo input[type='text']:not(:disabled)") : null;
-    const destino = () => document.querySelector<HTMLInputElement>('.vmc-pagina [data-testid="busqueda"]:not(:disabled)') ?? caja() ?? buscar();
+    const destino = () => document.querySelector<HTMLInputElement>('[data-testid="vender"] [data-testid="busqueda"]:not(:disabled)') ?? caja() ?? buscar();
     for (const espera of [60, 150, 350, 600]) setTimeout(() => { if (!cancelado) destino()?.focus(); }, espera);
   }
   const pestanaActual = () => document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button");

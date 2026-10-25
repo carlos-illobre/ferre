@@ -1,0 +1,10 @@
+.cab { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 2px dashed var(--m-borde-fuerte); }
+.linea { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--m-borde); font-size: 0.9375rem; }
+.cantidad { font-weight: 800; color: var(--m-texto-2); }
+.nombre { font-weight: 650; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nombre small { display: block; font-size: 0.875rem; color: var(--m-texto-3); font-weight: 500; }
+.importe { font-weight: 800; }
+.falta .nombre small, .falta .importe { color: var(--m-urgente-texto); }
+.total { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 12px; margin-top: 4px; border-top: 2px dashed var(--m-borde-fuerte); font-weight: 700; }
+.total small { display: block; font-size: 0.875rem; color: var(--m-texto-3); font-weight: 500; }
+.total :global(.importe) { font-size: 2rem; }

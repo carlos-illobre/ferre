@@ -13,13 +13,13 @@ export function marcarLlegado(clave: string): void {
   setTimeout(() => { const resto = new Set(llegados); resto.delete(clave); llegados = resto; avisar(); }, DURA_MS);
 }
 
-// Compara la venta de antes con la de después y marca lo que entró: un renglón nuevo o uno al
-// que le subió la cantidad.
+// Lo que entró entre la venta de antes y la de después: un renglón nuevo o uno al que le subió
+// la cantidad.
+export const loQueEntro = (antes: readonly Item[], despues: readonly Item[]): Item[] =>
+  despues.filter((it) => { const previo = antes.find((a) => a.clave === it.clave); return !previo || it.cantidad > previo.cantidad; });
+
 export function marcarLoQueEntro(antes: readonly Item[], despues: readonly Item[]): void {
-  for (const it of despues) {
-    const previo = antes.find((a) => a.clave === it.clave);
-    if (!previo || it.cantidad > previo.cantidad) marcarLlegado(it.clave);
-  }
+  for (const it of loQueEntro(antes, despues)) marcarLlegado(it.clave);
 }
 
 export function useLlegadosDelCelular(): ReadonlySet<string> {

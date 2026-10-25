@@ -1,0 +1,19 @@
+/* Vender en la computadora (decisiones 121 y 122): la v2 del director de arte («Mostrador»), con
+   el panel de la derecha («De dónde sale» o la boleta) y el cobro en la barra de abajo. */
+.pagina {
+  --m-fondo: #F4F2EC; --m-hundido: #ECE9E1; --m-borde: #E6E2D8; --m-borde-fuerte: #CEC8BA; --m-tinta: #1A1D1B; --m-texto-2: #545955; --m-texto-3: #6B706B;
+  --m-pino: #12382F; --m-pino-suave: #E3EEE8; --m-pino-texto: #17614E; --m-accion: #E8541C;
+  --m-urgente: #F0A20F; --m-urgente-suave: #FFF3D8; --m-urgente-texto: #845400; --m-logro-suave: #E2F4EA; --m-logro-texto: #11764A;
+  --m-sombra-1: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03);
+  padding-bottom: 0 !important; gap: var(--e3) !important;
+}
+:global(body):has(.pagina), :global(.cuerpo):has(.pagina) { background: #F4F2EC; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: var(--e5); align-items: start; flex: 1; }
+.grid.sinPanel { grid-template-columns: minmax(0, 1fr) auto; }
+.izq { display: flex; flex-direction: column; gap: var(--e3); min-width: 0; }
+/* Los botones se hunden un poco al apretarlos (decisión 134). */
+.pagina :global(.boton) { transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 120ms; }
+.pagina :global(.boton):active:not(:disabled) { transform: scale(.97); }
+/* En una pantalla de 1366 px el panel se angosta un poco para que el renglón entre en dos líneas. */
+@media (max-width: 1400px) { .grid { grid-template-columns: minmax(0, 1fr) 290px; gap: var(--e4); } }
+@media (prefers-reduced-motion: reduce) { .pagina :global(.boton):active { transform: none; } }

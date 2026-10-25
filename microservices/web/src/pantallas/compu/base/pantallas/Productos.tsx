@@ -14,7 +14,7 @@ import { Aviso, Boton, Buscador, Icono, Pagina, Pastilla, Progreso, Vacio, numer
 import { FichaProducto } from "./FichaProducto";
 import { FichaAlLado } from "./FichaAlLado";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
-import { VincularParaEscanear } from "../../Vender";
+import { VincularParaEscanear } from "../../ventas/VincularParaEscanear";
 import "../estilos/productos.css";
 import { precioDelProducto } from "../../../../negocio/catalogo/precio";
 import { cuantosFiltros, SIN_FILTROS, stockDe, type Disponibilidad, type Filtros } from "../../../../negocio/catalogo/stock-y-filtros";
@@ -185,7 +185,7 @@ export function Productos() {
         <div className="fila envuelve productos-arriba">
           {resumen && resumen.productos > 0 && <Pastilla sinPunto>{cuantosProductos(resumen.productos)}</Pastilla>}
           {resumen && resumen.sin_margen > 0 && <span className="pastilla-sin-precio" data-testid="cuantos-sin-precio"><Icono nombre="alerta" tam={15} />{numero(resumen.sin_margen)} {t.sinPrecio.largo}</span>}
-          {!esCelular && emparejado && <VincularParaEscanear vinculado alVincular={() => undefined} comoV2 />}
+          {!esCelular && emparejado && <VincularParaEscanear vinculado alVincular={() => undefined} comoV2={{}} />}
           {!esCelular && puede("catalogo.listas") && <Boton icono="subir" onClick={() => irA("listas")} data-testid="cargar-lista">{t.cargarLista.largo}</Boton>}
         </div>
       </AlLadoDeLasPestanas>}>

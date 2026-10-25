@@ -12,3 +12,9 @@
 @keyframes anim-d-sube { from { opacity: 0; transform: translateY(.45em); } }
 @keyframes anim-d-baja { from { opacity: 0; transform: translateY(-.45em); } }
 @media (prefers-reduced-motion: reduce) { .anim-d { animation: none; } }
+/* Asomar (un desplegable) y subir (un aviso, un recuadro que aparece), para usar como clase. */
+.anim-asoma { animation: anim-asoma 120ms cubic-bezier(.2, .8, .2, 1) both; }
+.anim-sube { animation: anim-sube 200ms cubic-bezier(.2, .8, .2, 1) both; }
+@media (prefers-reduced-motion: reduce) { .anim-asoma, .anim-sube { animation: none; } }
+/* Un número que rueda con useRueda: necesita ser un bloque en la línea. */
+.anim-rueda-valor { display: inline-block; }

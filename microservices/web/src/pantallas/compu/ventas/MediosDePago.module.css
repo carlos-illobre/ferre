@@ -1,0 +1,5 @@
+.medio { display: inline-flex; align-items: center; gap: 6px; height: 46px; padding: 0 9px; border-radius: 12px; border: 1px solid var(--m-borde-fuerte); background: #fff; font-weight: 700; font-size: 0.875rem; color: var(--m-tinta); white-space: nowrap; transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 120ms; }
+.medio[aria-checked="true"] { border: 2px solid var(--medio); background: var(--medio-suave); padding: 0 8px; }
+.medio :global(.tecla) { margin-left: 2px; }
+.medio:active { transform: scale(.97); }
+@media (prefers-reduced-motion: reduce) { .medio:active { transform: none; } }

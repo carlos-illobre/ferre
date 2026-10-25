@@ -1,0 +1,5 @@
+.listo { display: flex; flex-direction: column; align-items: center; gap: var(--e2); text-align: center; }
+.tilde { width: 64px; height: 64px; border-radius: 99px; background: #1E9E62; color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 8px var(--m-logro-suave); margin: 6px 0 8px; }
+.tilde.pendiente { background: var(--m-urgente); box-shadow: 0 0 0 8px var(--m-urgente-suave); }
+.total { font-size: 2.5rem; font-weight: 800; }
+.listo :global(.detalle) { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }

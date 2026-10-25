@@ -1,0 +1,6 @@
+/* Sin transform para centrarlo, que lo usa la animación al subir. */
+.aviso { position: absolute; left: 0; right: 0; bottom: calc(100% + 10px); z-index: 20; display: flex; align-items: center; gap: 12px; width: fit-content; min-width: 0; max-width: min(640px, calc(100% - 48px)); margin: 0 auto; padding: 10px 10px 10px 16px; border-radius: 14px; background: #12382F; color: #fff; font-size: 16px; font-weight: 700; box-shadow: 0 12px 32px rgb(26 29 27 / .25); }
+.aviso > span { flex: 1; min-width: 0; }
+.aviso button { flex: none; height: 38px; padding: 0 14px; border: 0; border-radius: 10px; background: rgb(255 255 255 / .16); color: #fff; font: inherit; font-weight: 750; cursor: pointer; }
+.aviso button:hover { background: rgb(255 255 255 / .26); }
+.aviso button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }

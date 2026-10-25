@@ -51,7 +51,6 @@
  "src/pantallas/compu/Ingreso.tsx",
  "src/pantallas/compu/Inventario.tsx",
  "src/pantallas/compu/Mas.tsx",
- "src/pantallas/compu/Vender.tsx",
  "src/pantallas/compu/base/pantallas/Actividad.tsx",
  "src/pantallas/compu/base/pantallas/Anomalias.tsx",
  "src/pantallas/compu/base/pantallas/Configuracion.tsx",

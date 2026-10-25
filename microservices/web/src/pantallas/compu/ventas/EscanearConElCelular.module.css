@@ -1,0 +1,15 @@
+/* «Escanear con el celular», como la v2: verde oscuro, del alto de la búsqueda (decisión 126). */
+:global(.pagina) :global(.boton).escanear { min-height: 52px; padding: 0 var(--e5); border: 0; border-radius: 12px; background: #12382F; color: #fff; font-size: 16px; font-weight: 750; gap: 10px; box-shadow: 0 1px 2px rgb(18 56 47 / 0.25); }
+:global(.pagina) :global(.boton).escanear:hover { background: #0C2A23; color: #fff; }
+:global(.pagina) :global(.boton).escanear:focus-visible { outline: 3px solid #E8541C; outline-offset: 2px; }
+
+/* «El celular está escaneando» (de la v4), en lugar del botón. */
+.camara { flex: none; display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 10px; border-radius: 14px; background: #0E1512; color: #fff; white-space: nowrap; }
+.vivo { width: 38px; height: 38px; border-radius: 10px; background: radial-gradient(circle at 40% 40%, #3b4a44, #121a17); position: relative; overflow: hidden; }
+.vivo::after { content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 2px; background: #FF6A33; box-shadow: 0 0 8px #FF6A33; animation: late 1.1s ease-in-out infinite; }
+.texto { font-size: 14px; line-height: 18px; font-weight: 700; display: flex; flex-direction: column; }
+.texto small { font-weight: 500; color: rgba(255, 255, 255, .7); font-size: 14px; }
+.graba { width: 10px; height: 10px; border-radius: 99px; background: #FF6A33; box-shadow: 0 0 0 4px rgba(255, 106, 51, .25); animation: graba 1.2s ease-in-out infinite; }
+.camara button { height: 36px; padding: 0 12px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .14); color: #fff; font-weight: 700; }
+@keyframes late { 50% { transform: translateY(-8px); } }
+@keyframes graba { 50% { opacity: .35; } }

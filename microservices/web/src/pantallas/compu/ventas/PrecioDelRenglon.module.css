@@ -1,0 +1,12 @@
+/* El precio por unidad, y a su lado «a mano», que abre la caja para escribirlo. */
+.precio { display: inline-flex; align-items: center; gap: 6px; }
+.aMano { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 6px; border: 1px solid #CEC8BA; border-radius: 8px; background: #fff; color: var(--m-texto-2); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 120ms; }
+.aMano:hover { color: var(--m-tinta); border-color: var(--m-tinta); }
+.aMano:focus-visible { outline: 3px solid var(--m-pino); outline-offset: 1px; }
+.aMano:active { transform: scale(.97); }
+.aMano.grande { height: 36px; padding: 0 14px; gap: 8px; border-radius: 10px; font-size: 15px; color: var(--m-tinta); }
+/* «Precio a mano» al lado del precio por unidad: sin borde, con el lápiz (como la maqueta). */
+.aMano.fantasma { height: 32px; padding: 0 8px; gap: 8px; border-color: transparent; background: none; color: #1A1D1B; font-size: 15px; font-weight: 600; }
+.aMano.fantasma:hover { background: #ECE9E1; }
+@media (max-width: 1400px) { .aMano.fantasma { padding: 0 6px; gap: 6px; font-size: 14px; } }
+@media (prefers-reduced-motion: reduce) { .aMano:active { transform: none; } }

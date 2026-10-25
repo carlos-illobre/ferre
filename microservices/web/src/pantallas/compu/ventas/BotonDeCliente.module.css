@@ -1,0 +1,9 @@
+.cliente { flex: 1; display: inline-flex; align-items: center; gap: 6px; min-width: 120px; height: 46px; padding: 0 9px; border-radius: 12px; border: 1px solid var(--m-borde-fuerte); background: #fff; font-size: 0.875rem; color: var(--m-texto-2); font-weight: 650; white-space: nowrap; transition: transform 120ms cubic-bezier(.2, .8, .2, 1), background-color 120ms; }
+.cliente span { overflow: hidden; text-overflow: ellipsis; }
+.cliente.elegido { color: var(--m-tinta); font-weight: 750; border-color: var(--m-tinta); }
+.cliente.falta { border: 2px solid var(--m-urgente); background: var(--m-urgente-suave); color: var(--m-urgente-texto); }
+.cliente :global(.tecla) { margin-left: auto; }
+.cliente:active { transform: scale(.97); }
+/* El cliente elegido, con sus iniciales. */
+.iniciales { width: 26px; height: 26px; border-radius: 99px; background: #FDEDE4; color: #B23E0E; display: grid; place-items: center; font-size: 0.75rem; font-weight: 800; flex: none; }
+@media (prefers-reduced-motion: reduce) { .cliente:active { transform: none; } }

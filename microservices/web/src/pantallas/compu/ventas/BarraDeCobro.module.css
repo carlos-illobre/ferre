@@ -1,0 +1,6 @@
+.cobro { position: sticky; bottom: 0; z-index: 5; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--e4); margin: 0 calc(var(--e6) * -1); padding: 12px var(--e6); background: #fff; border-top: 1px solid var(--m-borde); box-shadow: 0 -10px 30px -18px rgba(26, 29, 27, .25); }
+.fila { grid-column: 1 / -1; }
+.medios { display: flex; flex-wrap: nowrap; gap: 6px; justify-content: flex-start; }
+.cobro > :global(.boton) { min-width: 150px; }
+/* El total va dentro de «Cobrar». */
+.cobro > :global(.boton) .total { font-size: 1.25rem; font-weight: 800; margin-left: 6px; }

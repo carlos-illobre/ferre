@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
+import { catalogoFalso, producto } from "../../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown } }));
-vi.mock("../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../negocio/catalogo")>()), ...((await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
-vi.mock("../../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
-vi.mock("../../puesto", async (original) => ({ ...(await original<typeof import("../../puesto")>()), puestoRemoto: () => null, puestoLocal: () => null, guardarPuestoLocal: vi.fn() }));
-vi.mock("../../codigos-del-celular", () => ({ enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), pedirLector: vi.fn() }));
+vi.mock("../../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../../negocio/catalogo")>()), ...((await import("../../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
+vi.mock("../../../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
+vi.mock("../../../puesto", async (original) => ({ ...(await original<typeof import("../../../puesto")>()), puestoRemoto: () => null, puestoLocal: () => null, guardarPuestoLocal: vi.fn() }));
+vi.mock("../../../codigos-del-celular", () => ({ enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), pedirLector: vi.fn() }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
-vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-vi.mock("../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../datos/almacenamiento")>()), ...(({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: vi.fn(async () => 0), pendientes: vi.fn(async () => []), alCambiarLaCola: () => () => undefined })) }));
+vi.mock("../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../../datos/almacenamiento")>()), ...(({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: vi.fn(async () => 0), pendientes: vi.fn(async () => []), alCambiarLaCola: () => () => undefined })) }));
 
 import { Vender } from "./Vender";
 
@@ -113,7 +113,7 @@ describe("Vender (v2)", () => {
   });
 
   it("dicen lo mismo que el celular: los medios de pago y los avisos salen de los textos compartidos", async () => {
-    const { MEDIOS, TEXTOS } = await import("../textos");
+    const { MEDIOS, TEXTOS } = await import("../../textos");
     const { agregar } = armar();
     agregar("mecha vender");
     // En la barra va el nombre corto (no entra el largo); el largo lo dice al pasar el mouse y al lector.
@@ -196,7 +196,7 @@ describe("Vender (v2)", () => {
   });
 
   it("lo que agrega el celular se marca «Llegó del celular» un momento", async () => {
-    const { marcarLlegado } = await import("../../negocio/ventas/llegados-del-celular");
+    const { marcarLlegado } = await import("../../../negocio/ventas/llegados-del-celular");
     const { agregar, item } = armar();
     agregar("mecha vender");
     act(() => marcarLlegado(item("MECHA").dataset.clave!));

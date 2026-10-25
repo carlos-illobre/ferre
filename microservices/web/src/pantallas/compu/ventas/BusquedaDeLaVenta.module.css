@@ -1,0 +1,3 @@
+.fila { display: flex; gap: var(--e3); align-items: flex-start; }
+.fila > :global(.boton), .fila > :global(.fila) { flex: none; }
+.caja { position: relative; flex: 1; min-width: 0; }

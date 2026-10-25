@@ -1,0 +1,15 @@
+/* El panel de la derecha llega hasta la barra del cobro, como la maqueta (decisión 133). */
+.panel { position: sticky; top: var(--e4); display: flex; flex-direction: column; height: calc(100dvh - 196px - var(--cabeza-extra, 0px)); background: #fff; border: 1px solid var(--m-borde); border-radius: 16px; overflow: hidden; }
+.cab { display: flex; align-items: center; gap: 4px; padding: 8px 8px 0; border-bottom: 1px solid var(--m-borde); }
+.cab [role="tab"] { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 10px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; color: var(--m-texto-2); font-weight: 650; font-size: 0.875rem; }
+.cab [role="tab"][aria-selected="true"] { color: var(--m-pino); border-bottom-color: var(--m-pino); font-weight: 800; }
+.ocultar { margin-left: auto; width: 36px; height: 36px; border: 0; border-radius: 8px; background: none; color: var(--m-texto-3); display: grid; place-items: center; }
+.ocultar:hover { background: var(--m-hundido); color: var(--m-tinta); }
+.cuerpo { flex: 1; overflow: auto; padding: 14px 18px 18px; }
+/* Con la boleta a la vista, el panel termina en el borde dentado del ticket, como la maqueta (decisión 127). */
+.panel.conBoleta { overflow: visible; border-bottom: 0; border-radius: 16px 16px 0 0; margin-bottom: 10px; }
+.panel.conBoleta::after { content: ""; position: absolute; left: -1px; right: -1px; bottom: -10px; height: 10px; background: linear-gradient(-45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x, linear-gradient(45deg, transparent 7px, #fff 0) 0 0 / 14px 10px repeat-x; filter: drop-shadow(0 4px 3px rgba(26, 29, 27, .06)); }
+.panel.conBoleta .cuerpo { border-radius: 0; }
+.abrir { position: sticky; top: var(--e4); align-self: start; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 8px; border: 1px solid var(--m-borde); border-radius: 14px; background: #fff; color: var(--m-pino); font-weight: 750; font-size: 0.875rem; box-shadow: var(--m-sombra-1); cursor: pointer; }
+.abrir span { writing-mode: vertical-rl; transform: rotate(180deg); }
+.abrir:hover { background: var(--m-pino-suave); }
