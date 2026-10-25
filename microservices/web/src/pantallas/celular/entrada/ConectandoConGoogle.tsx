@@ -1,6 +1,7 @@
-import { Isotipo, Logotipo } from "../Logotipo";
-import { TEXTOS_DE_ENTRADA } from "../compu/base/pantallas/Entrar";
-import { TEXTOS } from "../textos";
+import { Isotipo, Logotipo } from "../../Logotipo";
+import { TEXTOS_DE_ENTRADA } from "../../comun/entrada/textos-de-entrada";
+import { TEXTOS } from "../../textos";
+import { PieConOnda } from "./PieConOnda";
 import "./entrar.css";
 
 // Volviendo de Google con la cuenta ya confirmada (007-T021): en lugar de la entrada, que haría
@@ -41,12 +42,7 @@ export function ConectandoConGoogle() {
           <li><span className="cg-marca ahora" /><span><strong>{t.abriendoSesion.corto}</strong><span>{t.abriendoSesionDetalle.corto}</span></span></li>
         </ol>
       </section>
-      <footer className="en-pie" aria-hidden="true">
-        <svg className="en-onda" viewBox="0 0 390 150" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 4 C 110 46, 250 84, 390 92 L 390 150 L 0 150 Z" fill="var(--p-naranja)" />
-          <path d="M0 26 C 110 62, 250 90, 390 96 L 390 150 L 0 150 Z" fill="var(--p-verde)" />
-        </svg>
-      </footer>
+      <PieConOnda />
     </main>
   );
 }

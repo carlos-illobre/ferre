@@ -19,15 +19,15 @@ afterEach(() => { delete window.google; vi.useRealTimers(); });
 describe("el identificador de Google", () => {
   it("el botón de Google se dibuja con el identificador que da el servidor", async () => {
     apiFalsa.mockImplementation(async (ruta: string) => (ruta === "/sesiones/google/cliente" ? { clienteId: "el-del-servidor.apps.googleusercontent.com" } : {}));
-    const { BotonGoogle } = await import("./compu/base/pantallas/Entrar");
+    const { BotonGoogle } = await import("./compu/entrada/BotonesDeEntrada");
     render(<BotonGoogle />);
     await waitFor(() => expect(configurado?.client_id).toBe("el-del-servidor.apps.googleusercontent.com"));
   });
 
   it("sin conexión con el servidor lo dice, y lo vuelve a pedir solo hasta que llega", async () => {
     apiFalsa.mockRejectedValueOnce(new TypeError("Failed to fetch")).mockResolvedValue({ clienteId: "el-del-servidor.apps.googleusercontent.com" });
-    const { BotonGoogle } = await import("./celular/pantallas/Login");
-    const { TEXTOS_DE_ENTRADA } = await import("./compu/base/pantallas/Entrar");
+    const { BotonGoogle } = await import("./celular/entrada/BotonesDeEntrada");
+    const { TEXTOS_DE_ENTRADA } = await import("./comun/entrada/textos-de-entrada");
     vi.useFakeTimers({ toFake: ["setTimeout"] });
     render(<BotonGoogle />);
     await act(async () => { await vi.advanceTimersByTimeAsync(0); });

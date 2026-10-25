@@ -4,7 +4,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 
 const entrarConGoogle = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 // El identificador de Google lo da el servidor (007-T043): acá, uno de prueba.
-vi.mock("../../negocio/vinculo", async (original) => ({ ...(await original<typeof import("../../negocio/vinculo")>()), entrarConGoogle: (...a: unknown[]) => entrarConGoogle(...a), useClienteDeGoogle: () => ({ clienteId: "prueba.apps.googleusercontent.com", fallo: false }) }));
+vi.mock("../../../negocio/vinculo", async (original) => ({ ...(await original<typeof import("../../../negocio/vinculo")>()), entrarConGoogle: (...a: unknown[]) => entrarConGoogle(...a), useClienteDeGoogle: () => ({ clienteId: "prueba.apps.googleusercontent.com", fallo: false }) }));
 
 // El botón de Google, de mentira: guarda la función que Google llama al volver con la cuenta.
 let alVolverDeGoogle: ((r: { credential: string }) => Promise<void>) | null = null;
@@ -19,7 +19,7 @@ describe("Conectando tu cuenta de Google", () => {
   beforeEach(() => { vi.resetModules(); alVolverDeGoogle = null; googleDeMentira(); entrarConGoogle.mockReset(); });
 
   async function boton() {
-    const { BotonGoogle } = await import("./pantallas/Login");
+    const { BotonGoogle } = await import("./BotonesDeEntrada");
     render(<BotonGoogle conPantallaDeCarga />);
     await waitFor(() => expect(alVolverDeGoogle).not.toBeNull());
   }

@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { ConRutas } from "../rutas";
-import { Icono } from "../ui";
+import { ConRutas } from "../base/rutas";
+import { Icono } from "../base/ui";
 
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 // El dibujo del QR es trabajo asíncrono de verdad: con la máquina cargada termina tarde y corre
 // el momento en que vence el código. Acá es instantáneo; lo que se prueba es la entrada.
 vi.mock("qrcode", () => ({ default: { toDataURL: async (texto: string) => `data:image/png;base64,${btoa(texto)}` } }));
-import { Entrar, TEXTOS_DE_ENTRADA } from "./Entrar";
+import { Entrar } from "./Entrar";
+import { TEXTOS_DE_ENTRADA } from "../../comun/entrada/textos-de-entrada";
 
 // El servidor contesta (o no) a la pregunta de si está vivo: de eso depende «En línea» (decisión 118).
 const servidor = vi.hoisted(() => ({ responde: true }));

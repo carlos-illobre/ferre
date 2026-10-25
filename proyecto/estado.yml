@@ -661,7 +661,7 @@ RF-76:
   pruebas:
     - microservices/api/src/rutas/sesiones.test.ts
     - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
-    - microservices/web/src/pantallas/compu/base/pantallas/Entrar.test.tsx
+    - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
     - microservices/web/src/pantallas/celular/App.entrar-compu.test.tsx
@@ -1303,7 +1303,7 @@ RF-97:
   pruebas:
     - microservices/web/src/pantallas/compu/base/pantallas/Manual.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Manual.config.test.ts
-    - microservices/web/src/pantallas/compu/base/pantallas/Entrar.test.tsx
+    - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
     - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
     - tests/e2e/escritorio/01-login.spec.ts
   defectos:

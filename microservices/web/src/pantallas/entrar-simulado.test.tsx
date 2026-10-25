@@ -15,10 +15,10 @@ vi.mock("@simplewebauthn/browser", () => ({ browserSupportsWebAuthn: () => true,
 
 const { ErrorApi } = await import("../datos/conexion");
 const { ProveedorDeSesion, useSesion } = await import("../datos/sesion");
-const compu = await import("./compu/base/pantallas/Entrar");
-const OfrecerEnLaCompu = (await import("./compu/base/pantallas/OfrecerHuella")).OfrecerHuella;
-const celular = await import("./celular/pantallas/Login");
-const OfrecerEnElCelular = (await import("./celular/componentes/OfrecerHuella")).OfrecerHuella;
+const compu = await import("./compu/entrada/BotonesDeEntrada");
+const OfrecerEnLaCompu = (await import("./compu/entrada/OfrecerHuella")).OfrecerHuella;
+const celular = await import("./celular/entrada/BotonesDeEntrada");
+const OfrecerEnElCelular = (await import("./celular/entrada/OfrecerHuella")).OfrecerHuella;
 
 const ANDROID = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36";
 const COMPU = navigator.userAgent;

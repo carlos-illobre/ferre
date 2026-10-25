@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import QRCode from "qrcode";
 // La misma versión de la librería que usa la aplicación construida (la ESM), con la corrección de las esquinas.
 import { BinaryBitmap, HybridBinarizer, QRCodeReader, RGBLuminanceSource } from "@zxing/library/esm/index";
-import "../../../../plataforma/camara/esquinasDelQR";
-import { QR_DE_ENTRADA } from "./Entrar";
+import "../../../plataforma/camara/esquinasDelQR";
+import { QR_DE_ENTRADA } from "../../../negocio/entrada";
 
 // El código de la entrada con el isotipo en el centro (decisión 118), dibujado como lo vería una
 // cámara perfecta: un recuadro blanco del tamaño del isotipo y, adentro, la F oscura (un

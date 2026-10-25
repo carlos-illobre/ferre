@@ -3,7 +3,7 @@ import { puestoRemoto } from "../../puesto";
 import { enviarCodigoAlPuesto } from "../../codigos-del-celular";
 import { irA } from "../../rutas";
 import { Escaner } from "../../plataforma/camara/Escaner";
-import "./entrar.css";
+import "./entrada/entrar.css";
 
 // El celular como lector de códigos de barras de la computadora emparejada (decisión 59). Es
 // un modo aparte de Vender: lo que se lee acá va solo a la computadora, a la pantalla que ella
