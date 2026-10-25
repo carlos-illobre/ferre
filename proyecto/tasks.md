@@ -279,7 +279,7 @@ Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con 
 - [ ] T144 [agente] Usuarios y acceso en su propio servicio con su base, cuando un tercer servicio necesite iniciar sesión (depende de T143)
 - [ ] T145 [agente] Etapa 6: réplica en caliente en una segunda máquina y archivos para análisis (Parquet con DuckDB) (depende de T143)
 - [ ] T146 [carlos] Crear las cuentas gratuitas de Cloudflare R2, Backblaze B2 y Healthchecks.io (antes de T140)
-- [ ] T150 [carlos] [alta] Terminar de pasar a la base propia (022). Pruebas ya está, desde el 2026-10-25: claves en su .env, scripts reinstalados y primer usuario creado. Falta: borrar en GitHub los secretos BASE_PRODUCCION y BASE_PRUEBAS, y en producción, antes de promover, agregar al .env AMBIENTE=produccion, las tres CLAVE_BASE_* (distintas de las de pruebas) y PUERTO_BASE=5433, quitar DATABASE_URL y, después de promover, crear el primer usuario (docs/operacion/DEPLOYMENT.md) (depende de T139)
+- [ ] T150 [carlos] [alta] Terminar de pasar a la base propia (022). Pruebas ya está, desde el 2026-10-25: claves en su .env, scripts reinstalados y primer usuario creado. Los secretos de Supabase en GitHub ya no están. Falta producción: antes de promover, agregar al .env AMBIENTE=produccion, las tres CLAVE_BASE_* (distintas de las de pruebas) y PUERTO_BASE=5433, quitar DATABASE_URL y, después de promover, crear el primer usuario (docs/operacion/DEPLOYMENT.md) (depende de T139)
 
 ## Sin etapa
 

@@ -1533,7 +1533,7 @@ RNF-64:
     - microservices/api/src/rutas/stock.test.ts
     - microservices/web/src/datos/almacenamiento/descarga.test.tsx
   defectos:
-    - "Pruebas ya corre con la base propia (2026-10-25); falta producción, que se pasa al promover, y borrar los secretos BASE_PRODUCCION y BASE_PRUEBAS en GitHub (T150)"
+    - "Pruebas ya corre con la base propia (2026-10-25); falta producción, que se pasa al promover (T150)"
     - "La prueba de E07 comprueba que migrar de nuevo no aplica nada, no que la aplicación responda sin productos ni ventas con la base vacía (revisión de 022, 1.5)"
 
 RNF-65:

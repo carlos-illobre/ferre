@@ -122,8 +122,6 @@ La base vive en la máquina y no se alcanza desde internet: el monitor no la con
    minuto el horario (`47 11` → `46 11`), con el botón «Commit changes». Y en Settings →
    Notifications → System → Actions, que esté «Email».
 2. **Probarlo.** Actions → Monitor → «Run workflow»: los dos ambientes en verde.
-3. **Borrar los secretos viejos** `BASE_PRODUCCION` y `BASE_PRUEBAS` (las cadenas de Supabase), en
-   Settings → Secrets and variables → Actions: ya no se usan.
 
 ## Respaldo y recuperación
 
