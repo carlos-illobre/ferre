@@ -2,3 +2,4 @@
 export * from "./configuracion";
 export * from "./descarga";
 export { cambiarPreferencia, guardaEnElDispositivo, useDescarga, usePreferencias } from "../../datos/almacenamiento";
+export * from "./recordado";

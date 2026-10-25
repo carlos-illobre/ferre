@@ -4,3 +4,4 @@ export * from "./almacen";
 export * from "./guardado";
 export * from "./preferencias";
 export * from "./producto";
+export * from "./en-el-dispositivo";

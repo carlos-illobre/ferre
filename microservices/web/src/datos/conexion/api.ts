@@ -56,6 +56,8 @@ export { ErrorDelServidor as ErrorApi, esFaltaDeRed };
 export const urlApi = cliente.url;
 export const api = cliente.pedir;
 export const descargar = cliente.descargar;
+export const bajar = cliente.bajar;
+export const pedirTalCual = cliente.pedirTalCual;
 export const leerToken = cliente.leerToken;
 export const guardarToken = cliente.guardarToken;
 export const borrarToken = cliente.borrarToken;

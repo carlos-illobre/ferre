@@ -44,5 +44,19 @@ export default tseslint.config(
       ],
     },
   },
+  // Lo guardado en el aparato y los pedidos al servidor son de datos/ (y de la técnica de la
+  // plataforma): el negocio y las pantallas los usan por datos/, nunca directo (ADR-028).
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/datos/**", "src/plataforma/**", "src/app/**", "src/**/*.test.{ts,tsx}", "src/pruebas/**"],
+    rules: {
+      "no-restricted-globals": ["error",
+        { name: "localStorage", message: "Lo guardado va por datos/almacenamiento (ADR-028)." },
+        { name: "sessionStorage", message: "Lo guardado va por datos/almacenamiento (ADR-028)." },
+        { name: "indexedDB", message: "Lo guardado va por datos/almacenamiento (ADR-028)." },
+        { name: "fetch", message: "Los pedidos al servidor van por datos/conexion (ADR-028)." },
+      ],
+    },
+  },
   ...(excepciones.length ? [{ files: excepciones, rules: Object.fromEntries(Object.keys(LIMITES).map((r) => [r, "off"])) }] : []),
 );

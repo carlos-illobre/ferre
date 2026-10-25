@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import { useRecordado } from "../../../../negocio/configuracion";
 import { irA } from "../rutas";
 import { Logotipo } from "../../../Logotipo";
 import type { Dispositivo } from "./manual/piezas";
 import { CAPITULOS, escritoPara, seccionesDe } from "./manual/capitulos";
-import { guardarDispositivo, leerDispositivo } from "./manual/SelectorDeDispositivo";
 import { Buscador } from "./manual/Buscador";
 import { IndiceDelManual } from "./manual/Indice";
 import { Lectura } from "./manual/Lectura";
@@ -39,14 +39,14 @@ function useSeccionQueSeLee(ids: string[]): string {
 // El capítulo abierto y el dispositivo elegido. Si el capítulo abierto no está escrito para el
 // dispositivo, se abre el primero que sí.
 function useManual() {
-  const [dispositivo, setDispositivo] = useState<Dispositivo>(leerDispositivo);
+  // El dispositivo elegido se recuerda en esa computadora; si no se puede guardar, abre en Computadora.
+  const [dispositivo, guardarDispositivo] = useRecordado<Dispositivo>("ferre.manual-dispositivo", ["compu", "celu"]);
   const [elegido, setElegido] = useState(0);
   const numero = escritoPara(CAPITULOS[elegido]!, dispositivo) ? elegido : Math.max(0, CAPITULOS.findIndex((c) => escritoPara(c, dispositivo)));
   const secciones = seccionesDe(CAPITULOS[numero]!, dispositivo);
   const actual = useSeccionQueSeLee(secciones.map((x) => x.id));
   const escritos = CAPITULOS.map((c, i) => ({ c, i })).filter(({ c }) => escritoPara(c, dispositivo));
   function elegirDispositivo(d: Dispositivo) {
-    setDispositivo(d);
     guardarDispositivo(d);
     window.scrollTo({ top: 0 });
   }

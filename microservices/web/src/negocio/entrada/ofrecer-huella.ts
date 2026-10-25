@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { leerRecordado, recordar } from "../../datos/almacenamiento";
 import { hayHuella, vincularEsteDispositivo } from "../../datos/credenciales";
 import { describirDispositivo, esCelular } from "../../plataforma/dispositivo";
 
@@ -8,14 +9,14 @@ import { describirDispositivo, esCelular } from "../../plataforma/dispositivo";
 const CLAVE_OFRECIDA = "ferre.huella-ofrecida";
 const CLAVE_RECIEN_GOOGLE = "ferre.recien-google";
 
-export const marcarEntradaConGoogle = () => { try { sessionStorage.setItem(CLAVE_RECIEN_GOOGLE, "1"); } catch { /* sin almacenamiento */ } };
+export const marcarEntradaConGoogle = () => recordar(CLAVE_RECIEN_GOOGLE, "1", true);
 function corresponde(): boolean {
-  try {
-    return esCelular() && hayHuella() && sessionStorage.getItem(CLAVE_RECIEN_GOOGLE) === "1" && localStorage.getItem(CLAVE_OFRECIDA) === null;
-  } catch { return false; }
+  try { return esCelular() && hayHuella() && leerRecordado(CLAVE_RECIEN_GOOGLE, true) === "1" && leerRecordado(CLAVE_OFRECIDA) === null; }
+  catch { return false; }
 }
 function yaOfrecida() {
-  try { localStorage.setItem(CLAVE_OFRECIDA, new Date().toISOString()); sessionStorage.removeItem(CLAVE_RECIEN_GOOGLE); } catch { /* nada */ }
+  recordar(CLAVE_OFRECIDA, new Date().toISOString());
+  recordar(CLAVE_RECIEN_GOOGLE, null, true);
 }
 
 // `explicar` dice el error como lo dice cada pantalla; si no se pudo, no se marca como ofrecida y

@@ -1,15 +1,14 @@
 import { useState } from "react";
+import { useRecordado } from "../../../negocio/configuracion";
 
-// El panel de la derecha (decisión 122): se muestra u oculta con F1 y queda así la próxima vez.
-const GUARDADO = "ferre.panel";
-const leer = () => { try { return localStorage.getItem(GUARDADO) !== "oculto"; } catch { return true; } };
-const guardar = (si: boolean) => { try { localStorage.setItem(GUARDADO, si ? "visible" : "oculto"); } catch { /* sin almacenamiento */ } };
+// El panel de la derecha (decisión 122): se muestra u oculta y queda así la próxima vez.
 export type PestanaDelPanel = "donde" | "boleta";
 
 export function usePanel() {
-  const [visible, setVisible] = useState(leer);
+  const [guardado, guardar] = useRecordado("ferre.panel", ["visible", "oculto"]);
+  const visible = guardado === "visible";
   const [pestana, setPestana] = useState<PestanaDelPanel>("donde");
-  const ver = (si: boolean) => { setVisible(si); guardar(si); };
+  const ver = (si: boolean) => guardar(si ? "visible" : "oculto");
   return { visible, ver, alternar: () => ver(!visible), pestana, setPestana };
 }
 export type Panel = ReturnType<typeof usePanel>;

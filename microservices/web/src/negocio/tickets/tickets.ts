@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, ErrorApi, leerToken, reducirImagen, urlApi } from "../../datos/conexion";
+import { api, bajar, ErrorApi, reducirImagen } from "../../datos/conexion";
 import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "../../datos/almacenamiento";
 import { guardarMeta, leerMeta } from "../../datos/almacenamiento";
 import type { Ticket } from "@servidor/tickets";
@@ -89,7 +89,7 @@ export function useFoto(ruta: string | Blob): string | null {
     let vigente = true; let creada: string | null = null;
     const mostrar = (b: Blob) => { if (!vigente) return; creada = URL.createObjectURL(b); setUrl(creada); };
     if (typeof ruta !== "string") mostrar(ruta);
-    else fetch(urlApi(ruta), { headers: { Authorization: `Bearer ${leerToken() ?? ""}` } }).then((r) => (r.ok ? r.blob() : Promise.reject(new Error("sin foto")))).then(mostrar).catch(() => undefined);
+    else bajar(ruta).then(mostrar).catch(() => undefined);
     return () => { vigente = false; if (creada) URL.revokeObjectURL(creada); };
   }, [ruta]);
   return url;

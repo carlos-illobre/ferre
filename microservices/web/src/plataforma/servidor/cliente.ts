@@ -84,17 +84,28 @@ export function crearCliente(opciones: OpcionesDeCliente) {
     return respuesta.status === 204 ? (undefined as T) : ((await respuesta.json()) as T);
   }
 
+  // La respuesta tal cual (con la sesión puesta y revisada), para quien necesita el cuerpo de un
+  // error (un 409 que dice cómo quedó algo). Sin red, falla como `fetch`.
+  async function pedirTalCual(ruta: string, pedido: RequestInit = {}): Promise<Response> {
+    const token = leerToken();
+    const respuesta = await fetch(url(ruta), { ...pedido, headers: cabecerasDe(pedido, token) });
+    revisar(respuesta, token);
+    return respuesta;
+  }
+
   // Bajar un archivo con la sesión puesta. Un enlace común no sirve: el token va en la
-  // cabecera, no en una cookie. Se pide, se arma un blob y se dispara la descarga.
-  async function descargar(ruta: string, nombre: string): Promise<void> {
+  // cabecera, no en una cookie.
+  async function bajar(ruta: string): Promise<Blob> {
     const token = leerToken();
     const cabeceras = new Headers();
     if (token) cabeceras.set("Authorization", `Bearer ${token}`);
     const respuesta = await llegar(ruta, { headers: cabeceras });
     opciones.alContestar?.(respuesta);
     if (!respuesta.ok) await fallar(respuesta);
-    guardarArchivo(await respuesta.blob(), nombre);
+    return respuesta.blob();
   }
+  // Se baja y se dispara la descarga.
+  const descargar = async (ruta: string, nombre: string): Promise<void> => guardarArchivo(await bajar(ruta), nombre);
 
-  return { url, pedir, descargar, leerToken, guardarToken, borrarToken };
+  return { url, pedir, pedirTalCual, bajar, descargar, leerToken, guardarToken, borrarToken };
 }

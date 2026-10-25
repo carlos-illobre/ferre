@@ -2,15 +2,6 @@ import type { ReactNode } from "react";
 import type { Dispositivo } from "./piezas";
 import { NOMBRE_DEL_DISPOSITIVO } from "./capitulos";
 
-// El dispositivo elegido se recuerda en esa computadora; si no se puede guardar, abre en Computadora.
-const GUARDADO = "ferre.manual-dispositivo";
-export function leerDispositivo(): Dispositivo {
-  try { return localStorage.getItem(GUARDADO) === "celu" ? "celu" : "compu"; } catch { return "compu"; }
-}
-export function guardarDispositivo(d: Dispositivo) {
-  try { localStorage.setItem(GUARDADO, d); } catch { /* sin almacenamiento: solo por esta vez */ }
-}
-
 // «¿Dónde lo usás?»: Computadora o Celular, como un grupo de opciones.
 export function SelectorDeDispositivo({ valor, alElegir }: { valor: Dispositivo; alElegir: (d: Dispositivo) => void }) {
   const opciones: { d: Dispositivo; icono: ReactNode }[] = [

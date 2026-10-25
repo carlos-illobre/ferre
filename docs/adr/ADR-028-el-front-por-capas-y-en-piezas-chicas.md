@@ -95,6 +95,9 @@ Además:
   a lo de adentro, para reemplazarlo.
 - **Sin ciclos:** ningún archivo depende, a la larga, de sí mismo.
 - **Control automático:** `dependency-cruiser` (`pnpm capas`) lo controla en cada subida.
+- **Lo guardado y el servidor, solo por `datos/`:** fuera de `datos/`, `plataforma/` y `app/` no se
+  usan `localStorage`, `sessionStorage`, `indexedDB` ni `fetch` (`pnpm limites`). Lo que la
+  persona deja así en el aparato (el menú plegado) lo da `useRecordado` del negocio.
 
 ### Una responsabilidad por pieza
 

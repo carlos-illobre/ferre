@@ -23,7 +23,7 @@ Cada etapa se sube con todas las pruebas en verde y sin cambiar nada a la vista 
 - [x] T020 Depósito, compras, negocio, anomalías, mejoras y errores, configuración, sistema y el manual sin código de teclas (depende de T017)
 - [x] T013 Cierre: la lista de excepciones vacía, ADR-018 y `001/ux.md` al día con las carpetas, y la documentación de `tests/capturas/` (depende de T012)
 - [ ] T014 Revisión independiente (paso 7) (depende de T013)
-- [ ] T021 Lo guardado en el dispositivo y los pedidos al servidor solo en `datos/` (y `plataforma/`): sin `localStorage`, `sessionStorage` ni `fetch` en `negocio/` ni en `pantallas/`, con una regla de `pnpm limites` que lo controle (revision.md, punto 2)
+- [x] T021 Lo guardado en el dispositivo y los pedidos al servidor solo en `datos/` (y `plataforma/`): sin `localStorage`, `sessionStorage` ni `fetch` en `negocio/` ni en `pantallas/`, con una regla de `pnpm limites` que lo controle (revision.md, punto 2)
 - [ ] T022 Quién puede qué, una sola vez en `negocio/permisos/`: `puede`, `usePuede` y la regla de quién anula una venta (hoy en cada interfaz) (revision.md, punto 3)
 - [ ] T023 Sin código copiado: los 40 clones que deja pasar el umbral de 1 % de jscpd, y el umbral en 0 (revision.md, punto 1)
 - [ ] T024 El teclado reconoce la pantalla solo por marcas del HTML (`data-…`), documentadas en ADR-029, y no por nombres de clase ni `data-testid`; las ayudas y el manual que nombran teclas, a T147 (revision.md, defectos del teclado)
