@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { cuantosProductos, cuandoCorto, diaCorto, enMiles, horaCorta, vistaDelCambio, type CambioApartado, type VistaDelCambio } from "../../../negocio/apartados";
 import { nombreDeMedio } from "../../../negocio/ventas";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto } from "../../../negocio/formato";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../../../ui/iconos";

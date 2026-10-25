@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRevisionDeLista, type Cargada } from "../../../negocio/catalogo";
-import { fecha } from "../../../formato";
+import { fecha, numero } from "../../../negocio/formato";
 import { useTeclasGlobales } from "../../../plataforma/teclado";
-import { Aviso, Icono, numero } from "../base/ui";
+import { Aviso, Icono } from "../base/ui";
 import { FiltrosDeLaRevision, type FiltroDeRevision } from "./FiltrosDeLaRevision";
 import { FilasDeLaRevision } from "./FilasDeLaRevision";
 import { NumerosDeLaLista } from "./NumerosDeLaLista";

@@ -1,7 +1,7 @@
 import { precioDelProducto, stockDe, useCatalogo, type Producto } from "../../../negocio/catalogo";
+import { pesosCortos } from "../../../negocio/formato";
 import { usePuede } from "../../permisos";
 import { TEXTOS } from "../../textos";
-import { pesosCortos } from "../base/ui";
 import { FotoDeLaFicha } from "./FotoDeLaFicha";
 import { MargenEnSegmentos } from "./MargenEnSegmentos";
 import type { Cambios } from "./tipos";

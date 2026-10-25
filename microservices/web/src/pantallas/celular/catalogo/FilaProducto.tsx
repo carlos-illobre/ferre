@@ -2,7 +2,7 @@ import { faltaParaElPrecio, precioDelProducto, type Producto } from "../../../ne
 import { esMargenBoton } from "../../../negocio/precios";
 import { usePuede } from "../../permisos";
 import { TEXTOS } from "../../textos";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { Icono } from "../componentes/base";
 
 // Cada producto, una tarjeta blanca como la v2 (decisión 145): la foto; el stock en color arriba

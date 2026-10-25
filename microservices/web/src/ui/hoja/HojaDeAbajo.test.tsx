@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
-import { Hoja } from "./base";
+import { HojaDeAbajo as Hoja } from "./HojaDeAbajo";
 
 // 001, «Lo de atrás queda quieto»: con una hoja abierta, la pantalla de atrás no se desplaza.
 describe("la hoja del celular", () => {

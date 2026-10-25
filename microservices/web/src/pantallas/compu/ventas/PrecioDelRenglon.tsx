@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { pesosCortos } from "../../../negocio/formato";
 import { precioDe, type Item } from "../../../negocio/ventas";
-import { Icono, pesosCortos } from "../base/ui";
+import { Icono } from "../base/ui";
 import { HojaPrecioAMano } from "./HojaPrecioAMano";
 import { PrecioAMano } from "./PrecioAMano";
 import css from "./PrecioDelRenglon.module.css";

@@ -1,4 +1,4 @@
-import { fecha } from "../../formato";
+import { fecha } from "../formato";
 import type { CelularDeOtroFila, SesionFila } from "./usuarios";
 
 // Sus sesiones y sus celulares con huella (decisión 100), en la tarjeta del celular: cada sesión va

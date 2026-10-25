@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import css from "./VentasDelDia.module.css";
 
 // El precio de un renglón: se toca y se escribe otro; Enter o salir lo deja.

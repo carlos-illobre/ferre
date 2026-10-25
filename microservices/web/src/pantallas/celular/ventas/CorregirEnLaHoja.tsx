@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { aEntrada, fueSinConexion, MEDIOS, useCorregirVenta, useCorrigiendo, type Correccion, type Corrigiendo, type VentaDelDia } from "../../../negocio/ventas";
 import { pedirClientes } from "../../../negocio/catalogo";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { signo } from "../../comun/ventas/textos-del-dia";
 import { AvisoError, Hoja, Icono } from "../componentes/base";

@@ -1,5 +1,5 @@
 import { fueSinConexion, nombreDelDia } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { Rodar } from "../../../plataforma/animacion";
 import { TEXTOS } from "../../textos";
 import { errorDelDia, hora, mayuscula } from "../../comun/ventas/textos-del-dia";

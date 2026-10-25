@@ -1,5 +1,5 @@
 import { MEDIOS as LOS_MEDIOS, precioDe, type Item } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { AvisoError, Icono, Toast } from "../componentes/base";
 import { BotonDeCliente } from "./BotonDeCliente";

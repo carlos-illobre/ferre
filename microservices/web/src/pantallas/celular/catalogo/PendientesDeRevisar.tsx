@@ -1,5 +1,5 @@
 import type { ListaFila } from "../../../negocio/catalogo";
-import { fecha, porcentaje } from "../../../formato";
+import { fecha, porcentaje } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { subida } from "../../comun/catalogo/fechas-de-listas";
 import { Icono } from "../componentes/base";

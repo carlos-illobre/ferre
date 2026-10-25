@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { faltaParaElPrecio, margenAMano, precioDelProducto, type Producto } from "../../../negocio/catalogo";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
 import { CalculoDeLaFicha } from "./CalculoDeLaFicha";

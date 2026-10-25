@@ -10,7 +10,7 @@ import { PrecioDelRenglon } from "./PrecioDelRenglon";
 import { StockQueNoAlcanza } from "./StockQueNoAlcanza";
 import { UnidadDelRenglon } from "./UnidadDelRenglon";
 import { subtotalDe } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import css from "./Renglon.module.css";
 
 // Un renglón de la venta (decisión 119): la foto, el nombre con su marca y stock y el precio por

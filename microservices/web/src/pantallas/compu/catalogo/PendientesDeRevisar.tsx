@@ -1,4 +1,4 @@
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { diaYMes, subida } from "../../comun/catalogo/fechas-de-listas";
 import { Icono } from "../base/ui";

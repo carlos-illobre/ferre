@@ -3,7 +3,7 @@ import {
   aEntradaDeCambio, diferenciaDelCambio, fueSinConexion, valorQueVuelve, paraVolver, paraVolverDeLaBusqueda, resolucionDelCambio, useRegistrarCambio,
   type CobroDeDiferencia, type Medio, type ParaVolver, type SeLleva, type VentaDelDia, type VentaParaCambio, type Vuelve,
 } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { signo } from "../../comun/ventas/textos-del-dia";
 

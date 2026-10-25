@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { conPermisos, conTodosLosPermisos, usuarioDePrueba } from "../pruebas/sesion";
 import { puede } from "./permisos";
-import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
+import { DE_MAS as DE_MAS_COMPU } from "./compu/marco/Mas";
 import { DE_MAS as DE_MAS_CELU } from "./celular/App";
 import { PantallaDeProcesos, pedirAProcesos } from "./comun/procesos/Procesos";
 

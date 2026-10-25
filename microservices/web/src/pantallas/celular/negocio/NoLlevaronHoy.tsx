@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fecha, pesosCortos } from "../../../formato";
+import { fecha, pesosCortos } from "../../../negocio/formato";
 import { agruparNoLlevados, cuandoFueLaConsulta, type Consulta } from "../../../negocio/ventas";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../../../ui/iconos";

@@ -1,5 +1,5 @@
 import { MEDIOS, type useResumenDelDia } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { Rodar } from "../../../plataforma/animacion";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { MEDIOS as MEDIOS_DE_TEXTOS, TEXTOS } from "../../textos";

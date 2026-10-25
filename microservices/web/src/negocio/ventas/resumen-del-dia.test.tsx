@@ -7,7 +7,7 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { comparar, diaAnterior, nombreDelDia, porHora, resumenDelDia, totalHasta, useResumenDelDia } from "./resumen-del-dia";
 import { consultas } from "../../datos/conexion";
-import { hoyLocal } from "../../formato";
+import { hoyLocal } from "../formato";
 
 const a = (h: number, m = 0, dia = "2026-10-17") => new Date(`${dia}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`).toISOString();
 const venta = (id: string, fecha: string, medio: string, total: number, renglones = 1, estado = "confirmada") =>

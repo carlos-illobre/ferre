@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { Cobro } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { LoCobrado } from "../../comun/ventas/LoCobrado";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";

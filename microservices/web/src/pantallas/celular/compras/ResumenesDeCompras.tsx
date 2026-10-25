@@ -1,5 +1,5 @@
 import { gastoPorDia, letrasDeLaSemana, type CompraFila, type Gastos } from "../../../negocio/compras";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import css from "./Compras.module.css";
 

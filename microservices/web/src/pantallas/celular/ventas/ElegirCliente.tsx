@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { pesos } from "../../../formato";
+import { pesos } from "../../../negocio/formato";
 import { Buscador, Lista } from "../componentes/base";
 import hojas from "./hojas.module.css";
 

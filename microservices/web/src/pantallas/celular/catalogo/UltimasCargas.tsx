@@ -1,5 +1,5 @@
 import type { ListaFila } from "../../../negocio/catalogo";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { diaYMes } from "../../comun/catalogo/fechas-de-listas";
 import { mayuscula } from "../../comun/ventas/textos-del-dia";

@@ -1,7 +1,7 @@
 import { estadoDelSector, type Conteo, type Sector } from "../../../negocio/deposito";
-import { fecha } from "../../../formato";
+import { fecha, numero } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Boton, numero } from "../base/ui";
+import { Boton } from "../base/ui";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 import type { Contar } from "./useContar";
 import css from "./Contar.module.css";

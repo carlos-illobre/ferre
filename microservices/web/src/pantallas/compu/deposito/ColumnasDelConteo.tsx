@@ -1,7 +1,8 @@
 import { abreviarUnidad, conUnidad } from "../../../negocio/catalogo";
+import { numero } from "../../../negocio/formato";
 import { claseDeDiferencia, diferenciaDe, type Contado } from "../../../negocio/deposito";
 import { TEXTOS } from "../../textos";
-import { Explicado, Vacio, numero } from "../base/ui";
+import { Explicado, Vacio } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import { FotoChica } from "./FotoChica";
 import { conSigno } from "./deposito-comun";

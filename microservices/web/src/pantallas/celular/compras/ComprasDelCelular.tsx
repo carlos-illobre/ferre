@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { conUnidad } from "../../../negocio/catalogo";
 import { anularCompra, nombreDelComprobante, type CompraFila } from "../../../negocio/compras";
-import { fecha, pesos, pesosCortos } from "../../../formato";
+import { fecha, pesos, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { VerComprobante } from "../../FotoDeFactura";
 import { useAbiertas } from "../../comun/compras/useAbiertas";

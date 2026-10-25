@@ -1,5 +1,5 @@
 import { precioDe, type Item } from "../../../negocio/ventas";
-import { pesos } from "../../../formato";
+import { pesos } from "../../../negocio/formato";
 import { SiVeCostos } from "../../Costos";
 import { Margenes } from "../base/ui";
 import { PrecioDelRenglon } from "./PrecioDelRenglon";

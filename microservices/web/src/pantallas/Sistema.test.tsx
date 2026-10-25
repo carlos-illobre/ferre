@@ -9,7 +9,7 @@ import { ErrorApi } from "../datos/conexion";
 import { Sistema } from "./comun/sistema/Sistema";
 import { Configuracion } from "../pruebas/configuracion";
 import { olvidarAjustesVistos } from "../negocio/sistema/ajustes";
-import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
+import { DE_MAS as DE_MAS_COMPU } from "./compu/marco/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
 
 const AJUSTES = { sesion_segundos: 60, vinculo_dias: 30, tramos: { sesion_segundos: [0, 30, 60, 300, 600] } };

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { Movimiento } from "../../../negocio/deposito";
-import { fecha } from "../../../formato";
+import { fecha, numero } from "../../../negocio/formato";
 import { comoSeVe } from "../../comun/deposito/movimientos";
-import { Aviso, Progreso, numero } from "../base/ui";
+import { Aviso, Progreso } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import { conSigno } from "./deposito-comun";
 import css from "./Inventario.module.css";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { cuandoCorto, cuantosProductos, decidir, diaCorto, enMiles, horaCorta, vistaDelCambio, type CambioApartado, type VistaDelCambio } from "../../../negocio/apartados";
 import { nombreDeMedio } from "../../../negocio/ventas";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../../../ui/iconos";
 import { FotoDeProducto, ICONO_DEL_CAMBIO, Pesos } from "../../comun/anomalias/piezas";

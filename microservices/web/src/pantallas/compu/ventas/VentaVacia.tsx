@@ -1,7 +1,7 @@
 import type { Producto } from "../../../negocio/catalogo";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { precioDe, useSugeridos } from "../../sugeridos";
-import { Icono, pesosCortos } from "../base/ui";
+import { Icono } from "../base/ui";
 import { MiniaturaDeProducto } from "./MiniaturaDeProducto";
 import css from "./VentaVacia.module.css";
 

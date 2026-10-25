@@ -1,6 +1,6 @@
 import type { Evento } from "../../../negocio/actividad";
 import type { UsuarioFila as Usuario } from "../../../negocio/usuarios";
-import { fecha, pesosCortos } from "../../../formato";
+import { fecha, pesosCortos } from "../../../negocio/formato";
 import { nombreDeMedio } from "../../../negocio/ventas";
 
 // El detalle de cada acción en una línea: qué se cambió, de cuánto a cuánto, sobre quién.

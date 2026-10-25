@@ -1,5 +1,6 @@
 import { MOTIVOS_DE_ANULACION, SIN_MOTIVO, useAnularConMotivo, type VentaDelDia } from "../../../negocio/ventas";
-import { Aviso, Boton, Hoja, hora, pesosCortos } from "../base/ui";
+import { hora, pesosCortos } from "../../../negocio/formato";
+import { Aviso, Boton, Hoja } from "../base/ui";
 
 // Anular no se puede deshacer: es de las pocas acciones que piden confirmar. El motivo, de una
 // lista que empieza en «Sin motivo», y un comentario (decisión 110); Ctrl+Enter confirma.

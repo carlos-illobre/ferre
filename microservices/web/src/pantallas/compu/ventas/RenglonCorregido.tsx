@@ -1,8 +1,8 @@
 import { conCantidad, conPrecio, subtotalCorregido, type RenglonCorregido as Renglon } from "../../../negocio/ventas";
 import { abreviarUnidad, conUnidad } from "../../../negocio/catalogo";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto, numero, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Icono, Pastilla, numero, pesosCortos } from "../base/ui";
+import { Icono, Pastilla } from "../base/ui";
 import { MiniaturaDeProducto } from "./MiniaturaDeProducto";
 import { PrecioEditable } from "./PrecioEditable";
 import css from "./VentasDelDia.module.css";

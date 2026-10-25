@@ -1,5 +1,5 @@
 import { conCantidad, conPrecio, subtotalCorregido, type RenglonCorregido as Renglon } from "../../../negocio/ventas";
-import { nombreDeProducto, pesosCortos } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { Icono } from "../componentes/base";
 import { FotoChica } from "./FotoChica";
 import { MasMenos } from "./MasMenos";

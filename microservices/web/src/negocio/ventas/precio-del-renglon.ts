@@ -1,7 +1,7 @@
 import { IVA_SI_NO_SE_SABE, precioDelProducto } from "../catalogo";
 import { margenReal, subtotalDeRenglon } from "../precios";
 import { conUnidad } from "../catalogo";
-import { pesos, pesosCortos } from "../../formato";
+import { pesos, pesosCortos } from "../formato";
 import type { Item } from "./venta-en-curso";
 
 // El precio de un renglón y de dónde sale: del precio puesto a mano, o del costo con su margen.

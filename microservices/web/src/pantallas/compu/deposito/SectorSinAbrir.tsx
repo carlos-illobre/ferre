@@ -1,5 +1,5 @@
 import type { Sector } from "../../../negocio/deposito";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { Boton, Progreso } from "../base/ui";
 import { plural } from "./deposito-comun";
 import css from "./Contar.module.css";

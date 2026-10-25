@@ -1,6 +1,6 @@
 import { nombreDelDia, type Comparacion } from "../../../negocio/ventas";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { pesosCortos } from "../base/ui";
 import css from "./VentasDelDia.module.css";
 
 // Contra el día anterior: el porcentaje en su pastilla y cuánto se vendió aquel día.

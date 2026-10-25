@@ -1,5 +1,5 @@
 import { descargar, useOrigenDeLista, type Producto } from "../../../negocio/catalogo";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { cuantosProductos, TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
 

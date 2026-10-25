@@ -1,4 +1,4 @@
-import { Aviso, Boton, Exito, Pagina, Toast, pesosCortos } from "../base/ui";
+import { Aviso, Boton, Exito, Pagina, Toast } from "../base/ui";
 import { AvisoDePedido } from "../../comun/deposito/Pedidos";
 import { BuscadorDeProducto } from "./BuscadorDeProducto";
 import { DatosDelIngreso } from "./DatosDelIngreso";
@@ -6,7 +6,7 @@ import { PieDelIngreso } from "./PieDelIngreso";
 import { RenglonesDelIngreso } from "./RenglonesDelIngreso";
 import { plural } from "./deposito-comun";
 import { useIngresoDeLaCompu, type IngresoDeLaCompu } from "./useIngresoDeLaCompu";
-import { pesos } from "../../../formato";
+import { pesos, pesosCortos } from "../../../negocio/formato";
 import "../base/estilos/compras.css";
 import css from "./Deposito.module.css";
 

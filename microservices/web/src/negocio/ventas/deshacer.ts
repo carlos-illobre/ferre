@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSeVaSolo } from "../../plataforma/tiempo";
-import { nombreDeProducto } from "../../formato";
+import { nombreDeProducto } from "../formato";
 import type { Item } from "./venta-en-curso";
 
 // Quitar un renglón o vaciar la venta no pregunta: avisa y deja deshacer (003, historia 1,

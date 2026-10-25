@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { precioDelProducto, useCatalogo, type Producto } from "../../../negocio/catalogo";
 import type { SeLleva } from "../../../negocio/ventas";
-import { nombreDeProducto, pesosCortos } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { Icono } from "../componentes/base";
 import { FotoChica } from "./FotoChica";
 import css from "./VentasDelDia.module.css";

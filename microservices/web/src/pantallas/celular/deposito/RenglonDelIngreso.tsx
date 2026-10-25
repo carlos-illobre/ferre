@@ -1,6 +1,6 @@
 import { cantidadValida, enteras, unidadDe, type Producto } from "../../../negocio/catalogo";
 import { diferenciaConLaLista, type Renglon } from "../../../negocio/deposito";
-import { pesos, porcentaje } from "../../../formato";
+import { pesos, porcentaje } from "../../../negocio/formato";
 import { Contador } from "../componentes/base";
 import { FotoDeProducto } from "./FotoDeProducto";
 import type { IngresoDelCelular } from "./useIngresoDelCelular";

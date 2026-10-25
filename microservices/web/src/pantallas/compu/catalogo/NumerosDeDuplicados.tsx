@@ -1,7 +1,8 @@
 import { useMemo } from "react";
+import { numero } from "../../../negocio/formato";
 import { barrasDeLaSemana, type Sugerencia } from "../../../negocio/catalogo";
 import { TEXTOS } from "../../textos";
-import { Icono, numero } from "../base/ui";
+import { Icono } from "../base/ui";
 import css from "./Duplicados.module.css";
 
 // Los números de arriba: por revisar (con las barritas de los últimos siete días), cuántas por

@@ -1,8 +1,9 @@
 import { useId, useState, type FormEvent } from "react";
+import { numero } from "../../../negocio/formato";
 import { enteras, unidadDe } from "../../../negocio/catalogo";
 import { useCorregirStock, useFormularioDeCorreccion } from "../../../negocio/deposito";
 import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../../textos";
-import { Aviso, Boton, numero } from "../base/ui";
+import { Aviso, Boton } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import type { Producto } from "./deposito-comun";
 import css from "./Inventario.module.css";

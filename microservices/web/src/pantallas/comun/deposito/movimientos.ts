@@ -1,5 +1,5 @@
 import { nombreDeMovimiento, type Movimiento } from "../../../negocio/deposito";
-import { pesos } from "../../../formato";
+import { pesos } from "../../../negocio/formato";
 import type { NombreDeIcono } from "../../../ui/iconos";
 
 // Cómo se ve cada movimiento de stock, igual en el celular y la computadora: su nombre, su ícono y

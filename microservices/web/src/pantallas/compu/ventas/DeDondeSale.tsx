@@ -1,7 +1,7 @@
 import { cuentaDelRenglon, type Item } from "../../../negocio/ventas";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { useVeCostos } from "../../Costos";
-import { Aviso, pesosCortos } from "../base/ui";
+import { Aviso } from "../base/ui";
 import css from "./DeDondeSale.module.css";
 
 // «De dónde sale» (de la v3): la cuenta del renglón elegido, paso a paso, siempre a la vista. Como

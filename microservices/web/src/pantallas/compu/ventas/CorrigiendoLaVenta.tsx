@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { pesosCortos } from "../../../negocio/formato";
 import { useCorrigiendo, type Correccion, type VentaDelDia } from "../../../negocio/ventas";
 import { TEXTOS } from "../../textos";
 import { signo } from "../../comun/ventas/textos-del-dia";
-import { Aviso, Boton, Icono, Pastilla, pesosCortos } from "../base/ui";
+import { Aviso, Boton, Icono, Pastilla } from "../base/ui";
 import { AgregarProducto } from "./AgregarProducto";
 import { ComoSeResuelve } from "./ComoSeResuelve";
 import { ElegirCliente } from "./ElegirCliente";

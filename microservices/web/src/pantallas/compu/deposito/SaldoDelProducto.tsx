@@ -1,7 +1,7 @@
 import type { Movimiento, StockFila } from "../../../negocio/deposito";
+import { numero } from "../../../negocio/formato";
 import { usePuede } from "../../permisos";
 import { pesosEnteros } from "../../comun/deposito/movimientos";
-import { numero } from "../base/ui";
 import { nombreUnidad, plural, type Producto } from "./deposito-comun";
 import css from "./Inventario.module.css";
 

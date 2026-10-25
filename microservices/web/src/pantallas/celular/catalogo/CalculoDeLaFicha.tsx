@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { cuentaDelPrecio, margenAMano, otroMargen, type Producto } from "../../../negocio/catalogo";
 import { MARGENES } from "../../../negocio/precios";
-import { pesos, pesosCortos } from "../../../formato";
+import { pesos, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import type { Cambios } from "./useProductosDelCelular";
 import css from "./Ficha.module.css";

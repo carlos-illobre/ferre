@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { anularCompra, type CompraFila } from "../../../negocio/compras";
-import { fecha } from "../../../formato";
-import { Aviso, Boton, Hoja, pesosCortos } from "../base/ui";
+import { fecha, pesosCortos } from "../../../negocio/formato";
+import { Aviso, Boton, Hoja } from "../base/ui";
 import { mensajeDe, plural } from "../deposito/deposito-comun";
 import { nombreComprobante } from "./CompraReciente";
 

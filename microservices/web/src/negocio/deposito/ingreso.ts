@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, ErrorApi } from "../../datos/conexion";
 import { productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../catalogo";
 import { contarAlEspejo, useEspejar } from "../../espejo";
-import { hoyLocal } from "../../formato";
+import { hoyLocal } from "../formato";
 import type { Producto } from "../catalogo";
 import { useProveedoresActivos, type Proveedor } from "../proveedores";
 import { ingresoParaElEspejo, renglonesDeIngresoDelEspejo, type IngresoEnEspejo } from "./ingreso-en-espejo";

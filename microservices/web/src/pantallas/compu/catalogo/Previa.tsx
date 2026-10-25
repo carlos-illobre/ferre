@@ -1,6 +1,6 @@
 import { useState, type KeyboardEvent } from "react";
 import { variacion, type Fila } from "../../../negocio/catalogo";
-import { pesos, porcentaje } from "../../../formato";
+import { pesos, porcentaje } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Explicado, Icono } from "../base/ui";
 import { SUBA_GRANDE } from "./FiltrosDeLaRevision";

@@ -1,5 +1,6 @@
 import { abreviarUnidad } from "../../../negocio/catalogo";
-import { Pastilla, numero } from "../base/ui";
+import { numero } from "../../../negocio/formato";
+import { Pastilla } from "../base/ui";
 
 // El stock en su pastilla. Sin movimientos de stock, no hay: «sin stock», como la maqueta. Con
 // `pide`, si lo pedido no alcanza lo dice.

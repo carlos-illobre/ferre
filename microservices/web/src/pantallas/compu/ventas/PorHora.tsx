@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { pesosCortos } from "../base/ui";
 import css from "./VentasDelDia.module.css";
 
 // Lo vendido por hora: la barra de cada hora, con una raya punteada en lo que se vendió a esa hora el

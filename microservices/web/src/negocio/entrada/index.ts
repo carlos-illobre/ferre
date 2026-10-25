@@ -11,3 +11,4 @@ export * from "./vincular";
 export { useClienteDeGoogle, type Vinculado } from "../vinculo";
 export { useSesion } from "../../datos/sesion";
 export { urlApi } from "../../datos/conexion";
+export { ProveedorDeSesion } from "../../datos/sesion";

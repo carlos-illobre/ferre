@@ -1,8 +1,8 @@
 import { NOMBRE_DE_MEDIO, type Medio, type VentaDelDia } from "../../../negocio/ventas";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto, hora } from "../../../negocio/formato";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { TEXTOS } from "../../textos";
-import { Pastilla, hora } from "../base/ui";
+import { Pastilla } from "../base/ui";
 import { CorrigiendoLaVenta } from "./CorrigiendoLaVenta";
 import { DetalleDeLaVenta } from "./DetalleDeLaVenta";
 import type { ListaDelDia } from "./useListaDelDia";

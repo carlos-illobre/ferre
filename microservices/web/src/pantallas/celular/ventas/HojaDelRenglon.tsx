@@ -1,7 +1,7 @@
 import { enteras, type Unidad } from "../../../negocio/catalogo";
 import { MARGENES, precioDeVenta } from "../../../negocio/precios";
 import { precioDe, subtotalDe, type Item } from "../../../negocio/ventas";
-import { nombreDeProducto, pesos, pesosCortos } from "../../../formato";
+import { nombreDeProducto, pesos, pesosCortos } from "../../../negocio/formato";
 import { Contador, Hoja, Icono } from "../componentes/base";
 import { POR_UNIDAD } from "./por-unidad";
 import { PrecioAMano } from "./PrecioAMano";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../datos/conexion";
-import { pesos } from "../formato";
+import { pesos } from "../negocio/formato";
 import "./dinero-invertido.css";
 import type { Stock } from "@servidor/stock";
 

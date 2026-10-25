@@ -1,5 +1,5 @@
 import { precioDelProducto, urlDeFoto, abreviarUnidad, type Producto } from "../../../negocio/catalogo";
-import { nombreDeProducto, pesosCortos } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { AvisoError, Buscador, Hoja, Icono } from "../componentes/base";
 import type { EstadoDeVender } from "./useVender";
 import css from "./BuscarProducto.module.css";

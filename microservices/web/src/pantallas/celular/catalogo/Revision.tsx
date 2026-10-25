@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useFilasDeLista, useRevisionDeLista, type Cargada } from "../../../negocio/catalogo";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { AvisoError, Hoja, Lista } from "../componentes/base";
 import { AplicarODescartar } from "./AplicarODescartar";
 import { NumerosDeLaLista } from "./NumerosDeLaLista";

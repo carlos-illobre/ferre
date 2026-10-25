@@ -1,5 +1,5 @@
-import { pesosCortos } from "../base/ui";
 import css from "./Resumen.module.css";
+import { pesosCortos } from "../../../negocio/formato";
 
 // El «$» chico de la v2, delante del importe.
 export function Pesos({ valor }: { valor: number }) {

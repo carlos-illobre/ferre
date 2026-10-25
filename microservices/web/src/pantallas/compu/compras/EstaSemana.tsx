@@ -1,7 +1,7 @@
 import { esDeLaSemana, gastoPorDia, letrasDeLaSemana, type CompraFila, type Gastos } from "../../../negocio/compras";
-import { fecha, pesos } from "../../../formato";
+import { fecha, pesos, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Explicado, pesosCortos } from "../base/ui";
+import { Explicado } from "../base/ui";
 import { plural } from "../deposito/deposito-comun";
 import css from "./Compras.module.css";
 

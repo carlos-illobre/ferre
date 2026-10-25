@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { buscarUniones, type Union } from "../../../negocio/catalogo";
-import { fecha } from "../../../formato";
+import { fecha, numero } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Boton, Buscador, Hoja, numero } from "../base/ui";
+import { Boton, Buscador, Hoja } from "../base/ui";
 import css from "./Duplicados.module.css";
 
 // Los productos unidos, para separarlos si fue un error, con un buscador.

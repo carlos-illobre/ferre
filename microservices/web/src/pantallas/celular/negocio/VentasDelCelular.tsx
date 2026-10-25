@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { barrasDeHoy, compararConElAnterior, consultasDeHoy, diaAnterior, hoyLocal, MEDIOS, nombreDelDia, pasosDeLoVendido, resumenDelDia, useConsultas, useVentasDelDia, type ComparacionDelTablero, type ResumenDelDia, type VentasDelDia } from "../../../negocio/ventas";
 import { Hoja, Pasos } from "../componentes/base";
 import { TEXTOS } from "../../textos";

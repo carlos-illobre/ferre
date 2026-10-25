@@ -1,6 +1,6 @@
 import type { Conteo } from "../../../negocio/deposito";
 import { avanceDelConteo } from "../../../negocio/deposito";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { plural } from "./deposito-comun";
 import css from "./Contar.module.css";

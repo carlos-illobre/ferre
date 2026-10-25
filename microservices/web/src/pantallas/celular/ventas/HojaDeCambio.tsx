@@ -1,5 +1,5 @@
 import type { VentaDelDia } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { AvisoError, Hoja, Icono } from "../componentes/base";
 import { BuscarVentaParaCambio } from "./BuscarVentaParaCambio";

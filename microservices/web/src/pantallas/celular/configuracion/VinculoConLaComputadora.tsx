@@ -1,4 +1,4 @@
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import type { useMiVinculo } from "../../../negocio/configuracion";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../../../ui/iconos";

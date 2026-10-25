@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ElegirYGuardarRoles, type RolAsignable } from "../../RolesDeUsuario";
 import { rolesEnOrden, useCambioDeRoles, type Acceso, type CambioDeRoles, type CelularDeOtroFila, type SesionFila } from "../../../negocio/usuarios";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Iniciales } from "../../iconos-de-negocio";
 import { Icono } from "../../../ui/iconos";

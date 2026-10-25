@@ -1,5 +1,5 @@
 import { useCatalogo, type Producto } from "../../../negocio/catalogo";
-import { pesos } from "../../../formato";
+import { pesos } from "../../../negocio/formato";
 import { Lista } from "../componentes/base";
 import type { IngresoDelCelular } from "./useIngresoDelCelular";
 

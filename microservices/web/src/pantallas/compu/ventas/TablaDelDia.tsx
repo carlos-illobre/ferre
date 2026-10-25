@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 import { loQueSeLlevo, NOMBRE_DE_MEDIO, type Medio, type VentaDelDia } from "../../../negocio/ventas";
 import { conUnidad } from "../../../negocio/catalogo";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto, hora, pesosCortos } from "../../../negocio/formato";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { TEXTOS } from "../../textos";
 import { Resaltar } from "../../comun/ventas/Resaltar";
-import { Icono, Pastilla, hora, pesosCortos } from "../base/ui";
+import { Icono, Pastilla } from "../base/ui";
 import css from "./VentasDelDia.module.css";
 
 // La tabla del día. La elegida, siempre a la vista, y con el foco si estaba en la tabla.

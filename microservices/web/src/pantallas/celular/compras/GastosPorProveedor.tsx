@@ -1,5 +1,5 @@
 import type { Gastos } from "../../../negocio/compras";
-import { pesos, pesosCortos } from "../../../formato";
+import { pesos, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Hoja } from "../componentes/base";
 import css from "./Compras.module.css";

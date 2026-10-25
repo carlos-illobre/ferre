@@ -1,5 +1,5 @@
 import type { Cargada } from "../../../negocio/catalogo";
-import { numero } from "../base/ui";
+import { numero } from "../../../negocio/formato";
 import css from "./Listas.module.css";
 
 // Qué filas ver. Los filtros que el sistema todavía no sabe hacer quedan a la vista y apagados (021, E02).

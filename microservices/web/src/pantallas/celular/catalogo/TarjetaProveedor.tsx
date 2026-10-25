@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { diferenciaDeCosto, proveedoresDeLaFicha, type Producto } from "../../../negocio/catalogo";
-import { fecha, pesos } from "../../../formato";
+import { fecha, pesos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
 import css from "./Ficha.module.css";

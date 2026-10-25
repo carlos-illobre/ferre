@@ -9,7 +9,7 @@ vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof im
 import { conPermisos, conTodosLosPermisos } from "../pruebas/sesion";
 import { consultas } from "../datos/conexion";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "./pestanas-de-negocio";
-import { DE_MAS as DE_MAS_COMPU, Mas } from "./compu/Mas";
+import { DE_MAS as DE_MAS_COMPU, Mas } from "./compu/marco/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
 import { ComoVaElNegocio } from "./celular/negocio/ComoVaElNegocio";
 import { ResumenCompras, ResumenInventario, ResumenVentas } from "./compu/negocio/Resumen";

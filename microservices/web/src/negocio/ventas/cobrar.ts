@@ -2,7 +2,7 @@ import type { ConsultaEntrada, VentaEntrada } from "@servidor/ventas";
 import { consultas } from "../../datos/conexion";
 import { enviarOEncolar, guardar } from "../../datos/almacenamiento";
 import { contarAlEspejo } from "../../espejo";
-import { pesosCortos } from "../../formato";
+import { pesosCortos } from "../formato";
 import { subtotalDeRenglon } from "../precios";
 import type { Medio } from "./medios";
 import { esAMano, precioDe } from "./precio-del-renglon";

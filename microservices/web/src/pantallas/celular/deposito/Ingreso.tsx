@@ -1,4 +1,4 @@
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { Escaner, hayCamara } from "../../../plataforma/camara";
 import { AvisoDePedido } from "../../comun/deposito/Pedidos";
 import { AvisoError, Buscador, Exito, Hoja, Lista } from "../componentes/base";

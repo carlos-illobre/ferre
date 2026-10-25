@@ -1,7 +1,7 @@
 import { enMiles, type VistaDelCambio } from "../../../negocio/apartados";
 import { horaDe, porDia, TITULOS_DE_ANOMALIA, type Anomalia } from "../../../negocio/anomalias";
 import { urlDeFoto } from "../../../negocio/catalogo";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto } from "../../../negocio/formato";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 
 // Lo que dibujan igual las dos interfaces en Más → Anomalías (specs/014 y 005, la v2).

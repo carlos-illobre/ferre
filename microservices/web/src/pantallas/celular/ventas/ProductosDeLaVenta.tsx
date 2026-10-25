@@ -1,7 +1,7 @@
 import { urlDeFoto } from "../../../negocio/catalogo";
 import { conUnidad } from "../../../negocio/catalogo";
 import type { VentaDelDia } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { Icono } from "../componentes/base";
 import css from "./VentasDelDia.module.css";
 

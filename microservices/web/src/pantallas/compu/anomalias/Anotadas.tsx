@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cuantasAnomalias, cuantasVeces, errorDeAnomalias, laSemana, ultimaVez, useAnomalias, type LaSemana, type PaginaDeAnomalias } from "../../../negocio/anomalias";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto } from "../../../negocio/formato";
 import { NOMBRES, TEXTOS } from "../../textos";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 import { EntradasDelRegistro, FotoDeProducto, PaginasDelRegistro } from "../../comun/anomalias/piezas";

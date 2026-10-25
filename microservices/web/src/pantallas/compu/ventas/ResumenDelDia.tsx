@@ -1,7 +1,7 @@
 import { MEDIOS, NOMBRE_DE_MEDIO, type ResumenDelDia as Resumen, type useResumenDelDia } from "../../../negocio/ventas";
+import { pesosCortos } from "../../../negocio/formato";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { TEXTOS } from "../../textos";
-import { pesosCortos } from "../base/ui";
 import { LaComparacion } from "./LaComparacion";
 import { PorHora } from "./PorHora";
 import css from "./VentasDelDia.module.css";

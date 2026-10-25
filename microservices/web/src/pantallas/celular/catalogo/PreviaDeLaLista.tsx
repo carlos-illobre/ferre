@@ -1,5 +1,5 @@
 import { variacion, type Fila } from "../../../negocio/catalogo";
-import { pesos, porcentaje } from "../../../formato";
+import { pesos, porcentaje } from "../../../negocio/formato";
 import { Explicacion } from "../componentes/Explicacion";
 import { Lista } from "../componentes/base";
 

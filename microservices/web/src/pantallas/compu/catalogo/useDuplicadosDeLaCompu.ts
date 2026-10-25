@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { numero } from "../../../negocio/formato";
 import { buscarDuplicados, mensajeDeDuplicados, resolverSugerencia, separarProductos, unirProductos, useColaDeDuplicados, useDuplicados, type Sugerencia, type Union } from "../../../negocio/catalogo";
 import { useEnLinea } from "../../../plataforma/sin-conexion";
-import { numero } from "../base/ui";
 
 // El estado de Duplicados en la computadora: la cola (filtrada por motivo), lo último que se hizo
 // (con su «Deshacer»), el error y qué panel está abierto. Unir y separar se deshacen una con la otra.

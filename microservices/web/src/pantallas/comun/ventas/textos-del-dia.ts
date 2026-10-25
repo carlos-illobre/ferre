@@ -1,5 +1,5 @@
 import { nombreDelDia, type ResumenDelDia } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 
 // Los textos de «Ventas del día» que dicen lo mismo en las dos interfaces, con el largo de cada una.

@@ -1,7 +1,6 @@
 import { abreviarUnidad, conUnidad } from "../../../negocio/catalogo";
 import { precioDe, subtotalDe, type Item } from "../../../negocio/ventas";
-import { nombreDeProducto } from "../../../formato";
-import { hora, pesosCortos } from "../base/ui";
+import { nombreDeProducto, hora, pesosCortos } from "../../../negocio/formato";
 import css from "./Boleta.module.css";
 
 // La boleta (de la v4): la venta como un ticket de mostrador.

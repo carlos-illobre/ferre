@@ -1,6 +1,6 @@
 import type { Comparado } from "../../../negocio/ventas";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { pesosCortos } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import css from "./Resumen.module.css";
 

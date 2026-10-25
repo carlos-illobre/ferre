@@ -1,6 +1,6 @@
 import { abreviarUnidad } from "../../../negocio/catalogo";
 import type { Item } from "../../../negocio/ventas";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto } from "../../../negocio/formato";
 import css from "./Renglon.module.css";
 
 // El nombre con la marca y el stock, que abre la hoja del renglón; en un ítem libre, la caja para escribirlo.

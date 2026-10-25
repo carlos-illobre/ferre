@@ -1,5 +1,5 @@
 import { estadoDelSector, type Sector } from "../../../negocio/deposito";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
 import css from "./Contar.module.css";

@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { cuantasVeces, errorDeAnomalias, laSemana, useAnomalias, type LaSemana, type PaginaDeAnomalias } from "../../../negocio/anomalias";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Hoja } from "../componentes/base";
 import { Icono } from "../../../ui/iconos";

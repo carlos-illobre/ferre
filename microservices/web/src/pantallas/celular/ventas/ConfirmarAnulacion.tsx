@@ -1,5 +1,5 @@
 import { MOTIVOS_DE_ANULACION, NOMBRE_DE_MEDIO, SIN_MOTIVO, useAnularConMotivo, type VentaDelDia } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { hora } from "../../comun/ventas/textos-del-dia";
 import { AvisoError, Hoja, Icono } from "../componentes/base";
 import css from "./VentasDelDia.module.css";

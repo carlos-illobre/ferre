@@ -1,4 +1,4 @@
-import { hoyLocal } from "../../../formato";
+import { hoyLocal } from "../../../negocio/formato";
 
 // «Quién hizo qué» en palabras, igual en el celular y en la computadora (decisión 47; la v2,
 // decisión 148): el nombre de cada acción con el ícono de su tipo, el detalle en una línea y

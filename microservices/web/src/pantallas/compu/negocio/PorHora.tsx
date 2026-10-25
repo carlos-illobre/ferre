@@ -1,6 +1,6 @@
 import { graficoPorHora, type VentasDelDia as DatosHoy } from "../../../negocio/ventas";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { pesosCortos } from "../base/ui";
 import { ErrorDeBloque } from "./Cargas";
 import type { Carga } from "./negocio-comun";
 import css from "./Resumen.module.css";

@@ -2,9 +2,9 @@ import { useState } from "react";
 import { precioDelProducto, useCatalogo, type Producto } from "../../../negocio/catalogo";
 import type { RenglonCorregido } from "../../../negocio/ventas";
 import { teclearCon } from "../../../plataforma/teclado";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Icono, pesosCortos } from "../base/ui";
+import { Icono } from "../base/ui";
 import { MiniaturaDeProducto } from "./MiniaturaDeProducto";
 import css from "./VentasDelDia.module.css";
 

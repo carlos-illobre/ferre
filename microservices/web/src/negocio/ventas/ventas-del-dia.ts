@@ -4,7 +4,7 @@ import type { AnulacionDeVenta, Consulta, VentaDelDia, VentasDelDia } from "@ser
 import { api } from "../../datos/conexion";
 import { consultas } from "../../datos/conexion";
 import { useDelServidor } from "../del-servidor";
-import { hoyLocal } from "../../formato";
+import { hoyLocal } from "../formato";
 
 export { hoyLocal };
 

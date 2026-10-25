@@ -1,5 +1,5 @@
 import type { Item } from "../../../negocio/ventas";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto } from "../../../negocio/formato";
 import { detalleDe } from "./detalle";
 import { StockDelProducto } from "./StockDelProducto";
 import css from "./NombreDelRenglon.module.css";

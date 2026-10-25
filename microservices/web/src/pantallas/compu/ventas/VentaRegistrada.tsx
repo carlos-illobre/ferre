@@ -1,6 +1,7 @@
 import type { Cobro } from "../../../negocio/ventas";
+import { pesosCortos } from "../../../negocio/formato";
 import { LoCobrado } from "../../comun/ventas/LoCobrado";
-import { Aviso, Boton, Hoja, Icono, pesosCortos } from "../base/ui";
+import { Aviso, Boton, Hoja, Icono } from "../base/ui";
 import css from "./VentaRegistrada.module.css";
 
 // La venta registrada (como en el celular): el total, el medio, cuántos productos y la hora;

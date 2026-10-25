@@ -8,7 +8,7 @@ vi.mock("../datos/credenciales", async (original) => ({ ...(await original<typeo
 
 import { conPermisos, conTodosLosPermisos } from "../pruebas/sesion";
 import { PESTANAS_DE_USUARIOS } from "./pestanas-de-usuarios";
-import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
+import { DE_MAS as DE_MAS_COMPU } from "./compu/marco/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
 import { CabezaDeNegocio } from "./celular/negocio/CabezaDeNegocio";
 import { irA } from "../rutas";

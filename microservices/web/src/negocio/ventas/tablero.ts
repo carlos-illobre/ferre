@@ -2,7 +2,7 @@ import type { Consulta } from "@servidor/ventas";
 import { comparar, porHora, resumenDelDia, totalHasta, type Comparacion } from "./resumen-del-dia";
 import { confirmadas, type VentaDelDia, type VentasDelDia } from "./ventas-del-dia";
 import { MEDIOS, NOMBRE_DE_MEDIO } from "./venta";
-import { pesos } from "../../formato";
+import { pesos } from "../formato";
 
 // El tablero de «Cómo va el negocio» como la v2 (021, decisión 148), igual en el celular y en la
 // computadora. Cada número de arriba se compara con el día anterior hasta la misma hora, como en

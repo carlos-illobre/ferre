@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Item } from "../../../negocio/ventas";
-import { nombreDeProducto } from "../../../formato";
-import { Boton, Hoja, numero } from "../base/ui";
+import { nombreDeProducto, numero } from "../../../negocio/formato";
+import { Boton, Hoja } from "../base/ui";
 import { soloDigitos } from "./soloDigitos";
 import css from "./HojaPrecioAMano.module.css";
 

@@ -1,4 +1,4 @@
-import { Icono, type NombreDeIcono } from "../compu/base/ui";
+import { Icono, type NombreDeIcono } from "../../ui";
 
 // Las pestañas de adentro de una parte (Catálogo, Depósito), con la elegida en blanco como en la v2
 // (decisión 140). Dos van sin ícono, como en la v2; tres o más, apiladas, con su ícono para

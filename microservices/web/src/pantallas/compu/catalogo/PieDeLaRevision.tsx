@@ -1,6 +1,7 @@
 import { fraccionAplicada, type Avance, type Cargada } from "../../../negocio/catalogo";
+import { numero } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Icono, Progreso, numero } from "../base/ui";
+import { Icono, Progreso } from "../base/ui";
 import css from "./Listas.module.css";
 
 // Al pie: «Descartar» y «Aplicar»; aplicando, cuánto va (tarda un rato, la pantalla puede quedar abierta).

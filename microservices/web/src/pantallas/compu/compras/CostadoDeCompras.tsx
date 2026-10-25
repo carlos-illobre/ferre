@@ -1,5 +1,5 @@
 import { comoVieneElPedido, type Pedido } from "../../../negocio/compras";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { irA } from "../base/rutas";
 import { Boton } from "../base/ui";

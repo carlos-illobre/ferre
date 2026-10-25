@@ -1,6 +1,7 @@
 import { pasaElFiltro, sumaDeConfirmadas, type FiltroDeVentas } from "../../../negocio/ventas";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Icono, pesosCortos } from "../base/ui";
+import { Icono } from "../base/ui";
 import type { ListaDelDia } from "./useListaDelDia";
 import css from "./VentasDelDia.module.css";
 

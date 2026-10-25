@@ -1,5 +1,5 @@
 import { masBaratoDe, plano, type Resumen, type Sugerencia, type useColaDeDuplicados } from "../../../negocio/catalogo";
-import { fecha, pesos } from "../../../formato";
+import { fecha, pesos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
 import css from "./Duplicados.module.css";

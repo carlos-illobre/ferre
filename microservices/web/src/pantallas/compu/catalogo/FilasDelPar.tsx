@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { cuantoMasCaro, masBaratoDe, plano, type Lado, type Resumen, type Sugerencia } from "../../../negocio/catalogo";
-import { fecha, pesos } from "../../../formato";
+import { fecha, pesos, numero } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Icono, numero } from "../base/ui";
+import { Icono } from "../base/ui";
 import css from "./Duplicados.module.css";
 
 // La tabla del par: el producto con «Conservar este», la marca, el código, el proveedor, el costo

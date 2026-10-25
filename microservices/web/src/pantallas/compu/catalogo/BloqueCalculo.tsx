@@ -1,5 +1,5 @@
 import { cuentaDelPrecio, type Producto } from "../../../negocio/catalogo";
-import { pesos, pesosCortos } from "../../../formato";
+import { pesos, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../base/ui";
 import css from "./FichaAlLado.module.css";

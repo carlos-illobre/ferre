@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { pesosCortos } from "../../../negocio/formato";
 import type { Cliente } from "../../../negocio/catalogo";
 import { teclearCon } from "../../../plataforma/teclado";
 import { TEXTOS } from "../../textos";
-import { Boton, Hoja, Pastilla, Vacio, pesosCortos } from "../base/ui";
+import { Boton, Hoja, Pastilla, Vacio } from "../base/ui";
 
 // El cliente se busca escribiendo; cada uno dice cuánto debe. Con cuenta corriente, solo los que
 // la tienen; con otro medio es opcional.

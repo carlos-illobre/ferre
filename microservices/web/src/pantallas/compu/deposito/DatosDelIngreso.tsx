@@ -1,4 +1,4 @@
-import { hoyLocal } from "../../../formato";
+import { hoyLocal } from "../../../negocio/formato";
 import { COMPROBANTES } from "../../textos";
 import { FotoDeFactura } from "../../FotoDeFactura";
 import { Segmentos } from "../base/ui";

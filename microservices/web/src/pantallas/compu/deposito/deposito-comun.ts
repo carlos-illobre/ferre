@@ -1,5 +1,5 @@
 import { abreviarUnidad, type Producto } from "../../../negocio/catalogo";
-import { numero } from "../base/ui";
+import { numero } from "../../../negocio/formato";
 
 // Lo que comparten Stock, Compras y Contar: las pocas cuentas y palabras que las tres escriben
 // igual.

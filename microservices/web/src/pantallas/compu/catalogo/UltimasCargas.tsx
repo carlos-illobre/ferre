@@ -1,7 +1,8 @@
 import type { ListaFila } from "../../../negocio/catalogo";
+import { numero } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { diaYMes } from "../../comun/catalogo/fechas-de-listas";
-import { Icono, numero } from "../base/ui";
+import { Icono } from "../base/ui";
 import css from "./Listas.module.css";
 
 // Las últimas tres cargas, con qué cambió y su estado.

@@ -1,7 +1,8 @@
 import type { Medio } from "../../../negocio/ventas";
+import { pesosCortos } from "../../../negocio/formato";
 import type { Cliente } from "../../../negocio/catalogo";
 import { useRueda } from "../../../plataforma/animacion";
-import { Aviso, Boton, pesosCortos } from "../base/ui";
+import { Aviso, Boton } from "../base/ui";
 import { AvisoDeLaVenta } from "./AvisoDeLaVenta";
 import { BotonDeCliente } from "./BotonDeCliente";
 import { MediosDePago } from "./MediosDePago";

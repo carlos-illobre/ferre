@@ -1,8 +1,9 @@
 import { useResumenDelCatalogo } from "../../../negocio/catalogo";
+import { numero } from "../../../negocio/formato";
 import { AlLadoDeLasPestanas } from "../../AlLadoDeLasPestanas";
 import { cuantosProductos, TEXTOS } from "../../textos";
 import { irA } from "../base/rutas";
-import { Boton, Icono, Pastilla, numero } from "../base/ui";
+import { Boton, Icono, Pastilla } from "../base/ui";
 import { VincularParaEscanear } from "../ventas/VincularParaEscanear";
 
 // Al lado de las pestañas: cuántos productos hay y cuántos sin precio (los cuenta el servidor),

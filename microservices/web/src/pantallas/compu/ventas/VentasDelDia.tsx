@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { pesosCortos } from "../../../negocio/formato";
 import { fueSinConexion, hoyLocal, nombreDelDia, type VentaDelDia } from "../../../negocio/ventas";
 import { TEXTOS } from "../../textos";
 import { errorDelDia } from "../../comun/ventas/textos-del-dia";
-import { Aviso, Icono, Pagina, pesosCortos } from "../base/ui";
+import { Aviso, Icono, Pagina } from "../base/ui";
 import { AnularVenta } from "./AnularVenta";
 import { CabezaDelDia } from "./CabezaDelDia";
 import { ListaYVentaElegida } from "./ListaYVentaElegida";

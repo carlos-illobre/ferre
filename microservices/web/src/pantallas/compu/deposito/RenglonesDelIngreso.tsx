@@ -1,6 +1,7 @@
 import type { KeyboardEvent } from "react";
+import { pesosCortos } from "../../../negocio/formato";
 import { incompleto, type Renglon } from "../../../negocio/deposito";
-import { Boton, Vacio, pesosCortos } from "../base/ui";
+import { Boton, Vacio } from "../base/ui";
 import { CantidadDelRenglon, CostoDelRenglon, NombreDelRenglon, SegunLaLista } from "./CeldasDelIngreso";
 import type { IngresoDeLaCompu } from "./useIngresoDeLaCompu";
 

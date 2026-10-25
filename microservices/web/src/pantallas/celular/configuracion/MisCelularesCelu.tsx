@@ -1,4 +1,4 @@
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { haceCuanto } from "../../../negocio/apartados";
 import { useMisCelulares } from "../../../negocio/configuracion";
 import { describirDispositivo } from "../../../plataforma/dispositivo";

@@ -1,4 +1,4 @@
-import { nombreDeProducto, pesosCortos } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
 import { FotoChica } from "./FotoChica";

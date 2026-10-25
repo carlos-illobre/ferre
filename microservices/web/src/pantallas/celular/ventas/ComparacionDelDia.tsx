@@ -1,5 +1,5 @@
 import { nombreDelDia, type Comparacion } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
 import css from "./VentasDelDia.module.css";

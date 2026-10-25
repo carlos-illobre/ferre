@@ -660,7 +660,7 @@ RF-76:
   estado: "Hecho (#72): la computadora entra leyendo su código con el celular, sin paso de confirmar"
   pruebas:
     - microservices/api/src/rutas/sesiones.test.ts
-    - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
+    - microservices/web/src/pantallas/celular/entrada/EntrarEnLaCompu.test.tsx
     - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
@@ -1304,7 +1304,7 @@ RF-97:
     - microservices/web/src/pantallas/compu/base/pantallas/Manual.test.tsx
     - microservices/web/src/pantallas/compu/base/pantallas/Manual.config.test.ts
     - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
-    - microservices/web/src/pantallas/celular/EntrarEnLaCompu.test.tsx
+    - microservices/web/src/pantallas/celular/entrada/EntrarEnLaCompu.test.tsx
     - tests/e2e/escritorio/01-login.spec.ts
   defectos:
     - "Sin escribir: Listas y Duplicados del Catálogo, Vender y las secciones de Más"

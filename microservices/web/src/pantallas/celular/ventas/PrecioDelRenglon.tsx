@@ -1,5 +1,5 @@
 import { precioDe, type Item } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { useVeCostos } from "../../Costos";
 import { POR_UNIDAD } from "./por-unidad";
 import { PrecioAMano } from "./PrecioAMano";

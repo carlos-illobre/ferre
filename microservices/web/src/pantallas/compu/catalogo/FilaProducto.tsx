@@ -1,8 +1,9 @@
 import { esMargenBoton } from "../../../negocio/precios";
+import { pesosCortos } from "../../../negocio/formato";
 import { precioDelProducto, urlDeFoto, type Producto } from "../../../negocio/catalogo";
 import { usePuede } from "../../permisos";
 import { TEXTOS } from "../../textos";
-import { Icono, pesosCortos } from "../base/ui";
+import { Icono } from "../base/ui";
 import css from "./Productos.module.css";
 
 // Cada producto de la lista, como la v2: la foto, el nombre, la marca y el stock con su unidad; el

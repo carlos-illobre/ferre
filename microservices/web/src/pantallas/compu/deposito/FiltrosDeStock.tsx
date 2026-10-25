@@ -1,6 +1,6 @@
 import type { FiltroDeStock } from "../../../negocio/deposito";
+import { numero } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { numero } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import type { Inventario } from "./useInventario";
 import css from "./Inventario.module.css";

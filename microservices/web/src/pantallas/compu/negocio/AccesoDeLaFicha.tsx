@@ -1,5 +1,5 @@
-import { fecha } from "../../../formato";
-import { Icono, haceCuanto } from "../base/ui";
+import { fecha, haceCuantoCorto } from "../../../negocio/formato";
+import { Icono } from "../base/ui";
 import { fechaCompleta } from "./negocio-comun";
 import type { Acceso, CelularDeOtroFila, SesionFila } from "../../../negocio/usuarios";
 import css from "./Usuarios.module.css";
@@ -14,7 +14,7 @@ export function AccesoDeLaFicha({ nombre, acceso, enLinea, alCerrarSesion, alQui
         <h3>Sesiones abiertas ({acceso.sesiones.length})</h3>
         {acceso.sesiones.length === 0 && <p className={css.detalle}>No tiene sesiones abiertas.</p>}
         {acceso.sesiones.map((s) => (
-          <Dispositivo key={s.id} testId="sesion" icono={/celular/i.test(s.dispositivo) ? "smartphone" : "monitor"} nombre={s.dispositivo} detalle={`usada ${haceCuanto(s.ultimo_uso_en)}`} title={fechaCompleta(s.ultimo_uso_en)}
+          <Dispositivo key={s.id} testId="sesion" icono={/celular/i.test(s.dispositivo) ? "smartphone" : "monitor"} nombre={s.dispositivo} detalle={`usada ${haceCuantoCorto(s.ultimo_uso_en)}`} title={fechaCompleta(s.ultimo_uso_en)}
             accion="Cerrar" disabled={!enLinea} alTocar={() => alCerrarSesion(s)} ariaLabel={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`} />
         ))}
       </div>

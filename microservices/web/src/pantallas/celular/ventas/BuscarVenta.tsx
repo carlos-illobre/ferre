@@ -1,5 +1,5 @@
 import { sumaDeConfirmadas } from "../../../negocio/ventas";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Hoja, Icono } from "../componentes/base";
 import type { VentasDelDiaCelular } from "./useVentasDelDia";

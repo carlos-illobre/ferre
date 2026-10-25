@@ -1,6 +1,6 @@
 import { abreviarUnidad, enteras, unidadDe } from "../../../negocio/catalogo";
 import { diferenciaConLaLista, type Renglon } from "../../../negocio/deposito";
-import { pesos, porcentaje } from "../../../formato";
+import { pesos, porcentaje } from "../../../negocio/formato";
 import { Contador, Explicado, Pastilla } from "../base/ui";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { detalleDe } from "./deposito-comun";

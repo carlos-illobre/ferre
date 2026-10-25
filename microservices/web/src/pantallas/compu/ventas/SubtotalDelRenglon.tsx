@@ -1,7 +1,7 @@
 import { conUnidad } from "../../../negocio/catalogo";
+import { pesosCortos } from "../../../negocio/formato";
 import { precioDe, subtotalDe, type Item } from "../../../negocio/ventas";
 import { useRueda } from "../../../plataforma/animacion";
-import { pesosCortos } from "../base/ui";
 import css from "./SubtotalDelRenglon.module.css";
 
 // El total del renglón y, debajo, la cuenta (cantidad × precio) o qué le falta para tenerlo.

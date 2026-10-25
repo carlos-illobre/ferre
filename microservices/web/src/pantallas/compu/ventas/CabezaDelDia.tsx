@@ -1,8 +1,9 @@
 import { nombreDelDia } from "../../../negocio/ventas";
+import { hora } from "../../../negocio/formato";
 import { AlLadoDeLasPestanas } from "../../AlLadoDeLasPestanas";
 import { TEXTOS } from "../../textos";
 import { mayuscula } from "../../comun/ventas/textos-del-dia";
-import { Boton, hora } from "../base/ui";
+import { Boton } from "../base/ui";
 import type { ListaDelDia } from "./useListaDelDia";
 import css from "./VentasDelDia.module.css";
 

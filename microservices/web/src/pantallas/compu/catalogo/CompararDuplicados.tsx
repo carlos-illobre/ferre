@@ -1,5 +1,5 @@
 import { masBaratoDe, type Lado, type Sugerencia } from "../../../negocio/catalogo";
-import { pesos } from "../../../formato";
+import { pesos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../base/ui";
 import { FilasDelPar } from "./FilasDelPar";

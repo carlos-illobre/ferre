@@ -1,5 +1,5 @@
 import { diferenciaDeCosto, type Producto } from "../../../negocio/catalogo";
-import { fecha, pesos } from "../../../formato";
+import { fecha, pesos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Boton, Icono } from "../base/ui";
 import css from "./FichaAlLado.module.css";

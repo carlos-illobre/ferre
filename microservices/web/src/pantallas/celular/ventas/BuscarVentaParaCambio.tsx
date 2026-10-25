@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NOMBRE_DE_MEDIO, useVentasParaCambio, type VentaParaCambio } from "../../../negocio/ventas";
-import { nombreDeProducto, pesosCortos } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { TEXTOS } from "../../textos";
 import { hora } from "../../comun/ventas/textos-del-dia";

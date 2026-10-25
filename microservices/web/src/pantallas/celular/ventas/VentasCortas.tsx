@@ -1,6 +1,6 @@
 import { loQueSeLlevo, NOMBRE_DE_MEDIO, type VentaDelDia } from "../../../negocio/ventas";
 import { conUnidad } from "../../../negocio/catalogo";
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { TEXTOS } from "../../textos";
 import { Resaltar } from "../../comun/ventas/Resaltar";

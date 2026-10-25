@@ -1,4 +1,4 @@
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import type { Comparado } from "../../../negocio/ventas";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../../../ui/iconos";

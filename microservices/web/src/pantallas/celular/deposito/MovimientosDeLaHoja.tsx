@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Movimiento } from "../../../negocio/deposito";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { comoSeVe } from "../../comun/deposito/movimientos";
 import { Icono } from "../../../ui/iconos";
 import css from "./Stock.module.css";

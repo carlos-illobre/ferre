@@ -13,3 +13,4 @@ export { diaAnterior, nombreDelDia, resumenDelDia, useResumenDelDia, type Compar
 export { aEntrada, conCantidad, conPrecio, empezarCorreccion, subtotalCorregido, useCorregirVenta, type Correccion, type RenglonCorregido } from "./correccion";
 export { aEntradaDeCambio, diferenciaDelCambio, paraVolver, paraVolverDeLaBusqueda, resolucionDelCambio, sePuedeCambiar, useRegistrarCambio, useVentasParaCambio, valorQueVuelve, type ParaVolver, type SeLleva, type VentaParaCambio, type Vuelve } from "./cambio";
 export * from "./tablero";
+export { useVentaEnEspejo } from "./venta-en-espejo";

@@ -1,4 +1,4 @@
-import { pesosCortos } from "../../../formato";
+import { pesosCortos } from "../../../negocio/formato";
 import { useBarraTocada } from "./useBarraTocada";
 import css from "./VentasDelDia.module.css";
 

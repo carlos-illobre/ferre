@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
+import { numero } from "../../../negocio/formato";
 import type { FiltroDeStock, Stock } from "../../../negocio/deposito";
 import { TEXTOS } from "../../textos";
 import { pesosEnteros } from "../../comun/deposito/movimientos";
-import { Explicado, numero } from "../base/ui";
+import { Explicado } from "../base/ui";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 import { plural } from "./deposito-comun";
 import type { Inventario } from "./useInventario";

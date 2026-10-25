@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nombreDeProducto } from "./formato";
+import { nombreDeProducto } from "./nombre-de-producto";
 
 // Los nombres de las listas vienen en mayúsculas y se muestran como frase (decisión 127).
 describe("nombreDeProducto", () => {

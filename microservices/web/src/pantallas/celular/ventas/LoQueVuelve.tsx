@@ -1,6 +1,6 @@
 import type { ParaVolver, Vuelve } from "../../../negocio/ventas";
 import { conUnidad } from "../../../negocio/catalogo";
-import { nombreDeProducto, pesosCortos } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { hora } from "../../comun/ventas/textos-del-dia";
 import { Icono } from "../componentes/base";

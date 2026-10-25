@@ -1,6 +1,5 @@
 import { precioDelProducto, type Producto } from "../../../negocio/catalogo";
-import { nombreDeProducto } from "../../../formato";
-import { pesosCortos } from "../base/ui";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { detalleDe } from "./detalle";
 import { MiniaturaDeProducto } from "./MiniaturaDeProducto";
 import { StockDelProducto } from "./StockDelProducto";

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { TEXTOS } from "../../textos";
-import { fecha } from "../../../formato";
+import { fecha } from "../../../negocio/formato";
 import { Aviso, Icono } from "../base/ui";
 import { useCambioDeRoles, type Acceso, type CelularDeOtroFila, type SesionFila, type UsuarioFila } from "../../../negocio/usuarios";
 import type { RolAsignable } from "../../RolesDeUsuario";

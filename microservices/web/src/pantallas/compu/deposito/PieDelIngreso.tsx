@@ -1,7 +1,7 @@
 import { conUnidad, unidadDe } from "../../../negocio/catalogo";
 import type { Renglon } from "../../../negocio/deposito";
-import { pesos } from "../../../formato";
-import { Boton, Explicado, pesosCortos } from "../base/ui";
+import { pesos, pesosCortos } from "../../../negocio/formato";
+import { Boton, Explicado } from "../base/ui";
 import { plural } from "./deposito-comun";
 import type { IngresoDeLaCompu } from "./useIngresoDeLaCompu";
 import css from "./Deposito.module.css";

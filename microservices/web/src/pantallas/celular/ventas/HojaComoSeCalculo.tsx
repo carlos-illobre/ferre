@@ -1,5 +1,5 @@
 import { precioDe, subtotalDe, type Item } from "../../../negocio/ventas";
-import { nombreDeProducto, pesos } from "../../../formato";
+import { nombreDeProducto, pesos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { Hoja, Pasos } from "../componentes/base";
 import hojas from "./hojas.module.css";

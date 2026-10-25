@@ -1,10 +1,10 @@
 import type { KeyboardEvent } from "react";
 import { conUnidad } from "../../../negocio/catalogo";
 import type { CompraFila } from "../../../negocio/compras";
-import { fecha, pesos } from "../../../formato";
+import { fecha, pesos, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
 import { VerComprobante } from "../../FotoDeFactura";
-import { Boton, pesosCortos } from "../base/ui";
+import { Boton } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import { plural } from "../deposito/deposito-comun";
 import css from "./Compras.module.css";

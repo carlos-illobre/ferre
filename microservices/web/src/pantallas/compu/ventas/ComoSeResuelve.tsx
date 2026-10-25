@@ -1,6 +1,6 @@
 import { COBROS_DE_DIFERENCIA, type Corrigiendo } from "../../../negocio/ventas";
+import { pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { pesosCortos } from "../base/ui";
 import { MediosChicos } from "./MediosChicos";
 import css from "./VentasDelDia.module.css";
 

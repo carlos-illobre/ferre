@@ -1,5 +1,5 @@
 import type { Cargada } from "../../../negocio/catalogo";
-import { porcentaje } from "../../../formato";
+import { porcentaje } from "../../../negocio/formato";
 import css from "./Listas.module.css";
 
 // El resumen de la lista: leídos, los que cambian, nuevos, sin cambio, los que ya no están y las salteadas.

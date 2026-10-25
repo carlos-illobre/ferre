@@ -1,8 +1,8 @@
 import type { VentaDelDia } from "../../../negocio/ventas";
 import { conUnidad } from "../../../negocio/catalogo";
-import { nombreDeProducto } from "../../../formato";
+import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Aviso, Boton, Icono, pesosCortos } from "../base/ui";
+import { Aviso, Boton, Icono } from "../base/ui";
 import { MiniaturaDeProducto } from "./MiniaturaDeProducto";
 
 // Mirando la venta: sus productos, el total, «Corregir» (E) y «Anular» (Supr), y cuántas veces se corrigió.

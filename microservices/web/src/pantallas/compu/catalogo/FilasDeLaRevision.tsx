@@ -1,5 +1,6 @@
 import { mensajeDeLista, useFilasDeLista, type Cargada } from "../../../negocio/catalogo";
-import { Aviso, Boton, numero } from "../base/ui";
+import { numero } from "../../../negocio/formato";
+import { Aviso, Boton } from "../base/ui";
 import type { FiltroDeRevision } from "./FiltrosDeLaRevision";
 import { Previa } from "./Previa";
 import css from "./Listas.module.css";
