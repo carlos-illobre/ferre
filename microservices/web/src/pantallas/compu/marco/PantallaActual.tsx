@@ -54,6 +54,9 @@ const PANTALLAS: Record<string, (c: Contexto) => ReactNode> = {
   "para-revisar": ({ conPestanas }) => <ParaRevisar titulo={!conPestanas} />,
 };
 
+// Si una dirección tiene su pantalla (Vender es la de cualquier otra).
+export const tienePantalla = (ruta: string): boolean => ruta === "vender" || ruta in PANTALLAS;
+
 export function PantallaActual({ actual, ...c }: Contexto & { actual: string }) {
   if (c.m.falta) return <SinPermiso falta={c.m.falta} />;
   return <>{(PANTALLAS[actual] ?? (() => <Vender />))(c)}</>;
