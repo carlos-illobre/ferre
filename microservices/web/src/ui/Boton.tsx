@@ -1,14 +1,18 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { useEtiqueta } from "../plataforma/comandos";
 import { Icono, type NombreDeIcono } from "./iconos";
 
 // El botón de «Mostrador»: con su variante (principal, marino, peligro, sobre el marino), su
-// tamaño, un ícono y, en la computadora, la tecla que lo aprieta.
+// tamaño, un ícono y, si hace una acción con nombre, la tecla que la pide (la pone el teclado).
 type VarianteBoton = "principal" | "marino" | "peligro" | "sobre-marino";
-export function Boton({ children, variante, tam, icono, ancho, tecla, className, ...resto }: {
-  children?: ReactNode; variante?: VarianteBoton; tam?: "chico" | "grande"; icono?: NombreDeIcono; ancho?: boolean; tecla?: string; className?: string;
+const clasesDelBoton = (b: { variante?: VarianteBoton; tam?: string; ancho?: boolean; soloIcono: boolean; className?: string }) =>
+  ["boton", b.variante, b.tam, b.ancho && "ancho", b.soloIcono && "solo-icono", b.className].filter(Boolean).join(" ");
+
+export function Boton({ children, variante, tam, icono, ancho, accion, className, ...resto }: {
+  children?: ReactNode; variante?: VarianteBoton; tam?: "chico" | "grande"; icono?: NombreDeIcono; ancho?: boolean; accion?: string; className?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
-  const soloIcono = icono && (children === undefined || children === null);
-  const clases = ["boton", variante, tam, ancho && "ancho", soloIcono && "solo-icono", className].filter(Boolean).join(" ");
+  const tecla = useEtiqueta(accion ?? "");
+  const clases = clasesDelBoton({ variante, tam, ancho, soloIcono: Boolean(icono) && (children === undefined || children === null), className });
   return (
     <button type="button" className={clases} aria-keyshortcuts={tecla} {...resto}>
       {icono && <Icono nombre={icono} tam={tam === "chico" ? 16 : 20} />}

@@ -4,6 +4,7 @@ import { cleanup } from "@testing-library/react";
 // Directo al archivo y no al index: el index cargaría la API antes de que cada prueba la reemplace.
 import { consultas } from "../datos/conexion/consultas";
 import { conTodosLosPermisos, usuarioDePrueba } from "./sesion";
+import { instalarLasTablasParaLasPruebas } from "../teclado";
 
 // Las pantallas se prueban sueltas, sin el proveedor de sesión: la sesión es la de prueba.
 // `entrar` y `salir` son siempre las mismas, como en la aplicación: una pantalla que depende de
@@ -15,6 +16,9 @@ vi.mock("../datos/sesion", async (original) => {
     useSesion: () => ({ sesion: { estado: "con-sesion", usuario: usuarioDePrueba, sinConexion: false, sesionId: "s1" }, entrar, salir }),
   };
 });
+
+// Las teclas, como en la aplicación: las pantallas ofrecen acciones y el teclado las pide (ADR-029).
+instalarLasTablasParaLasPruebas();
 
 // jsdom no trae IntersectionObserver; las pantallas lo usan para la carga progresiva.
 class ObservadorFalso {

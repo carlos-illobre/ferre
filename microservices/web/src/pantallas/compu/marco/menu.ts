@@ -55,4 +55,3 @@ export const A_PARTE_COMUN: Record<string, string> = {
 };
 export const DE_PARTE_COMUN: Record<string, string> = { ...Object.fromEntries(Object.entries(A_PARTE_COMUN).map(([ruta, parte]) => [parte, ruta])), "catalogo/productos": "productos", "vender/anular": "hoy" };
 // Alt + número abre cada pantalla, en el orden en que se ven: 1 a 9 y 0.
-export const TECLAS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];

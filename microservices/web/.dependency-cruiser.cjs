@@ -73,7 +73,7 @@ module.exports = {
       name: "nadie-usa-el-teclado",
       comment: "Las pantallas, las piezas y el negocio no saben de teclas (ADR-029): ofrecen acciones con nombre (plataforma/comandos) y src/teclado dice qué tecla pide cada una. Solo el arranque lo instala.",
       severity: "error",
-      from: { path: "^src/", pathNot: "^src/(teclado|app)/" },
+      from: { path: "^src/", pathNot: "^src/(teclado|app|pruebas)/|\\.test\\.tsx?$" },
       to: { path: "^src/teclado/" },
     },
     {

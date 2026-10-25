@@ -1,5 +1,4 @@
-import type { KeyboardEvent } from "react";
-import { Icono, Pagina, type NombreDeIcono } from "../base/ui";
+import { Atajo, Icono, Pagina, type NombreDeIcono } from "../base/ui";
 import type { Permiso } from "../../permisos";
 import { irA } from "../base/rutas";
 import { TEXTOS } from "../../textos";
@@ -17,41 +16,18 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
   { ruta: "sistema", nombre: "Sistema", detalle: TEXTOS.sistema.queHay.largo, icono: "computadora", pide: ["admin.sistema"] },
 ];
 
-// Las opciones se recorren con las flechas como la grilla que se ve (pedido de Carlos del
-// 2026-10-15): → a la siguiente y ← a la anterior; ↓ a la de abajo y ↑ a la de arriba, en la misma
-// columna; ← desde la primera vuelve al menú.
-const FLECHAS = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
-// Cuántas opciones entran por fila: las que empiezan a la misma altura que la primera.
-function columnas(botones: HTMLButtonElement[]) {
-  const arriba = botones[0]!.getBoundingClientRect().top;
-  return Math.max(1, botones.filter((b) => Math.abs(b.getBoundingClientRect().top - arriba) < 2).length);
-}
-const conModificador = (e: KeyboardEvent<HTMLElement>) => e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
-const parteDelMenu = () => document.querySelector<HTMLButtonElement>(".lateral nav button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".lateral nav button");
-function teclas(e: KeyboardEvent<HTMLUListElement>) {
-  if (conModificador(e) || !FLECHAS.includes(e.key)) return;
-  const botones = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button")];
-  const i = botones.indexOf(document.activeElement as HTMLButtonElement);
-  if (i < 0) return;
-  const n = columnas(botones);
-  const paso = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n }[e.key as "ArrowRight" | "ArrowLeft" | "ArrowDown" | "ArrowUp"];
-  e.preventDefault(); e.stopPropagation();
-  const destino = botones[i + paso] ?? (e.key === "ArrowLeft" ? parteDelMenu() : null);
-  destino?.focus();
-}
-
 // `destino`: adónde lleva la opción, si no es su propia ruta (Usuarios y Cómo va el negocio van a su primera pestaña).
-export function Mas({ atajoDe, opciones }: { atajoDe: (ruta: string) => string | null; opciones: ((typeof DE_MAS)[number] & { destino?: string })[] }) {
+export function Mas({ accionDe, opciones }: { accionDe: (ruta: string) => string | null; opciones: ((typeof DE_MAS)[number] & { destino?: string })[] }) {
   return (
     <Pagina titulo="Más" testId="mas" bajada="Lo que se usa de vez en cuando.">
-      <ul className="mas-grilla" onKeyDown={teclas}>
+      <ul className="mas-grilla">
         {opciones.map((d) => (
           <li key={d.ruta}>
             <button type="button" className="tarjeta mas-tarjeta" onClick={() => irA(d.destino ?? d.ruta)} data-testid={`mas-${d.ruta}`}>
               <span className="mas-icono"><Icono nombre={d.icono} tam={24} /></span>
               <span className="nombre">{d.nombre}</span>
               <span className="detalle">{d.detalle}</span>
-              {atajoDe(d.destino ?? d.ruta) && <span className="tecla" aria-hidden="true">Alt+{atajoDe(d.destino ?? d.ruta)}</span>}
+              <Atajo accion={accionDe(d.destino ?? d.ruta) ?? ""} />
             </button>
           </li>
         ))}

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useComandos } from "../../../plataforma/comandos";
 import { createPortal } from "react-dom";
 import { Icono } from "../base/ui";
 
@@ -16,25 +17,22 @@ function useCerrarAfuera(abierto: boolean, cerrar: () => void, raiz: React.RefOb
 }
 
 // El usuario abajo del menú, como la v2 (decisión 126): las iniciales, el nombre y el rol; al tocarlo,
-// un menú con el nombre y el rol arriba y «Cerrar sesión». Esc lo cierra.
+// un menú con el nombre y el rol arriba y «Cerrar sesión». Mientras está abierto, ofrece cerrarlo.
 export function CuentaDelUsuario({ nombre, rol, detalle, alSalir }: { nombre: string; rol: string; detalle: string; alSalir: () => void }) {
   const [abierto, setAbierto] = useState(false);
   const raiz = useRef<HTMLDivElement>(null);
   const menuDeCuenta = useRef<HTMLDivElement>(null);
   useCerrarAfuera(abierto, () => setAbierto(false), raiz, menuDeCuenta);
-  const conEsc = (soloAbierto: boolean) => (e: KeyboardEvent) => {
-    if (e.key !== "Escape" || (soloAbierto && !abierto)) return;
-    e.preventDefault(); e.stopPropagation(); setAbierto(false); raiz.current?.querySelector<HTMLButtonElement>(".quien-boton")?.focus();
-  };
+  useComandos({ cerrar: () => { setAbierto(false); raiz.current?.querySelector<HTMLButtonElement>(".quien-boton")?.focus(); } }, { activo: abierto, encima: true });
   return (
-    <div className="quien" ref={raiz} onKeyDown={conEsc(true)}>
+    <div className="quien" ref={raiz}>
       <button type="button" className="quien-boton" aria-haspopup="menu" aria-expanded={abierto} onClick={() => setAbierto((a) => !a)} title={detalle} aria-label={`${nombre}${rol ? `, ${rol}` : ""}: opciones de la cuenta`} data-testid="cuenta">
         <span className="avatar" aria-hidden="true">{inicialesDe(nombre)}</span>
         <span className="quien-nombre"><b data-testid="usuario">{nombre}</b>{rol ? <small>{rol}</small> : null}</span>
       </button>
       {/* Se dibuja en el cuerpo de la página: dentro del menú lateral lo tapaba la barra del cobro. */}
       {abierto && createPortal(
-        <div className="cuenta-menu" role="menu" aria-label="La cuenta" ref={menuDeCuenta} onKeyDown={conEsc(false)}>
+        <div className="cuenta-menu" role="menu" aria-label="La cuenta" ref={menuDeCuenta}>
           <p className="cuenta-menu-cab">{nombre}{rol ? ` · ${rol}` : ""}</p>
           <button type="button" role="menuitem" onClick={alSalir} data-testid="salir"><Icono nombre="salir" tam={20} />Cerrar sesión</button>
         </div>, document.body,

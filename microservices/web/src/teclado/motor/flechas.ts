@@ -1,4 +1,4 @@
-import { usarTeclasPorDefecto } from "./teclas";
+import { usarTeclasPorDefecto } from "../../plataforma/teclado";
 import { filasDeLaPantalla, fijarDisposicion, laDisposicion, type DisposicionParaFlechas } from "./disposicion";
 import { abrir, filaMarcada, marcar } from "./marca";
 import "./flechas.css";

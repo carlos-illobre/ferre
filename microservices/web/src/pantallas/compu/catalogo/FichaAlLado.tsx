@@ -49,7 +49,7 @@ export const FichaAlLado = forwardRef<HTMLElement, Props>(function FichaAlLado(f
           <span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> {t.otroProducto.largo}</span>
         </span>
         <Boton className={css.listo} onClick={f.alListo} data-ficha-vertical="" data-testid="ficha-listo">{t.listo.largo}</Boton>
-        {f.alAgregar && <Boton variante="principal" icono="carrito" tecla="+" onClick={f.alAgregar} data-ficha-vertical="" data-testid="ficha-agregar">{TEXTOS.catalogo.agregarALaVenta.largo}</Boton>}
+        {f.alAgregar && <Boton variante="principal" icono="carrito" accion="productos.agregar" onClick={f.alAgregar} data-ficha-vertical="" data-testid="ficha-agregar">{TEXTOS.catalogo.agregarALaVenta.largo}</Boton>}
       </div>
     </article>
   );

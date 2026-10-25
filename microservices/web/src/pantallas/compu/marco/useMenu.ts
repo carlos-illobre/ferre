@@ -3,7 +3,7 @@ import { PIDE_EL_NEGOCIO } from "../../pestanas-de-negocio";
 import { puede, type Permiso } from "../../permisos";
 import type { UsuarioDeLaSesion } from "../../../negocio/usuarios";
 import { useParaRevisar } from "../../../negocio/apartados";
-import { DE_ANOMALIAS, DE_NEGOCIO, MENU, NOMBRES, PESTANA_DE, RUTAS_DE_ANOMALIAS, RUTAS_DE_NEGOCIO, SIN_ATAJO, TECLAS, TODAS, type Pestana } from "./menu";
+import { DE_ANOMALIAS, DE_NEGOCIO, MENU, NOMBRES, PESTANA_DE, RUTAS_DE_ANOMALIAS, RUTAS_DE_NEGOCIO, SIN_ATAJO, TODAS, type Pestana } from "./menu";
 import { DE_MAS } from "./Mas";
 
 type Usuario = UsuarioDeLaSesion | null;
@@ -30,8 +30,9 @@ export function useMenu(usuario: Usuario, actual: string) {
   const conAtajo = useMemo(() => menu.flatMap((m) => m.pestanas.map((p) => p.ruta)).filter((r) => !SIN_ATAJO.has(r) || r === deAnomalias[0]?.ruta), [menu, deAnomalias]);
   // Adónde lleva cada pestaña: Resumen, a la primera sección que se ve (decisión 95).
   const destinoDe = (r: string) => (r === "resumen" ? deNegocio[0]?.ruta ?? "resumen" : r);
-  const atajoDe = (r: string) => { const i = conAtajo.indexOf(r); return i < 0 || i >= TECLAS.length ? null : TECLAS[i]!; };
-  return { menu, deAnomalias, paraRevisar, conAtajo, destinoDe, atajoDe, ...dondeEsta(usuario, actual, menu, deAnomalias), falta: permisoQueFalta(usuario, actual) };
+  // La acción que abre esa pantalla por su lugar en el menú (las diez primeras): «menu.1», «menu.2»…
+  const accionDe = (r: string) => { const i = conAtajo.indexOf(r); return i < 0 || i >= 10 ? null : `menu.${i + 1}`; };
+  return { menu, deAnomalias, paraRevisar, conAtajo, destinoDe, accionDe, ...dondeEsta(usuario, actual, menu, deAnomalias), falta: permisoQueFalta(usuario, actual) };
 }
 
 // La parte del menú de la pantalla abierta, sus pestañas (con una sola a la vista no se dibujan;

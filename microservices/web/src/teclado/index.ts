@@ -2,3 +2,4 @@
 // (plataforma/comandos); acá están las tablas de qué tecla pide cada una. Solo lo instala el arranque.
 export { instalarTecladoDeLaCompu } from "./compu";
 export { instalarTecladoDelCelular } from "./celular";
+export { instalarLasTablasParaLasPruebas } from "./pruebas";

@@ -1,4 +1,4 @@
-import { useEffect, type MutableRefObject } from "react";
+import { porLaMarca } from "./por-la-marca";
 
 // Dos focos independientes (decisiones 82 y 137): con el cursor en una caja de texto, las flechas
 // mueven la marca del teclado por el menú y las pestañas sin sacar el cursor de la caja. ← (con la
@@ -7,7 +7,7 @@ import { useEffect, type MutableRefObject } from "react";
 // vuelve al menú), Enter abre la pestaña, y ↓ o Esc devuelven la marca a la pantalla. Escribir algo,
 // Tab o el mouse la sacan.
 type Marca = { zona: "menu" | "pestanas"; i: number } | null;
-type Estado = { marca: Marca; porLaMarca: MutableRefObject<boolean> };
+type Estado = { marca: Marca };
 
 const menu = () => [...document.querySelectorAll<HTMLButtonElement>(".lateral nav button")];
 const pestanas = () => [...document.querySelectorAll<HTMLButtonElement>(".cuerpo .pestanas button")];
@@ -37,7 +37,7 @@ function aLasPestanas(s: Estado, ruta: string) {
 // Al abrir algo con la marca, el cursor sigue en una caja de texto: la de la pantalla nueva, si tiene.
 function abrirConLaMarca(s: Estado, b: HTMLButtonElement | undefined) {
   if (!b) return;
-  s.porLaMarca.current = true; b.click(); setTimeout(() => { s.porLaMarca.current = false; }, 700);
+  porLaMarca.ahora = true; b.click(); setTimeout(() => { porLaMarca.ahora = false; }, 700);
 }
 
 // Sin marca: ← con la caja vacía o el cursor al principio la pone en el menú.
@@ -85,14 +85,8 @@ function alTeclear(s: Estado, e: KeyboardEvent) {
   else enLasPestanas(s, m, e, usar);
 }
 
-export function useDosFocos(conSesion: boolean, porLaMarca: MutableRefObject<boolean>) {
-  useEffect(() => {
-    if (!conSesion) return;
-    const s: Estado = { marca: null, porLaMarca };
-    const tecla = (e: KeyboardEvent) => alTeclear(s, e);
-    const conElMouse = () => sacar(s);
-    window.addEventListener("keydown", tecla, { capture: true });
-    window.addEventListener("mousedown", conElMouse, { capture: true });
-    return () => { window.removeEventListener("keydown", tecla, { capture: true }); window.removeEventListener("mousedown", conElMouse, { capture: true }); sacar(s); };
-  }, [conSesion, porLaMarca]);
+export function instalarDosFocos(): void {
+  const s: Estado = { marca: null };
+  window.addEventListener("keydown", (e) => alTeclear(s, e), { capture: true });
+  window.addEventListener("mousedown", () => sacar(s), { capture: true });
 }

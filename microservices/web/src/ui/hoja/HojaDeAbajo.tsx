@@ -1,10 +1,11 @@
 import { useEffect, type ReactNode } from "react";
 import { useVolverCierra } from "../../plataforma/navegacion";
 import { Icono } from "../iconos";
+import { useComandos } from "../../plataforma/comandos";
 
-// La hoja del celular: sube desde abajo. Cierra tocando el fondo, con Escape o con el botón que
-// le pase el contenido.
-const hojasAbiertas: (() => void)[] = [];
+// La hoja del celular: sube desde abajo. Cierra tocando el fondo, con el botón que le pase el
+// contenido o con la acción «cerrar».
+
 // Mientras haya alguna hoja abierta, la pantalla de atrás no se desplaza (001, «Lo de atrás queda
 // quieto»): la página entera se traba y queda donde estaba. Se cuenta para las hojas apiladas.
 let trabas = 0;
@@ -15,21 +16,12 @@ function useTrabarLoDeAtras() {
   }, []);
 }
 
-// Con varias hojas apiladas (la ficha y, encima, una explicación), Escape cierra la de arriba.
-function useEscapeCierraLaDeArriba(alCerrar: () => void) {
-  useEffect(() => {
-    hojasAbiertas.push(alCerrar);
-    const tecla = (e: KeyboardEvent) => { if (e.key === "Escape" && hojasAbiertas[hojasAbiertas.length - 1] === alCerrar) { e.stopPropagation(); alCerrar(); } };
-    window.addEventListener("keydown", tecla, true);
-    return () => { window.removeEventListener("keydown", tecla, true); const i = hojasAbiertas.lastIndexOf(alCerrar); if (i >= 0) hojasAbiertas.splice(i, 1); };
-  }, [alCerrar]);
-}
-
 export function HojaDeAbajo({ titulo, extra, alCerrar, children, testId, clase }: { titulo?: ReactNode; extra?: ReactNode; alCerrar: () => void; children: ReactNode; testId?: string; clase?: string }) {
   // El botón de volver del celular cierra la hoja y deja la pantalla de abajo como estaba.
   useVolverCierra(alCerrar);
   useTrabarLoDeAtras();
-  useEscapeCierraLaDeArriba(alCerrar);
+  // Con varias hojas apiladas (la ficha y, encima, una explicación), cerrar cierra la de arriba.
+  useComandos({ cerrar: alCerrar }, { encima: true });
   return (
     <div className="hoja-fondo" onClick={alCerrar} role="presentation">
       <div className={`hoja ${clase ?? ""}`} role="dialog" aria-label={typeof titulo === "string" ? titulo : undefined} onClick={(e) => e.stopPropagation()} data-testid={testId}>

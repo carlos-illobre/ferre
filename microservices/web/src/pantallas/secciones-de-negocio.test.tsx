@@ -49,7 +49,7 @@ describe("Más → Cómo va el negocio", () => {
     expect(DE_MAS_COMPU.find((d) => d.ruta === "resumen")).toBeUndefined();
     expect(DE_MAS_CELULAR.find((d) => d.parte === "negocio")!.pide).toEqual(PIDE_EL_NEGOCIO);
     expect(PIDE_EL_NEGOCIO).toEqual(["negocio.ventas", "negocio.gastos", "deposito.compras", "negocio.invertido"]);
-    render(<Mas atajoDe={() => null} opciones={DE_MAS_COMPU} />);
+    render(<Mas accionDe={() => null} opciones={DE_MAS_COMPU} />);
     expect(screen.queryByTestId("mas-resumen")).toBeNull();
   });
 

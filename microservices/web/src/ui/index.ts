@@ -15,3 +15,4 @@ export * from "./Progreso";
 export * from "./Lista";
 export * from "./hoja";
 export * from "./iconos";
+export * from "./Atajo";

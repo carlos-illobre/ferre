@@ -26,7 +26,7 @@ export function BarraDeCobro(b: Props) {
         <MediosDePago medio={b.medio} alElegir={b.alElegirMedio} />
         <BotonDeCliente cliente={b.cliente} falta={b.medio === "cuenta_corriente"} alElegir={b.alElegirCliente} />
       </div>
-      <Boton variante="principal" tam="grande" disabled={b.ocupado || !b.hayItems} onClick={b.alCobrar} tecla="F2" data-testid="cobrar">
+      <Boton variante="principal" tam="grande" disabled={b.ocupado || !b.hayItems} onClick={b.alCobrar} accion="vender.cobrar" data-testid="cobrar">
         {b.ocupado ? "Cobrando…" : <>Cobrar <span className={`importe anim-rueda-valor ${css.total}`} ref={rueda} data-testid="total">{pesosCortos(b.total)}</span></>}
       </Boton>
     </section>

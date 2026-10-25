@@ -2,7 +2,7 @@ import "../../plataforma/animacion/animacion.css";
 // Las hojas de las piezas que comparten las pantallas, antes que los módulos de cada pantalla:
 // un módulo pisa lo de ellas con el mismo peso (specs/024).
 import "../medios.css";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas";
 import type { UsuarioDeLaSesion } from "../../negocio/usuarios";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
@@ -16,8 +16,7 @@ import { VincularCelular } from "./entrada/VincularCelular";
 // cuál gana cuando dos reglas pesan lo mismo (specs/024).
 import { PantallaActual } from "./marco/PantallaActual";
 import { NOMBRES } from "./marco/menu";
-import { useAtajosConAlt, useFlechaAlMenu } from "./marco/atajos-del-marco";
-import { useDosFocos } from "./marco/dos-focos";
+import { useAccionesDelMenu } from "./marco/acciones-del-menu";
 import { useMarco } from "./marco/useMarco";
 import type { MenuDeLaPersona } from "./marco/useMenu";
 import { usePlegado } from "./marco/usePlegado";
@@ -67,19 +66,16 @@ function FueraDelMarco({ nombre, codigo }: { nombre: string; codigo: string | nu
 }
 
 function Marco({ usuario, m, actual }: { usuario: UsuarioDeLaSesion; m: MenuDeLaPersona; actual: string }) {
-  const porLaMarca = useRef(false);
-  const { plegado, plegar } = usePlegado(true);
-  useAtajosConAlt(true, m.conAtajo);
-  useFlechaAlMenu(true);
-  useDosFocos(true, porLaMarca);
+  const { plegado, plegar } = usePlegado();
+  useAccionesDelMenu(m.conAtajo, plegar);
   useEffect(() => { window.scrollTo(0, 0); }, [actual]);
   useEffect(() => { document.title = `${NOMBRES.get(actual)} · Ferrebress`; }, [actual]);
   return (
     <div className={`app ${plegado ? "plegado" : ""}`}>
       <a className="saltar" href="#contenido" onClick={(e) => { e.preventDefault(); document.getElementById("contenido")?.focus(); }}>Ir al contenido</a>
-      <Lateral m={m} plegado={plegado} plegar={plegar} porLaMarca={porLaMarca} />
+      <Lateral m={m} plegado={plegado} plegar={plegar} />
       <div className={`cuerpo ${m.pestanas ? "con-pestanas" : ""} ${m.titulo ? "con-titulo" : ""}`}>
-        {(m.pestanas || m.titulo) && <CabezaDeLaParte m={m} actual={actual} porLaMarca={porLaMarca} />}
+        {(m.pestanas || m.titulo) && <CabezaDeLaParte m={m} actual={actual} />}
         <PantallaActual actual={actual} usuario={usuario} m={m} conPestanas={Boolean(m.pestanas)} />
       </div>
     </div>

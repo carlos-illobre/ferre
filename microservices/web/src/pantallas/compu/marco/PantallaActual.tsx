@@ -38,7 +38,7 @@ function compras({ usuario }: Contexto) {
 
 // Cada dirección con su pantalla; la que no está, Vender.
 const PANTALLAS: Record<string, (c: Contexto) => ReactNode> = {
-  mas: ({ m }) => <Mas atajoDe={m.atajoDe} opciones={m.deMas} />,
+  mas: ({ m }) => <Mas accionDe={m.accionDe} opciones={m.deMas} />,
   roles: () => <Roles />,
   pedidos,
   hoy: () => <VentasDelDia />, productos: () => <Productos />, ingreso: () => <Ingreso />,

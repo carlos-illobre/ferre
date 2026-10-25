@@ -1,9 +1,10 @@
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
+import { useAccionesDelLugar } from "../plataforma/comandos";
 import { Icono } from "./iconos";
 
 // La cantidad con − y +: enteros por unidad, de a 0,5 a granel (hasta un decimal). Se puede
-// tipear (a medio tipear se ve lo tipeado, «2,» camino a «2,5») y las flechas ↑ ↓ suman y
-// restan. Con `alQuitar`, «−» en el mínimo quita el renglón (Vender, decisión 119); `children`
+// tipear (a medio tipear se ve lo tipeado, «2,» camino a «2,5»), y con el foco en la caja ofrece
+// sumar y restar uno. Con `alQuitar`, «−» en el mínimo quita el renglón (Vender, decisión 119); `children`
 // va al final (por ejemplo, la unidad).
 type Props = {
   valor: number; entera: boolean; alCambiar: (v: number) => void; min?: number; etiqueta?: string; testId?: string;
@@ -26,7 +27,8 @@ function useCantidad({ valor, entera, alCambiar, min = entera ? 1 : 0.1, alQuita
     quita, mostrado: texto ?? (valor === 0 ? "" : String(valor).replace(".", ",")),
     menos: () => (quita ? alQuitar?.() : restar()),
     mas: () => poner(redondear(valor + paso)),
-    flecha: (tecla: string) => (tecla === "ArrowUp" ? poner(redondear(valor + paso)) : restar()),
+    subir: () => poner(redondear(valor + paso)),
+    bajar: restar,
     // A medio tipear («2,») se ve lo tipeado; si no, la cantidad ya ajustada (1,55 → 1,6).
     tipear: (crudo: string) => {
       const limpio = limpiar(crudo);
@@ -42,11 +44,12 @@ function useCantidad({ valor, entera, alCambiar, min = entera ? 1 : 0.1, alQuita
 export function Contador(props: Props) {
   const { entera, etiqueta = "Cantidad", testId = "cantidad", sinBotones, children } = props;
   const c = useCantidad(props);
+  const caja = useRef<HTMLInputElement>(null);
+  useAccionesDelLugar(caja, { "cantidad.subir": c.subir, "cantidad.bajar": c.bajar });
   return (
     <div className="contador">
       {!sinBotones && <button type="button" aria-label={c.quita ? "Quitar" : "Uno menos"} onClick={c.menos}><Icono nombre="menos" tam={18} grosor={2.4} /></button>}
-      <input inputMode={entera ? "numeric" : "decimal"} aria-label={etiqueta} value={c.mostrado} onFocus={(e) => e.target.select()} onChange={(e) => c.tipear(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); e.stopPropagation(); c.flecha(e.key); } }}
+      <input ref={caja} inputMode={entera ? "numeric" : "decimal"} aria-label={etiqueta} value={c.mostrado} onFocus={(e) => e.target.select()} onChange={(e) => c.tipear(e.target.value)}
         onBlur={c.alSalir} data-testid={testId} />
       {!sinBotones && <button type="button" aria-label="Uno más" onClick={c.mas}><Icono nombre="mas" tam={18} grosor={2.4} /></button>}
       {children}

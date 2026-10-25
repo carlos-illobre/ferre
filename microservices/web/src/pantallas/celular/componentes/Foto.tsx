@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useComandos } from "../../../plataforma/comandos";
 import { urlDeFoto } from "../../../negocio/catalogo";
 import { Icono } from "./base";
 import { useVolverCierra } from "../../../plataforma/navegacion";
@@ -6,14 +7,10 @@ import { useVolverCierra } from "../../../plataforma/navegacion";
 type AlSubir = (archivo: File) => Promise<void>;
 
 // Con la foto abierta en grande, el botón de volver del celular la cierra (como cualquier otra
-// cosa abierta encima de la pantalla) en vez de cambiar de pantalla; Escape también.
+// cosa abierta encima de la pantalla) en vez de cambiar de pantalla; también ofrece cerrarla.
 function CierraAlVolver({ alCerrar }: { alCerrar: () => void }) {
   useVolverCierra(alCerrar);
-  useEffect(() => {
-    const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") alCerrar(); };
-    window.addEventListener("keydown", tecla);
-    return () => window.removeEventListener("keydown", tecla);
-  });
+  useComandos({ cerrar: alCerrar }, { encima: true });
   return null;
 }
 
