@@ -1,5 +1,5 @@
 # Procesos (ADR-019). Contexto de build: la raíz del repo, por el lockfile del workspace.
-# Solo entra este paquete; no depende de nada de Ferrebress.
+# Solo entra este paquete y el kit de auditoría; no depende de nada de Ferrebress.
 FROM node:22-alpine AS base
 RUN corepack enable pnpm
 WORKDIR /app
@@ -7,6 +7,8 @@ WORKDIR /app
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY microservices/procesos/servidor/package.json microservices/procesos/servidor/
+# El kit de auditoría es un paquete del workspace que se compila al instalar (specs/027).
+COPY microservices/auditoria-kit microservices/auditoria-kit
 RUN pnpm install --frozen-lockfile --filter procesos-servidor...
 
 FROM deps AS build

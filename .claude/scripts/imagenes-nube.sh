@@ -18,6 +18,7 @@ CERT='COPY --from=cert ca-bundle.crt /etc/ssl/certs/proxy-ca.crt\nENV NODE_EXTRA
 # El certificado va en la etapa que baja dependencias; la imagen final no lo lleva.
 sed "/^FROM node:22-alpine AS base/a $CERT" microservices/comercial/Dockerfile > "$T/api.Dockerfile"
 sed "/^FROM node:22-alpine AS base/a $CERT" microservices/procesos/servidor/Dockerfile > "$T/procesos.Dockerfile"
+sed "/^FROM node:22-alpine AS base/a $CERT" microservices/auditoria/Dockerfile > "$T/auditoria.Dockerfile"
 sed "/^FROM .* AS build/a $CERT" microservices/listas/Dockerfile > "$T/listas.Dockerfile"
 for f in "$T"/*.Dockerfile; do grep -q proxy-ca.crt "$f" || { echo "No se pudo agregar el certificado a $(basename "$f"): cambió su primer FROM; actualizá este script."; exit 1; }; done
 
@@ -27,6 +28,8 @@ services:
     build: { dockerfile: $T/api.Dockerfile, additional_contexts: { cert: $T/cert } }
   procesos:
     build: { dockerfile: $T/procesos.Dockerfile, additional_contexts: { cert: $T/cert } }
+  auditoria:
+    build: { dockerfile: $T/auditoria.Dockerfile, additional_contexts: { cert: $T/cert } }
   listas-de-proveedores:
     build: { context: ./microservices/listas, dockerfile: $T/listas.Dockerfile, additional_contexts: { cert: $T/cert } }
 EOF

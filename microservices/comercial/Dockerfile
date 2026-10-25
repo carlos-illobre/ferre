@@ -9,6 +9,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY microservices/comercial/package.json microservices/comercial/
 # La conexión entre dispositivos es un paquete del workspace que se compila al instalar (ADR-027).
 COPY microservices/conexion microservices/conexion
+# El kit de auditoría es un paquete del workspace que se compila al instalar (specs/027).
+COPY microservices/auditoria-kit microservices/auditoria-kit
 RUN pnpm install --frozen-lockfile --filter comercial...
 
 FROM deps AS build

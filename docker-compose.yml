@@ -50,6 +50,8 @@ services:
         condition: service_healthy
       procesos:
         condition: service_healthy
+      auditoria:
+        condition: service_healthy
     environment:
       ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
@@ -81,6 +83,8 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?falta GOOGLE_CLIENT_ID en el .env}
       # No cambia entre ambientes: el otro servicio siempre vive en la misma red del compose.
       LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
+      # Adónde manda sus eventos (specs/027). Sin ella, funciona igual y no los manda.
+      AUDITORIA_URL: http://auditoria:8095
       CARPETA_LISTAS: /app/datos/listas
       # Solo informativa: /health la devuelve para saber qué corre. No cambia el comportamiento.
       VERSION: ${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
@@ -129,9 +133,35 @@ services:
       # Los nombres que Ferrebress les da a los dos permisos de Procesos (026): no cambian entre ambientes.
       PERMISO_VER: procesos.ver
       PERMISO_DIBUJAR: procesos.dibujar
+      AUDITORIA_URL: http://auditoria:8095
       PORT: "8090"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8090/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 9
+      start_period: 30s
+
+  # Auditoría (specs/027): junta lo que hizo cada uno en todos los servicios. Los servicios le
+  # mandan sus eventos por la red interna; los reportes pasan por la puerta. Sin puertos.
+  auditoria:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/auditoria:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build:
+      context: .
+      dockerfile: microservices/auditoria/Dockerfile
+    restart: unless-stopped
+    logging: *logs
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://auditoria:${CLAVE_BASE_AUDITORIA:?falta CLAVE_BASE_AUDITORIA en el .env}@db:5432/auditoria
+      TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
+      # El permiso de Ferrebress que deja ver los reportes: no cambia entre ambientes.
+      PERMISO_REPORTES: negocio.actividad
+      PORT: "8095"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8095/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 9
@@ -147,6 +177,7 @@ services:
       POSTGRES_PASSWORD: ${CLAVE_BASE_ADMIN:?falta CLAVE_BASE_ADMIN en el .env}
       CLAVE_BASE_MOSTRADOR: ${CLAVE_BASE_MOSTRADOR:?falta CLAVE_BASE_MOSTRADOR en el .env}
       CLAVE_BASE_PROCESOS: ${CLAVE_BASE_PROCESOS:?falta CLAVE_BASE_PROCESOS en el .env}
+      CLAVE_BASE_AUDITORIA: ${CLAVE_BASE_AUDITORIA:?falta CLAVE_BASE_AUDITORIA en el .env}
     ports:
       - "127.0.0.1:${PUERTO_BASE:?falta PUERTO_BASE en el .env}:5432"
     volumes:

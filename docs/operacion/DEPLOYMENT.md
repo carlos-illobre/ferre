@@ -42,10 +42,11 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
 - Base de datos: el contenedor `db` de cada ambiente, con sus datos en un volumen y publicado
   solo en `127.0.0.1` (5433 producción, 5434 pruebas)
   ([ADR-026](../adr/ADR-026-una-base-por-servicio-en-la-maquina.md)). Supabase ya no se usa.
-- **Las claves de la base** (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`) se
-  leen una sola vez: cuando `db` arranca con el volumen vacío y crea las bases y sus usuarios.
-  Cambiar después una clave en el `.env` no cambia la del usuario, y el servicio deja de
-  conectarse. Para cambiar una clave, o reponerlas todas, ver «Si se pierde el `.env`».
+- **Las claves de la base** (`CLAVE_BASE_ADMIN` y una `CLAVE_BASE_<SERVICIO>` por servicio:
+  `MOSTRADOR`, `PROCESOS`, `AUDITORIA`): `db` crea la base y el usuario de cada servicio que
+  falte, al arrancar y en cada control de salud (specs/027), con la clave que dice el `.env`. Un
+  servicio nuevo aparece solo al agregar su clave. Cambiar después una clave en el `.env` no
+  cambia la del usuario que ya existe, y el servicio deja de conectarse. Para cambiar una clave, o reponerlas todas, ver «Si se pierde el `.env`».
 - Desde afuera del contenedor, la base pide clave siempre; adentro, por el socket, el
   administrador entra sin clave (lo usa el control de salud del contenedor).
 - **Logs:** los de cada contenedor no pasan de 10 MB (dos archivos de 5 MB que rotan), porque el
@@ -86,13 +87,13 @@ del contenedor `db`, el administrador entra sin clave por el socket, así que la
 reponen desde la máquina, en la carpeta del ambiente:
 
 1. Rehacer el `.env` desde su plantilla (`deployment/oracle-single/<ambiente>/.env.oracle`), con
-   claves nuevas en las tres `CLAVE_BASE_*` (`openssl rand -hex 24`). Para cambiar una sola,
+   claves nuevas en todas las `CLAVE_BASE_*` (`openssl rand -hex 24`). Para cambiar una sola,
    alcanza con cambiarla en el `.env`.
 2. Ponerle a cada usuario de la base la clave que dice el `.env`:
 
    ```bash
    cd ~/ferre/<ambiente>
-   for par in mostrador:CLAVE_BASE_MOSTRADOR procesos:CLAVE_BASE_PROCESOS postgres:CLAVE_BASE_ADMIN; do
+   for par in mostrador:CLAVE_BASE_MOSTRADOR procesos:CLAVE_BASE_PROCESOS auditoria:CLAVE_BASE_AUDITORIA postgres:CLAVE_BASE_ADMIN; do
      rol=${par%%:*}; clave=$(grep "^${par#*:}=" .env | cut -d= -f2-)
      echo "ALTER ROLE $rol PASSWORD :'clave';" | docker compose exec -T db psql -U postgres -q -v clave="$clave"
    done

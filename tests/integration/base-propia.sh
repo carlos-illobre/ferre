@@ -11,14 +11,16 @@ admin() { docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STO
 como() { docker compose exec -T -e PGPASSWORD="$2" db psql -h 127.0.0.1 -U "$1" -d "$3" -v ON_ERROR_STOP=1 -tAc "$4"; }
 falla() { echo "$1"; exit 1; }
 
-# 022-E01: las bases del mostrador y de Procesos, cada una con su usuario y su esquema al día.
-[[ "$(admin "SELECT string_agg(datname, ',' ORDER BY datname) FROM pg_database WHERE datname IN ('mostrador', 'procesos')")" == "mostrador,procesos" ]] || falla "faltan las bases mostrador y procesos"
+# 022-E01: las bases del mostrador, de Procesos y de Auditoría, cada una con su usuario y su esquema al día.
+[[ "$(admin "SELECT string_agg(datname, ',' ORDER BY datname) FROM pg_database WHERE datname IN ('auditoria', 'mostrador', 'procesos')")" == "auditoria,mostrador,procesos" ]] || falla "faltan las bases auditoria, mostrador y procesos"
 [[ "$(como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "SELECT count(*) > 30 FROM kysely_migration")" == "t" ]] || falla "el esquema del mostrador no está al día"
 [[ "$(como procesos "$(valor CLAVE_BASE_PROCESOS)" procesos "SELECT count(*) FROM procesos.kysely_migration")" -ge 1 ]] || falla "el esquema de Procesos no está al día"
 
 # 022-E04: el usuario de cada servicio no puede abrir la base del otro.
 como procesos "$(valor CLAVE_BASE_PROCESOS)" mostrador "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Procesos abrió la base del mostrador"
 como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" procesos "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base de Procesos"
+como auditoria "$(valor CLAVE_BASE_AUDITORIA)" mostrador "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Auditoría abrió la base del mostrador"
+como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" auditoria "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base de Auditoría"
 for base in postgres template1; do
   como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base $base"
   como procesos "$(valor CLAVE_BASE_PROCESOS)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Procesos abrió la base $base"
@@ -48,5 +50,5 @@ docker compose up -d --wait >/dev/null 2>&1
 correo="primera-$RANDOM@ferre.test"
 docker compose exec -T comercial node dist/crear-usuario.js "$correo" "Primera" >/dev/null || falla "el comando no dio de alta a la primera persona"
 [[ "$(como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "SELECT (SELECT count(*) FROM usuario_rol ur JOIN usuario u ON u.id = ur.usuario_id WHERE u.email = '$correo') = (SELECT count(*) FROM rol)")" == "t" ]] || falla "la primera persona no recibió todos los roles"
-como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "DELETE FROM evento WHERE contenido->>'email' = '$correo'; DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '$correo'); DELETE FROM usuario WHERE email = '$correo'" >/dev/null
+como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "DELETE FROM auditoria_bandeja WHERE evento->'contenido'->>'email' = '$correo'; DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '$correo'); DELETE FROM usuario WHERE email = '$correo'" >/dev/null
 exit 0
