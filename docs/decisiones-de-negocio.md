@@ -1340,3 +1340,16 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      carpeta con poco acoplamiento, eligió moverlo. Las pantallas no saben de teclas: ofrecen
      acciones con nombre, y el teclado, en su carpeta, dice qué tecla dispara cada una. Mientras
      tanto las teclas pueden cambiar; precisa el escenario E05 de specs/024.
+
+
+160. **Avisos sin consultas: gastar datos solo cuando es probable que algo pase** (2026-10-25,
+     specs/025). Carlos agrupó la comunicación por para qué sirve y pidió sacar los
+     temporizadores que consultan la red. Lo que casi nunca pasa (versión nueva, sesión
+     cerrada) viaja en las respuestas a lo que la aplicación ya pide: se sacrifica precisión,
+     y si la aplicación no se usa no se consulta nada, ni al volver a ella (precisa las 157 y
+     158). Lo que es probable en un momento (que escaneen un código QR recién mostrado) llega
+     en el momento por una conexión abierta solo ese rato. El indicador de conexión puede no
+     ser exacto sin una conexión abierta; lo acepta. El vínculo usa el servidor solo para armar
+     la directa o de respaldo, por el mismo canal. Los temporizadores que no usan la red (la
+     cuenta regresiva del código) se quedan. Todo en el módulo de comunicación de 023, como
+     una pieza que se extiende declarando casos nuevos.

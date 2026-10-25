@@ -221,6 +221,11 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-138 | Nada del vínculo pregunta al servidor ni a la base a ritmo fijo | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
 | RF-139 | Un indicador en los dos dispositivos dice el estado de la conexión, con un color por estado; al tocarlo, el detalle | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
 | RF-140 | Todo lo que viaja entre el celular y la computadora usa esta conexión: lector, espejo y pedido de foto | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
+| RF-141 | Lo que una pantalla espera en un momento (los códigos QR) llega en el momento, por un canal abierto solo ese rato, sin preguntar a ritmo fijo | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
+| RF-142 | La versión nueva y la sesión cerrada no tienen consultas propias: viajan en las respuestas; sin uso, no se consulta nada | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
+| RF-143 | Los indicadores de conexión no preguntan: dicen lo que muestran las respuestas, el navegador y los canales | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
+| RF-144 | Lo pendiente se manda cuando vuelve la red o el servidor contesta, sin reintentos a ritmo fijo | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
+| RF-145 | Un solo canal por dispositivo; el vínculo lo usa para armar la directa y, armada, lo cierra | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
 
 ## Requerimientos no funcionales
 
@@ -296,6 +301,8 @@ Los que son reglas generales están además en la constitución.
 | RNF-67 | Todo lo que cambia entre ambientes está en el archivo de variables de entorno: el código que se prueba es el que corre en producción, sin valores por omisión | [022-base-de-datos-propia](022-base-de-datos-propia/spec.md) |
 | RNF-68 | La conexión entre dispositivos se puede llevar a otro proyecto: módulo propio, sin dependencias, simple, sin código repetido, comentado y con pruebas que recorren cada línea | [023-conexion-entre-dispositivos](023-conexion-entre-dispositivos/spec.md) |
 | RNF-69 | El front está en capas (técnica, piezas visuales, negocio y las pantallas de cada interfaz), sin código repetido, en piezas chicas y con poca complejidad, controlado en cada subida | [024-front-por-capas](024-front-por-capas/spec.md) |
+| RNF-70 | Esperar algo del otro lado, saber si hay conexión y mandar lo pendiente salen de una sola pieza reutilizable: un caso nuevo se declara, sin código de red | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
+| RNF-71 | Sin temporizadores que consulten la red: una aplicación sin usar, sin código QR y sin vínculo por el servidor no gasta datos | [025-avisos-sin-consultas](025-avisos-sin-consultas/spec.md) |
 
 ## De dónde vino cada cosa
 
