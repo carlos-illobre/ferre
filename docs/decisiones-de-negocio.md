@@ -1400,6 +1400,15 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      Cada servicio guarda sus eventos de «Quién hizo qué» en su propia base, dentro de su
      transacción. Un servicio de Auditoría que los junte, con un broker de mensajes entre los
      servicios, es complejo (no perder eventos sin guardar datos de auditoría en los otros
-     servicios) y va en su propia etapa, después de las copias, donde se vuelve a analizar.
-     Orden de las etapas: gateway y nombres, Tickets, Acceso, dispositivo, seguridad en la base,
-     análisis, copias, copias completas y disponibilidad, y Auditoría (`proyecto/tasks.md`).
+     servicios) y va en su propia etapa, después de las copias, donde se vuelve a analizar
+     (Auditoría lo precisa la 165). El orden de las etapas está en `proyecto/tasks.md`.
+
+165. **Auditoría ya, que va a buscar los eventos de cada servicio** (2026-10-25). Carlos cambió de
+     opinión: acepta que cada servicio guarde sus eventos de «Quién hizo qué» en su propia base,
+     dentro de su transacción, y pide el servicio de Auditoría ahora (precisa la 164). Auditoría
+     no recibe los eventos: cuando alguien abre un reporte, les pide a los servicios los nuevos
+     desde la última marca que tiene, los guarda en su base y responde una sola lista. Así no se
+     pierde ninguno (la fuente está en cada servicio), ninguna transacción cruza servicios y no
+     hay temporizadores. Va en la etapa 3, después del gateway, para que Tickets y Acceso nazcan
+     entregándole sus eventos. El broker de mensajes queda para el final (etapa 11), donde se
+     reanaliza si Auditoría pasa a recibirlos por ahí.
