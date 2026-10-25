@@ -506,7 +506,7 @@ RF-55:
   estado: "Hecho en parte (#36): se arma desde cero y se manda como texto; faltan la sugerencia, el correo y el PDF"
   pruebas:
     - microservices/api/src/rutas/pedidos.test.ts
-    - microservices/web/src/pantallas/Pedidos.test.tsx
+    - microservices/web/src/pantallas/comun/deposito/Pedidos.test.tsx
     - tests/e2e/celular/16-pedidos.spec.ts
     - tests/e2e/escritorio/16-pedidos.spec.ts
   defectos:

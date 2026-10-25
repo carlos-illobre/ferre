@@ -1,0 +1,45 @@
+/* Compras en el celular como la v2 (decisión 148): «Resumen», la variante 1 de la maqueta del
+   director de arte. Los colores, de la paleta compartida (paleta.css). */
+.cm { display: flex; flex-direction: column; gap: 14px; }
+.cm-resumenes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.cm-res { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 14px 16px; border-radius: 18px; background: var(--p-superficie); border: 1px solid var(--p-borde); box-shadow: 0 1px 2px rgb(26 29 27 / .05); text-align: left; font: inherit; color: var(--p-tinta); min-width: 0; }
+.cm-res.error { background: var(--p-error-suave); border-color: transparent; }
+.cm-et { font-size: 15px; font-weight: 600; color: var(--p-texto-2); }
+.cm-va { font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.cm-sub { font-size: 14px; font-weight: 600; color: var(--p-error-texto); }
+.cm-barras { display: flex; align-items: flex-end; gap: 6px; height: 28px; margin-top: 6px; width: 100%; }
+.cm-barras i { flex: 1; border-radius: 4px; background: var(--p-relleno-fuerte); }
+.cm-barras i.hoy { background: var(--p-verde); }
+
+.cm-seccion { display: flex; flex-direction: column; gap: 8px; }
+.cm .cm-titulo { display: flex; justify-content: space-between; align-items: baseline; margin: 4px 2px 0; font-size: 19px; font-weight: 750; color: var(--p-tinta); }
+.cm-enlace { min-height: 44px; padding: 0; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 700; color: var(--p-pino-texto); }
+.cm-tarjeta { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05); }
+.cm-ico { width: 44px; height: 44px; flex: none; border-radius: 12px; display: grid; place-items: center; background: var(--p-relleno); color: var(--p-texto-2); }
+.cm-texto { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.cm-texto b { font-size: 16px; line-height: 22px; font-weight: 700; color: var(--p-tinta); }
+.cm-texto span { font-size: 14px; line-height: 20px; color: var(--p-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cm-texto .cm-a-medias { color: var(--p-urgente-texto); }
+.cm-texto .cm-anulada { color: var(--p-error-texto); }
+.cm-llego { min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--p-relleno); font: inherit; font-size: 16px; font-weight: 700; color: var(--p-tinta); }
+.cm-compra { flex-direction: column; align-items: stretch; gap: 0; }
+.cm-compra.anulada { background: var(--p-fondo-2); }
+.cm-fila { display: flex; align-items: center; gap: 12px; }
+.cm-mini { width: 44px; height: 44px; flex: none; border-radius: 10px; background: var(--p-relleno); color: var(--p-texto-2); display: grid; place-items: center; overflow: hidden; }
+.cm-mini .ff-ver { width: 100%; height: 100%; padding: 0; border: 0; background: none; }
+.cm-mini .ff-ver img { width: 100%; height: 100%; object-fit: cover; }
+.cm-abrir { flex: 1; min-width: 0; min-height: 48px; display: flex; align-items: center; gap: 12px; padding: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; }
+.cm-importe { font-size: 18px; font-weight: 800; color: var(--p-tinta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cm-importe.tachado { text-decoration: line-through; color: var(--p-texto-2); }
+.cm-detalle { display: flex; flex-direction: column; gap: 6px; padding-top: 8px; }
+.cm-items { list-style: none; margin: 0; padding: 0; }
+.cm-items li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--p-borde-suave); font-size: 15px; color: var(--p-texto-2); }
+.cm-items b { color: var(--p-tinta); white-space: nowrap; }
+
+/* «Sacale foto a la factura», al pulgar, encima del menú de abajo. */
+.cm-foto { position: sticky; bottom: calc(65px + env(safe-area-inset-bottom)); z-index: 5; margin: 4px -16px 0; padding: 12px 16px; display: flex; gap: 12px; background: rgb(255 255 255 / .94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--p-borde); box-shadow: 0 -8px 24px -12px rgb(26 29 27 / .15); }
+.cm-foto-boton { flex: 1; min-height: 56px; display: flex; align-items: center; gap: 14px; padding: 0 20px; border: 0; border-radius: 14px; background: var(--p-naranja); color: #fff; font: inherit; text-align: left; box-shadow: 0 8px 20px -8px rgb(216 63 14 / .55); }
+.cm-foto-boton span { display: flex; flex-direction: column; }
+.cm-foto-boton b { font-size: 18px; line-height: 22px; font-weight: 700; }
+.cm-foto-boton small { font-size: 14px; line-height: 18px; color: rgb(255 255 255 / .9); }
+.cm-escanear { width: 56px; min-height: 56px; flex: none; display: grid; place-items: center; border: 1px solid var(--p-borde-fuerte); border-radius: 14px; background: var(--p-superficie); color: var(--p-tinta); }
