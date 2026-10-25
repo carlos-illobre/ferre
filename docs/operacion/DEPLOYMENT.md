@@ -42,10 +42,7 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
 - **Las claves de la base** (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`) se
   leen una sola vez: cuando `db` arranca con el volumen vacío y crea las bases y sus usuarios.
   Cambiar después una clave en el `.env` no cambia la del usuario, y el servicio deja de
-  conectarse. Para cambiarla: primero en la base y después en el `.env`, y se reinicia el
-  servicio:
-  `docker compose exec db psql -U postgres -c "ALTER ROLE mostrador PASSWORD 'clave-nueva'"`
-  (o `procesos`, o `postgres` para la del administrador).
+  conectarse. Para cambiar una clave, o reponerlas todas, ver «Si se pierde el `.env`».
 - Desde afuera del contenedor, la base pide clave siempre; adentro, por el socket, el
   administrador entra sin clave (lo usa el control de salud del contenedor).
 - Imágenes publicadas por CI en GHCR, etiquetadas por SHA corto
@@ -74,6 +71,32 @@ Con la versión que trae la base propia, cada dispositivo guarda lo suyo aparte 
 entrar), bajan el catálogo de nuevo y dejan de ver lo que tenían guardado antes, incluida una
 cola de ventas sin enviar: conviene que no quede ninguna pendiente antes de actualizar. El
 vínculo entre celular y computadora se hace de nuevo. Pasa una sola vez.
+
+## Si se pierde el `.env`, o hay que cambiar una clave de la base
+
+Los datos no se pierden: están en el volumen del ambiente, no dependen de las claves. Sin las
+claves, los servicios no pueden conectarse a la base hasta que se les pongan otras. Adentro
+del contenedor `db`, el administrador entra sin clave por el socket, así que las claves se
+reponen desde la máquina, en la carpeta del ambiente:
+
+1. Rehacer el `.env` desde su plantilla (`deployment/oracle-single/<ambiente>/.env.oracle`), con
+   claves nuevas en las tres `CLAVE_BASE_*` (`openssl rand -hex 24`). Para cambiar una sola,
+   alcanza con cambiarla en el `.env`.
+2. Ponerle a cada usuario de la base la clave que dice el `.env`:
+
+   ```bash
+   cd ~/ferre/<ambiente>
+   for par in mostrador:CLAVE_BASE_MOSTRADOR procesos:CLAVE_BASE_PROCESOS postgres:CLAVE_BASE_ADMIN; do
+     rol=${par%%:*}; clave=$(grep "^${par#*:}=" .env | cut -d= -f2-)
+     echo "ALTER ROLE $rol PASSWORD :'clave';" | docker compose exec -T db psql -U postgres -q -v clave="$clave"
+   done
+   ```
+
+3. Reiniciar los servicios para que tomen las claves: `docker compose up -d --force-recreate`.
+4. Comprobar que la salud diga `"db":"ok"`: `curl -s http://127.0.0.1:<PUERTO_API>/health`.
+
+Lo que sí pierde los datos es perder el disco de la máquina o borrar el volumen
+(`docker compose down -v`): hasta la etapa 2 no hay copias (ver «Respaldo y recuperación»).
 
 ## Primer usuario
 
