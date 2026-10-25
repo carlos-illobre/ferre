@@ -58,3 +58,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T047 [arreglo] La letra de los importes del celular («Archivo Narrow») no cargaba: su hoja la buscaba en una carpeta que no existe (desde el 2026-10-17)
 - [x] T048 [ajuste] Los logs de cada contenedor no pasan de 10 MB: dos archivos de 5 MB que rotan (decisión 161)
 - [x] T049 [ajuste] Un usuario de Linux por ambiente en la máquina, cada uno con su Docker: la instalación es por ambiente y la guía lo explica (decisión 161)
+- [x] T050 [ajuste] La guía de la máquina dice cómo pasar un ambiente de un usuario a otro sin que un aviso lo vuelva a levantar (decisión 161)

@@ -12,6 +12,14 @@ dos Docker distintos, con sus imágenes, volúmenes y redes. Sin root, sin sudo,
 
 Los pasos 1 a 3, 6, 7, 9 y 10 se hacen **una vez con cada usuario**, cada uno con su ambiente.
 
+**Pasar un ambiente que ya corre de un usuario a otro:** primero detener el servicio de
+despliegue del usuario viejo (`systemctl --user stop ferre-despliegue`). Si sigue escuchando,
+un aviso que llega en el medio vuelve a levantar el ambiente mientras se lo baja. Después
+bajarlo (`docker compose down -v` en la carpeta de ese ambiente, comprobando que terminó sin
+error antes de seguir), borrar su carpeta y volver a arrancar el servicio del usuario viejo si
+le queda otro ambiente. Recién entonces arrancar el del usuario nuevo: el puerto local lo
+puede usar uno solo.
+
 El reverse proxy de la máquina **no es parte de este proyecto**: lo administra la
 máquina para todas sus aplicaciones. Ferre solo cumple un contrato con él (ver "El
 reverse proxy").
