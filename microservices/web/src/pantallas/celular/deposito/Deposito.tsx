@@ -4,7 +4,7 @@ import { usePuede, type Permiso } from "../../permisos";
 import { SinPermiso } from "../../SinPermiso";
 import { irA } from "../../../rutas";
 import { Pestanas } from "../Pestanas";
-import { ComprasRecientes } from "../ComprasRecientes";
+import { ComprasRecientes } from "../compras/ComprasRecientes";
 import { Contar } from "./Contar";
 import { Ingreso } from "./Ingreso";
 import { Stock } from "./Stock";

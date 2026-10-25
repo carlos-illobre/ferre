@@ -10,7 +10,7 @@ import { usePuede } from "../permisos";
 import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
 import { CabezaDeNegocio } from "./Usuarios";
 import { DineroInvertido } from "../DineroInvertido";
-import { ComprasRecientes } from "./ComprasRecientes";
+import { ComprasRecientes } from "./compras/ComprasRecientes";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { Hoja, Pasos } from "./componentes/base";
 

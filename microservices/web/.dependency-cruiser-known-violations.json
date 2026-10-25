@@ -1443,20 +1443,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/ComprasRecientes.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/Sistema.tsx",
     "to": "src/negocio/sistema/ajustes.ts",
     "unresolvedTo": "../negocio/sistema/ajustes",

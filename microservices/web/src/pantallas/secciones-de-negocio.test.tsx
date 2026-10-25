@@ -14,7 +14,7 @@ import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
 import { ComoVaElNegocio } from "./celular/ComoVaElNegocio";
 import { ResumenCompras, ResumenInventario, ResumenVentas } from "./compu/base/pantallas/Resumen";
 import { DineroInvertido } from "./DineroInvertido";
-import { ComprasRecientes } from "./compu/ComprasRecientes";
+import { ComprasRecientes } from "./compu/compras/ComprasRecientes";
 
 const hoy = new Date().toISOString();
 const RESPUESTAS: Record<string, unknown> = {

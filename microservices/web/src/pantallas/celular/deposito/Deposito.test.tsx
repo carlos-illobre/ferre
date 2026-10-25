@@ -14,7 +14,7 @@ vi.mock("../../../datos/conexion", async (original) => ({ ...(await original<typ
 vi.mock("../../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../../datos/almacenamiento")>()), ...(({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a) })) }));
 
 import { Deposito } from "./Deposito";
-import { ComprasRecientes } from "../ComprasRecientes";
+import { ComprasRecientes } from "../compras/ComprasRecientes";
 
 const compras = [{ id: "c1", fecha: "2026-09-14", comprobante_tipo: "factura", comprobante_numero: "0001-00000777", total: "16000", estado: "confirmada", proveedor: "Proveedor uno", renglones: "2",
   items: [{ descripcion: "CINTA AISLADORA", cantidad: "10", costo_unitario: "1200" }, { descripcion: "PINCEL NUEVO", cantidad: "5", costo_unitario: "800" }] }];

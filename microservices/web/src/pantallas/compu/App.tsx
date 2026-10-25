@@ -41,7 +41,7 @@ import { DineroInvertido } from "../DineroInvertido";
 import { Ingreso } from "./deposito/Ingreso";
 import { Configuracion } from "./base/pantallas/Configuracion";
 import { PantallaDeProcesos } from "../Procesos";
-import { ComprasRecientes } from "./ComprasRecientes";
+import { ComprasRecientes } from "./compras/ComprasRecientes";
 import { Contar } from "./deposito/Contar";
 import { ResumenCompras, ResumenInventario, ResumenVentas } from "./base/pantallas/Resumen";
 import { Usuarios } from "./base/pantallas/Usuarios";

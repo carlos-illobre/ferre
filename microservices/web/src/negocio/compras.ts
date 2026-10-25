@@ -72,3 +72,9 @@ export type PantallaDeCompras = "escritorio" | "ingreso" | "pedidos";
 export function pantallaDeCompras(puede: (...permisos: ("negocio.gastos" | "deposito.compras" | "deposito.ingresos")[]) => boolean): PantallaDeCompras {
   return puede("negocio.gastos", "deposito.compras") ? "escritorio" : puede("deposito.ingresos") ? "ingreso" : "pedidos";
 }
+
+// Cómo viene un pedido por llegar: a medias (con cuántos faltan) o enviado (cuándo y cuántos renglones).
+export function comoVieneElPedido(p: Pedido, cuantos: (n: number, uno: string, varios: string) => string, dia: (iso: string) => string): { aMedias: boolean; texto: string } {
+  if (p.estado === "recibido_parcial") return { aMedias: true, texto: `Llegó a medias · ${faltanDe(p) === 1 ? "falta 1" : `faltan ${faltanDe(p)}`}` };
+  return { aMedias: false, texto: `Enviado${p.enviado_en ? ` el ${dia(p.enviado_en)}` : ""} · ${cuantos(p.items.length, "renglón", "renglones")}` };
+}
