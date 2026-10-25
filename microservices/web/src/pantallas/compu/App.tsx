@@ -22,10 +22,10 @@ const DISPOSICION: DisposicionParaFlechas = {
 };
 import { VincularParaEscanear } from "./Vender";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
-import { esAmbienteDePrueba, VERSION } from "../../plataforma/ambiente";
+import { VERSION } from "../../plataforma/ambiente";
 import { ProveedorDeSesion, useSesion } from "../../datos/sesion";
 import { ConRutas, irA, useRuta } from "./base/rutas";
-import { Boton, EstadoDeConexion, Icono, Marca, Pagina, type NombreDeIcono } from "./base/ui";
+import { EstadoDeConexion, Icono, Marca, type NombreDeIcono } from "./base/ui";
 import { Entrar } from "./base/pantallas/Entrar";
 import { Manual } from "./base/pantallas/Manual";
 import { VincularCelular } from "./base/pantallas/VincularCelular";
@@ -43,7 +43,6 @@ import { Contar } from "./base/pantallas/Contar";
 import { ResumenCompras, ResumenInventario, ResumenVentas } from "./base/pantallas/Resumen";
 import { Usuarios } from "./base/pantallas/Usuarios";
 import { Sistema } from "../Sistema";
-import { PESTANAS_DE_USUARIOS } from "../pestanas-de-usuarios";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../pestanas-de-negocio";
 import { Actividad } from "./base/pantallas/Actividad";
 import { Vender } from "./Vender";
@@ -82,8 +81,6 @@ export function App() {
 // Cada pantalla dice qué permiso pide (RF-72); sin `pide`, la ve cualquiera con sesión.
 type Pestana = { ruta: string; nombre: string; icono: NombreDeIcono; pide?: Permiso[] };
 type Parte = { clave: string; nombre: string; icono: NombreDeIcono; pestanas: Pestana[] };
-const DE_USUARIOS: Pestana[] = PESTANAS_DE_USUARIOS.map((p) => ({ ruta: p.valor, nombre: p.nombre, icono: p.icono, pide: p.pide }));
-const RUTAS_DE_USUARIOS = new Set(DE_USUARIOS.map((p) => p.ruta));
 // Cómo va el negocio también es una opción de Más con pestañas, una por sección (decisión 95).
 const RUTA_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "resumen", compras: "gastos", inventario: "invertido" };
 const DE_NEGOCIO: Pestana[] = SECCIONES_DE_NEGOCIO.map((s) => ({ ruta: RUTA_DE_SECCION[s.valor], nombre: s.nombre, icono: s.icono, pide: s.pide }));
@@ -192,7 +189,6 @@ function Pantallas() {
   const usuario = sesion.estado === "con-sesion" ? sesion.usuario : null;
   const menu = useMemo(() => MENU.map((m) => ({ ...m, pestanas: m.pestanas.filter((p) => puede(usuario, ...(p.pide ?? []))) })).filter((m) => m.pestanas.length > 0), [usuario]);
   // Las pestañas de Usuarios no llevan atajo (decisión 88): lo lleva solo la opción de Más, que abre la primera que se ve.
-  const deUsuarios = useMemo(() => DE_USUARIOS.filter((p) => puede(usuario, ...(p.pide ?? []))), [usuario]);
   const deNegocio = useMemo(() => DE_NEGOCIO.filter((p) => puede(usuario, ...(p.pide ?? []))), [usuario]);
   const deAnomalias = useMemo(() => DE_ANOMALIAS.filter((p) => puede(usuario, ...(p.pide ?? []))), [usuario]);
   // Lo que hay para revisar, para mostrar la cantidad en su pestaña (014).
@@ -417,7 +413,6 @@ function Pantallas() {
   const titulo = parte !== "mas" ? MENU.find((m) => m.clave === parte)!.nombre : RUTAS_DE_ANOMALIAS.has(actual) ? "Anomalías" : null;
   const pestanas = deLaParte && deLaParte.length > 1 ? deLaParte : null;
   const deMas = DE_MAS.filter((d) => puede(usuario, ...(d.pide ?? []))).map((d) => (d.ruta === "anomalias" ? { ...d, destino: deAnomalias[0]?.ruta ?? "anomalias" } : d));
-  const prueba = esAmbienteDePrueba();
 
   return (
     <div className={`app ${plegado ? "plegado" : ""}`}>

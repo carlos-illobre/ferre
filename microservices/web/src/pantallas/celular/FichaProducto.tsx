@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useVeCostos } from "../Costos";
 import { CodigoDeBarras } from "../CodigoDeBarras";
 import { usePuede } from "../permisos";

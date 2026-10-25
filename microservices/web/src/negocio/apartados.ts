@@ -146,7 +146,6 @@ export function vistaDelCambio(c: CambioApartado, unidadDe: (productoId?: string
     });
     const total = productos.reduce((s, p) => s + (p.importe ?? 0), 0);
     const medio = v.medio_pago ? NOMBRE_DE_MEDIO[v.medio_pago as keyof typeof NOMBRE_DE_MEDIO] ?? v.medio_pago : null;
-    const cuantos = items.length === 1 ? "1 producto" : `${items.length} productos`;
     return {
       tipo: "venta", nombre: "Venta", detalle: [`${diaCorto(c.hecho_en)} ${hora(c.hecho_en)}`, medio].filter(Boolean).join(" · "), importe: total, medio: v.medio_pago ?? null,
       titulo: "Cobrada sin conexión, sin registrar", hecho: "Cobrada", productos, boton: "Aceptar venta",

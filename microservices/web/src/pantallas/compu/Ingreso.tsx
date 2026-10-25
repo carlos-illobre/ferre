@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
-import { detalleDelRegistro, diferenciaConLaLista, incompleto, useIngreso, type Proveedor, type Renglon } from "../../negocio/deposito/ingreso";
+import { detalleDelRegistro, diferenciaConLaLista, incompleto, useIngreso, type Renglon } from "../../negocio/deposito/ingreso";
 import { AvisoDePedido, usePedidoAIngresar } from "../Pedidos";
 import { irA } from "./base/rutas";
-import { usePuede } from "../permisos";
 import { COMPROBANTES } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
 import { hoyLocal, pesos, porcentaje } from "../../formato";
-import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe, type Unidad } from "../../negocio/catalogo";
-import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
-import { Aviso, Boton, Contador, Exito, Explicado, Hoja, Icono, Pagina, Pastilla, Plegable, Progreso, Segmentos, Toast, Vacio, numero as cifra, pesosCortos } from "./base/ui";
-import { useEsCelular } from "./base/vista";
+import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../negocio/catalogo";
+import { Aviso, Boton, Contador, Exito, Explicado, Pagina, Pastilla, Segmentos, Toast, Vacio, pesosCortos } from "./base/ui";
 import { BuscadorDeProducto, detalleDe, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";
 import "./base/estilos/compras.css";
-import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
+import { FotoDeFactura } from "../FotoDeFactura";
 
 // Ingreso de mercadería: proveedor y comprobante, renglones con la búsqueda de siempre, y
 // registrar. Suma stock y, si el comprobante trae otro costo, ese pasa a ser el vigente.
@@ -22,7 +19,6 @@ const CLAVE_BORRADOR = "ferre.v2.ingreso";
 const costoATexto = (costo: number) => String(costo).replace(".", ",");
 
 export function Ingreso() {
-  const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   // Si se viene de un pedido (RF-55), el ingreso arranca con su proveedor y con lo que falta llegar.
   const { pedido, error: errorPedido } = usePedidoAIngresar();
@@ -30,12 +26,9 @@ export function Ingreso() {
     lado: "computadora", costoATexto, pedido, borrador: CLAVE_BORRADOR,
     textoSinConexion: "No se registró: se cortó la conexión y registrar un ingreso necesita internet. Lo cargado sigue acá; probá de nuevo cuando vuelva.",
   });
-  const { catalogo, errorCatalogo, proveedores, proveedor, proveedorId, setProveedorId, comprobante, setComprobante, foto, setFoto, fechaCompra, setFechaCompra, consulta, setConsulta, resultados, renglones, cambiar, cambiarCosto, cambiarFoto, total, incompletos, error, ocupado } = ingreso;
+  const { errorCatalogo, proveedores, proveedor, proveedorId, setProveedorId, comprobante, setComprobante, foto, setFoto, fechaCompra, setFechaCompra, consulta, setConsulta, resultados, renglones, cambiar, cambiarCosto, cambiarFoto, total, incompletos, error, ocupado } = ingreso;
   const [intento, setIntento] = useState(false);
   const [errorCodigo, setErrorCodigo] = useState<string | null>(null);
-  const [eligiendoProveedor, setEligiendoProveedor] = useState(false);
-  const [escaneando, setEscaneando] = useState(false);
-  const [ultimoEscaneado, setUltimoEscaneado] = useState<string | null>(null);
   const [descartado, setDescartado] = useState<Renglon[] | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [exito, setExito] = useState<{ total: number; proveedor: string; detalle: string } | null>(null);
@@ -61,9 +54,8 @@ export function Ingreso() {
     if (!clave) return;
     focoPedido.current = null;
     const fila = zona.current?.querySelector<HTMLElement>(`[data-clave="${clave}"]`);
-    if (esCelular) fila?.scrollIntoView({ block: "nearest" });
-    else fila?.querySelector<HTMLInputElement>("[data-testid='cantidad']")?.focus();
-  }, [renglones, esCelular]);
+    fila?.querySelector<HTMLInputElement>("[data-testid='cantidad']")?.focus();
+  }, [renglones]);
 
   // Enter termina el renglón: de la cantidad al costo si falta, y si no de vuelta al buscador.
   function teclasDeRenglon(e: KeyboardEvent<HTMLElement>, r: Renglon) {
@@ -77,16 +69,6 @@ export function Ingreso() {
     else caja.current?.focus();
   }
 
-  // Escanear agrega el renglón y deja la cámara lista para el siguiente.
-  const alDetectar = useCallback((codigo: string) => {
-    const noEsta = (texto: string) => { setEscaneando(false); setUltimoEscaneado(null); setErrorCodigo(texto); caja.current?.focus(); };
-    ingreso.agregarPorCodigo(codigo).then((agregado) => {
-      if (agregado) { setErrorCodigo(null); setDescartado(null); focoPedido.current = agregado.clave; setUltimoEscaneado(`Agregado: ${agregado.producto.descripcion}${agregado.cantidad > 1 ? ` (van ${agregado.cantidad})` : ""}. Escaneá el siguiente.`); }
-      else noEsta(`El código ${codigo} no está en el catálogo. Buscá el producto por su nombre; si no existe, lo agregás como producto nuevo.`);
-    }).catch((e: Error) => noEsta(e.message));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ingreso.agregarPorCodigo]);
-
   // Lo que falta para poder registrar. Se calcula de lo cargado: al corregirlo, desaparece.
   const faltaProveedor = intento && !proveedorId;
   const problema = !intento ? null
@@ -97,7 +79,7 @@ export function Ingreso() {
   async function registrar() {
     if (ocupado || !enLinea) return;
     setIntento(true);
-    if (ingreso.falta === "proveedor") { if (esCelular) setEligiendoProveedor(true); else selector.current?.focus(); return; }
+    if (ingreso.falta === "proveedor") { selector.current?.focus(); return; }
     if (ingreso.falta === "productos") return;
     if (ingreso.falta === "renglones") { zona.current?.querySelector<HTMLElement>("[aria-invalid='true'], .falta input")?.focus(); return; }
     const registro = await ingreso.registrar();
@@ -120,8 +102,8 @@ export function Ingreso() {
     return (
       <span className="compras-cantidad">
         {enteras(unidad)
-          ? <Contador valor={r.cantidad} entera sinBotones={!esCelular} alCambiar={(v) => cambiar(r.clave, { cantidad: Math.floor(v) })} etiqueta={`Cantidad de ${r.descripcion || "producto nuevo"}`} />
-          : <CantidadAGranel valor={r.cantidad} unidad={unidad} conBotones={esCelular} alCambiar={(v) => cambiar(r.clave, { cantidad: v })} etiqueta={`Cantidad de ${r.descripcion}, en ${unidad}`} />}
+          ? <Contador valor={r.cantidad} entera sinBotones alCambiar={(v) => cambiar(r.clave, { cantidad: Math.floor(v) })} etiqueta={`Cantidad de ${r.descripcion || "producto nuevo"}`} />
+          : <Contador valor={r.cantidad} entera={false} sinBotones siQuedaVacio={1} alCambiar={(v) => cambiar(r.clave, { cantidad: v })} etiqueta={`Cantidad de ${r.descripcion}, en ${unidad}`} />}
         <span className="detalle" data-testid="unidad-ingreso">{abreviarUnidad(unidad)}</span>
       </span>
     );
@@ -156,7 +138,7 @@ export function Ingreso() {
         <input className="entrada" value={r.descripcion} placeholder="Descripción del producto nuevo" aria-label="Descripción del producto nuevo" aria-invalid={!r.descripcion.trim()} onChange={(e) => cambiar(r.clave, { descripcion: e.target.value })} data-testid="descripcion-nueva" />
       </span>
     );
-  const botonQuitar = (r: Renglon) => <Boton tam={esCelular ? undefined : "chico"} icono="basura" variante="peligro" title="Quitar del ingreso" aria-label={`Quitar ${r.descripcion || "el producto nuevo"}`} onClick={() => quitar(r.clave)} data-testid="quitar" />;
+  const botonQuitar = (r: Renglon) => <Boton tam="chico" icono="basura" variante="peligro" title="Quitar del ingreso" aria-label={`Quitar ${r.descripcion || "el producto nuevo"}`} onClick={() => quitar(r.clave)} data-testid="quitar" />;
 
   return (
     <Pagina titulo="Compras" testId="pantalla-compras" className={renglones.length ? "deposito-con-pie" : ""} bajada="Acá se carga la mercadería que llega. Suma stock y, si el comprobante trae otro costo, ese pasa a ser el vigente.">
@@ -170,16 +152,10 @@ export function Ingreso() {
         <div className="compras-datos">
           <div className="campo compras-proveedor">
             <label htmlFor={`${id}-proveedor`}>Proveedor</label>
-            {esCelular ? (
-              <button type="button" id={`${id}-proveedor`} className={`selector compras-elegir ${proveedor ? "" : "sin-elegir"}`} onClick={() => setEligiendoProveedor(true)} aria-haspopup="dialog" aria-invalid={faltaProveedor || undefined} aria-describedby={faltaProveedor ? `${id}-falta-proveedor` : undefined} data-testid="proveedor">
-                <span className="corta">{proveedor ? proveedor.nombre : "Elegí el proveedor"}</span><Icono nombre="abajo" tam={18} />
-              </button>
-            ) : (
-              <select ref={selector} id={`${id}-proveedor`} className="selector" value={proveedorId} onChange={(e) => setProveedorId(e.target.value)} autoFocus={!proveedorId} aria-invalid={faltaProveedor || undefined} aria-describedby={faltaProveedor ? `${id}-falta-proveedor` : undefined} data-testid="proveedor">
-                <option value="">{proveedores === null ? "Trayendo los proveedores…" : "Elegí el proveedor"}</option>
-                {(proveedores ?? []).map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-              </select>
-            )}
+            <select ref={selector} id={`${id}-proveedor`} className="selector" value={proveedorId} onChange={(e) => setProveedorId(e.target.value)} autoFocus={!proveedorId} aria-invalid={faltaProveedor || undefined} aria-describedby={faltaProveedor ? `${id}-falta-proveedor` : undefined} data-testid="proveedor">
+              <option value="">{proveedores === null ? "Trayendo los proveedores…" : "Elegí el proveedor"}</option>
+              {(proveedores ?? []).map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+            </select>
             {faltaProveedor && <p className="compras-falta" id={`${id}-falta-proveedor`} role="alert">Elegí de qué proveedor llegó.</p>}
           </div>
           <div className="campo" data-testid="comprobante">
@@ -187,16 +163,15 @@ export function Ingreso() {
             <Segmentos opciones={COMPROBANTES} actual={comprobante} alElegir={setComprobante} etiqueta="Comprobante" />
           </div>
           {comprobante !== "sin_comprobante" && (
-            <div className="campo compras-foto"><span>{comprobante === "remito" ? "Foto del remito" : "Foto de la factura"}</span><FotoDeFactura foto={foto} alCambiar={setFoto} conCelular={!esCelular} nombre={comprobante === "remito" ? "remito" : "factura"} /></div>
+            <div className="campo compras-foto"><span>{comprobante === "remito" ? "Foto del remito" : "Foto de la factura"}</span><FotoDeFactura foto={foto} alCambiar={setFoto} conCelular nombre={comprobante === "remito" ? "remito" : "factura"} /></div>
           )}
           <label className="campo compras-fecha"><span>Fecha</span><input className="entrada" type="date" value={fechaCompra} max={hoyLocal()} onChange={(e) => setFechaCompra(e.target.value || hoyLocal())} data-testid="fecha" /></label>
         </div>
 
         <BuscadorDeProducto primero={proveedor?.id} consulta={consulta} alCambiar={(v) => { setConsulta(v); setErrorCodigo(null); }} resultados={resultados} alElegir={(p) => agregar(p)} alCrear={(d) => agregar(null, d)} cajaRef={caja}
-          placeholder={esCelular ? "Producto que llegó" : "Escribí el producto que llegó"} alEscanear={esCelular && hayCamara() ? () => { setUltimoEscaneado(null); setEscaneando(true); } : undefined}
+          placeholder="Escribí el producto que llegó"
           aLaDerecha={(p) => <span className="importe chico">{p.costo_neto === null ? "sin costo" : pesos(p.costo_neto)}</span>} />
         <Aviso tipo="error" testId="codigo-desconocido">{errorCodigo}</Aviso>
-        {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} ultimo={ultimoEscaneado} />}
 
         <Aviso tipo="info" accion={<Boton tam="chico" icono="deshacer" onClick={() => { if (descartado) ingreso.reponer(descartado); setDescartado(null); }} data-testid="deshacer-descarte">Deshacer</Boton>}>
           {descartado && renglones.length === 0 ? `Descartaste el ingreso (${plural(descartado.length, "renglón", "renglones")}).` : null}
@@ -207,22 +182,6 @@ export function Ingreso() {
             <Vacio icono="compras" titulo={proveedor ? "Buscá el primer producto que llegó" : "Elegí el proveedor y buscá el primer producto"}>
               El costo viene de la última lista del proveedor: en el caso común solo ponés la cantidad. Si el comprobante dice otro costo, escribilo y pasa a ser el vigente.
             </Vacio>
-          ) : esCelular ? (
-            <ul className="compras-tarjetas" data-testid="renglones">
-              {renglones.map((r) => (
-                <li key={r.clave} className={`tarjeta compras-tarjeta ${incompleto(r) ? "incompleto" : ""}`} data-clave={r.clave} data-testid="renglon" onKeyDown={(e) => teclasDeRenglon(e, r)}>
-                  <div className="compras-tarjeta-cabeza"><div className="crece">{nombreDe(r)}</div>{botonQuitar(r)}</div>
-                  <div className="compras-tarjeta-campos">
-                    <div className="campo"><span>Cantidad</span>{campoCantidad(r)}</div>
-                    <div className="campo"><span>Costo sin IVA</span>{campoCosto(r)}</div>
-                  </div>
-                  <div className="compras-tarjeta-pie">
-                    {r.costo === null ? <span className="falta-texto">Falta el costo</span> : segunLista(r)}
-                    <span className="importe chico">{r.costo === null ? "" : pesosCortos(r.costo * r.cantidad)}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
           ) : (
             <div className="tabla-marco">
               <table className="tabla compras-tabla" data-testid="renglones">
@@ -244,7 +203,6 @@ export function Ingreso() {
           )}
         </div>
         {renglones.length > 0 && <p className="detalle solo-compu">Enter en la cantidad vuelve al buscador. El costo viene de la última lista: si el comprobante dice otro, escribilo y pasa a ser el vigente.</p>}
-        {renglones.length > 0 && <div className="solo-celu"><Boton variante="peligro" icono="basura" onClick={descartar} data-testid="descartar-celular">Descartar el ingreso</Boton></div>}
       </section>
 
       {renglones.length > 0 && (
@@ -257,63 +215,14 @@ export function Ingreso() {
             {(problema ?? error) && <span className="compras-falta" role="alert" data-testid="error-ingreso">{problema ?? error}</span>}
           </div>
           <Boton className="solo-compu" onClick={descartar} disabled={ocupado} data-testid="descartar">Descartar</Boton>
-          <Boton variante="principal" tam="grande" onClick={() => void registrar()} disabled={ocupado || !enLinea} data-testid={esCelular ? "registrar" : "confirmar"}>
+          <Boton variante="principal" tam="grande" onClick={() => void registrar()} disabled={ocupado || !enLinea} data-testid="confirmar">
             {ocupado ? "Registrando…" : "Registrar ingreso"}
           </Boton>
         </div>
       )}
 
-      {eligiendoProveedor && (
-        <ElegirProveedor proveedores={proveedores} elegido={proveedorId} alElegir={(idElegido) => { setProveedorId(idElegido); setEligiendoProveedor(false); }} alCerrar={() => setEligiendoProveedor(false)} />
-      )}
       {exito && <Exito que="Ingreso registrado" importe={pesosCortos(exito.total)} medio={exito.proveedor} detalle={exito.detalle} boton="Listo" alCerrar={() => { setExito(null); caja.current?.focus(); }} />}
     </Pagina>
   );
 }
 
-// Cantidad a granel (kilo, metro, litro): hasta un decimal, con coma. Guarda lo tipeado
-// para que la coma no desaparezca mientras se escribe «2,5».
-function CantidadAGranel({ valor, unidad, alCambiar, conBotones, etiqueta }: { valor: number; unidad: Unidad; alCambiar: (v: number) => void; conBotones: boolean; etiqueta: string }) {
-  const escrito = (v: number) => (v === 0 ? "" : String(v).replace(".", ","));
-  const [texto, setTexto] = useState(escrito(valor));
-  useEffect(() => { setTexto((t) => (cantidadValida(t, unidad) === valor ? t : escrito(valor))); }, [valor, unidad]);
-  const redondo = (v: number) => Math.round(v * 10) / 10;
-  return (
-    <div className="contador">
-      {conBotones && <button type="button" aria-label="Medio menos" onClick={() => alCambiar(Math.max(0.1, redondo(valor - 0.5)))}><Icono nombre="menos" tam={18} grosor={2.4} /></button>}
-      <input inputMode="decimal" aria-label={etiqueta} value={texto} onFocus={(e) => e.target.select()}
-        onChange={(e) => { const t = e.target.value.replace(/[^\d,.]/g, ""); setTexto(t); alCambiar(cantidadValida(t, unidad)); }}
-        onKeyDown={(e) => {
-          if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
-          e.preventDefault(); e.stopPropagation();
-          alCambiar(e.key === "ArrowUp" ? redondo(valor + 0.5) : Math.max(0.1, redondo(valor - 0.5)));
-        }}
-        onBlur={() => { if (valor === 0) alCambiar(1); else setTexto(escrito(valor)); }} data-testid="cantidad" />
-      {conBotones && <button type="button" aria-label="Medio más" onClick={() => alCambiar(redondo(valor + 0.5))}><Icono nombre="mas" tam={18} grosor={2.4} /></button>}
-    </div>
-  );
-}
-
-function ElegirProveedor({ proveedores, elegido, alElegir, alCerrar }: { proveedores: Proveedor[] | null; elegido: string; alElegir: (id: string) => void; alCerrar: () => void }) {
-  const [filtro, setFiltro] = useState("");
-  const visibles = (proveedores ?? []).filter((p) => p.nombre.toLocaleLowerCase("es").includes(filtro.trim().toLocaleLowerCase("es")));
-  return (
-    <Hoja titulo="¿De qué proveedor llegó?" alCerrar={alCerrar} testId="hoja-proveedores">
-      {(proveedores?.length ?? 0) > 8 && <input className="entrada" type="search" value={filtro} onChange={(e) => setFiltro(e.target.value)} placeholder="Escribí parte del nombre" aria-label="Buscar proveedor" />}
-      {proveedores === null && <Progreso texto="Trayendo los proveedores…" />}
-      {proveedores?.length === 0 && <Aviso tipo="alerta">No se pudieron traer los proveedores. Revisá la conexión, cerrá esta ventana y volvé a abrirla.</Aviso>}
-      {visibles.length > 0 && (
-        <ul className="lista">
-          {visibles.map((p) => (
-            <li key={p.id}>
-              <button type="button" className={`renglon ${p.id === elegido ? "elegido" : ""}`} aria-pressed={p.id === elegido} onClick={() => alElegir(p.id)} data-testid="opcion-proveedor">
-                <span className="nombre">{p.nombre}</span>{p.id === elegido && <Icono nombre="tilde" />}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-      {proveedores && proveedores.length > 0 && visibles.length === 0 && <p className="detalle">Ningún proveedor con «{filtro.trim()}».</p>}
-    </Hoja>
-  );
-}

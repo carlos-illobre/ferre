@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ConectandoConGoogle } from "../ConectandoConGoogle";
-import { useSesion, type Usuario } from "../../../datos/sesion";
+import { useSesion } from "../../../datos/sesion";
 import { entrarConHuella, hayHuella } from "../../../datos/credenciales";
 import { marcarEntradaConGoogle } from "../componentes/OfrecerHuella";
 import { AvisoError, Icono } from "../componentes/base";

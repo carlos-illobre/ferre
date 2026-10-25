@@ -1,10 +1,8 @@
 import type { KeyboardEvent } from "react";
-import { PIDE_USUARIOS } from "../pestanas-de-usuarios";
 import { Icono, Pagina, type NombreDeIcono } from "./base/ui";
 import type { Permiso } from "../permisos";
 import { irA } from "./base/rutas";
-import { NOMBRES, TEXTOS } from "../textos";
-import { PIDE_EL_NEGOCIO } from "../pestanas-de-negocio";
+import { TEXTOS } from "../textos";
 import { PIDE_LAS_ANOMALIAS } from "../pestanas-de-anomalias";
 
 // «Más» guarda las pantallas que se usan poco, para que el menú tenga solo lo de todos los días.

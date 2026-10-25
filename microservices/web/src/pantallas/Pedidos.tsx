@@ -143,7 +143,7 @@ function Hoja({ titulo, alCerrar, testId, children }: { titulo: string; alCerrar
 
 // Armar el pedido: buscar, agregar, cambiar cantidades, quitar. Se guarda solo como borrador.
 function ArmarPedido({ inicial, proveedor, celular, alVolver }: { inicial: Borrador; proveedor: Proveedor; celular: boolean; alVolver: (mensaje?: string) => void }) {
-  const { catalogo, buscarProductos } = useCatalogo();
+  const { buscarProductos } = useCatalogo();
   const [renglones, setRenglones] = useState<Renglon[]>(inicial.renglones);
   const [consulta, setConsulta] = useState("");
   const [guardado, setGuardado] = useState<"si" | "guardando" | "no">("si");

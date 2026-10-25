@@ -15,7 +15,6 @@ import "./hoy.css";
 import { pesosCortos } from "../../../formato";
 import { urlDeFoto } from "../../../datos/conexion";
 import { conUnidad } from "../../../negocio/catalogo";
-const numero = (n: number) => n.toLocaleString("es-AR");
 import { MEDIOS, NOMBRE_DE_MEDIO } from "../../../negocio/ventas/venta";
 import { buscarVentas, confirmadas, fueSinConexion, hoyLocal, useVentasDelDia, MOTIVOS_DE_ANULACION, motivoDeAnulacion, plano, SIN_MOTIVO, useAnularVenta, type VentaDelDia } from "../../../negocio/ventas/ventas-del-dia";
 

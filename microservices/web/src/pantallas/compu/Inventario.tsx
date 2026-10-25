@@ -12,8 +12,7 @@ import { cantidadContada, nombreDeMovimiento, productosConStock, useCorregirStoc
 import { fecha, pesos } from "../../formato";
 import { enteras, unidadDe } from "../../negocio/catalogo";
 import { irA } from "./base/rutas";
-import { Aviso, Boton, Buscador, Explicado, Hoja, Pagina, Progreso, Toast, Vacio, numero } from "./base/ui";
-import { useEsCelular } from "./base/vista";
+import { Aviso, Boton, Buscador, Explicado, Pagina, Progreso, Toast, Vacio, numero } from "./base/ui";
 import { AlLadoDeLasPestanas } from "../AlLadoDeLasPestanas";
 
 import { conSigno, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";
@@ -38,7 +37,6 @@ export function Inventario() {
   const corrige = puedeEsto("deposito.stock");
   const veInvertido = puedeEsto("negocio.invertido");
   const pidePedidos = puedeEsto("deposito.pedidos");
-  const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { catalogo, buscandoEnElServidor, error: errorCatalogo, buscarProductos, actualizarProducto } = useCatalogo();
   const { datos, porId, delDispositivo, error: fallo, recargar: cargar } = useStock();
@@ -49,7 +47,6 @@ export function Inventario() {
   const [orden, setOrden] = useState<{ columna: Columna; sube: boolean } | null>(null);
   const [elegidoId, setElegidoId] = useState<string | null>(null);
   // En la ventana angosta, la cuenta del producto que se abrió encima.
-  const [abiertoId, setAbiertoId] = useState<string | null>(null);
   // Correcciones guardadas sin conexión: se ven en la fila hasta que el servidor las confirma.
   const [porEnviar, setPorEnviar] = useState<Map<string, number>>(new Map());
   const caja = useRef<HTMLInputElement>(null);
@@ -62,7 +59,7 @@ export function Inventario() {
   // Lo que lee el celular vinculado queda escrito en la búsqueda (decisión 59).
   const [emparejado, setEmparejado] = useState(() => puestoLocal()?.id ?? null);
   useEffect(() => { const mirar = () => setEmparejado(puestoLocal()?.id ?? null); window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar); return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); }, []);
-  useEffect(() => { if (!emparejado || esCelular) return; return escucharPuesto(emparejado, (codigo) => setConsulta(codigo)); }, [emparejado, esCelular]);
+  useEffect(() => { if (!emparejado) return; return escucharPuesto(emparejado, (codigo) => setConsulta(codigo)); }, [emparejado]);
   const [lectorPedido, setLectorPedido] = useState<boolean | null>(null);
   useEffect(() => { if (lectorPedido === null) return; const x = setTimeout(() => setLectorPedido(null), 20000); return () => clearTimeout(x); }, [lectorPedido]);
 
@@ -95,14 +92,13 @@ export function Inventario() {
   useEffect(() => { document.querySelector(".sv-filas [aria-selected='true']")?.scrollIntoView?.({ block: "nearest" }); }, [marcada]);
 
   function corregido(p: Producto, habia: number, hay: number, encolado: boolean) {
-    setAbiertoId(null);
     const dif = hay - habia;
     if (encolado) { setPorEnviar((m) => new Map(m).set(p.id, hay)); setMensaje(`${p.descripcion}: quedó en ${conUnidad(hay, p.unidad)}. Guardado en este dispositivo, se manda al volver internet.`); return; }
     setMensaje(dif === 0 ? `${p.descripcion}: sin diferencia, el stock ya decía ${conUnidad(hay, p.unidad)}.` : `${p.descripcion}: había ${conUnidad(habia, p.unidad)}, hay ${conUnidad(hay, p.unidad)} (${conSigno(dif)} ${nombreUnidad(p.unidad)}).`);
   }
 
   const teclas = useCallback((e: globalThis.KeyboardEvent) => {
-    if (abiertoId || document.querySelector("dialog[open]")) return;
+    if (document.querySelector("dialog[open]")) return;
     const destino = e.target as HTMLElement;
     const enPanel = Boolean(panel.current?.contains(destino));
     const escribiendo = destino.tagName === "INPUT" || destino.tagName === "TEXTAREA";
@@ -117,12 +113,11 @@ export function Inventario() {
       if (marcada === 0) { if (!escribiendo) document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']")?.focus(); }
       else setElegidoId(filas[marcada - 1]!.id);
     }
-    else if (e.key === "Enter" && destino === caja.current && elegido) { e.preventDefault(); if (esCelular) setAbiertoId(elegido.id); else panel.current?.querySelector<HTMLInputElement>("[data-testid='cantidad-real']")?.focus(); }
+    else if (e.key === "Enter" && destino === caja.current && elegido) { e.preventDefault(); panel.current?.querySelector<HTMLInputElement>("[data-testid='cantidad-real']")?.focus(); }
     else if (e.key === "Escape" && destino === caja.current && consulta) { e.preventDefault(); setConsulta(""); }
-  }, [abiertoId, filas, marcada, elegido, corrige, consulta, esCelular]);
+  }, [filas, marcada, elegido, corrige, consulta]);
   useTeclasGlobales(teclas, caja.current);
 
-  const productoAbierto = abiertoId ? (catalogo?.find((p) => p.id === abiertoId) ?? null) : null;
   const sinNada = datos !== null && datos.productos.length === 0 && !consulta.trim();
   const esperando = datos === null && !error && !errorCatalogo;
   const ordenar = (columna: Columna) => setOrden((o) => (o?.columna === columna ? (o.sube === (columna === "producto") ? { columna, sube: !o.sube } : null) : { columna, sube: columna === "producto" }));
@@ -189,10 +184,10 @@ export function Inventario() {
       {datos && !sinNada && (
         <div className="sv-cuerpo">
           <div className="sv-izq">
-            <Buscador valor={consulta} alCambiar={setConsulta} placeholder={esCelular ? t.buscar.corto : t.buscar.largo} etiqueta="Buscar un producto" cajaRef={caja} autoFoco={!esCelular}
+            <Buscador valor={consulta} alCambiar={setConsulta} placeholder={t.buscar.largo} etiqueta="Buscar un producto" cajaRef={caja} autoFoco
               extra={<>
                 {!consulta && <kbd className="tecla sv-barra">/</kbd>}
-                {!esCelular && emparejado && <Boton variante="marino" className="sv-celular" onClick={() => void pedirLector().then(setLectorPedido)} data-testid="pedir-lector"><Icono nombre="scan-barcode" />{t.conElCelular.largo}</Boton>}
+                {emparejado && <Boton variante="marino" className="sv-celular" onClick={() => void pedirLector().then(setLectorPedido)} data-testid="pedir-lector"><Icono nombre="scan-barcode" />{t.conElCelular.largo}</Boton>}
               </>} />
             {lectorPedido !== null && <Aviso tipo={lectorPedido ? "info" : "alerta"}>{lectorPedido ? "Abrí Ferrebress en el celular y tocá «Abrir el lector»." : "No se pudo avisar al celular."}</Aviso>}
             <div className="sv-chips" role="group" aria-label="Qué productos mostrar">
@@ -218,7 +213,7 @@ export function Inventario() {
                     const n = cantidadDe(p.id);
                     return (
                       <li key={p.id} className={`sv-fila ${p.id === elegido?.id ? "foco" : ""}`} aria-selected={p.id === elegido?.id} data-testid="fila-stock"
-                        onClick={() => { setElegidoId(p.id); if (esCelular) setAbiertoId(p.id); }}>
+                        onClick={() => setElegidoId(p.id)}>
                         <FotoDeProducto producto={p} alCambiar={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} />
                         <span className="sv-texto">
                           <span className="sv-nombre">{p.descripcion}</span>
@@ -227,7 +222,7 @@ export function Inventario() {
                             {porEnviar.has(p.id) && <span className="sv-pastilla urgente">Se manda al volver internet</span>}
                           </span>
                         </span>
-                        <button type="button" className={`sv-dato ${estadoDe(n)}`} onClick={(e) => { e.stopPropagation(); setElegidoId(p.id); if (esCelular) setAbiertoId(p.id); }}
+                        <button type="button" className={`sv-dato ${estadoDe(n)}`} onClick={(e) => { e.stopPropagation(); setElegidoId(p.id); }}
                           aria-label={`${conUnidad(n, p.unidad)}. Ver los movimientos de ${p.descripcion}`} data-testid="stock">
                           <span className="sv-et">Stock</span><span className="sv-va">{conUnidad(n, p.unidad).replace("-", "−")}</span>
                         </button>
@@ -240,19 +235,13 @@ export function Inventario() {
             )}
           </div>
 
-          {!esCelular && (elegido
+          {elegido
             ? <CuentaDelProducto key={elegido.id} panelRef={panel} producto={catalogo.find((p) => p.id === elegido.id) ?? elegido} fila={porId.get(elegido.id) ?? null} cantidad={cantidadDe(elegido.id)} porEnviar={porEnviar.has(elegido.id)}
               alCorregir={(habia, hay, encolado) => corregido(elegido, habia, hay, encolado)} alTerminar={() => caja.current?.focus()} />
-            : <aside className="sv-panel sv-sin-elegido detalle">Elegí un producto para ver su stock, sus movimientos y corregirlo.</aside>)}
+            : <aside className="sv-panel sv-sin-elegido detalle">Elegí un producto para ver su stock, sus movimientos y corregirlo.</aside>}
         </div>
       )}
 
-      {abiertoId && productoAbierto && (
-        <Hoja ancha titulo={productoAbierto.descripcion} alCerrar={() => setAbiertoId(null)} testId="detalle-stock">
-          <CuentaDelProducto producto={productoAbierto} fila={porId.get(productoAbierto.id) ?? null} cantidad={cantidadDe(productoAbierto.id)} porEnviar={porEnviar.has(productoAbierto.id)} enHoja
-            alCorregir={(habia, hay, encolado) => corregido(productoAbierto, habia, hay, encolado)} alTerminar={() => setAbiertoId(null)} />
-        </Hoja>
-      )}
     </Pagina>
   );
 }
@@ -265,8 +254,8 @@ const ICONO_DEL_MOVIMIENTO: Record<string, { icono: NombreDeIcono; clase: string
 
 // La cuenta de un producto: su stock grande, los movimientos que lo explican con lo que queda
 // después de cada uno, y la corrección a mano. Fija a la derecha de la lista, o en una hoja.
-function CuentaDelProducto({ producto: p, fila, cantidad, porEnviar, enHoja, panelRef, alCorregir, alTerminar }: {
-  producto: Producto; fila: StockFila | null; cantidad: number; porEnviar: boolean; enHoja?: boolean; panelRef?: React.RefObject<HTMLElement>;
+function CuentaDelProducto({ producto: p, fila, cantidad, porEnviar, panelRef, alCorregir, alTerminar }: {
+  producto: Producto; fila: StockFila | null; cantidad: number; porEnviar: boolean; panelRef?: React.RefObject<HTMLElement>;
   alCorregir: (habia: number, hay: number, encolado: boolean) => void; alTerminar: () => void;
 }) {
   const puede = usePuede();
@@ -317,16 +306,13 @@ function CuentaDelProducto({ producto: p, fila, cantidad, porEnviar, enHoja, pan
   const visibles = todos ? conSaldo : conSaldo.slice(0, 3);
   const valor = Number(fila?.valor ?? 0);
 
-  const Contenedor = enHoja ? "div" : "aside";
   return (
-    <Contenedor ref={panelRef as React.RefObject<HTMLDivElement>} className={`sv-panel ${enHoja ? "en-hoja" : ""}`} data-testid={enHoja ? undefined : "detalle-stock"} aria-label={`Stock de ${p.descripcion}`}>
-      {!enHoja && (
-        <div className="sv-p-cab">
-          <FotoDeProducto producto={p} alCambiar={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} />
-          <div className="sv-p-titulo"><h2>{p.descripcion}</h2><span className="detalle">{[p.marca, fila?.proveedor ?? p.proveedor].filter(Boolean).join(" · ") || "Sin marca ni proveedor"}</span></div>
-          <Boton tam="chico" className="sv-icono" disabled title={TEXTOS.stock.todaviaNo.largo} aria-label="Imprimir su etiqueta"><Icono nombre="printer" tam={16} /></Boton>
-        </div>
-      )}
+    <aside ref={panelRef} className="sv-panel" data-testid="detalle-stock" aria-label={`Stock de ${p.descripcion}`}>
+      <div className="sv-p-cab">
+        <FotoDeProducto producto={p} alCambiar={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} />
+        <div className="sv-p-titulo"><h2>{p.descripcion}</h2><span className="detalle">{[p.marca, fila?.proveedor ?? p.proveedor].filter(Boolean).join(" · ") || "Sin marca ni proveedor"}</span></div>
+        <Boton tam="chico" className="sv-icono" disabled title={TEXTOS.stock.todaviaNo.largo} aria-label="Imprimir su etiqueta"><Icono nombre="printer" tam={16} /></Boton>
+      </div>
       <div className="sv-saldo">
         <div className={`sv-total ${cantidad < 0 ? "negativo" : ""}`} data-testid="stock-del-producto">{cantidad < 0 ? "−" : ""}{numero(Math.abs(cantidad))}<small>{rotulo}</small></div>
         <div className="sv-cuenta-saldo">
@@ -381,7 +367,7 @@ function CuentaDelProducto({ producto: p, fila, cantidad, porEnviar, enHoja, pan
           </div>
         </form>
       )}
-    </Contenedor>
+    </aside>
   );
 }
 

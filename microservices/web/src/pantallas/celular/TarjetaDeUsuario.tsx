@@ -7,14 +7,6 @@ import { Iniciales, iconoDeRol as iconoV2 } from "../iconos-de-negocio";
 import "./usuarios.css";
 import { Icono } from "../../ui/iconos";
 
-// Los íconos de cada rol (007-T032); un rol que armó el negocio lleva el escudo de los roles.
-const TRAZOS_DE_ROL: Record<string, string> = {
-  Administrador: "M3 8l4 4 5-7 5 7 4-4-2 11H5z",
-  Comprador: "M4 5h2l2.2 10.2a1 1 0 0 0 1 .8h8.3a1 1 0 0 0 1-.76L20 8H7M10 20.5h.01M17.5 20.5h.01",
-  Gerente: "M4 20V10M10 20V4M16 20v-7M22 20H2",
-  Recepción: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
-  Vendedor: "M3 12V4h8l10 10-8 8L3 12zM7.5 7.5h.01",
-};
 const TRAZO_DE_OTRO_ROL = "M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z";
 const trazo = (props: { d: string; tam?: number; grosor?: number }) => (
   <svg width={props.tam ?? 16} height={props.tam ?? 16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={props.grosor ?? 2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={props.d} /></svg>

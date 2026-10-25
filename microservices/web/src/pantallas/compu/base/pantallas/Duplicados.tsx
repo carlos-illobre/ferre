@@ -7,7 +7,6 @@ import { TEXTOS } from "../../../textos";
 import { useCatalogo } from "../../../../negocio/catalogo";
 import { fecha, pesos } from "../../../../formato";
 import { Aviso, Boton, Buscador, Hoja, Icono, Pagina, Progreso, Vacio, numero } from "../ui";
-import { useEsCelular } from "../vista";
 import "../estilos/duplicados.css";
 
 // Un mismo artículo en varios proveedores (RF-06): quien administra ve las sugerencias lado
@@ -34,7 +33,6 @@ function useEnLinea(): boolean {
 }
 
 export function Duplicados() {
-  const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { sugerencias, uniones: unidos, error: fallo, recargar } = useDuplicados();
   const uniones = unidos ?? [];
@@ -137,7 +135,7 @@ export function Duplicados() {
   const tope = Math.max(1, ...barras);
 
   return (
-    <Pagina titulo="Duplicados" testId="duplicados" className={esCelular ? "" : "duplicados-v2"}
+    <Pagina titulo="Duplicados" testId="duplicados" className="duplicados-v2"
       acciones={<AlLadoDeLasPestanas>
         <div className="fila dv-arriba">
           <Boton icono="buscar" disabled={quieto} onClick={() => void buscar()} data-atajo="b" data-testid="buscar-duplicados">{t.buscarEnTodo.largo}<kbd className="tecla solo-compu" aria-hidden="true">Alt B</kbd></Boton>

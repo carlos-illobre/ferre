@@ -25,7 +25,6 @@ const CONSULTAS_A_LA_VISTA = 3;
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
 const RUTA_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "resumen", compras: "gastos", inventario: "invertido" };
 const ICONO_DE_SECCION: Record<SeccionDeNegocio, NombreDeIcono> = { ventas: "chart-column", compras: "truck", inventario: "boxes" };
-const HORAS = ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
 const horaCorta = (d: Date) => d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 
 // Cómo va el negocio como la v2 (decisión 148): las secciones como segmentos con ícono, el

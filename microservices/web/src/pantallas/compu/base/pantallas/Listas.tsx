@@ -8,7 +8,6 @@ import { altaDeProveedor, faltaEnProveedor } from "../../../../negocio/proveedor
 import { fecha, pesos, porcentaje } from "../../../../formato";
 import { irA } from "../rutas";
 import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Progreso, Toast, Vacio, numero } from "../ui";
-import { useEsCelular } from "../vista";
 import "../estilos/listas.css";
 
 type Resultado = { titulo: string; detalle: string };
@@ -46,7 +45,6 @@ function useEnLinea(): boolean {
 // Teclado: Alt S elige el archivo, 1 a 9 abren la pendiente de ese número, ↑ ↓ recorren la tabla,
 // Espacio pliega la explicación, Alt D descarta, Ctrl Enter aplica y «/» busca un proveedor.
 export function Listas() {
-  const esCelular = useEsCelular();
   const enLinea = useEnLinea();
   const { proveedores, historial, error: fallo, recargar } = useListas();
   const error = fallo && mensajeDe(fallo);
@@ -88,7 +86,7 @@ export function Listas() {
   useTeclasGlobales(teclas);
 
   return (
-    <Pagina titulo="Listas de precios" testId="listas" className={esCelular ? "" : "listas-v2"}
+    <Pagina titulo="Listas de precios" testId="listas" className="listas-v2"
       acciones={<AlLadoDeLasPestanas>
         <div className="fila lv-arriba">
           {activos.length > 0 && <Boton icono="edificio" onClick={() => setAltaAbierta(true)} data-testid="agregar-proveedor">{t.agregarProveedor.largo}</Boton>}

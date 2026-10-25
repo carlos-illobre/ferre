@@ -2,9 +2,8 @@ import { IconoDeMedio } from "../IconoDeMedio";
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { SiVeCostos, useVeCostos } from "../Costos";
 import { usePuede } from "../permisos";
-import { MEDIOS, TEXTOS, type Medio } from "../textos";
+import { MEDIOS, TEXTOS } from "../textos";
 import { createPortal } from "react-dom";
-import { contarAlEspejo, useEspejar } from "../../espejo";
 import { ventaActual } from "../../negocio/ventas/venta-en-curso";
 import { entra, sacudir, sale, useDeslizar, useRueda } from "../../plataforma/animacion/animacion";
 import { precioDe as precioSugerido, useSugeridos } from "../sugeridos";
@@ -13,24 +12,19 @@ import { NOMBRE_DE_MEDIO, cuentaDelRenglon, precioDe, subtotalDe, useVenta, type
 import { esMargenBoton } from "../../negocio/precios/vista-previa";
 import { precioDelProducto } from "../../negocio/catalogo/precio";
 import { useCodigoParaVincular } from "../../negocio/vinculo";
-import { abreviarUnidad, cantidadValida, conUnidad, enteras, unidadDe, type Unidad } from "../../negocio/catalogo";
-import { api, ErrorApi, subirFoto, urlDeFoto } from "../../datos/conexion";
-import { guardar, borrarAnterioresA } from "../../datos/almacenamiento";
-import { enviarOEncolar, enviarPendientes } from "../../datos/almacenamiento";
+import { abreviarUnidad, conUnidad, enteras, type Unidad } from "../../negocio/catalogo";
+import { urlDeFoto } from "../../datos/conexion";
 import { busquedaAlDia, esperarBusqueda, useCatalogo, type Cliente } from "../../negocio/catalogo";
 import { useTeclasGlobales } from "../../plataforma/teclado/teclas";
 import { nombreDeProducto, pesos } from "../../formato";
-import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
-import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, puestoLocal, puestoRemoto, soltarEmparejamiento } from "../../puesto";
-import { enviarCodigoAlPuesto, escucharPuesto, pedirLector } from "../../codigos-del-celular";
+import { EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../puesto";
+import { escucharPuesto, pedirLector } from "../../codigos-del-celular";
 import type { Producto } from "../celular/pantallas/Productos";
 import { describirDispositivo } from "./base/dispositivo";
-import { useEsCelular } from "./base/vista";
 import { irA } from "./base/rutas";
-import { Aviso, Boton, Buscador, Contador, Exito, Explicado, FotoProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Progreso, Toast, Vacio, hora, numero, pesosCortos } from "./base/ui";
+import { Aviso, Boton, Buscador, Contador, FotoProducto, Hoja, Icono, Margenes, Pagina, Pastilla, Vacio, hora, numero, pesosCortos } from "./base/ui";
 import "./base/estilos/vender.css";
 import "./base/estilos/vender-mostrador.css";
-import { AlLadoDeLasPestanas } from "../AlLadoDeLasPestanas";
 import { SelectorDeUnidad } from "../comun/SelectorDeUnidad";
 
 // La venta, en el orden del mostrador: buscar → costo, margen y precio → cantidad → cobro.
@@ -38,18 +32,14 @@ import { SelectorDeUnidad } from "../comun/SelectorDeUnidad";
 // Enter agrega, F5 a F8 eligen cómo paga, F2 (o Enter con la búsqueda vacía) cobra.
 const precioDeLista = (p: Producto) => precioDelProducto(p).valor;
 const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
-const pasosDeCosto = (p: Producto, costo: number) => (p.explicacion_costo?.length ? p.explicacion_costo : [`Costo ${pesos(costo)} según la lista del proveedor`]);
 const iniciales = (nombre: string) => nombre.split(/\s+/).filter((x) => /^[A-ZÁÉÍÓÚÑ]/i.test(x)).slice(0, 2).map((x) => x[0]!.toUpperCase()).join("");
 const soloDigitos = (v: string) => (v === "" ? null : Number(v.replace(/[^\d]/g, "")) || null);
 
 export function Vender() {
   const puedeEsto = usePuede();
-  const { catalogo, buscandoEnElServidor, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos, actualizarProducto, ajustarStockLocal } = useCatalogo();
-  const esCelular = useEsCelular();
+  const { catalogo, buscandoEnElServidor, stock: stockPorId, clientes, error: errorCatalogo, buscarProductos } = useCatalogo();
   const [consulta, setConsulta] = useState("");
   const [elegido, setElegido] = useState(0);
-  const [escaneando, setEscaneando] = useState(false);
-  const [ultimoEscaneo, setUltimoEscaneo] = useState<string | null>(null);
   const [puestoVinculado, setPuestoVinculado] = useState(false);
   const llegados = useLlegadosDelCelular();
   // Lo que se suma entra con un rebote y el borde verde: un renglón nuevo o uno al que le subió la cantidad.
@@ -72,16 +62,10 @@ export function Vender() {
     alCambiar: useCallback((motivo: MotivoDeCambio) => { if (motivo === "agregar") setConsulta(""); caja.current?.focus(); }, []),
     alFaltarCliente: () => setEligiendoCliente(true),
   });
-  const { items, medio, setMedio, clienteId, setClienteId, cliente, total, sinPrecio, mensaje, setMensaje, error, ocupado, codigoDesconocido, setCodigoDesconocido, cobro, agregar, cambiarItem, cambiarUnidad, quitar, elegirMargen, subirFotoDe, elegirSugerencia, elegirMedio, cobrar } = venta;
+  const { items, medio, clienteId, setClienteId, cliente, total, sinPrecio, mensaje, setMensaje, error, ocupado, codigoDesconocido, setCodigoDesconocido, cobro, agregar, cambiarItem, cambiarUnidad, quitar, elegirMargen, subirFotoDe, elegirSugerencia, elegirMedio, cobrar } = venta;
   // Un código que no es de ningún producto deja la búsqueda limpia, para elegir a cuál asociarlo.
   const agregarPorCodigo = useCallback((codigo: string) => { const conocido = venta.agregarPorCodigo(codigo); setConsulta(""); return conocido; }, [venta.agregarPorCodigo]);
   const noLlevo = () => venta.noLlevo(TEXTOS.vender.noLlevo.largo);
-  // Lo que se dice de la venta recién cobrada, con las palabras de la computadora.
-  const exito = useMemo(() => cobro && {
-    total: cobro.total, encolado: cobro.encolado,
-    medio: NOMBRE_DE_MEDIO[cobro.medio] + (cobro.cliente ? ` · ${cobro.cliente}` : ""),
-    detalle: cobro.encolado ? "Sin conexión: quedó guardada en este dispositivo y se envía sola cuando vuelva internet." : `${cobro.productos} ${cobro.productos === 1 ? "producto" : "productos"} a las ${hora(cobro.fecha)}. El stock ya se descontó.`,
-  }, [cobro]);
 
   const resultados = useMemo(() => (consulta.trim() ? buscarProductos(consulta, 8) : []), [buscarProductos, consulta]);
   useEffect(() => { setElegido(0); }, [consulta]);
@@ -105,12 +89,6 @@ export function Vender() {
     return () => { window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); pararPuesto.current?.(); };
   }, [alVincular]);
 
-  const alDetectar = useCallback((codigo: string) => {
-    const conocido = manejarCodigo.current(codigo);
-    setUltimoEscaneo(conocido ? `${codigo}: agregado` : `${codigo}: no está en el catálogo`);
-    if (puestoRemoto()) enviarCodigoAlPuesto(codigo).then((r) => { if (r === "llego") setUltimoEscaneo((u) => `${u ?? codigo}. Enviado a la computadora.`); });
-  }, []);
-
   function teclasBusqueda(e: KeyboardEvent<HTMLInputElement>) {
     // Sin resultados a la vista, ↑ ↓ no son para elegir uno: recorren la pantalla (flechas.ts).
     if (e.key === "ArrowDown" && resultados.length) { e.preventDefault(); setElegido((i) => Math.min(i + 1, resultados.length - 1)); }
@@ -130,7 +108,7 @@ export function Vender() {
     }
     else if (e.key === "Escape" && consulta) { e.preventDefault(); setConsulta(""); }
   }
-  const hayVentana = Boolean(exito) || eligiendoCliente || escaneando;
+  const hayVentana = Boolean(cobro) || eligiendoCliente;
   useEffect(() => {
     const global = (e: globalThis.KeyboardEvent) => {
       if (hayVentana) return;
@@ -151,7 +129,6 @@ export function Vender() {
 
   // Los cuatro últimos productos vendidos, para la venta vacía (decisión 131); se recalculan al cobrar.
   const sugeridos = useSugeridos(catalogo, cobro);
-  const vacio = items.length === 0 && !consulta.trim() && !codigoDesconocido;
   // La computadora (decisión 122): el renglón elegido, el panel de la derecha y sus pestañas,
   // el celular que escanea y el aviso con Deshacer.
   const [elegida, setElegida] = useState<string | null>(null);
@@ -160,7 +137,7 @@ export function Vender() {
   const [pestanaPanel, setPestanaPanel] = useState<"donde" | "boleta">("donde");
   const [aviso, setAviso] = useState<{ texto: string; deshacer?: () => void } | null>(null);
   useEffect(() => { if (!aviso) return; const t = setTimeout(() => setAviso(null), 6000); return () => clearTimeout(t); }, [aviso]);
-  useEffect(() => { if (!mensaje || esCelular) return; const t = setTimeout(() => setMensaje(null), 6000); return () => clearTimeout(t); }, [mensaje, esCelular, setMensaje]);
+  useEffect(() => { if (!mensaje) return; const t = setTimeout(() => setMensaje(null), 6000); return () => clearTimeout(t); }, [mensaje, setMensaje]);
   const lista = useRef<HTMLUListElement>(null);
   useDeslizar(lista, items);
   const ruedaTotal = useRueda<HTMLSpanElement>(total);
@@ -183,7 +160,6 @@ export function Vender() {
   const quitarConDeshacer = (it: Item) => { const copia = items; sale(renglones().filter((r) => r.dataset.clave === it.clave), () => { quitar(it.clave); setAviso({ texto: `Quitaste ${nombreDeProducto(it.descripcion)}`, deshacer: () => venta.devolver(copia) }); }); };
   const [escaneandoCelular, setEscaneandoCelular] = useState(false);
   useEffect(() => {
-    if (esCelular) return;
     const tecla = (e: globalThis.KeyboardEvent) => {
       if (hayVentana || e.altKey || e.ctrlKey || e.metaKey) return;
       if (e.key === "F1") { e.preventDefault(); verPanel(!panel); return; }
@@ -207,246 +183,156 @@ export function Vender() {
     alCambiarUnidad: (u: Unidad) => cambiarUnidad(it, u), alSubirFoto: it.producto ? (a: File) => subirFotoDe(it, a) : undefined, marcar: Boolean(error) && sinPrecio,
   }));
 
-  if (!esCelular) {
-    const renglonElegido = items.find((i) => i.clave === elegida) ?? null;
-    const faltan = items.filter((i) => precioDe(i).unitario === null).length;
-    return (
-      <Pagina titulo="Vender" testId="vender" className="vender vmc-pagina">
-        <div className={`vmc ${panel ? "" : "sin-panel"}`}>
-          <div className="vmc-izq">
-            <div className="vmc-busqueda">
-              <div className="vender-busqueda">
-                <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco onKeyDown={teclasBusqueda}
-                  placeholder={"Buscá por nombre o código, o escaneá"}
-                  etiqueta="Buscar un producto para agregarlo a la venta" controla="vender-sugerencias" activo={resultados[elegido] ? `sug-${resultados[elegido]!.id}` : undefined} />
-                {resultados.length > 0 && (
-                  // El desplegable de la v2 (decisión 126): la foto, el nombre con marca y proveedor, el stock
-                  // en su pastilla y el precio; abajo, las teclas y cuántos encontró.
-                  <div className="vmc-sug" data-testid="sugerencias">
-                    <ul className="vender-sugerencias" id="vender-sugerencias" role="listbox" aria-label="Productos encontrados">
-                      {resultados.map((p, i) => {
-                        const precio = precioDeLista(p);
-                        const stock = stockPorId.get(p.id);
-                        return (
-                          <li key={p.id} id={`sug-${p.id}`} role="option" aria-selected={i === elegido} className="vmc-sug-r" onMouseDown={(e) => { e.preventDefault(); conEntrada(() => elegirSugerencia(p)); }} onMouseEnter={() => setElegido(i)}>
-                            <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
-                            <span className="vmc-sug-txt"><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className="detalle">{detalleDe(p) || "\u00a0"}</span></span>
-                            {/* Sin movimientos de stock, no hay: «sin stock», como la maqueta. */}
-                            {(stock ?? 0) > 0 ? <Pastilla tipo="ok" sinPunto>{numero(stock!)} {abreviarUnidad(p.unidad ?? "unidad")}</Pastilla> : <Pastilla sinPunto>sin stock</Pastilla>}
-                            <span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    <div className="vmc-sug-pie" aria-hidden="true">
-                      <span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> elegir</span><span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">Esc</kbd> cierra</span>
-                      <span className="crece" /><span>{resultados.length} {resultados.length === 1 ? "encontrado" : "encontrados"}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-              {puestoVinculado && (escaneandoCelular
-                ? <div className="vmc-camara" role="status" data-testid="celular-escaneando"><span className="vivo" aria-hidden="true" /><span className="t">El celular está escaneando<small>Lo que lea entra acá</small></span><span className="rec" aria-hidden="true" /><button type="button" onClick={() => setEscaneandoCelular(false)} data-testid="dejar-de-escanear">Detener</button></div>
-                : <VincularParaEscanear vinculado alVincular={alVincular} alPedir={() => setEscaneandoCelular(true)} comoV2 />)}
-            </div>
-            {/* Las teclas que no están en ningún botón, con el aspecto de la v2. */}
-            <p className="vender-teclas detalle" data-testid="teclas">
-              <span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> eligen el renglón</span>
-              <span><kbd className="tecla">+</kbd><kbd className="tecla">−</kbd> cantidad</span><span><kbd className="tecla">Supr</kbd> quita</span><span><kbd className="tecla">F1</kbd> panel</span>
-            </p>
-            <Aviso tipo="error">{errorCatalogo}</Aviso>
-            {codigoDesconocido && (
-              <Aviso tipo="alerta" testId="codigo-desconocido" accion={<Boton tam="chico" onClick={() => setCodigoDesconocido(null)}>Ignorar</Boton>}>
-                El código <code>{codigoDesconocido}</code> no está en el catálogo. Buscá el producto y elegilo: el código le queda asociado.
-              </Aviso>
-            )}
-            {consulta.trim() && resultados.length === 0 && !buscandoEnElServidor && !errorCatalogo && (
-              <div className="lista" data-sin-flechas>
-                <button type="button" className="renglon" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
-                  <span className="nombre">Agregar «{consulta.trim()}» como ítem libre</span><Icono nombre="mas" />
-                  <span className="detalle">No está en ninguna lista. Le ponés el precio a mano. Enter lo agrega.</span>
-                </button>
-              </div>
-            )}
-            <div className="vmc-cab" data-testid="titulo-venta">
-              <h2>Esta venta</h2><span className="vmc-cuenta"><span className="vmc-rueda" ref={ruedaCuenta}>{items.length}</span> {items.length === 1 ? "producto" : "productos"}</span>
-              {/* Cuántos precios faltan, al lado de la cuenta y no en la barra del cobro (decisión 126). */}
-              {faltan > 0 && <span className="vmc-cuenta falta" data-testid="faltan-precios">Falta{faltan > 1 ? `n ${faltan} precios` : " 1 precio"}</span>}
-              <span className="crece" />
-              {/* Con la venta vacía no hay nada que anotar ni vaciar: no se muestran (decisión 126). */}
-              {items.length > 0 && <>
-                <Boton tam="chico" icono="prohibido" className="vmc-fantasma" onClick={noLlevo} aria-keyshortcuts="F4" data-testid="no-llevo">No llevó <kbd className="tecla">F4</kbd></Boton>
-                <Boton tam="chico" icono="basura" className="vmc-fantasma" onClick={vaciar} data-testid="vaciar-venta">Vaciar</Boton>
-              </>}
-            </div>
-            {items.length === 0 ? (
-              <>
-                {/* La venta vacía, como la maqueta (decisión 131): el recuadro gris con el carrito y,
-                    debajo, los cuatro últimos productos vendidos, que se agregan con un clic. */}
-                <div className="vmc-vacia" data-testid="venta-vacia">
-                  <span className="vmc-vacia-icono" aria-hidden="true"><Icono nombre="vender" tam={26} /></span>
-                  <b>La venta está vacía</b>
-                  <span>Buscá por nombre o código, escaneá con el lector o con el celular.</span>
-                </div>
-                {sugeridos.ultimos.length > 0 && (
-                  <section className="vmc-ultimos" aria-label="Lo último que se vendió" data-testid="sugeridos-ultimos">
-                    <h2>Lo último que se vendió</h2>
-                    <ul data-sin-flechas>
-                      {sugeridos.ultimos.map((p) => {
-                        const precio = precioSugerido(p);
-                        return (
-                          <li key={p.id}>
-                            <button type="button" className="vmc-ultimo" onClick={() => conEntrada(() => agregar(p))}>
-                              <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={20} grosor={1.6} />}</span>
-                              <span className="vmc-ultimo-txt"><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span></span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </section>
-                )}
-              </>
-            ) : (
-              <ul className="lista vmc-items" ref={lista} data-testid="venta">
-                {filas.map((f) => <RenglonDeVenta key={f.item.clave} {...f} alQuitar={() => quitarConDeshacer(f.item)} elegido={f.item.clave === elegida} alElegir={() => setElegida(f.item.clave)} llegado={llegados.has(f.item.clave)} entrada={entrada.clave === f.item.clave ? entrada.n : 0} />)}
-              </ul>
-            )}
-          </div>
-          {!panel && (
-            <button type="button" className="vmc-abrir-panel" onClick={() => verPanel(true)} aria-keyshortcuts="F1" title="Mostrar el panel (F1)" data-testid="abrir-panel">
-              <Icono nombre="izquierda" tam={18} /><span>De dónde sale · Boleta</span><kbd className="tecla">F1</kbd>
-            </button>
-          )}
-          {panel && (
-            <aside className={`vmc-panel ${pestanaPanel === "boleta" ? "con-boleta" : ""}`} aria-label="Panel de la venta" data-testid="panel">
-              <div className="vmc-panel-cab" role="tablist">
-                <button type="button" role="tab" aria-selected={pestanaPanel === "donde"} onClick={() => setPestanaPanel("donde")} data-testid="panel-donde"><Icono nombre="calculadora" tam={16} />De dónde sale</button>
-                <button type="button" role="tab" aria-selected={pestanaPanel === "boleta"} onClick={() => setPestanaPanel("boleta")} data-testid="panel-boleta"><Icono nombre="archivo" tam={16} />Boleta</button>
-                <button type="button" className="vmc-ocultar" onClick={() => verPanel(false)} aria-label="Ocultar el panel" title="Ocultar el panel (F1)" aria-keyshortcuts="F1" data-testid="ocultar-panel"><Icono nombre="ocultar-panel" tam={20} grosor={1.9} /></button>
-              </div>
-              <div className="vmc-panel-cuerpo" role="tabpanel">
-                {pestanaPanel === "donde" ? <DeDondeSale item={renglonElegido} /> : <Boleta items={items} total={total} />}
-              </div>
-            </aside>
-          )}
-        </div>
-
-        <section className="vmc-cobro" aria-label="Cobro" data-testid="cobro">
-          {(aviso || mensaje) && (
-            // Como la maqueta (decisión 133): verde oscuro y centrado sobre la barra; con el tacho y
-            // «Deshacer» si se quitó algo, o con el tilde para lo demás («No llevó»). Se va solo.
-            <div className="vmc-aviso" role="status" data-testid="mensaje">
-              <Icono nombre={aviso?.deshacer ? "basura" : "tilde"} tam={20} />
-              <span>{aviso ? aviso.texto : mensaje}</span>
-              {aviso?.deshacer && <button type="button" onClick={() => { aviso.deshacer!(); setAviso(null); }}>Deshacer</button>}
-            </div>
-          )}
-          {error && <div className="vender-cobro-aviso"><Aviso tipo="error" testId="error-cobro">{error}</Aviso></div>}
-          <div className="vmc-medios" role="radiogroup" aria-label="Cómo paga">
-            {MEDIOS.map((m) => (
-              <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} aria-keyshortcuts={m.tecla} className={`vmc-medio medio-${m.valor}`} title={m.nombre} aria-label={m.nombre} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
-                <IconoDeMedio medio={m.valor} tam={18} />{m.corto}<kbd className="tecla">{m.tecla}</kbd>
-              </button>
-            ))}
-            <button type="button" className={`vmc-cliente ${cliente ? "elegido" : medio === "cuenta_corriente" ? "falta" : ""}`} onClick={() => setEligiendoCliente(true)} aria-keyshortcuts="F9" data-testid="cliente">
-              {cliente ? <span className="vmc-iniciales" aria-hidden="true">{iniciales(cliente.nombre)}</span> : <Icono nombre="usuarios" tam={16} />}<span>{cliente ? cliente.nombre : medio === "cuenta_corriente" ? "Elegí el cliente" : "Cliente"}</span><kbd className="tecla">F9</kbd>
-            </button>
-          </div>
-          <Boton variante="principal" tam="grande" disabled={ocupado || !items.length} onClick={() => void cobrar()} tecla="F2" data-testid="cobrar">{ocupado ? "Cobrando…" : <>Cobrar <span className="importe vmc-rueda" ref={ruedaTotal} data-testid="total">{pesosCortos(total)}</span></>}</Boton>
-        </section>
-
-        {eligiendoCliente && <ElegirCliente clientes={clientes} elegido={clienteId} soloCuentaCorriente={medio === "cuenta_corriente"} alCerrar={() => setEligiendoCliente(false)} alElegir={(id) => { setClienteId(id); setEligiendoCliente(false); }} />}
-        {cobro && <VentaRegistrada cobro={cobro} alVerHoy={() => { venta.cerrarCobro(); irA("hoy"); }} alCerrar={() => { venta.cerrarCobro(); setTimeout(() => caja.current?.focus(), 0); }} />}
-      </Pagina>
-    );
-  }
-
+  const renglonElegido = items.find((i) => i.clave === elegida) ?? null;
+  const faltan = items.filter((i) => precioDe(i).unitario === null).length;
   return (
-    <Pagina titulo="Vender" testId="vender" className={`vender ${items.length ? "con-cobro" : ""}`}
-      acciones={<AlLadoDeLasPestanas>
-        <div className="fila envuelve">
-          {/* Sin celular emparejado, «Vincular el celular» está en el menú lateral, siempre a la vista. */}
-          {!esCelular && puestoVinculado && <VincularParaEscanear vinculado={puestoVinculado} alVincular={alVincular} />}
-          {puestoRemoto() && <span data-testid="celular-vinculado-remoto"><Pastilla tipo="ok">Vinculado a la computadora</Pastilla></span>}
+    <Pagina titulo="Vender" testId="vender" className="vender vmc-pagina">
+      <div className={`vmc ${panel ? "" : "sin-panel"}`}>
+        <div className="vmc-izq">
+          <div className="vmc-busqueda">
+            <div className="vender-busqueda">
+              <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco onKeyDown={teclasBusqueda}
+                placeholder={"Buscá por nombre o código, o escaneá"}
+                etiqueta="Buscar un producto para agregarlo a la venta" controla="vender-sugerencias" activo={resultados[elegido] ? `sug-${resultados[elegido]!.id}` : undefined} />
+              {resultados.length > 0 && (
+                // El desplegable de la v2 (decisión 126): la foto, el nombre con marca y proveedor, el stock
+                // en su pastilla y el precio; abajo, las teclas y cuántos encontró.
+                <div className="vmc-sug" data-testid="sugerencias">
+                  <ul className="vender-sugerencias" id="vender-sugerencias" role="listbox" aria-label="Productos encontrados">
+                    {resultados.map((p, i) => {
+                      const precio = precioDeLista(p);
+                      const stock = stockPorId.get(p.id);
+                      return (
+                        <li key={p.id} id={`sug-${p.id}`} role="option" aria-selected={i === elegido} className="vmc-sug-r" onMouseDown={(e) => { e.preventDefault(); conEntrada(() => elegirSugerencia(p)); }} onMouseEnter={() => setElegido(i)}>
+                          <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
+                          <span className="vmc-sug-txt"><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className="detalle">{detalleDe(p) || "\u00a0"}</span></span>
+                          {/* Sin movimientos de stock, no hay: «sin stock», como la maqueta. */}
+                          {(stock ?? 0) > 0 ? <Pastilla tipo="ok" sinPunto>{numero(stock!)} {abreviarUnidad(p.unidad ?? "unidad")}</Pastilla> : <Pastilla sinPunto>sin stock</Pastilla>}
+                          <span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <div className="vmc-sug-pie" aria-hidden="true">
+                    <span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> elegir</span><span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">Esc</kbd> cierra</span>
+                    <span className="crece" /><span>{resultados.length} {resultados.length === 1 ? "encontrado" : "encontrados"}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            {puestoVinculado && (escaneandoCelular
+              ? <div className="vmc-camara" role="status" data-testid="celular-escaneando"><span className="vivo" aria-hidden="true" /><span className="t">El celular está escaneando<small>Lo que lea entra acá</small></span><span className="rec" aria-hidden="true" /><button type="button" onClick={() => setEscaneandoCelular(false)} data-testid="dejar-de-escanear">Detener</button></div>
+              : <VincularParaEscanear vinculado alVincular={alVincular} alPedir={() => setEscaneandoCelular(true)} comoV2 />)}
+          </div>
+          {/* Las teclas que no están en ningún botón, con el aspecto de la v2. */}
+          <p className="vender-teclas detalle" data-testid="teclas">
+            <span><kbd className="tecla">Enter</kbd> agrega</span><span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> eligen el renglón</span>
+            <span><kbd className="tecla">+</kbd><kbd className="tecla">−</kbd> cantidad</span><span><kbd className="tecla">Supr</kbd> quita</span><span><kbd className="tecla">F1</kbd> panel</span>
+          </p>
+          <Aviso tipo="error">{errorCatalogo}</Aviso>
+          {codigoDesconocido && (
+            <Aviso tipo="alerta" testId="codigo-desconocido" accion={<Boton tam="chico" onClick={() => setCodigoDesconocido(null)}>Ignorar</Boton>}>
+              El código <code>{codigoDesconocido}</code> no está en el catálogo. Buscá el producto y elegilo: el código le queda asociado.
+            </Aviso>
+          )}
+          {consulta.trim() && resultados.length === 0 && !buscandoEnElServidor && !errorCatalogo && (
+            <div className="lista" data-sin-flechas>
+              <button type="button" className="renglon" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
+                <span className="nombre">Agregar «{consulta.trim()}» como ítem libre</span><Icono nombre="mas" />
+                <span className="detalle">No está en ninguna lista. Le ponés el precio a mano. Enter lo agrega.</span>
+              </button>
+            </div>
+          )}
+          <div className="vmc-cab" data-testid="titulo-venta">
+            <h2>Esta venta</h2><span className="vmc-cuenta"><span className="vmc-rueda" ref={ruedaCuenta}>{items.length}</span> {items.length === 1 ? "producto" : "productos"}</span>
+            {/* Cuántos precios faltan, al lado de la cuenta y no en la barra del cobro (decisión 126). */}
+            {faltan > 0 && <span className="vmc-cuenta falta" data-testid="faltan-precios">Falta{faltan > 1 ? `n ${faltan} precios` : " 1 precio"}</span>}
+            <span className="crece" />
+            {/* Con la venta vacía no hay nada que anotar ni vaciar: no se muestran (decisión 126). */}
+            {items.length > 0 && <>
+              <Boton tam="chico" icono="prohibido" className="vmc-fantasma" onClick={noLlevo} aria-keyshortcuts="F4" data-testid="no-llevo">No llevó <kbd className="tecla">F4</kbd></Boton>
+              <Boton tam="chico" icono="basura" className="vmc-fantasma" onClick={vaciar} data-testid="vaciar-venta">Vaciar</Boton>
+            </>}
+          </div>
+          {items.length === 0 ? (
+            <>
+              {/* La venta vacía, como la maqueta (decisión 131): el recuadro gris con el carrito y,
+                  debajo, los cuatro últimos productos vendidos, que se agregan con un clic. */}
+              <div className="vmc-vacia" data-testid="venta-vacia">
+                <span className="vmc-vacia-icono" aria-hidden="true"><Icono nombre="vender" tam={26} /></span>
+                <b>La venta está vacía</b>
+                <span>Buscá por nombre o código, escaneá con el lector o con el celular.</span>
+              </div>
+              {sugeridos.ultimos.length > 0 && (
+                <section className="vmc-ultimos" aria-label="Lo último que se vendió" data-testid="sugeridos-ultimos">
+                  <h2>Lo último que se vendió</h2>
+                  <ul data-sin-flechas>
+                    {sugeridos.ultimos.map((p) => {
+                      const precio = precioSugerido(p);
+                      return (
+                        <li key={p.id}>
+                          <button type="button" className="vmc-ultimo" onClick={() => conEntrada(() => agregar(p))}>
+                            <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={20} grosor={1.6} />}</span>
+                            <span className="vmc-ultimo-txt"><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span></span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              )}
+            </>
+          ) : (
+            <ul className="lista vmc-items" ref={lista} data-testid="venta">
+              {filas.map((f) => <RenglonDeVenta key={f.item.clave} {...f} alQuitar={() => quitarConDeshacer(f.item)} elegido={f.item.clave === elegida} alElegir={() => setElegida(f.item.clave)} llegado={llegados.has(f.item.clave)} entrada={entrada.clave === f.item.clave ? entrada.n : 0} />)}
+            </ul>
+          )}
         </div>
-      </AlLadoDeLasPestanas>}>
-      <div className="vender-busqueda">
-        <Buscador valor={consulta} alCambiar={setConsulta} cajaRef={caja} autoFoco onKeyDown={teclasBusqueda}
-          placeholder={esCelular ? "Buscar producto o código" : "Escribí el nombre del producto o el código"}
-          etiqueta="Buscar un producto para agregarlo a la venta" controla="vender-sugerencias" activo={resultados[elegido] ? `sug-${resultados[elegido]!.id}` : undefined}
-          alEscanear={esCelular && hayCamara() ? () => setEscaneando(true) : undefined} />
-        {resultados.length > 0 && (
-          <ul className="lista vender-sugerencias" id="vender-sugerencias" role="listbox" aria-label="Productos encontrados" data-testid="sugerencias">
-            {resultados.map((p, i) => {
-              const precio = precioDeLista(p);
-              const stock = stockPorId.get(p.id);
-              return (
-                <li key={p.id} id={`sug-${p.id}`} role="option" aria-selected={i === elegido} className="renglon con-foto elegible" onMouseDown={(e) => { e.preventDefault(); elegirSugerencia(p); }} onMouseEnter={() => setElegido(i)}>
-                  <span className="miniatura">{p.foto_url ? <img src={urlDeFoto(p.foto_url) ?? ""} alt="" loading="lazy" /> : <Icono nombre="productos" tam={18} grosor={1.6} />}</span>
-                  <span className="nombre">{nombreDeProducto(p.descripcion)}</span>
-                  <span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "sin precio" : pesosCortos(precio)}</span>
-                  <span className="detalle">{detalleDe(p)}{stock !== undefined ? `${detalleDe(p) ? " · " : ""}stock ${conUnidad(stock, p.unidad)}` : ""}</span>
-                </li>
-              );
-            })}
-          </ul>
+        {!panel && (
+          <button type="button" className="vmc-abrir-panel" onClick={() => verPanel(true)} aria-keyshortcuts="F1" title="Mostrar el panel (F1)" data-testid="abrir-panel">
+            <Icono nombre="izquierda" tam={18} /><span>De dónde sale · Boleta</span><kbd className="tecla">F1</kbd>
+          </button>
+        )}
+        {panel && (
+          <aside className={`vmc-panel ${pestanaPanel === "boleta" ? "con-boleta" : ""}`} aria-label="Panel de la venta" data-testid="panel">
+            <div className="vmc-panel-cab" role="tablist">
+              <button type="button" role="tab" aria-selected={pestanaPanel === "donde"} onClick={() => setPestanaPanel("donde")} data-testid="panel-donde"><Icono nombre="calculadora" tam={16} />De dónde sale</button>
+              <button type="button" role="tab" aria-selected={pestanaPanel === "boleta"} onClick={() => setPestanaPanel("boleta")} data-testid="panel-boleta"><Icono nombre="archivo" tam={16} />Boleta</button>
+              <button type="button" className="vmc-ocultar" onClick={() => verPanel(false)} aria-label="Ocultar el panel" title="Ocultar el panel (F1)" aria-keyshortcuts="F1" data-testid="ocultar-panel"><Icono nombre="ocultar-panel" tam={20} grosor={1.9} /></button>
+            </div>
+            <div className="vmc-panel-cuerpo" role="tabpanel">
+              {pestanaPanel === "donde" ? <DeDondeSale item={renglonElegido} /> : <Boleta items={items} total={total} />}
+            </div>
+          </aside>
         )}
       </div>
 
-      <Aviso tipo="error">{errorCatalogo}</Aviso>
-      {codigoDesconocido && (
-        <Aviso tipo="alerta" testId="codigo-desconocido" accion={<Boton tam="chico" onClick={() => setCodigoDesconocido(null)}>Ignorar</Boton>}>
-          El código <code>{codigoDesconocido}</code> no está en el catálogo. Buscá el producto y elegilo: el código le queda asociado.
-        </Aviso>
-      )}
-      {consulta.trim() && resultados.length === 0 && !buscandoEnElServidor && !errorCatalogo && (
-        <div className="lista" data-sin-flechas>
-          <button type="button" className="renglon" onClick={() => agregar(null, consulta.trim())} data-testid="agregar-libre">
-            <span className="nombre">Agregar «{consulta.trim()}» como ítem libre</span><Icono nombre="mas" />
-            <span className="detalle">No está en ninguna lista. Le ponés el precio a mano.{!esCelular && " Enter lo agrega."}</span>
+      <section className="vmc-cobro" aria-label="Cobro" data-testid="cobro">
+        {(aviso || mensaje) && (
+          // Como la maqueta (decisión 133): verde oscuro y centrado sobre la barra; con el tacho y
+          // «Deshacer» si se quitó algo, o con el tilde para lo demás («No llevó»). Se va solo.
+          <div className="vmc-aviso" role="status" data-testid="mensaje">
+            <Icono nombre={aviso?.deshacer ? "basura" : "tilde"} tam={20} />
+            <span>{aviso ? aviso.texto : mensaje}</span>
+            {aviso?.deshacer && <button type="button" onClick={() => { aviso.deshacer!(); setAviso(null); }}>Deshacer</button>}
+          </div>
+        )}
+        {error && <div className="vender-cobro-aviso"><Aviso tipo="error" testId="error-cobro">{error}</Aviso></div>}
+        <div className="vmc-medios" role="radiogroup" aria-label="Cómo paga">
+          {MEDIOS.map((m) => (
+            <button key={m.valor} type="button" role="radio" aria-checked={medio === m.valor} aria-keyshortcuts={m.tecla} className={`vmc-medio medio-${m.valor}`} title={m.nombre} aria-label={m.nombre} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
+              <IconoDeMedio medio={m.valor} tam={18} />{m.corto}<kbd className="tecla">{m.tecla}</kbd>
+            </button>
+          ))}
+          <button type="button" className={`vmc-cliente ${cliente ? "elegido" : medio === "cuenta_corriente" ? "falta" : ""}`} onClick={() => setEligiendoCliente(true)} aria-keyshortcuts="F9" data-testid="cliente">
+            {cliente ? <span className="vmc-iniciales" aria-hidden="true">{iniciales(cliente.nombre)}</span> : <Icono nombre="usuarios" tam={16} />}<span>{cliente ? cliente.nombre : medio === "cuenta_corriente" ? "Elegí el cliente" : "Cliente"}</span><kbd className="tecla">F9</kbd>
           </button>
         </div>
-      )}
+        <Boton variante="principal" tam="grande" disabled={ocupado || !items.length} onClick={() => void cobrar()} tecla="F2" data-testid="cobrar">{ocupado ? "Cobrando…" : <>Cobrar <span className="importe vmc-rueda" ref={ruedaTotal} data-testid="total">{pesosCortos(total)}</span></>}</Boton>
+      </section>
 
-      {vacio && (
-        <Vacio icono="vender" titulo="Venta nueva">
-          {esCelular ? "Escribí el nombre del producto o escaneá el código de barras." : "Escribí el nombre del producto o el código y apretá Enter. También podés escanear con el celular vinculado."}
-        </Vacio>
-      )}
-
-      {/* Siguen a la vista con la venta empezada, para sumar otro producto de un clic. */}
-
-      {items.length > 0 && <ul className="vender-items" data-testid="venta">{filas.map((f) => <TarjetaDeVenta key={f.item.clave} {...f} />)}</ul>}
-
-      {items.length > 0 && (
-        <section className="vender-cobro sobre-oscuro" aria-label="Cobro" data-testid="cobro">
-          {error && <div className="vender-cobro-aviso"><Aviso tipo="error" testId="error-cobro">{error}</Aviso></div>}
-          <div className="vender-total"><span>Total</span><strong className="importe total" data-testid="total">{pesosCortos(total)}</strong></div>
-          <div className="vender-medios" role="radiogroup" aria-label="Cómo paga">
-            {MEDIOS.map((m) => (
-              <Boton key={m.valor} variante="sobre-marino" role="radio" aria-checked={medio === m.valor} aria-keyshortcuts={m.tecla} onClick={() => elegirMedio(m.valor)} data-testid={`medio-${m.valor}`}>
-                {!esCelular && <span className="tecla" aria-hidden="true">{m.tecla}</span>}<IconoDeMedio medio={m.valor} tam={16} conFondo className="chico" />{esCelular ? m.corto : m.nombre}
-              </Boton>
-            ))}
-          </div>
-          {medio === "cuenta_corriente" && (
-            <Boton variante="sobre-marino" className={`vender-cliente ${cliente ? "" : "falta"}`} icono="usuarios" onClick={() => setEligiendoCliente(true)} data-testid="cliente">{cliente ? cliente.nombre : "Elegí el cliente"}</Boton>
-          )}
-          <div className="vender-acciones">
-            <Boton variante="sobre-marino" onClick={noLlevo} data-testid="no-llevo">No llevó <kbd className="tecla">F4</kbd></Boton>
-            <Boton variante="principal" tam="grande" disabled={ocupado} onClick={() => void cobrar()} tecla="F2" data-testid="cobrar">{ocupado ? "Cobrando…" : esCelular ? `Cobrar ${pesosCortos(total)}` : "Cobrar"}</Boton>
-          </div>
-        </section>
-      )}
-
-      <Toast texto={mensaje} alCerrar={() => setMensaje(null)} />
-      {escaneando && <Escaner alDetectar={alDetectar} alCerrar={() => setEscaneando(false)} ultimo={ultimoEscaneo} />}
-      {eligiendoCliente && <ElegirCliente clientes={clientes} elegido={clienteId} alCerrar={() => setEligiendoCliente(false)} alElegir={(id) => { setClienteId(id); setMedio("cuenta_corriente"); setEligiendoCliente(false); }} />}
-      {exito && (
-        <Exito que={exito.encolado ? "Venta guardada en este dispositivo" : "Venta registrada"} importe={pesosCortos(exito.total)} medio={exito.medio} detalle={exito.detalle} boton="Nueva venta"
-          alCerrar={() => { venta.cerrarCobro(); setTimeout(() => caja.current?.focus(), 0); }} />
-      )}
+      {eligiendoCliente && <ElegirCliente clientes={clientes} elegido={clienteId} soloCuentaCorriente={medio === "cuenta_corriente"} alCerrar={() => setEligiendoCliente(false)} alElegir={(id) => { setClienteId(id); setEligiendoCliente(false); }} />}
+      {cobro && <VentaRegistrada cobro={cobro} alVerHoy={() => { venta.cerrarCobro(); irA("hoy"); }} alCerrar={() => { venta.cerrarCobro(); setTimeout(() => caja.current?.focus(), 0); }} />}
     </Pagina>
   );
 }
@@ -462,9 +348,6 @@ function useRenglon(it: Item) {
   const margenTexto = it.precioManual !== null ? "precio a mano" : p.margen === null ? "elegí el margen" : `margen ${p.margen} %${esMargenBoton(p.margen) ? "" : " a mano"}`;
   return { p, renglon, margenTexto };
 }
-const StockDeRenglon = ({ stock, cantidad, unidad }: { stock: number | undefined; cantidad: number; unidad: string }) => (stock === undefined ? null : (
-  <>stock {conUnidad(stock, unidad)}{stock - cantidad < 0 && <> <Pastilla tipo="alerta" sinPunto>{TEXTOS.vender.stockNoAlcanza.largo}</Pastilla></>}</>
-));
 function PrecioAMano({ item, alCambiar, falta, id, enfocar }: { item: Item; alCambiar: (c: Partial<Item>) => void; falta?: boolean; id?: string; enfocar?: boolean }) {
   return (
     <label className={`con-prefijo vender-a-mano ${falta ? "falta" : ""}`} title="Un precio distinto solo para esta venta. No cambia el producto.">
@@ -607,48 +490,6 @@ function VentaRegistrada({ cobro, alCerrar, alVerHoy }: { cobro: Cobro; alCerrar
   );
 }
 
-// Celular: cada renglón es una tarjeta. Si no tiene precio, los márgenes ya están a la vista.
-function TarjetaDeVenta({ item: it, stock, marcar, alCambiar, alQuitar, alElegirMargen, alCambiarUnidad, alSubirFoto }: PropsDeRenglon) {
-  const { p, renglon, margenTexto } = useRenglon(it);
-  const producto = it.producto;
-  const sinPrecio = p.unitario === null;
-  const abierto = it.abierto || (sinPrecio && Boolean(producto));
-  return (
-    <li className={`tarjeta vender-item ${sinPrecio ? "sin-precio" : ""} ${sinPrecio && marcar ? "marcada" : ""}`} data-testid="item">
-      <div className="vender-item-cabeza">
-        {producto ? <FotoProducto id={producto.id} url={producto.foto_url ?? null} descripcion={producto.descripcion} alSubir={alSubirFoto} /> : <span className="miniatura"><Icono nombre="editar" tam={18} grosor={1.6} /></span>}
-        <div className="crece pila junta">
-          {producto ? <span className="nombre">{nombreDeProducto(it.descripcion)}</span>
-            : <input className="entrada" value={it.descripcion} placeholder="¿Qué se lleva?" aria-label="Descripción del ítem libre" onChange={(e) => alCambiar({ descripcion: e.target.value })} data-testid="descripcion-libre" />}
-          <span className="detalle">{producto ? <>{detalleDe(producto)}{detalleDe(producto) && stock !== undefined ? " · " : ""}<StockDeRenglon stock={stock} cantidad={it.cantidad} unidad={it.unidad} /></> : "Ítem libre"}</span>
-        </div>
-        <span data-testid="subtotal">{renglon ? <Explicado conCosto className="importe" valor={pesosCortos(renglon.valor)} pasos={[...p.pasos, ...renglon.pasos]} etiqueta={`Subtotal ${pesosCortos(renglon.valor)}`} /> : !producto ? <PrecioAMano item={it} alCambiar={alCambiar} falta /> : <span className="falta-texto" data-testid="sin-precio">sin precio</span>}</span>
-      </div>
-      <div className="vender-item-pie">
-        <Contador valor={it.cantidad} entera={enteras(it.unidad)} alCambiar={(v) => alCambiar({ cantidad: v })}><SelectorDeUnidad unidad={it.unidad} alCambiar={alCambiarUnidad} /></Contador>
-        <span className="crece" />
-        {producto && p.costo !== null && !sinPrecio && (
-          <Boton onClick={() => alCambiar({ abierto: !it.abierto })} aria-expanded={abierto} data-testid="margen">{margenTexto}<Icono nombre={abierto ? "arriba" : "abajo"} tam={16} grosor={2.4} /></Boton>
-        )}
-        <Boton icono="basura" aria-label={`Quitar ${it.descripcion || "el ítem"}`} onClick={alQuitar} />
-      </div>
-      {abierto && producto && p.costo !== null && (
-        <div className="vender-item-margen">
-          <div className="fila">
-            <SiVeCostos><span className="crece"><Explicado valor={`Costo ${pesos(p.costo)}`} pasos={pasosDeCosto(producto, p.costo)} /></span></SiVeCostos>
-            {p.unitario !== null && <span className="detalle">{pesosCortos(p.unitario)} c/u</span>}
-          </div>
-          {sinPrecio && <p className="falta-texto">Elegí el margen o poné el precio a mano.</p>}
-          <Margenes elegido={it.precioManual === null ? p.margen : null} alElegir={alElegirMargen} etiqueta={`Margen de ${it.descripcion}`} />
-          <div className="fila">
-            <label className="crece detalle" htmlFor={`mano-${it.clave}`}>Otro precio, solo para esta venta</label>
-            <PrecioAMano item={it} alCambiar={alCambiar} id={`mano-${it.clave}`} />
-          </div>
-        </div>
-      )}
-    </li>
-  );
-}
 
 // Cuenta corriente: el cliente se busca escribiendo; cada uno dice cuánto debe.
 export function ElegirCliente({ clientes, elegido, alElegir, alCerrar, soloCuentaCorriente = true }: { clientes: Cliente[]; elegido: string; alElegir: (id: string) => void; alCerrar: () => void; soloCuentaCorriente?: boolean }) {

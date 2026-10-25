@@ -1,26 +1,14 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { NOMBRES, TEXTOS } from "../textos";
-import { DineroInvertido } from "../DineroInvertido";
-import { ComprasRecientes } from "./ComprasRecientes";
-import { urlApi } from "../../datos/conexion";
+import { useState, type FormEvent, type ReactNode } from "react";
+import { NOMBRES } from "../textos";
 import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, quitarCelularDeOtro, useCelularesDeOtros, useSesiones, useUsuarios, type CelularDeOtroFila, type SesionFila } from "../../negocio/usuarios";
-import { useGastosDeLaSemana } from "../../negocio/compras";
 import { Actividad } from "./Actividad";
-import { fecha, pesos } from "../../formato";
 import { useSesion } from "../../datos/sesion";
 import { usePuede } from "../permisos";
 import { ElegirRoles, useRolesAsignables } from "../RolesDeUsuario";
 import { AutorizarOtro, TarjetaDeUsuario } from "./TarjetaDeUsuario";
 import { FiltroDeUsuarios } from "./FiltroDeUsuarios";
 import { useFiltroDeUsuarios } from "../filtro-de-usuarios";
-import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../datos/credenciales";
-import { AvisoError, Hoja, Icono, Toast, Lista } from "./componentes/base";
-import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
-import { describirDispositivo } from "./pantallas/Login";
-import { pesosCortos } from "../../formato";
-import { MEDIOS, NOMBRE_DE_MEDIO } from "../../negocio/ventas/venta";
-import { useVentasDelDia } from "../../negocio/ventas/ventas-del-dia";
-import { esAmbienteDePrueba } from "../../plataforma/ambiente";
+import { AvisoError, Hoja } from "./componentes/base";
 
 
 // Usuarios y quién hizo qué: dos pestañas de Más → Usuarios (decisiones 88 y 100); la tercera,

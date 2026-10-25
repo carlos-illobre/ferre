@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useVeCostos } from "../../Costos";
 import { Isotipo, Logotipo } from "../../Logotipo";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
@@ -6,7 +6,6 @@ import { leerMeta } from "../../../datos/almacenamiento";
 import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../datos/almacenamiento";
 import { urlDeFoto } from "../../../datos/conexion";
 import { MARGENES } from "../../../negocio/precios/vista-previa";
-import { UNIDADES, type Unidad } from "../../../negocio/catalogo";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 import { Boton, Buscador, Contador, Exito, Segmentos, Toast, useDialogo } from "../../../ui";
 

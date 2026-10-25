@@ -1,5 +1,5 @@
 import { useVolverCierra } from "../../../plataforma/navegacion/volver";
-import { Children, useEffect, useRef, type HTMLAttributes, type ReactNode } from "react";
+import { Children, useEffect, type HTMLAttributes, type ReactNode } from "react";
 import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 import { Buscador, Contador, Exito, Segmentos, Toast } from "../../../ui";
 

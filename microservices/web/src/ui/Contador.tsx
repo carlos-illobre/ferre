@@ -8,12 +8,14 @@ import { Icono } from "./iconos";
 type Props = {
   valor: number; entera: boolean; alCambiar: (v: number) => void; min?: number; etiqueta?: string; testId?: string;
   sinBotones?: boolean; alQuitar?: () => void; children?: ReactNode;
+  /** Lo que vale si se deja la caja vacía; si no se dice, el mínimo. */
+  siQuedaVacio?: number;
 };
 
 // Lo tipeado, con un solo separador decimal (coma o punto) y sin letras.
 const limpiar = (crudo: string) => crudo.replace(/[^\d.,]/g, "").replace(/[.,](?=.*[.,])/g, "");
 
-function useCantidad({ valor, entera, alCambiar, min = entera ? 1 : 0.1, alQuitar }: Props) {
+function useCantidad({ valor, entera, alCambiar, min = entera ? 1 : 0.1, alQuitar, siQuedaVacio = min }: Props) {
   const paso = entera ? 1 : 0.5;
   const redondear = (v: number) => (entera ? Math.floor(v) : Math.round(v * 10) / 10);
   const [texto, setTexto] = useState<string | null>(null);
@@ -33,7 +35,7 @@ function useCantidad({ valor, entera, alCambiar, min = entera ? 1 : 0.1, alQuita
       setTexto(!entera && /[.,]$/.test(limpio) ? limpio.replace(".", ",") : null);
       alCambiar(ajustado);
     },
-    alSalir: () => { setTexto(null); if (valor === 0) alCambiar(min); },
+    alSalir: () => { setTexto(null); if (valor === 0) alCambiar(siQuedaVacio); },
   };
 }
 

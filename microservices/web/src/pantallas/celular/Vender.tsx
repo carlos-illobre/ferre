@@ -35,7 +35,6 @@ import "./vender.css";
 // Esc descarta ("no llevó"); F2 cobra.
 
 const iniciales = (nombre: string) => nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join("");
-const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join(" · ");
 const num = (n: number) => n.toLocaleString("es-AR");
 const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 

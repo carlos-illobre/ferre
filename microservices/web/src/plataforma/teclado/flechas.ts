@@ -18,7 +18,6 @@ import "./flechas.css";
 // recorre de otra forma (su menú, sus pestañas), los resultados que despliega una búsqueda (los
 // recorre esa búsqueda) ni lo que una pantalla marca con `data-sin-flechas`. Los títulos de una
 // tabla no son filas. Los nombres propios de cada aplicación llegan en `DisposicionParaFlechas`.
-const ENFOCABLES = "a[href], button:not([disabled]), input:not([disabled]):not([type='hidden']):not([type='file']), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
 const LISTAS = "ul, ol, table, [role='list'], .lista";
 const NO_SON_NUNCA = "[role='listbox'], [data-sin-flechas], [data-flechas-propias], thead";
 

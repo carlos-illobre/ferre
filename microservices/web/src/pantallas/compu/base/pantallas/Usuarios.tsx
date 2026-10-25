@@ -1,13 +1,12 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { NOMBRES, TEXTOS } from "../../../textos";
-import { api, ErrorApi } from "../../../../datos/conexion";
+import { ErrorApi } from "../../../../datos/conexion";
 import { fecha } from "../../../../formato";
 import { useSesion } from "../../../../datos/sesion";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../../../../datos/credenciales";
-import { useEsCelular } from "../vista";
 import { Aviso, Boton, Hoja, Icono, Pagina, Toast, Vacio, haceCuanto } from "../ui";
 import { describirDispositivo } from "../dispositivo";
-import { IconoCompu, comoCarga, esFallaDeRed, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
+import { comoCarga, esFallaDeRed, fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
 import { accesoDe, autorizar as autorizarPersona, cambiarUsuario, cerrarSesion, faltaEnAlta, partesResaltadas, quitarCelularDeOtro, resumenDelAcceso, useCelularesDeOtros, useSesiones, useUsuarios, type Acceso, type CelularDeOtroFila, type EstadoDeUsuario, type OrdenDeUsuarios, type SesionFila, type UsuarioFila } from "../../../../negocio/usuarios";
 import { useFiltroDeUsuarios } from "../../../filtro-de-usuarios";
 import { usePuede } from "../../../permisos";
@@ -404,7 +403,6 @@ function AltaDeUsuario({ disponibles, enLinea, alAutorizar }: { disponibles: Rol
 // Mis celulares vinculados: desde acá se vincula este dispositivo con la huella, y se quita uno
 // perdido. Cada usuario ve los suyos; los de otros, quien administra usuarios, en su fila.
 function Celulares({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
-  const esCelular = useEsCelular();
   const [filas, setFilas] = useState<Credencial[] | null>(null);
   const [error, setError] = useState<{ texto: string; reintentar?: () => void } | null>(null);
   const [nombrando, setNombrando] = useState(false);
@@ -432,7 +430,7 @@ function Celulares({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
   }
 
   const vincular = puede ? (
-    <Boton icono="huella" tam={esCelular ? "grande" : undefined} ancho={esCelular} disabled={!enLinea} onClick={() => setNombrando(true)} data-testid="vincular-celular">Vincular este celular con mi huella</Boton>
+    <Boton icono="huella" disabled={!enLinea} onClick={() => setNombrando(true)} data-testid="vincular-celular">Vincular este celular con mi huella</Boton>
   ) : null;
   const usos = (c: Credencial) => c.ultimo_uso_en ? fecha(c.ultimo_uso_en.slice(0, 10)) : "Todavía no";
 
@@ -440,7 +438,7 @@ function Celulares({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
     <section className="negocio-seccion" data-testid="celulares" aria-labelledby="usuarios-celulares">
       <header className="negocio-seccion-cabeza">
         <h2 id="usuarios-celulares">Mis celulares con huella</h2>
-        {!esCelular && filas && filas.length > 0 && vincular}
+        {filas && filas.length > 0 && vincular}
         <p className="detalle">Vinculá el celular una vez y desde entonces entra con la huella, sin Google. Si lo perdés, quitalo de acá.</p>
       </header>
       <Aviso tipo="error" accion={error?.reintentar ? <Boton tam="chico" onClick={error.reintentar}>Reintentar</Boton> : undefined}>{error?.texto}</Aviso>
@@ -452,17 +450,7 @@ function Celulares({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
           </Vacio>
         </div>
       )}
-      {filas && filas.length > 0 && (esCelular ? (
-        <ul className="lista">
-          {filas.map((c) => (
-            <li key={c.id} className="renglon" data-testid="celular">
-              <span className="nombre">{c.dispositivo ?? "Celular"}</span>
-              <Boton variante="peligro" disabled={ocupado === c.id || !enLinea} onClick={() => quitar(c)} aria-label={`Quitar ${c.dispositivo ?? "este celular"}`}>Quitar</Boton>
-              <span className="detalle">Vinculado el {fecha(c.creada_en.slice(0, 10))} · último uso: {usos(c).toLowerCase()}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
+      {filas && filas.length > 0 && (
         <div className="tabla-marco">
           <table className="tabla">
             <thead><tr><th scope="col">Celular</th><th scope="col">Vinculado el</th><th scope="col">Último uso</th><th scope="col" className="angosta"><span className="solo-lectores">Acción</span></th></tr></thead>
@@ -478,8 +466,7 @@ function Celulares({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
             </tbody>
           </table>
         </div>
-      ))}
-      {filas && filas.length > 0 && esCelular && vincular}
+      )}
       {!puede && <Aviso>Este dispositivo no tiene lector de huella o desbloqueo compatible: vinculá desde el celular.</Aviso>}
       {nombrando && <NombrarCelular alCerrar={() => setNombrando(false)} alVincular={(c) => { setNombrando(false); avisar({ texto: `Listo: «${c.dispositivo ?? "este celular"}» entra con la huella desde ahora.`, testId: "mensaje-celular" }); cargar(); }} />}
     </section>

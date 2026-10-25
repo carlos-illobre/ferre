@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { contarAlEspejo, useEspejar } from "../../espejo";
 import { detalleDelRegistro, diferenciaConLaLista, useIngreso } from "../../negocio/deposito/ingreso";
 import { cantidadContada } from "../../negocio/deposito/inventario";
 import { abrirConteo, crearSector as crearSectorNuevo, ordenarSectores, useConteo, useSectores, type Conteo } from "../../negocio/deposito/conteo";
@@ -9,7 +8,7 @@ import { usePuede, type Permiso } from "../permisos";
 import { SinPermiso } from "../SinPermiso";
 import { COMPROBANTES } from "../textos";
 import { FotoDeProducto } from "./FotoDeProducto";
-import { FotoDeFactura, VerComprobante } from "../FotoDeFactura";
+import { FotoDeFactura } from "../FotoDeFactura";
 import { ErrorApi } from "../../datos/conexion";
 import { busquedaAlDia, esperarBusqueda, productoEnMemoria, traerPorCodigo, traerPorIds, useCatalogo } from "../../negocio/catalogo";
 import { fecha, pesos, pesosCortos, porcentaje } from "../../formato";
@@ -65,7 +64,7 @@ function Ingreso() {
   // Si se viene de un pedido (RF-55), el ingreso arranca con su proveedor y con lo que falta llegar.
   const { pedido, error: errorPedido } = usePedidoAIngresar();
   const ingreso = useIngreso({ lado: "celular", costoATexto: String, pedido, textoSinConexion: "Sin conexión con el servidor. Registrar una compra necesita internet." });
-  const { catalogo, errorCatalogo, proveedor, proveedorId, setProveedorId, comprobante, setComprobante, foto, setFoto, fechaCompra, setFechaCompra, consulta, setConsulta, resultados, renglones, agregar, cambiar, cambiarCosto, cambiarFoto, quitar, total, ocupado } = ingreso;
+  const { errorCatalogo, proveedor, proveedorId, setProveedorId, comprobante, setComprobante, foto, setFoto, fechaCompra, setFechaCompra, consulta, setConsulta, resultados, renglones, agregar, cambiar, cambiarCosto, cambiarFoto, quitar, total, ocupado } = ingreso;
   const proveedores = ingreso.proveedores ?? [];
   const { buscandoEnElServidor } = useCatalogo();
   const [elegido, setElegido] = useState(0);

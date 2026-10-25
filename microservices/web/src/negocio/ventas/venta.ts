@@ -3,7 +3,7 @@ import { CONSULTAS, ventasCambiaron } from "./ventas-del-dia";
 import { IVA_SI_NO_SE_SABE, precioDelProducto } from "../catalogo/precio";
 import { consultas } from "../../datos/conexion";
 import { useCallback, useEffect, useState } from "react";
-import { margenReal, precioDeVenta, subtotalDeRenglon } from "../precios/vista-previa";
+import { margenReal, subtotalDeRenglon } from "../precios/vista-previa";
 import { ErrorApi, subirFoto } from "../../datos/conexion";
 import { borrarAnterioresA, guardar } from "../../datos/almacenamiento";
 import { pedirClientes, traerPorCodigo, useCatalogo } from "../catalogo";
