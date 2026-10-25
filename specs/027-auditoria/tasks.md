@@ -5,7 +5,7 @@
 - [ ] T003 Las bases nuevas aparecen solas: `asegurar.sh` repetible, en el arranque y en el control de salud; `CLAVE_BASE_AUDITORIA` (depende de T002)
 - [x] T004 El contrato v1 escrito (`docs/auditoria/contrato-v1.md`) (E15) (depende de T002)
 - [x] T005 El kit: bandeja, anotar, mandador, apagado, borrar lo viejo; pruebas contra PostgreSQL al 100 % (E05–E11) (depende de T004)
-- [ ] T006 El servicio de Auditoría: base, entrada v1, reportes y grupos, permiso; su capa de datos al 100 % (E01–E03, E12–E14) (depende de T004)
+- [x] T006 El servicio de Auditoría: base, entrada v1, reportes y grupos, permiso; su capa de datos al 100 % (E01–E03, E12–E14) (depende de T004)
 - [ ] T007 Comercial: los eventos con sus palabras por el kit, las uniones de productos en su tabla, sin `/auditoria` ni la tabla de eventos (depende de T005)
 - [ ] T008 Procesos: sus eventos por el kit (depende de T005)
 - [ ] T009 La puerta reparte `/auditoria` a Auditoría; compose y CI (depende de T006)

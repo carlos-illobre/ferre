@@ -10,4 +10,5 @@ packages:
   - microservices/procesos/web
   - microservices/conexion
   - microservices/auditoria-kit
+  - microservices/auditoria
   - tests/e2e
