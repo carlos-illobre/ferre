@@ -280,7 +280,7 @@ Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con 
 - [ ] T145 [agente] Etapa 6: réplica en caliente en una segunda máquina y archivos para análisis (Parquet con DuckDB) (depende de T143)
 - [ ] T146 [carlos] Crear las cuentas gratuitas de Cloudflare R2, Backblaze B2 y Healthchecks.io (antes de T140)
 - [x] T150 [carlos] [alta] Pasar los dos ambientes a la base propia (022): pruebas el 2026-10-25 y producción el mismo día, al promover 4c86d71; secretos de Supabase fuera de GitHub (depende de T139)
-- [x] T153 [carlos] [alta] Un usuario de Linux por ambiente en la máquina (decisión 161, 001-T049): ferre-pruebas y ferre-produccion corren cada uno su ambiente con su Docker rootless desde el 2026-10-25; el usuario ferre quedó sin servicios ni linger, y borrarlo lo decide Carlos
+- [x] T153 [carlos] [alta] Un usuario de Linux por ambiente en la máquina (decisión 161, 001-T049): ferre-pruebas y ferre-produccion corren cada uno su ambiente con su Docker rootless desde el 2026-10-25; el usuario ferre se borró el mismo día, con su Docker y su carpeta
 
 ## Sin etapa
 
