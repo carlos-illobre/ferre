@@ -13,18 +13,18 @@ import { Aviso, Boton, EstadoDeConexion, Hoja, Pastilla, Pagina, pesosCortos } f
 import { comoCarga, diaYHora, useEnLinea, type Carga } from "./negocio-comun";
 import { useConsultas, useVentasDelDia, type Consulta } from "../../../../negocio/ventas/ventas-del-dia";
 import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../../../pestanas-de-negocio";
-import { IconoN, type IconoDeNegocio } from "../../../iconos-de-negocio";
+
 import { agruparNoLlevados, compararConElAnterior, pasosDeLoVendido, type Comparado } from "../../../../negocio/ventas/tablero";
 import { diaAnterior, nombreDelDia, porHora, resumenDelDia } from "../../../../negocio/ventas/resumen-del-dia";
 import { hoyLocal } from "../../../../negocio/ventas/ventas-del-dia";
 import "../estilos/negocio.css";
 import "../estilos/resumen.css";
-
+import { Icono, type NombreDeIcono } from "../../../../ui/iconos";
 
 const CONSULTAS_A_LA_VISTA = 3;
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
 const RUTA_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "resumen", compras: "gastos", inventario: "invertido" };
-const ICONO_DE_SECCION: Record<SeccionDeNegocio, IconoDeNegocio> = { ventas: "chart-column", compras: "truck", inventario: "boxes" };
+const ICONO_DE_SECCION: Record<SeccionDeNegocio, NombreDeIcono> = { ventas: "chart-column", compras: "truck", inventario: "boxes" };
 const HORAS = ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
 const horaCorta = (d: Date) => d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 
@@ -88,7 +88,7 @@ export function ResumenVentas() {
               </ul>
             </>
           )}
-          {puedeEsto("ventas.ver") && <button type="button" className="rv-enlace rv-ver-ventas" onClick={() => irA("hoy")} data-testid="ver-ventas">Ver las ventas de hoy <IconoN nombre="chevron-right" tam={16} /></button>}
+          {puedeEsto("ventas.ver") && <button type="button" className="rv-enlace rv-ver-ventas" onClick={() => irA("hoy")} data-testid="ver-ventas">Ver las ventas de hoy <Icono nombre="chevron-right" tam={16} /></button>}
         </section>
       </div>
 
@@ -120,7 +120,7 @@ function Comparacion({ c, actual, pesos, extra }: { c: Comparado | null; actual:
   const texto = `${dif >= 0 ? "+" : "−"}${f(Math.abs(dif))} · ayer: ${f(c.anterior)}`;
   return (
     <>
-      <span className={`rv-delta ${tipo}`}>{tipo !== "igual" && <IconoN nombre={p > 0 ? "arrow-up-right" : "arrow-down-right"} tam={16} />}{Math.abs(p)} %</span>
+      <span className={`rv-delta ${tipo}`}>{tipo !== "igual" && <Icono nombre={p > 0 ? "arrow-up-right" : "arrow-down-right"} tam={16} />}{Math.abs(p)} %</span>
       <span className="rv-comp-texto" title={extra ?? texto}>{extra ?? texto}</span>
     </>
   );
@@ -187,15 +187,15 @@ function Pesos({ valor }: { valor: number }) {
 
 // Un número de arriba: ícono y rótulo, el número grande y la comparación en una pastilla. Si el
 // número se explica, se toca (el número o la «i» de la esquina) y dice de dónde sale.
-function Kpi({ icono, rotulo, valor, comp, principal, pasos, titulo, testId }: { icono: IconoDeNegocio; rotulo: string; valor: ReactNode; comp: ReactNode; principal?: boolean; pasos?: string[] | null; titulo?: string; testId: string }) {
+function Kpi({ icono, rotulo, valor, comp, principal, pasos, titulo, testId }: { icono: NombreDeIcono; rotulo: string; valor: ReactNode; comp: ReactNode; principal?: boolean; pasos?: string[] | null; titulo?: string; testId: string }) {
   const [abierta, setAbierta] = useState(false);
   return (
     <div className={`rv-kpi ${principal ? "principal" : ""}`} data-testid={testId}>
-      <div className="rv-kpi-cab"><span className="rv-kpi-ico"><IconoN nombre={icono} tam={16} /></span><span className="rv-etiqueta">{rotulo}</span></div>
+      <div className="rv-kpi-cab"><span className="rv-kpi-ico"><Icono nombre={icono} tam={16} /></span><span className="rv-etiqueta">{rotulo}</span></div>
       {pasos ? (
         <>
           <button type="button" className="rv-explica" aria-label={`${rotulo}. Ver de dónde sale`} aria-haspopup="dialog" onClick={() => setAbierta(true)} data-testid="explicacion">
-            <span className="rv-va">{valor}</span><span className="rv-explica-i"><IconoN nombre="info" tam={16} /></span>
+            <span className="rv-va">{valor}</span><span className="rv-explica-i"><Icono nombre="info" tam={16} /></span>
           </button>
           {abierta && (
             <Hoja titulo={titulo ?? `De dónde sale ${rotulo}`} alCerrar={() => setAbierta(false)} testId="hoja-explicacion" pie={<Boton variante="marino" onClick={() => setAbierta(false)}>Entendido</Boton>}>
@@ -222,7 +222,6 @@ export function ResumenCompras({ recientes }: { recientes: (vuelta: number) => R
     </SeccionDelNegocio>
   );
 }
-
 
 // Inventario: el dinero invertido, en total y por proveedor.
 export function ResumenInventario({ invertido }: { invertido: (vuelta: number) => ReactNode }) {
@@ -274,16 +273,16 @@ function SeccionDelNegocio({ seccion, testId, bajada, cargando, datos, alActuali
   }, [seccion]);
   return (
     <Pagina titulo={NOMBRES.comoVaElNegocio} testId={testId} bajada={<span className="solo-lectores">{bajada}</span>} className="rv"
-      acciones={<AlLadoDeLasPestanas><span className="rv-actualizado">{TEXTOS.tablero.actualizado.largo} {horaCorta(actualizado)}</span><button type="button" className="rv-boton" onClick={actualizar} disabled={!enLinea || cargando} aria-keyshortcuts="F5" data-testid="actualizar-negocio"><IconoN nombre="refresh-cw" tam={16} />Actualizar <span className="rv-kbd">F5</span></button></AlLadoDeLasPestanas>}>
+      acciones={<AlLadoDeLasPestanas><span className="rv-actualizado">{TEXTOS.tablero.actualizado.largo} {horaCorta(actualizado)}</span><button type="button" className="rv-boton" onClick={actualizar} disabled={!enLinea || cargando} aria-keyshortcuts="F5" data-testid="actualizar-negocio"><Icono nombre="refresh-cw" tam={16} />Actualizar <span className="rv-kbd">F5</span></button></AlLadoDeLasPestanas>}>
       <div className="rv-barra">
         {visibles.length > 1 && (
           <div className="rv-segmentos rv-secciones" role="navigation" aria-label="Secciones" ref={segmentos} onKeyDown={moverse}>
             {visibles.map((s) => (
               <button key={s.valor} type="button" className={s.valor === seccion ? "elegido" : ""} aria-current={s.valor === seccion ? "page" : undefined} onClick={() => irA(RUTA_DE_SECCION[s.valor])} data-testid={`seccion-${s.valor}`}>
-                <IconoN nombre={ICONO_DE_SECCION[s.valor]} tam={16} />{s.nombre}
+                <Icono nombre={ICONO_DE_SECCION[s.valor]} tam={16} />{s.nombre}
               </button>
             ))}
-            <button type="button" disabled title={TEXTOS.tablero.sinResultado.largo}><IconoN nombre="scale" tam={16} />{TEXTOS.tablero.resultado.largo}</button>
+            <button type="button" disabled title={TEXTOS.tablero.sinResultado.largo}><Icono nombre="scale" tam={16} />{TEXTOS.tablero.resultado.largo}</button>
           </div>
         )}
         {seccion === "ventas" && <div className="rv-periodo">
@@ -306,7 +305,6 @@ function SeccionDelNegocio({ seccion, testId, bajada, cargando, datos, alActuali
   );
 }
 
-
 const textoDeEspera = (c: Carga<unknown>, enLinea: boolean) => (c.error ? (enLinea ? "No se pudo cargar" : "Se ve cuando vuelva internet") : "Trayendo el dato…");
 
 // El lugar del número: mientras carga no muestra $0, y si falló lo dice sin moverse de lugar.
@@ -323,7 +321,6 @@ function ErrorDeBloque({ carga }: { carga: Carga<unknown> }) {
 function Esqueleto({ renglones }: { renglones: number }) {
   return <div className="negocio-esqueleto" role="status" aria-label="Cargando">{Array.from({ length: renglones }, (_, i) => <span key={i} className="esqueleto" />)}</div>;
 }
-
 
 // Lo que preguntaron y no compraron, agrupado como la v2 («Disco de corte × 3»): demanda que hoy
 // se pierde. Se anota en Vender con «No llevó». «Ver las N» abre cada consulta, con cuándo, el
@@ -346,7 +343,7 @@ function NoLlevaron({ consultas, deHoy }: { consultas: Carga<Consulta[]>; deHoy:
         <ul className="rv-lista-simple">
           {grupos.slice(0, CONSULTAS_A_LA_VISTA).map((g, i) => (
             <li key={g.descripcion} className={i === CONSULTAS_A_LA_VISTA - 1 ? "ultima" : ""} data-testid="consulta">
-              <IconoN nombre="package" tam={16} /><span className="rv-lista-nombre">{g.descripcion}</span><span className="rv-pastilla">× {g.veces}</span>
+              <Icono nombre="package" tam={16} /><span className="rv-lista-nombre">{g.descripcion}</span><span className="rv-pastilla">× {g.veces}</span>
             </li>
           ))}
         </ul>
@@ -355,7 +352,7 @@ function NoLlevaron({ consultas, deHoy }: { consultas: Carga<Consulta[]>; deHoy:
         <ul className="rv-renglones rv-consultas">
           {lista.map((c) => (
             <li key={c.id} data-testid="consulta">
-              <span className="rv-renglon-ico"><IconoN nombre="package" tam={16} /></span>
+              <span className="rv-renglon-ico"><Icono nombre="package" tam={16} /></span>
               <span className="rv-renglon-nombre">{c.descripcion}<small>{diaYHora(c.fecha)} · {c.motivo ?? "No se anotó el motivo"}</small></span>
               <span className="rv-renglon-importe">{c.precio_ofrecido ? <Pesos valor={Number(c.precio_ofrecido)} /> : <span className="rv-sin-dato">Sin precio</span>}</span>
             </li>

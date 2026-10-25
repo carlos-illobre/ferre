@@ -4,12 +4,13 @@ import { guardaEnElDispositivo } from "../../../datos/almacenamiento";
 import { useDescarga } from "../../../datos/almacenamiento";
 import { fecha } from "../../../formato";
 import { cambiarSinConexion, NOMBRE_DEL_TIEMPO, useMiVinculo, useMisCelulares, useReducirMovimiento } from "../../configuracion-comun";
-import { IconoDeLaV2, type IconoV2 } from "../../IconoDeLaV2";
+
 import { haceCuanto } from "../../../negocio/apartados";
 import { describirDispositivo } from "./Login";
 import { TEXTOS } from "../../textos";
 import "../../mas-v2.css";
 import "./configuracion-v2.css";
+import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 
 // Configuración (RF-83, decisión 79) en el celular, como la v2 del director de arte (variante 1,
 // «Ajustes»; specs/009, decisión 148): una columna de tarjetas. Arriba cuánto se guarda en este
@@ -28,7 +29,7 @@ export function ConfiguracionCelu({ alCambiarElGuardado }: { alCambiarElGuardado
     <main id="contenido" className="mv2 cfgvc" tabIndex={-1} data-testid="configuracion">
       <h1>{t.titulo.corto}</h1>
       <div className="mv-tarjeta-2 cfgvc-guardado">
-        <span className="cfgvc-baldosa"><IconoDeLaV2 nombre="disco" tam={24} /></span>
+        <span className="cfgvc-baldosa"><Icono nombre="disco" tam={24} /></span>
         <div><div className="mv-detalle">{t.guardadoEn.corto}</div><div className="va">—</div><div className="mv-barra"><b style={{ width: 0 }} /></div></div>
       </div>
 
@@ -61,23 +62,23 @@ export function ConfiguracionCelu({ alCambiarElGuardado }: { alCambiarElGuardado
         {c.mensaje && <p className="mv-aviso logro" role="status" data-testid="mensaje-celular">{c.mensaje}</p>}
         {c.filas?.map((x) => (
           <div key={x.id} className="cfgvc-celular" data-testid="celular">
-            <span className="cfgvc-baldosa"><IconoDeLaV2 nombre="huella" /></span>
+            <span className="cfgvc-baldosa"><Icono nombre="huella" /></span>
             <div className="cfgvc-texto"><b>{x.dispositivo ?? "Celular"}</b><p className="mv-detalle">{x.ultimo_uso_en ? `Última vez ${haceCuanto(x.ultimo_uso_en)}` : `${t.conHuellaDesde.corto} ${fecha(x.creada_en.slice(0, 10))}`}</p></div>
             <button type="button" className="mv-btn chico fantasma" onClick={() => void c.quitar(x)}>{t.quitar.corto}</button>
           </div>
         ))}
         {c.filas && c.filas.length === 0 && <p className="mv-detalle cfgvc-sin">{t.sinCelulares.corto}</p>}
-        {c.puedeVincular ? <button type="button" className="mv-btn cfgvc-vincular" onClick={() => void c.vincular(describirDispositivo())} data-testid="vincular-celular"><IconoDeLaV2 nombre="huella" tam={18} />{t.vincularConHuella.corto}</button>
-          : <p className="cfgvc-nota"><IconoDeLaV2 nombre="info" tam={16} />Este dispositivo no tiene lector de huella o desbloqueo compatible.</p>}
+        {c.puedeVincular ? <button type="button" className="mv-btn cfgvc-vincular" onClick={() => void c.vincular(describirDispositivo())} data-testid="vincular-celular"><Icono nombre="huella" tam={18} />{t.vincularConHuella.corto}</button>
+          : <p className="cfgvc-nota"><Icono nombre="info" tam={16} />Este dispositivo no tiene lector de huella o desbloqueo compatible.</p>}
       </div>
 
       {v.emparejado && <>
         <h2 className="cfgvc-sub">{t.vinculoConLaComputadora.corto}</h2>
         <div className="mv-tarjeta-2 cfgvc-vinculo" data-testid="vinculo">
           <div className="cfgvc-linea" aria-hidden="true">
-            <span className="cfgvc-aparato"><IconoDeLaV2 nombre="celular" /></span><i />
+            <span className="cfgvc-aparato"><Icono nombre="celular" /></span><i />
             <span className={`mv-pastilla ${v.pausado ? "" : "logro"}`}><span className="punto" />{v.pausado ? t.desconectados.corto : t.trabajandoJuntos.corto}</span><i />
-            <span className="cfgvc-aparato"><IconoDeLaV2 nombre="pantalla" /></span>
+            <span className="cfgvc-aparato"><Icono nombre="pantalla" /></span>
           </div>
           <b className="cfgvc-vinculo-titulo" data-testid="vinculo-actual">{t.vinculadaConTuCelular.corto}</b>
           {v.vence && <p className="mv-detalle">{t.hasta.corto} {fecha(v.vence.slice(0, 10))}</p>}
@@ -91,10 +92,10 @@ export function ConfiguracionCelu({ alCambiarElGuardado }: { alCambiarElGuardado
   );
 }
 
-function Renglon({ icono, titulo, id, detalle, encendida, alCambiar, testId, filaTestId, children }: { icono: IconoV2; titulo: string; id: string; detalle: string; encendida: boolean; alCambiar: () => void; testId: string; filaTestId?: string; children?: ReactNode }) {
+function Renglon({ icono, titulo, id, detalle, encendida, alCambiar, testId, filaTestId, children }: { icono: NombreDeIcono; titulo: string; id: string; detalle: string; encendida: boolean; alCambiar: () => void; testId: string; filaTestId?: string; children?: ReactNode }) {
   return (
     <div className="cfgvc-renglon" data-testid={filaTestId}>
-      <span className="cfgvc-baldosa"><IconoDeLaV2 nombre={icono} /></span>
+      <span className="cfgvc-baldosa"><Icono nombre={icono} /></span>
       <div className="cfgvc-texto"><b id={id}>{titulo}</b><p className="mv-detalle" id={`${id}-detalle`}>{detalle}</p></div>
       <button type="button" role="switch" aria-checked={encendida} aria-labelledby={id} aria-describedby={`${id}-detalle`} className={`cfgvc-llave ${encendida ? "si" : ""}`} onClick={alCambiar} data-testid={testId} />
       {children && <div className="cfgvc-extra">{children}</div>}
@@ -108,7 +109,7 @@ function DatosSinConexion() {
   const cuando = descarga ? new Date(descarga.cuando) : null;
   return (
     <div className="cfgvc-guarda" data-testid="cfg-descarga">
-      <span className="cfgvc-baldosa blanca"><IconoDeLaV2 nombre="disco" /></span>
+      <span className="cfgvc-baldosa blanca"><Icono nombre="disco" /></span>
       <div className="cfgvc-texto">
         <b id="cfg-descarga">{t.datosSinConexion.corto}</b>
         <p className="mv-detalle" id="cfg-descarga-detalle" aria-live="polite">

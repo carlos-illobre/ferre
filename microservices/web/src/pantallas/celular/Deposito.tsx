@@ -19,7 +19,7 @@ import { AvisoError, Buscador, Contador, Exito, Hoja, Icono, Segmentos, Lista } 
 import { Pestanas } from "./Pestanas";
 import { Stock } from "./Stock";
 import { ComprasRecientes } from "./ComprasRecientes";
-import { IconoDeDeposito } from "../IconoDeDeposito";
+
 import { TEXTOS } from "../textos";
 import "./contar.css";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
@@ -227,25 +227,25 @@ function Contar() {
       {enCurso && (
         <button type="button" className="ctc-seguir" onClick={() => void abrir(enCurso.id)} data-testid="segui-donde-quedaste">
           <span className="ctc-anillo" style={{ background: `conic-gradient(var(--p-naranja) ${avance * 360}deg, var(--p-relleno) 0)` }}><span>{retomable ? `${Math.round(avance * 100)}%` : "—"}</span></span>
-          <span className="ctc-seguir-texto"><em><IconoDeDeposito nombre="pause" tam={16} />{tc.seguiDondeQuedaste.corto}</em><b>{enCurso.nombre}</b>
+          <span className="ctc-seguir-texto"><em><Icono nombre="pause" tam={16} />{tc.seguiDondeQuedaste.corto}</em><b>{enCurso.nombre}</b>
             <span>{retomable ? `Faltan ${retomable.sin_contar.length}${retomable.abierto_en ? ` · abierto el ${fecha(retomable.abierto_en).slice(0, 5)}` : ""}` : `${enCurso.productos} productos`}</span></span>
         </button>
       )}
       <div className="ctc-hoy" data-testid="hoy-toca">
-        <div className="ctc-hoy-cab"><IconoDeDeposito nombre="calendar-check" /><b>{tc.hoyTocaContar.corto} —</b></div>
+        <div className="ctc-hoy-cab"><Icono nombre="calendar-check" /><b>{tc.hoyTocaContar.corto} —</b></div>
         <span className="ctc-riel" />
       </div>
       <div className="ctc-cab"><h2>{tc.sectores.corto}</h2><span>{contados} de {ordenados.length} contados</span>
-        <button type="button" className="ctc-mas" onClick={() => setNuevo(true)} aria-label="Sector nuevo" data-testid="sector-nuevo"><IconoDeDeposito nombre="plus" /></button></div>
+        <button type="button" className="ctc-mas" onClick={() => setNuevo(true)} aria-label="Sector nuevo" data-testid="sector-nuevo"><Icono nombre="plus" /></button></div>
       <ul className="ctc-lista" data-testid="sectores">
         {ordenados.filter((s) => s.id !== enCurso?.id).map((s) => {
           const clase = s.conteo_abierto ? "en-curso" : s.ultimo_conteo === null ? "nunca" : "contado";
           return (
             <li key={s.id}>
               <button type="button" className="ctc-sector" onClick={() => void abrir(s.id)} data-testid="sector">
-                <span className={`ctc-ico ${clase}`}><IconoDeDeposito nombre={s.conteo_abierto ? "pause" : s.ultimo_conteo === null ? "circle-dashed" : "check"} /></span>
+                <span className={`ctc-ico ${clase}`}><Icono nombre={s.conteo_abierto ? "pause" : s.ultimo_conteo === null ? "circle-dashed" : "check"} /></span>
                 <span className="ctc-texto"><b>{s.nombre}</b><span><em className={clase}>{s.conteo_abierto ? tc.enCurso.corto : s.ultimo_conteo === null ? tc.nuncaContado.corto : `Contado el ${fecha(s.ultimo_conteo).slice(0, 5)}`}</em> · {s.productos}</span></span>
-                <IconoDeDeposito nombre="chevron-right" className="ctc-flecha" />
+                <Icono nombre="chevron-right" className="ctc-flecha" />
               </button>
             </li>
           );
@@ -253,8 +253,8 @@ function Contar() {
       </ul>
       {enCurso && (
         <div className="ctc-pie">
-          <button type="button" className="ctc-escanear" onClick={() => void abrir(enCurso.id)} aria-label={`Escanear en ${enCurso.nombre}`}><IconoDeDeposito nombre="scan-barcode" tam={26} /></button>
-          <button type="button" className="ctc-seguir-boton" onClick={() => void abrir(enCurso.id)} data-testid="seguir-contando">{tc.seguirContando.corto}<IconoDeDeposito nombre="arrow-right" /></button>
+          <button type="button" className="ctc-escanear" onClick={() => void abrir(enCurso.id)} aria-label={`Escanear en ${enCurso.nombre}`}><Icono nombre="scan-barcode" tam={26} /></button>
+          <button type="button" className="ctc-seguir-boton" onClick={() => void abrir(enCurso.id)} data-testid="seguir-contando">{tc.seguirContando.corto}<Icono nombre="arrow-right" /></button>
         </div>
       )}
       {nuevo && (

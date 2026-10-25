@@ -15,9 +15,10 @@ import { irA } from "./base/rutas";
 import { Aviso, Boton, Buscador, Explicado, Hoja, Pagina, Progreso, Toast, Vacio, numero } from "./base/ui";
 import { useEsCelular } from "./base/vista";
 import { AlLadoDeLasPestanas } from "../AlLadoDeLasPestanas";
-import { IconoDeDeposito, type IconoDeDepositoNombre } from "../IconoDeDeposito";
+
 import { conSigno, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./base/pantallas/deposito-comun";
 import "./base/estilos/stock.css";
+import { Icono, type NombreDeIcono } from "../../ui/iconos";
 
 // Stock, como la v2 («Lista y cuenta del producto», decisión 148): arriba los números del depósito,
 // a la izquierda la búsqueda, los filtros y los productos, y a la derecha, fijo, el elegido con su
@@ -126,8 +127,8 @@ export function Inventario() {
   const esperando = datos === null && !error && !errorCatalogo;
   const ordenar = (columna: Columna) => setOrden((o) => (o?.columna === columna ? (o.sube === (columna === "producto") ? { columna, sube: !o.sube } : null) : { columna, sube: columna === "producto" }));
 
-  const resumen = (valor: Filtro | null, clase: string, icono: IconoDeDepositoNombre, rotulo: string, cifra: ReactNode, testId: string) => {
-    const contenido = <><span className="sv-ico"><IconoDeDeposito nombre={icono} /></span><span><span className="sv-et">{rotulo}</span><span className="sv-va">{cifra}</span></span></>;
+  const resumen = (valor: Filtro | null, clase: string, icono: NombreDeIcono, rotulo: string, cifra: ReactNode, testId: string) => {
+    const contenido = <><span className="sv-ico"><Icono nombre={icono} /></span><span><span className="sv-et">{rotulo}</span><span className="sv-va">{cifra}</span></span></>;
     return valor
       ? <button type="button" className={`sv-resumen ${clase}`} aria-pressed={filtro === valor} onClick={() => setFiltro(filtro === valor ? "todos" : valor)} data-testid={testId}>{contenido}</button>
       : <div className={`sv-resumen ${clase}`} data-testid={testId}>{contenido}</div>;
@@ -147,9 +148,9 @@ export function Inventario() {
     <Pagina titulo="Inventario" testId="pantalla-stock" className="stock-v2"
       acciones={<AlLadoDeLasPestanas>
         <div className="sv-acciones">
-          <Boton tam="chico" disabled title={t.todaviaNo.largo} data-testid="exportar-excel"><IconoDeDeposito nombre="file-spreadsheet" tam={16} />{t.exportar.largo}</Boton>
-          <Boton tam="chico" disabled title={t.todaviaNo.largo} data-testid="etiquetas"><IconoDeDeposito nombre="printer" tam={16} />{t.etiquetas.largo} <kbd className="tecla">Alt E</kbd></Boton>
-          {pidePedidos && <Boton tam="chico" variante="principal" className="sv-que-pedir" onClick={() => irA("pedidos")} data-testid="que-pedir"><IconoDeDeposito nombre="truck" tam={16} />{t.quePedir.largo} · — </Boton>}
+          <Boton tam="chico" disabled title={t.todaviaNo.largo} data-testid="exportar-excel"><Icono nombre="file-spreadsheet" tam={16} />{t.exportar.largo}</Boton>
+          <Boton tam="chico" disabled title={t.todaviaNo.largo} data-testid="etiquetas"><Icono nombre="printer" tam={16} />{t.etiquetas.largo} <kbd className="tecla">Alt E</kbd></Boton>
+          {pidePedidos && <Boton tam="chico" variante="principal" className="sv-que-pedir" onClick={() => irA("pedidos")} data-testid="que-pedir"><Icono nombre="truck" tam={16} />{t.quePedir.largo} · — </Boton>}
         </div>
       </AlLadoDeLasPestanas>}>
       <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={cargar}>Reintentar</Boton>}>{error}</Aviso>
@@ -167,10 +168,10 @@ export function Inventario() {
           {resumen("negativo", cuenta.negativos ? "error" : "neutro", "circle-alert", t.negativo.largo, numero(cuenta.negativos), "stock-negativo")}
           {veInvertido && (
             <div className="sv-resumen dinero" data-testid="dinero-invertido-stock">
-              <span className="sv-ico"><IconoDeDeposito nombre="coins" /></span>
+              <span className="sv-ico"><Icono nombre="coins" /></span>
               <span><span className="sv-et">{t.dineroInvertido.largo}</span>
                 <span className="sv-va"><Explicado valor={pesosEnteros(datos.valor_total)} etiqueta="Dinero invertido" titulo="De dónde sale el dinero invertido" pasos={pasosDelInvertido(datos.por_proveedor, datos.valor_total)} /></span></span>
-              <span className="sv-candado" title="Lo ve solo quien tiene el permiso «Ver el dinero invertido»"><IconoDeDeposito nombre="lock" tam={16} /></span>
+              <span className="sv-candado" title="Lo ve solo quien tiene el permiso «Ver el dinero invertido»"><Icono nombre="lock" tam={16} /></span>
             </div>
           )}
         </div>
@@ -191,14 +192,14 @@ export function Inventario() {
             <Buscador valor={consulta} alCambiar={setConsulta} placeholder={esCelular ? t.buscar.corto : t.buscar.largo} etiqueta="Buscar un producto" cajaRef={caja} autoFoco={!esCelular}
               extra={<>
                 {!consulta && <kbd className="tecla sv-barra">/</kbd>}
-                {!esCelular && emparejado && <Boton variante="marino" className="sv-celular" onClick={() => void pedirLector().then(setLectorPedido)} data-testid="pedir-lector"><IconoDeDeposito nombre="scan-barcode" />{t.conElCelular.largo}</Boton>}
+                {!esCelular && emparejado && <Boton variante="marino" className="sv-celular" onClick={() => void pedirLector().then(setLectorPedido)} data-testid="pedir-lector"><Icono nombre="scan-barcode" />{t.conElCelular.largo}</Boton>}
               </>} />
             {lectorPedido !== null && <Aviso tipo={lectorPedido ? "info" : "alerta"}>{lectorPedido ? "Abrí Ferrebress en el celular y tocá «Abrir el lector»." : "No se pudo avisar al celular."}</Aviso>}
             <div className="sv-chips" role="group" aria-label="Qué productos mostrar">
               {chip("todos", t.todos.largo, cuenta.total)}
               {chip("revisar", t.paraRevisar.largo, cuenta.enCero + cuenta.negativos, "var(--p-urgente)")}
               {chip("negativo", t.negativo.corto, cuenta.negativos, "var(--p-error)")}
-              <button type="button" className="sv-chip" disabled title={t.todaviaNo.largo} data-testid="filtro-sin-codigo"><IconoDeDeposito nombre="barcode" tam={16} />{t.sinCodigo.largo} <span className="sv-n">—</span></button>
+              <button type="button" className="sv-chip" disabled title={t.todaviaNo.largo} data-testid="filtro-sin-codigo"><Icono nombre="barcode" tam={16} />{t.sinCodigo.largo} <span className="sv-n">—</span></button>
               {(filtro === "con" || filtro === "cero") && chip(filtro, filtro === "con" ? t.conStock.largo : t.sinStock.largo, filtro === "con" ? cuenta.con : cuenta.enCero)}
             </div>
 
@@ -230,7 +231,7 @@ export function Inventario() {
                           aria-label={`${conUnidad(n, p.unidad)}. Ver los movimientos de ${p.descripcion}`} data-testid="stock">
                           <span className="sv-et">Stock</span><span className="sv-va">{conUnidad(n, p.unidad).replace("-", "−")}</span>
                         </button>
-                        <IconoDeDeposito nombre="chevron-right" className="sv-flecha" />
+                        <Icono nombre="chevron-right" className="sv-flecha" />
                       </li>
                     );
                   })}
@@ -258,7 +259,7 @@ export function Inventario() {
 
 const estadoDe = (n: number) => (n < 0 ? "error" : n === 0 ? "neutro" : "logro");
 
-const ICONO_DEL_MOVIMIENTO: Record<string, { icono: IconoDeDepositoNombre; clase: string }> = {
+const ICONO_DEL_MOVIMIENTO: Record<string, { icono: NombreDeIcono; clase: string }> = {
   Venta: { icono: "shopping-cart", clase: "" }, Compra: { icono: "truck", clase: "compra" }, Ajuste: { icono: "square-pen", clase: "ajuste" }, Conteo: { icono: "clipboard-list", clase: "ajuste" },
 };
 
@@ -323,7 +324,7 @@ function CuentaDelProducto({ producto: p, fila, cantidad, porEnviar, enHoja, pan
         <div className="sv-p-cab">
           <FotoDeProducto producto={p} alCambiar={(f) => { actualizarProducto(p.id, { foto_url: f }).catch(() => undefined); }} />
           <div className="sv-p-titulo"><h2>{p.descripcion}</h2><span className="detalle">{[p.marca, fila?.proveedor ?? p.proveedor].filter(Boolean).join(" · ") || "Sin marca ni proveedor"}</span></div>
-          <Boton tam="chico" className="sv-icono" disabled title={TEXTOS.stock.todaviaNo.largo} aria-label="Imprimir su etiqueta"><IconoDeDeposito nombre="printer" tam={16} /></Boton>
+          <Boton tam="chico" className="sv-icono" disabled title={TEXTOS.stock.todaviaNo.largo} aria-label="Imprimir su etiqueta"><Icono nombre="printer" tam={16} /></Boton>
         </div>
       )}
       <div className="sv-saldo">
@@ -344,7 +345,7 @@ function CuentaDelProducto({ producto: p, fila, cantidad, porEnviar, enHoja, pan
           {visibles.map(({ m, queda }) => <Renglon key={m.id} m={m} queda={queda} />)}
           {conSaldo.length > 3 && (
             <li className="sv-mov">
-              <span className="sv-mov-ic"><IconoDeDeposito nombre="history" tam={16} /></span>
+              <span className="sv-mov-ic"><Icono nombre="history" tam={16} /></span>
               <button type="button" className="sv-mas-movs" onClick={() => setTodos((x) => !x)}>{todos ? "Ver solo los últimos 3" : `Ver ${numero(conSaldo.length - 3)} más, hasta el ${fecha(conSaldo[conSaldo.length - 1]!.m.fecha).slice(0, 5)}`}</button>
               <span /><span className="sv-mov-queda">{todos ? "↑" : "↓"}</span>
             </li>
@@ -357,11 +358,11 @@ function CuentaDelProducto({ producto: p, fila, cantidad, porEnviar, enHoja, pan
           <div className="sv-fila-c">
             <label className="sv-et-c" htmlFor={`${id}-real`}>¿Cuántas hay?</label>
             <span className="sv-cantidad">
-              <button type="button" onClick={() => sumar(-1)} aria-label="Una menos"><IconoDeDeposito nombre="minus" tam={16} /></button>
+              <button type="button" onClick={() => sumar(-1)} aria-label="Una menos"><Icono nombre="minus" tam={16} /></button>
               <input id={`${id}-real`} inputMode={enteras(unidad) ? "numeric" : "decimal"} autoComplete="off" value={real} onFocus={(e) => e.target.select()}
                 onChange={(e) => { setReal(e.target.value.replace(enteras(unidad) ? /[^\d]/g : /[^\d,.]/g, "")); setFalta((f) => ({ ...f, real: undefined })); }}
                 aria-invalid={Boolean(falta.real)} aria-describedby={falta.real ? `${id}-falta-real` : `${id}-vista`} data-testid="cantidad-real" />
-              <button type="button" onClick={() => sumar(1)} aria-label="Una más"><IconoDeDeposito nombre="plus" tam={16} /></button>
+              <button type="button" onClick={() => sumar(1)} aria-label="Una más"><Icono nombre="plus" tam={16} /></button>
             </span>
             <span className="sv-vista" id={`${id}-vista`}>{!valida ? <>el sistema dice <b>{numero(cantidad)}</b></> : hay === cantidad ? "coincide con el sistema" : <>había <b>{numero(cantidad)}</b>, hay <b>{numero(hay)}</b></>}</span>
           </div>
@@ -390,7 +391,7 @@ function Renglon({ m, queda }: { m: Movimiento; queda: number }) {
   const c = Number(m.cantidad);
   return (
     <li className="sv-mov">
-      <span className={`sv-mov-ic ${clase}`}><IconoDeDeposito nombre={icono} tam={16} /></span>
+      <span className={`sv-mov-ic ${clase}`}><Icono nombre={icono} tam={16} /></span>
       <span className="sv-mov-texto"><span className="sv-mov-tt">{nombre} · {fecha(m.fecha)}</span>{m.nota && <span className="sv-mov-nn">{m.nota}</span>}</span>
       <span className={`sv-mov-q ${c > 0 ? "mas" : ""}`}>{conSigno(c)}</span>
       <span className="sv-mov-queda">{numero(queda)}</span>

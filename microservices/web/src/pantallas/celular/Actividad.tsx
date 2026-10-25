@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useActividad, paginasDe, type Evento } from "../../negocio/actividad";
 import { useUsuarios } from "../../negocio/usuarios";
-import { IconoN, Iniciales } from "../iconos-de-negocio";
+import { Iniciales } from "../iconos-de-negocio";
 import { TIPOS, aplanar, detalleDe, diasDelPeriodo, horaDe, inicioDelDia, queFue, type Periodo } from "../actividad-en-palabras";
 import { Hoja } from "./componentes/base";
 import "./actividad.css";
+import { Icono } from "../../ui/iconos";
 
 const PERIODOS: { valor: Periodo; nombre: string }[] = [{ valor: "hoy", nombre: "Hoy" }, { valor: "ayer", nombre: "Ayer" }, { valor: "semana", nombre: "Esta semana" }, { valor: "rango", nombre: "Desde… hasta" }];
 const primerNombre = (n: string | null) => (n ? n.split(/\s+/)[0]! : "El sistema");
@@ -42,13 +43,13 @@ export function Actividad() {
         <div className="ac2-num ambar" title="Todavía no se sabe qué hay para revisar"><span>A revisar</span><b>—</b></div>
       </div>
       <div className="ac2-filtros">
-        <label className="ac2-chip oscuro"><IconoN nombre="calendar" tam={18} /><span>{nombrePeriodo === "Todo" ? "Todo" : PERIODOS.find((p) => p.valor === periodo)!.nombre}</span><IconoN nombre="chevron-down" tam={16} />
+        <label className="ac2-chip oscuro"><Icono nombre="calendar" tam={18} /><span>{nombrePeriodo === "Todo" ? "Todo" : PERIODOS.find((p) => p.valor === periodo)!.nombre}</span><Icono nombre="chevron-down" tam={16} />
           <select aria-label="Período" value={periodo} onChange={(e) => cambiar(() => setPeriodo(e.target.value as Periodo))} data-testid="filtro-periodo">{PERIODOS.map((p) => <option key={p.valor} value={p.valor}>{p.nombre}</option>)}</select>
         </label>
-        <label className={`ac2-chip ${usuario ? "puesto" : ""}`}><IconoN nombre="users" tam={18} /><span>{usuario ? primerNombre(usuarios.find((u) => u.id === usuario)?.nombre ?? null) : "Todos"}</span><IconoN nombre="chevron-down" tam={16} />
+        <label className={`ac2-chip ${usuario ? "puesto" : ""}`}><Icono nombre="users" tam={18} /><span>{usuario ? primerNombre(usuarios.find((u) => u.id === usuario)?.nombre ?? null) : "Todos"}</span><Icono nombre="chevron-down" tam={16} />
           <select aria-label="Quién" value={usuario} onChange={(e) => cambiar(() => setUsuario(e.target.value))} data-testid="filtro-usuario"><option value="">Todos</option>{usuarios.map((u) => <option key={u.id} value={u.id}>{u.nombre}{u.activo ? "" : " (desactivado)"}</option>)}</select>
         </label>
-        <label className={`ac2-chip ${tipo ? "puesto" : ""}`}><IconoN nombre="list-filter" tam={18} /><span>{tipo ? TIPOS.find((t) => t.valor === tipo)?.nombre ?? "Tipo" : "Todo tipo"}</span><IconoN nombre="chevron-down" tam={16} />
+        <label className={`ac2-chip ${tipo ? "puesto" : ""}`}><Icono nombre="list-filter" tam={18} /><span>{tipo ? TIPOS.find((t) => t.valor === tipo)?.nombre ?? "Tipo" : "Todo tipo"}</span><Icono nombre="chevron-down" tam={16} />
           <select aria-label="Qué" value={tipo} onChange={(e) => cambiar(() => setTipo(e.target.value))} data-testid="filtro-tipo"><option value="">Todo tipo</option>{TIPOS.map((t) => <option key={t.valor} value={t.valor}>{t.nombre}</option>)}</select>
         </label>
       </div>
@@ -68,7 +69,7 @@ export function Actividad() {
           const detalle = total ? detalleDe(e, usuarios).split(" · ").filter((p) => !p.startsWith("$")).join(" · ") : detalleDe(e, usuarios);
           return (
             <button key={e.id} type="button" className={`ac2-ac ${que.tono === "error" ? "rojo" : ""}`} onClick={() => setAbierto(e)} data-testid="evento">
-              <span className={`ac2-tipo ${que.tono ?? ""}`}><IconoN nombre={que.icono} /></span>
+              <span className={`ac2-tipo ${que.tono ?? ""}`}><Icono nombre={que.icono} /></span>
               <span className="ac2-texto"><span className="ac2-q">{que.nombre}{total}</span><span className="ac2-d"><Iniciales nombre={e.nombre ?? "Sistema"} clave={e.email ?? "sistema"} tam="s" />{primerNombre(e.nombre)}{detalle && ` · ${detalle}`}</span></span>
               <span className="ac2-h">{horaDe(e.fecha)}</span>
             </button>
@@ -77,9 +78,9 @@ export function Actividad() {
       </div>
       {datos && datos.total > 0 && (
         <nav className="ac2-pager" data-testid="paginado" aria-label="Páginas del registro">
-          <button type="button" className="ac2-boton" disabled={pagina <= 1} onClick={() => setPagina((p) => p - 1)} data-testid="anteriores"><IconoN nombre="chevron-left" tam={18} />Nuevas</button>
+          <button type="button" className="ac2-boton" disabled={pagina <= 1} onClick={() => setPagina((p) => p - 1)} data-testid="anteriores"><Icono nombre="chevron-left" tam={18} />Nuevas</button>
           <span className="ac2-t">{datos.pagina} de {paginas}<small>{desdeN} a {hastaN}</small></span>
-          <button type="button" className="ac2-boton" disabled={pagina >= paginas} onClick={() => setPagina((p) => p + 1)} data-testid="siguientes">Anteriores<IconoN nombre="chevron-right" tam={18} /></button>
+          <button type="button" className="ac2-boton" disabled={pagina >= paginas} onClick={() => setPagina((p) => p + 1)} data-testid="siguientes">Anteriores<Icono nombre="chevron-right" tam={18} /></button>
         </nav>
       )}
       {abierto && (

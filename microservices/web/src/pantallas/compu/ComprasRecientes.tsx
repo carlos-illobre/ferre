@@ -8,11 +8,12 @@ import { Aviso, Boton, Explicado, Hoja, pesosCortos } from "./base/ui";
 import { irA } from "./base/rutas";
 import { mensajeDe, plural, useEnLinea } from "./base/pantallas/deposito-comun";
 import { AlLadoDeLasPestanas } from "../AlLadoDeLasPestanas";
-import { IconoDeDeposito } from "../IconoDeDeposito";
+
 import { TEXTOS } from "../textos";
 import "./base/estilos/compras.css";
 import "./base/estilos/compras-v2.css";
 import { VerComprobante } from "../FotoDeFactura";
+import { Icono } from "../../ui/iconos";
 
 // Compras, como la v2 («El escritorio de compras», decisión 148). Van en Cómo va el negocio
 // (decisión 67): sirven para mirar qué se compró, no para recibir mercadería. Arriba lo gastado en
@@ -47,8 +48,8 @@ export function ComprasRecientes() {
     <div className="cv">
       <AlLadoDeLasPestanas>
         <div className="cv-acciones">
-          {encarga && <Boton tam="chico" onClick={() => irA("pedidos")} data-testid="armar-pedido"><IconoDeDeposito nombre="send" tam={16} />{t.armarPedido.largo} <kbd className="tecla">Alt P</kbd></Boton>}
-          {registra && <Boton tam="chico" variante="principal" className="cv-registrar" onClick={() => irA("ingreso")} data-testid="registrar-compra"><IconoDeDeposito nombre="camera" tam={16} />{t.registrarCompra.largo} <kbd className="tecla">Alt N</kbd></Boton>}
+          {encarga && <Boton tam="chico" onClick={() => irA("pedidos")} data-testid="armar-pedido"><Icono nombre="send" tam={16} />{t.armarPedido.largo} <kbd className="tecla">Alt P</kbd></Boton>}
+          {registra && <Boton tam="chico" variante="principal" className="cv-registrar" onClick={() => irA("ingreso")} data-testid="registrar-compra"><Icono nombre="camera" tam={16} />{t.registrarCompra.largo} <kbd className="tecla">Alt N</kbd></Boton>}
         </div>
       </AlLadoDeLasPestanas>
       <Aviso tipo="ok" testId="compra-anulada">{mensaje}</Aviso>
@@ -56,16 +57,16 @@ export function ComprasRecientes() {
       <div className="cv-resumenes">
         {veGastos && <EstaSemana gastos={gastos.datos} compras={compras.datos} error={gastos.error ? mensajeDe(gastos.error, "Se ve cuando vuelva internet") : null} />}
         <div className="cv-resumen" data-testid="pedidos-por-llegar">
-          <span className="cv-ico"><IconoDeDeposito nombre="truck" /></span>
+          <span className="cv-ico"><Icono nombre="truck" /></span>
           <span><span className="cv-et">{t.pedidosPorLlegar.largo}</span><span className="cv-va">{porLlegar ? porLlegar.length : "—"}</span>
             <span className="cv-sub">{porLlegar ? plural(porLlegar.filter((p) => p.estado === "recibido_parcial").length, "llegó a medias", "llegaron a medias") : "—"}</span></span>
         </div>
         <div className="cv-resumen" data-testid="se-les-debe">
-          <span className="cv-ico"><IconoDeDeposito nombre="landmark" /></span>
+          <span className="cv-ico"><Icono nombre="landmark" /></span>
           <span><span className="cv-et">{t.seLesDebe.largo}</span><span className="cv-va">—</span><span className="cv-sub">{t.todaviaNo.corto}</span></span>
         </div>
         <div className="cv-resumen error" data-testid="vencido">
-          <span className="cv-ico"><IconoDeDeposito nombre="triangle-alert" /></span>
+          <span className="cv-ico"><Icono nombre="triangle-alert" /></span>
           <span><span className="cv-et">{t.vencido.largo}</span><span className="cv-va">—</span><span className="cv-sub">{t.todaviaNo.corto}</span></span>
         </div>
       </div>
@@ -75,21 +76,21 @@ export function ComprasRecientes() {
         <aside className="cv-costado">
           <section className="cv-tarjeta cv-foto" aria-labelledby="cv-foto-titulo">
             <div className="cv-foto-arriba">
-              <span className="cv-qr" aria-hidden="true"><IconoDeDeposito nombre="qr-code" tam={40} grosor={1.5} /></span>
+              <span className="cv-qr" aria-hidden="true"><Icono nombre="qr-code" tam={40} grosor={1.5} /></span>
               <div><h2 id="cv-foto-titulo">{t.sacaleFoto.largo}</h2><p className="detalle">{t.sacaleFotoDetalle.largo}</p></div>
             </div>
             <div className="cv-foto-botones">
-              <Boton tam="chico" disabled={!registra} onClick={() => irA("ingreso")}><IconoDeDeposito nombre="image" tam={16} />{t.elegirArchivo.largo}</Boton>
-              <Boton tam="chico" disabled={!registra} onClick={() => irA("ingreso")}><IconoDeDeposito nombre="keyboard" tam={16} />{t.cargarAMano.largo}</Boton>
+              <Boton tam="chico" disabled={!registra} onClick={() => irA("ingreso")}><Icono nombre="image" tam={16} />{t.elegirArchivo.largo}</Boton>
+              <Boton tam="chico" disabled={!registra} onClick={() => irA("ingreso")}><Icono nombre="keyboard" tam={16} />{t.cargarAMano.largo}</Boton>
             </div>
           </section>
           <section className="cv-tarjeta" aria-labelledby="cv-llegar" data-testid="por-llegar">
-            <h2 id="cv-llegar" className="cv-tarjeta-titulo"><IconoDeDeposito nombre="truck" tam={18} />{t.porLlegar.largo}</h2>
+            <h2 id="cv-llegar" className="cv-tarjeta-titulo"><Icono nombre="truck" tam={18} />{t.porLlegar.largo}</h2>
             {porLlegar === null ? <p className="detalle">—</p> : porLlegar.length === 0 ? <p className="detalle">{t.nadaPorLlegar.largo}</p> : (
               <ul className="cv-renglones">
                 {porLlegar.slice(0, 3).map((p) => (
                   <li key={p.id}>
-                    <span className="cv-ico-chico"><IconoDeDeposito nombre="clipboard-list" tam={18} /></span>
+                    <span className="cv-ico-chico"><Icono nombre="clipboard-list" tam={18} /></span>
                     <span className="cv-texto"><b>{p.proveedor}</b><span className={p.estado === "recibido_parcial" ? "cv-a-medias" : ""}>{p.estado === "recibido_parcial" ? `Llegó a medias · ${faltanDe(p) === 1 ? "falta 1" : `faltan ${faltanDe(p)}`}` : `Enviado${p.enviado_en ? ` el ${fecha(p.enviado_en).slice(0, 5)}` : ""} · ${plural(p.items.length, "renglón", "renglones")}`}</span></span>
                     {registra && <Boton tam="chico" className="cv-llego" onClick={() => irA(`ingreso?pedido=${p.id}`)} data-testid="llego">{t.llego.largo}</Boton>}
                   </li>
@@ -98,7 +99,7 @@ export function ComprasRecientes() {
             )}
           </section>
           <section className="cv-tarjeta" aria-labelledby="cv-vence" data-testid="vence-primero">
-            <h2 id="cv-vence" className="cv-tarjeta-titulo"><IconoDeDeposito nombre="landmark" tam={18} />{t.vencePrimero.largo}</h2>
+            <h2 id="cv-vence" className="cv-tarjeta-titulo"><Icono nombre="landmark" tam={18} />{t.vencePrimero.largo}</h2>
             <p className="detalle">— {t.todaviaNo.largo}</p>
           </section>
         </aside>
@@ -180,13 +181,13 @@ function Recientes({ compras, gastos, enLinea, alAnular }: { compras: ReturnType
             return (
               <li key={c.id} className={`cv-compra ${anulada ? "anulada" : ""} ${abierta ? "abierta" : ""}`} data-testid="compra-reciente">
                 <div className="cv-fila">
-                  <span className="cv-mini">{c.foto ? <VerComprobante ruta={c.foto} /> : <IconoDeDeposito nombre="notebook-pen" />}</span>
+                  <span className="cv-mini">{c.foto ? <VerComprobante ruta={c.foto} /> : <Icono nombre="notebook-pen" />}</span>
                   <button type="button" className="cv-abrir" data-abre-compra onClick={() => alternar(c.id)} onKeyDown={(e) => teclas(e, c)} aria-expanded={abierta}
                     aria-label={`${abierta ? "Plegar" : "Ver"} los renglones de la compra a ${c.proveedor} del ${fecha(c.fecha)}`} aria-keyshortcuts={anulada ? undefined : "Delete"}>
                     <span className="cv-texto"><b>{c.proveedor}</b><span>{fecha(c.fecha)} · {nombreComprobante(c)} · {plural(Number(c.renglones), "renglón", "renglones")}</span></span>
                     <span className="cv-importe"><b className={anulada ? "tachado" : ""}>{pesosCortos(c.total)}</b><small>{anulada ? t.noSuma.largo : t.sinIva.largo}</small></span>
-                    <span className="cv-estado">{anulada && <span className="cv-pastilla error"><IconoDeDeposito nombre="ban" tam={16} />{t.anulada.largo}</span>}</span>
-                    <IconoDeDeposito nombre="chevron-right" className="cv-flecha" />
+                    <span className="cv-estado">{anulada && <span className="cv-pastilla error"><Icono nombre="ban" tam={16} />{t.anulada.largo}</span>}</span>
+                    <Icono nombre="chevron-right" className="cv-flecha" />
                   </button>
                 </div>
                 {abierta && (

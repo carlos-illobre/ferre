@@ -13,7 +13,7 @@ import { useFiltroDeUsuarios } from "../../../filtro-de-usuarios";
 import { usePuede } from "../../../permisos";
 import { ElegirRoles, useRolesAsignables, type RolAsignable } from "../../../RolesDeUsuario";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
-import { IconoN, Iniciales, iconoDeRol } from "../../../iconos-de-negocio";
+import { Iniciales, iconoDeRol } from "../../../iconos-de-negocio";
 import { irA } from "../rutas";
 import "../estilos/negocio.css";
 import "../estilos/usuarios.css";
@@ -137,8 +137,8 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
   return (
     <>
       <AlLadoDeLasPestanas>
-        {puedeEsto("admin.roles") && <button type="button" className="uv-boton" onClick={() => irA("roles")} aria-keyshortcuts="Alt+R" data-testid="ir-a-roles"><IconoN nombre="shield-check" tam={16} />Roles y permisos <span className="uv-kbd">Alt R</span></button>}
-        <button type="button" className="uv-boton accion" disabled={!enLinea} onClick={() => setAlta(true)} aria-keyshortcuts="Alt+N" data-testid="autorizar"><IconoN nombre="user-plus" tam={16} />{TEXTOS.usuarios.autorizarOtro.largo} <span className="uv-kbd">Alt N</span></button>
+        {puedeEsto("admin.roles") && <button type="button" className="uv-boton" onClick={() => irA("roles")} aria-keyshortcuts="Alt+R" data-testid="ir-a-roles"><Icono nombre="shield-check" tam={16} />Roles y permisos <span className="uv-kbd">Alt R</span></button>}
+        <button type="button" className="uv-boton accion" disabled={!enLinea} onClick={() => setAlta(true)} aria-keyshortcuts="Alt+N" data-testid="autorizar"><Icono nombre="user-plus" tam={16} />{TEXTOS.usuarios.autorizarOtro.largo} <span className="uv-kbd">Alt N</span></button>
       </AlLadoDeLasPestanas>
       <Aviso tipo="error" accion={<Boton tam="chico" onClick={lista.recargar}>Reintentar</Boton>}>{lista.error}</Aviso>
       {!lista.datos && !lista.error && <div className="tarjeta negocio-esqueleto" role="status" aria-label="Trayendo los usuarios">{[0, 1, 2].map((i) => <span key={i} className="esqueleto" />)}</div>}
@@ -147,10 +147,10 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
           <h2 id="usuarios-autorizados-titulo" className="solo-lectores">Usuarios autorizados</h2>
           <div className="uv-izq">
             <div className="uv-kpis">
-              <div className="uv-kpi"><span className="uv-kpi-ico"><IconoN nombre="users" /></span><span className="uv-kpi-va">{activos}</span><span className="uv-kpi-et">activos de {filas.length}</span></div>
-              <div className="uv-kpi"><span className="uv-kpi-ico"><IconoN nombre="monitor" /></span><span className="uv-kpi-va">{sesiones.datos ? sesiones.datos.length : "—"}</span><span className="uv-kpi-et">{sesiones.datos?.length === 1 ? "sesión" : "sesiones"}</span></div>
-              <div className="uv-kpi"><span className="uv-kpi-ico"><IconoN nombre="fingerprint" /></span><span className="uv-kpi-va">{celulares.datos ? conHuella : "—"}</span><span className="uv-kpi-et">con huella</span></div>
-              <div className="uv-kpi" title="Todavía no se sabe quién no entra hace 30 días"><span className="uv-kpi-ico"><IconoN nombre="hourglass" /></span><span className="uv-kpi-va uv-gris">—</span><span className="uv-kpi-et">sin usar 30 días</span></div>
+              <div className="uv-kpi"><span className="uv-kpi-ico"><Icono nombre="users" /></span><span className="uv-kpi-va">{activos}</span><span className="uv-kpi-et">activos de {filas.length}</span></div>
+              <div className="uv-kpi"><span className="uv-kpi-ico"><Icono nombre="monitor" /></span><span className="uv-kpi-va">{sesiones.datos ? sesiones.datos.length : "—"}</span><span className="uv-kpi-et">{sesiones.datos?.length === 1 ? "sesión" : "sesiones"}</span></div>
+              <div className="uv-kpi"><span className="uv-kpi-ico"><Icono nombre="fingerprint" /></span><span className="uv-kpi-va">{celulares.datos ? conHuella : "—"}</span><span className="uv-kpi-et">con huella</span></div>
+              <div className="uv-kpi" title="Todavía no se sabe quién no entra hace 30 días"><span className="uv-kpi-ico"><Icono nombre="hourglass" /></span><span className="uv-kpi-va uv-gris">—</span><span className="uv-kpi-et">sin usar 30 días</span></div>
             </div>
             <FiltroDeUsuarios filtro={filtro} roles={disponibles} filas={filas} buscador={buscador} />
             <div className="uv-tabla" data-testid="usuarios" ref={lista$} onKeyDown={moverse}>
@@ -165,16 +165,16 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
                     <Iniciales nombre={u.nombre} clave={u.email} apagado={!u.activo} />
                     <span className="uv-quien"><span className="uv-nom">{u.nombre}{u.id === yo && <span className="uv-yo">Vos</span>}</span><span className="uv-mail">{u.email}</span></span>
                     <span className="uv-roles">
-                      {roles.slice(0, entran).map((r) => <span key={r.id} className={`uv-rol ${r.nombre === "Administrador" ? "admin" : ""}`}><IconoN nombre={iconoDeRol(r.nombre)} tam={16} />{r.nombre}</span>)}
+                      {roles.slice(0, entran).map((r) => <span key={r.id} className={`uv-rol ${r.nombre === "Administrador" ? "admin" : ""}`}><Icono nombre={iconoDeRol(r.nombre)} tam={16} />{r.nombre}</span>)}
                       {roles.length > entran && <span className="uv-rol mas">+{roles.length - entran}</span>}
                       {roles.length === 0 && <span className="uv-gris">Sin roles</span>}
                     </span>
                     <span className="uv-acc">
                       {!u.activo ? <span className="uv-pastilla contorno">Inactivo</span>
                         : acceso.sesiones.length + acceso.celulares.length === 0 ? <span className="uv-gris" aria-label="Sin sesiones ni celulares">—</span>
-                        : <span aria-label={resumenDelAcceso(acceso) ?? ""}><IconoN nombre="monitor" tam={16} />{acceso.sesiones.length} · <IconoN nombre="fingerprint" tam={16} />{acceso.celulares.length}</span>}
+                        : <span aria-label={resumenDelAcceso(acceso) ?? ""}><Icono nombre="monitor" tam={16} />{acceso.sesiones.length} · <Icono nombre="fingerprint" tam={16} />{acceso.celulares.length}</span>}
                     </span>
-                    <IconoN nombre="chevron-right" className="uv-chev" />
+                    <Icono nombre="chevron-right" className="uv-chev" />
                   </button>
                 );
               })}
@@ -223,8 +223,8 @@ function Ficha({ u, yo, acceso, disponibles, enLinea, ocupada, error, cambiandoR
       </div>
       <div className="uv-sep" />
       <div data-testid="roles-de-usuario">
-        <h3>{TEXTOS.usuarios.roles.largo}{!cambiando && <button type="button" className="uv-boton suave" disabled={ocupada || !enLinea} onClick={abrir} aria-keyshortcuts="R" aria-label={`Cambiar los roles de ${u.nombre}`} data-testid="cambiar-roles"><IconoN nombre="pencil" tam={16} />Cambiar <span className="uv-kbd">R</span></button>}</h3>
-        {!cambiando && <div className="uv-roles uv-roles-ficha">{roles.length ? roles.map((r) => <span key={r.id} className={`uv-rol ${r.nombre === "Administrador" ? "admin" : ""}`}><IconoN nombre={iconoDeRol(r.nombre)} tam={16} />{r.nombre}</span>) : <span className="uv-gris">Sin roles</span>}</div>}
+        <h3>{TEXTOS.usuarios.roles.largo}{!cambiando && <button type="button" className="uv-boton suave" disabled={ocupada || !enLinea} onClick={abrir} aria-keyshortcuts="R" aria-label={`Cambiar los roles de ${u.nombre}`} data-testid="cambiar-roles"><Icono nombre="pencil" tam={16} />Cambiar <span className="uv-kbd">R</span></button>}</h3>
+        {!cambiando && <div className="uv-roles uv-roles-ficha">{roles.length ? roles.map((r) => <span key={r.id} className={`uv-rol ${r.nombre === "Administrador" ? "admin" : ""}`}><Icono nombre={iconoDeRol(r.nombre)} tam={16} />{r.nombre}</span>) : <span className="uv-gris">Sin roles</span>}</div>}
         {!cambiando && descripcion && <p className="uv-puede">{descripcion}</p>}
         {cambiando && (
           <div className="ru-panel">
@@ -243,7 +243,7 @@ function Ficha({ u, yo, acceso, disponibles, enLinea, ocupada, error, cambiandoR
         {acceso.sesiones.length === 0 && <p className="uv-detalle">No tiene sesiones abiertas.</p>}
         {acceso.sesiones.map((s) => (
           <div key={s.id} className="uv-disp" data-testid="sesion">
-            <span className="uv-disp-ico">{/celular/i.test(s.dispositivo) ? <IconoN nombre="smartphone" /> : <IconoN nombre="monitor" />}</span>
+            <span className="uv-disp-ico">{/celular/i.test(s.dispositivo) ? <Icono nombre="smartphone" /> : <Icono nombre="monitor" />}</span>
             <div className="uv-disp-texto"><div className="uv-disp-n">{s.dispositivo}</div><div className="uv-detalle" title={fechaCompleta(s.ultimo_uso_en)}>usada {haceCuanto(s.ultimo_uso_en)}</div></div>
             <button type="button" className="uv-boton suave" disabled={!enLinea} onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${u.nombre} en ${s.dispositivo}`}>Cerrar</button>
           </div>
@@ -254,7 +254,7 @@ function Ficha({ u, yo, acceso, disponibles, enLinea, ocupada, error, cambiandoR
         {acceso.celulares.length === 0 && <p className="uv-detalle">No vinculó ningún celular.</p>}
         {acceso.celulares.map((c) => (
           <div key={c.id} className="uv-disp" data-testid="celular-de-otro">
-            <span className="uv-disp-ico"><IconoN nombre="fingerprint" /></span>
+            <span className="uv-disp-ico"><Icono nombre="fingerprint" /></span>
             <div className="uv-disp-texto"><div className="uv-disp-n">{c.dispositivo ?? "Celular"}</div><div className="uv-detalle">{c.ultimo_uso_en ? `Último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : `Vinculado el ${fecha(c.creada_en.slice(0, 10))}`}</div></div>
             <button type="button" className="uv-boton suave" disabled={!enLinea} onClick={() => alQuitarCelular(c)} aria-label={`Quitar el celular ${c.dispositivo ?? ""} de ${u.nombre}`}>Quitar</button>
           </div>
@@ -264,7 +264,7 @@ function Ficha({ u, yo, acceso, disponibles, enLinea, ocupada, error, cambiandoR
       <div className="uv-pie">
         {u.id === yo ? <span className="uv-detalle uv-crece">A vos te desactiva otra persona</span> : (
           <button type="button" className={`uv-boton ${u.activo ? "peligro" : "suave"} uv-crece`} disabled={ocupada || !enLinea} onClick={alActivar} aria-label={`${u.activo ? "Desactivar" : "Reactivar"} a ${u.nombre}`}>
-            <IconoN nombre={u.activo ? "user-x" : "user-check"} tam={16} />{ocupada ? "Guardando…" : u.activo ? "Desactivar" : "Reactivar"}
+            <Icono nombre={u.activo ? "user-x" : "user-check"} tam={16} />{ocupada ? "Guardando…" : u.activo ? "Desactivar" : "Reactivar"}
           </button>
         )}
         <button type="button" className="uv-boton fantasma" onClick={() => irA("actividad")}>Todo lo que hizo</button>
@@ -284,7 +284,7 @@ function FiltroDeUsuarios({ filtro: f, roles, filas, buscador }: { filtro: Retur
     <div className="uv-barra" data-testid="filtro-usuarios">
       <label className="uv-campo">
         <span className="solo-lectores">{t.buscar.largo}</span>
-        <IconoN nombre="search" />
+        <Icono nombre="search" />
         <input ref={buscador} {...f.combo} type="search" value={f.texto} placeholder="Buscá nombre o correo" autoComplete="off" autoCapitalize="none" spellCheck={false}
           onChange={(e) => f.escribir(e.target.value)} onKeyDown={f.alTeclear} onBlur={f.cerrar} data-testid="buscar-usuario" />
         {f.texto ? <button type="button" className="usuarios-borrar" onClick={f.borrar} aria-label={t.borrarBusqueda.largo}>✕</button> : <span className="uv-kbd" aria-hidden="true">/</span>}
@@ -306,7 +306,7 @@ function FiltroDeUsuarios({ filtro: f, roles, filas, buscador }: { filtro: Retur
       <button type="button" className={`uv-chip ${f.estado === "activos" ? "elegido" : ""}`} aria-pressed={f.estado === "activos"} onClick={() => f.elegirEstado("activos")}>{t.activos.largo} ({activos})</button>
       <div className="usuarios-filtros">
         <button type="button" className={`uv-boton ${f.roles.length || f.estado === "inactivos" ? "con-filtros" : ""}`} aria-expanded={panel} onClick={() => setPanel(!panel)} data-testid="abrir-filtros">
-          <IconoN nombre="list-filter" tam={16} />Rol{f.filtrado && <span className="usuarios-aviso" aria-label="con filtros puestos" />}
+          <Icono nombre="list-filter" tam={16} />Rol{f.filtrado && <span className="usuarios-aviso" aria-label="con filtros puestos" />}
         </button>
         {panel && (
           <div className="usuarios-panel" role="dialog" aria-label={t.filtros.largo} data-testid="panel-filtros" onKeyDown={(e) => { if (e.key === "Escape") { e.stopPropagation(); setPanel(false); } }}>

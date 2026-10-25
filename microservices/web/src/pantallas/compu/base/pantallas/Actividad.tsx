@@ -4,10 +4,11 @@ import { useUsuarios } from "../../../../negocio/usuarios";
 import { Aviso, Boton, Hoja, Pagina, Progreso, Vacio } from "../ui";
 import { fechaCompleta, textoDeError, useEnLinea } from "./negocio-comun";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
-import { IconoN, Iniciales } from "../../../iconos-de-negocio";
+import { Iniciales } from "../../../iconos-de-negocio";
 import { CATEGORIAS, TIPOS, aplanar, detalleDe, diasDelPeriodo, haceCuantoFue, horaDe, inicioDelDia, queFue, type Periodo } from "../../../actividad-en-palabras";
 import "../estilos/negocio.css";
 import "../estilos/actividad.css";
+import { Icono } from "../../../../ui/iconos";
 
 type Filtros = { usuario: string; tipo: string; periodo: Periodo; desde: string; hasta: string };
 const AL_ABRIR: Filtros = { usuario: "", tipo: "", periodo: "hoy", desde: "", hasta: "" };
@@ -69,7 +70,7 @@ export function Actividad() {
     <Pagina titulo="Quién hizo qué" testId="actividad" className="actividad av2" bajada={<span className="solo-lectores">Cada venta, compra, cambio de precio o de usuario queda anotado con quién lo hizo y cuándo. No se puede editar ni borrar.</span>}>
       <AlLadoDeLasPestanas>
         <span className="av2-hoy">{hoyTexto.charAt(0).toUpperCase() + hoyTexto.slice(1)}</span>
-        <button type="button" className="av2-boton" disabled title="Bajar el registro en planilla todavía no se puede"><IconoN nombre="file-down" tam={16} />Bajar en planilla</button>
+        <button type="button" className="av2-boton" disabled title="Bajar el registro en planilla todavía no se puede"><Icono nombre="file-down" tam={16} />Bajar en planilla</button>
       </AlLadoDeLasPestanas>
       {!enLinea && <Aviso tipo="alerta" testId="actividad-sin-conexion">Sin conexión: el registro necesita internet. Se actualiza solo cuando vuelva.</Aviso>}
 
@@ -82,11 +83,11 @@ export function Actividad() {
                 <option value="">Todos</option>
                 {usuarios.map((u) => <option key={u.id} value={u.id}>{u.nombre}{u.activo ? "" : " (desactivado)"}</option>)}
               </select>
-              <IconoN nombre="chevron-down" tam={16} />
+              <Icono nombre="chevron-down" tam={16} />
             </label>
             <div className="av2-segmentos" role="group" aria-label="Período">
               {PERIODOS.map((p) => <button key={p.valor} type="button" className={filtros.periodo === p.valor ? "elegido" : ""} aria-pressed={filtros.periodo === p.valor} onClick={() => { setRango(false); filtrar({ periodo: p.valor }); }} data-testid={`periodo-${p.valor}`}>{p.nombre}</button>)}
-              <button type="button" className={filtros.periodo === "rango" ? "elegido" : ""} aria-pressed={filtros.periodo === "rango"} aria-expanded={rango} onClick={() => { setRango((r) => !r); filtrar({ periodo: "rango" }); }} data-testid="periodo-rango"><IconoN nombre="calendar" tam={16} />Desde… hasta</button>
+              <button type="button" className={filtros.periodo === "rango" ? "elegido" : ""} aria-pressed={filtros.periodo === "rango"} aria-expanded={rango} onClick={() => { setRango((r) => !r); filtrar({ periodo: "rango" }); }} data-testid="periodo-rango"><Icono nombre="calendar" tam={16} />Desde… hasta</button>
             </div>
             <label className={`av2-selector ${filtros.tipo ? "puesto" : ""}`}>
               <span className="av2-et">Qué</span>
@@ -94,9 +95,9 @@ export function Actividad() {
                 <option value="">Todo</option>
                 {TIPOS.map((t) => <option key={t.valor} value={t.valor}>{t.nombre}</option>)}
               </select>
-              <IconoN nombre="chevron-down" tam={16} />
+              <Icono nombre="chevron-down" tam={16} />
             </label>
-            {conFiltros && <button type="button" className="av2-boton fantasma" onClick={() => { setFiltros(AL_ABRIR); setPagina(1); setRango(false); }} data-testid="quitar-filtros"><IconoN nombre="x" tam={16} />Quitar filtros</button>}
+            {conFiltros && <button type="button" className="av2-boton fantasma" onClick={() => { setFiltros(AL_ABRIR); setPagina(1); setRango(false); }} data-testid="quitar-filtros"><Icono nombre="x" tam={16} />Quitar filtros</button>}
           </form>
           {rango && (
             <div className="av2-rango">
@@ -134,9 +135,9 @@ export function Actividad() {
                   <button key={e.id} type="button" className={`av2-fila ${e === elegido ? "elegida" : ""}`} aria-pressed={e === elegido} onClick={() => setMarcado(i)} onDoubleClick={() => setAbierto(e)} data-testid="evento" title={fechaCompleta(e.fecha)}>
                     <span className="av2-hora">{horaDe(e.fecha)}</span>
                     <span className="av2-quien" title={e.email ?? undefined}><Iniciales nombre={e.nombre ?? "Sistema"} clave={e.email ?? "sistema"} tam="s" />{primerNombre(e.nombre)}</span>
-                    <span className="av2-que"><span className={`av2-tipo ${que.tono ?? ""}`}><IconoN nombre={que.icono} tam={16} /></span>{que.nombre}</span>
+                    <span className="av2-que"><span className={`av2-tipo ${que.tono ?? ""}`}><Icono nombre={que.icono} tam={16} /></span>{que.nombre}</span>
                     <span className="av2-det">{detalle || "—"}</span>
-                    <IconoN nombre="chevron-right" className="av2-mas" />
+                    <Icono nombre="chevron-right" className="av2-mas" />
                   </button>
                 );
               })}
@@ -147,9 +148,9 @@ export function Actividad() {
             <nav className="av2-pie" data-testid="paginado" aria-label="Páginas del registro">
               <span className="av2-detalle">{desdeN} a {hastaN} de {datos.total.toLocaleString("es-AR")} · <span className="av2-kbd">↑</span> <span className="av2-kbd">↓</span> recorren, <span className="av2-kbd">Enter</span> abre</span>
               <span className="av2-paginador">
-                <button type="button" className="av2-boton icono" disabled={pagina <= 1 || cargando} onClick={() => setPagina((p) => p - 1)} aria-label="Anteriores" data-testid="anteriores"><IconoN nombre="chevron-left" tam={16} /></button>
+                <button type="button" className="av2-boton icono" disabled={pagina <= 1 || cargando} onClick={() => setPagina((p) => p - 1)} aria-label="Anteriores" data-testid="anteriores"><Icono nombre="chevron-left" tam={16} /></button>
                 {numeros.map((n) => <button key={n} type="button" className={`av2-pag ${n === pagina ? "actual" : ""}`} aria-current={n === pagina ? "page" : undefined} onClick={() => setPagina(n)} disabled={cargando}>{n}</button>)}
-                <button type="button" className="av2-boton" disabled={pagina >= paginas || cargando} onClick={() => setPagina((p) => p + 1)} data-testid="siguientes">Siguiente <IconoN nombre="chevron-right" tam={16} /></button>
+                <button type="button" className="av2-boton" disabled={pagina >= paginas || cargando} onClick={() => setPagina((p) => p + 1)} data-testid="siguientes">Siguiente <Icono nombre="chevron-right" tam={16} /></button>
               </span>
             </nav>
           )}
@@ -164,11 +165,11 @@ export function Actividad() {
                 const max = Math.max(1, todas ?? 1);
                 return (
                   <button key={c.tipo} type="button" className={`av2-b ${c.tono ?? ""} ${filtros.tipo === c.tipo ? "puesto" : ""}`} aria-pressed={filtros.tipo === c.tipo} onClick={() => filtrar({ tipo: filtros.tipo === c.tipo ? "" : c.tipo })}>
-                    <IconoN nombre={c.icono} tam={16} /><span>{c.nombre}</span><i style={{ width: `${n ? Math.max(6, (n / max) * 56) : 0}px` }} /><b>{n ?? "—"}</b>
+                    <Icono nombre={c.icono} tam={16} /><span>{c.nombre}</span><i style={{ width: `${n ? Math.max(6, (n / max) * 56) : 0}px` }} /><b>{n ?? "—"}</b>
                   </button>
                 );
               })}
-              <div className="av2-b otras"><IconoN nombre="ellipsis" tam={16} /><span>Otras</span><i style={{ width: `${todas !== null && porTipo.every((n) => n !== null) ? Math.max(6, ((todas - porTipo.reduce<number>((s, n) => s + (n ?? 0), 0)) / Math.max(1, todas)) * 56) : 0}px` }} /><b>{todas !== null && porTipo.every((n) => n !== null) ? todas - porTipo.reduce<number>((s, n) => s + (n ?? 0), 0) : "—"}</b></div>
+              <div className="av2-b otras"><Icono nombre="ellipsis" tam={16} /><span>Otras</span><i style={{ width: `${todas !== null && porTipo.every((n) => n !== null) ? Math.max(6, ((todas - porTipo.reduce<number>((s, n) => s + (n ?? 0), 0)) / Math.max(1, todas)) * 56) : 0}px` }} /><b>{todas !== null && porTipo.every((n) => n !== null) ? todas - porTipo.reduce<number>((s, n) => s + (n ?? 0), 0) : "—"}</b></div>
             </div>
           </section>
 
@@ -179,7 +180,7 @@ export function Actividad() {
             const quienFue = usuarios.find((u) => u.email === elegido.email);
             return (
               <section className="av2-caja av2-elegido" aria-label={`${que.nombre}, ${horaDe(elegido.fecha)}`} data-testid="accion-elegida">
-                <div className="av2-det-cab"><span className={`av2-tipo l ${que.tono ?? ""}`}><IconoN nombre={que.icono} /></span><div><div className="av2-det-titulo">{que.nombre}</div><div className="av2-detalle">{horaDe(elegido.fecha)} · {haceCuantoFue(elegido.fecha)}</div></div></div>
+                <div className="av2-det-cab"><span className={`av2-tipo l ${que.tono ?? ""}`}><Icono nombre={que.icono} /></span><div><div className="av2-det-titulo">{que.nombre}</div><div className="av2-detalle">{horaDe(elegido.fecha)} · {haceCuantoFue(elegido.fecha)}</div></div></div>
                 <dl className="av2-kv">
                   <dt>Quién</dt><dd className="av2-kv-quien"><Iniciales nombre={elegido.nombre ?? "Sistema"} clave={elegido.email ?? "sistema"} tam="s" />{elegido.nombre ?? "El sistema"}</dd>
                   {detalle && <><dt>Qué</dt><dd>{detalle}</dd></>}

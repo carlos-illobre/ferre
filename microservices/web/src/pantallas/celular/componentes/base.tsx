@@ -1,87 +1,13 @@
 import { useVolverCierra } from "../../../plataforma/navegacion/volver";
 import { Children, useEffect, useRef, type HTMLAttributes, type ReactNode } from "react";
+import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 
 // Piezas del sistema visual (docs/sistema-visual.md, rediseño de mockups/Ferre iOS.html): íconos de
 // trazo, hoja que sube desde abajo, avisos, segmentos, buscador, contador de cantidad,
 // pantalla de éxito. Mismas piezas en el celular y en la computadora.
 
-const TRAZOS: Record<string, string> = {
-  vender: "M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4ZM3 6h18M16 10a4 4 0 0 1-8 0",
-  // Agregar a la venta desde el Catálogo y los filtros (015).
-  carrito: "M3 4h2.2l2.1 10.4a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.3M8.2 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0M15.7 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0",
-  filtros: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 6a2 2 0 1 0 4 0a2 2 0 1 0-4 0M8 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0M16 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0",
-  catalogo: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
-  // Los del menú de abajo, los de la v2 del director de arte: el carrito, la etiqueta, la caja y las tres rayas.
-  "menu-vender": "M7 21a1 1 0 1 0 2 0a1 1 0 1 0-2 0M18 21a1 1 0 1 0 2 0a1 1 0 1 0-2 0M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12",
-  "menu-catalogo": "m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.426 2.426 0 0 0 3.42 0l3.58-3.58a2.426 2.426 0 0 0 0-3.42zM6 9.5a.5.5 0 1 0 1 0a.5.5 0 1 0-1 0",
-  "menu-deposito": "M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73zM12 22V12M3.3 7l7.703 4.734a2 2 0 0 0 1.994 0L20.7 7M7.5 4.27l9 5.15",
-  "menu-mas": "M4 6h16M4 12h16M4 18h16",
-  "menu-negocio": "M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3",
-  deposito: "M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16ZM3.3 7l8.7 5 8.7-5M12 22V12",
-  negocio: "M3 3v18h18M7 15l4-5 4 3 5-7",
-  buscar: "M11 11m-7.5 0a7.5 7.5 0 1 0 15 0a7.5 7.5 0 1 0-15 0M20.5 20.5l-4.2-4.2",
-  escanear: "M3 8V6a2 2 0 0 1 2-2h2M17 4h2a2 2 0 0 1 2 2v2M21 16v2a2 2 0 0 1-2 2h-2M7 20H5a2 2 0 0 1-2-2v-2M7 9v6M11 9v6M14 9v6M17 9v6",
-  cerrar: "M18 6 6 18M6 6l12 12",
-  tilde: "m5 12 5 5L20 7",
-  derecha: "m9 6 6 6-6 6",
-  izquierda: "m15 6-6 6 6 6",
-  abajo: "m6 9 6 6 6-6",
-  arriba: "m6 15 6-6 6 6",
-  subir: "M12 3v12M7 8l5-5 5 5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2",
-  camara: "M4 7h3l2-3h6l2 3h3v12H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
-  huella: "M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4M14 13.12c0 2.38 0 6.38-1 8.88M17.29 21.02c.12-.6.43-2.3.5-3.02M2 12a10 10 0 0 1 18-6M2 16h.01M21.8 16c.2-2 .131-5.354 0-6M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2M8.65 22c.21-.66.45-1.32.57-2M9 6.8a6 6 0 0 1 9 5.2v2",
-  // Listas de precios (002-T003).
-  excel: "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M9 13l4 5M13 13l-4 5",
-  proveedor: "M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6",
-  archivo: "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6",
-  subirArchivo: "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M12 17v-6M9 14l3-3 3 3",
-  caja: "M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8",
-  lector: "M4 6h16M4 12h10M4 18h7",
-  // Un código de barras, en la explicación de la venta vacía (003-T003).
-  barras: "M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14",
-  porcentaje: "M19 5L5 19M7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
-  reloj: "M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z",
-  // Duplicados (002-T005).
-  enlace: "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7",
-  separar: "M16 3h5v5M8 21H3v-5M21 3l-7 7M3 21l7-7M14 14l7 7M3 3l7 7",
-  marca: "M3 12V4h8l10 10-8 8L3 12zM7.5 7.5h.01",
-  sube: "M7 17 17 7M8 7h9v9",
-  baja: "M7 7l10 10M17 8v9H8",
-  calendario: "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 10h18M8 3v4M16 3v4",
-  codigoDeBarras: "M3 5v14M7 5v14M11 5v14M15 5v14M19 5v14",
-  lista: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
-  imagen: "M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01",
-  // Anular una venta (003-T005).
-  alerta: "M12 3l10 18H2zM12 10v5M12 18h.01",
-  prohibido: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM5.6 5.6l12.8 12.8",
-  persona: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
-  efectivo: "M3 7h18v10H3zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
-  mercado_pago: "M3 5h18v14H3zM3 10h18",
-  tarjeta: "M3 5h18v14H3zM3 10h18M7 15h3",
-  cuenta_corriente: "M4 4h16v16H4zM8 8h8M8 12h8M8 16h5",
-  salir: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
-  calculadora: "M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM8 6h8M16 14v4M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01",
-  bajar: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3",
-  // Vender en el celular (decisión 119).
-  tacho: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
-  flecha: "M5 12h14M13 6l6 6-6 6",
-  dispositivos: "M4 5h12v9H4zM8 18h4M10 14v4M17 9h4v11h-4z",
-  // La estrella del proveedor más barato, en la ficha (decisión 145).
-  estrella: "m12 3 2.700 5.800 6.300.700-4.700 4.300 1.300 6.200L12 16.900 6.400 20l1.300-6.200L3 9.500l6.300-.700Z",
-  // Los de Listas y Duplicados como la v2 (decisión 148), los de Lucide de la maqueta.
-  unir: "M18 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 21V9a9 9 0 0 0 9 9",
-  dividir: "M16 3h5v5M8 3H3v5M12 22v-8.300a4 4 0 0 0-1.170-2.870L3 3M15 9l6-6",
-  camion: "M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.650a1 1 0 0 0-.220-.620l-3.480-4.350A1 1 0 0 0 17.520 8H14M17 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z",
-  correo: "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM22 7l-8.970 5.700a1.940 1.940 0 0 1-2.060 0L2 7",
-  bandeja: "M3 13h5l2 3h4l2-3h5M3 13l2.600-7.200A1.500 1.500 0 0 1 7 5h10a1.500 1.500 0 0 1 1.400.800L21 13v5.500a1.500 1.500 0 0 1-1.500 1.500h-15A1.500 1.500 0 0 1 3 18.500Z",
-};
-export function Icono({ nombre, tam = 20, grosor = 2, className }: { nombre: keyof typeof TRAZOS | string; tam?: number; grosor?: number; className?: string }) {
-  return (
-    <svg className={className} width={tam} height={tam} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d={TRAZOS[nombre] ?? ""} />
-    </svg>
-  );
-}
+// Los íconos son uno solo para toda la aplicación (ADR-028).
+export { Icono, type NombreDeIcono };
 
 // Hoja: en el celular sube desde abajo; en la computadora es una ventana centrada. Cierra
 // tocando el fondo, con Escape o con el botón que le pase el contenido.

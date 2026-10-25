@@ -13,12 +13,9 @@
  "src/pantallas/Calendario.tsx",
  "src/pantallas/CodigoDeBarras.tsx",
  "src/pantallas/DineroInvertido.tsx",
- "src/pantallas/EspejoEstado.tsx",
  "src/pantallas/FotoDeFactura.tsx",
  "src/pantallas/FotoParaLaCompu.tsx",
  "src/pantallas/Pedidos.tsx",
- "src/pantallas/PedidosDeLaCompu.tsx",
- "src/pantallas/PedirFoto.tsx",
  "src/pantallas/Procesos.tsx",
  "src/pantallas/Roles.tsx",
  "src/pantallas/Sistema.tsx",
@@ -41,7 +38,6 @@
  "src/pantallas/celular/Vender.tsx",
  "src/pantallas/celular/componentes/EstadoDeConexion.tsx",
  "src/pantallas/celular/componentes/Foto.tsx",
- "src/pantallas/celular/componentes/base.tsx",
  "src/pantallas/celular/pantallas/Anomalias.tsx",
  "src/pantallas/celular/pantallas/Configuracion.tsx",
  "src/pantallas/celular/pantallas/CorregirYCambio.tsx",
@@ -89,7 +85,5 @@
  "src/plataforma/sin-conexion/cola.ts",
  "src/plataforma/teclado/atajos.ts",
  "src/plataforma/teclado/flechas.ts",
- "src/plataforma/teclado/teclas.ts",
- "src/plataforma/tiempo-real/flujo-de-eventos.ts",
- "src/puesto.ts"
+ "src/plataforma/teclado/teclas.ts"
 ]

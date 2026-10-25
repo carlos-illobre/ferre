@@ -6,9 +6,10 @@ import { anularCompra, faltanDe, gastoPorDia, letrasDeLaSemana, nombreDelComprob
 import { fecha, pesos, pesosCortos } from "../../formato";
 import { irA } from "../../rutas";
 import { Hoja, Toast } from "./componentes/base";
-import { IconoDeDeposito } from "../IconoDeDeposito";
+
 import { TEXTOS } from "../textos";
 import "./compras.css";
+import { Icono } from "../../ui/iconos";
 
 // Compras en el celular, como la v2 («Resumen», decisión 148), en el orden del pulgar: arriba lo
 // gastado en la semana (con «Ver los gastos»; tocarlo muestra lo comprado a cada proveedor) y lo
@@ -67,7 +68,7 @@ export function ComprasRecientes(_: { soloVer?: boolean } = {}) {
           {porLlegar?.length === 0 && <div className="aviso-suave">{t.nadaPorLlegar.corto}</div>}
           {porLlegar?.map((p) => (
             <div key={p.id} className="cm-tarjeta">
-              <span className="cm-ico"><IconoDeDeposito nombre="truck" /></span>
+              <span className="cm-ico"><Icono nombre="truck" /></span>
               <span className="cm-texto"><b>{p.proveedor}</b><span className={p.estado === "recibido_parcial" ? "cm-a-medias" : ""}>{p.estado === "recibido_parcial" ? `Llegó a medias · ${faltanDe(p) === 1 ? "falta 1" : `faltan ${faltanDe(p)}`}` : `Enviado${p.enviado_en ? ` el ${fecha(p.enviado_en).slice(0, 5)}` : ""} · ${p.items.length} ${p.items.length === 1 ? "renglón" : "renglones"}`}</span></span>
               {anula && <button type="button" className="cm-llego" onClick={() => irA(`deposito/ingreso?pedido=${p.id}`)} data-testid="llego">{t.llego.corto}</button>}
             </div>
@@ -85,7 +86,7 @@ export function ComprasRecientes(_: { soloVer?: boolean } = {}) {
             return (
               <div key={c.id} className={`cm-tarjeta cm-compra ${anulada ? "anulada" : ""}`} data-testid="compra-reciente">
                 <div className="cm-fila">
-                  <span className="cm-mini">{c.foto ? <VerComprobante ruta={c.foto} /> : <IconoDeDeposito nombre="notebook-pen" />}</span>
+                  <span className="cm-mini">{c.foto ? <VerComprobante ruta={c.foto} /> : <Icono nombre="notebook-pen" />}</span>
                   <button type="button" className="cm-abrir" onClick={() => setAbiertas((s) => { const n = new Set(s); if (n.has(c.id)) n.delete(c.id); else n.add(c.id); return n; })} aria-expanded={abierta}>
                     <span className="cm-texto"><b>{c.proveedor}</b><span className={anulada ? "cm-anulada" : ""}>{fecha(c.fecha).slice(0, 5)} · {nombreDelComprobante(c)}{anulada ? " · anulada" : ""}</span></span>
                     <b className={`cm-importe ${anulada ? "tachado" : ""}`}>{pesosCortos(c.total)}</b>
@@ -108,9 +109,9 @@ export function ComprasRecientes(_: { soloVer?: boolean } = {}) {
       {anula && (
         <div className="cm-foto">
           <button type="button" className="cm-foto-boton" onClick={() => irA("deposito/ingreso")} data-testid="sacale-foto">
-            <IconoDeDeposito nombre="camera" tam={26} /><span><b>{t.sacaleFoto.corto}</b><small>{t.sacaleFotoDetalle.corto}</small></span>
+            <Icono nombre="camera" tam={26} /><span><b>{t.sacaleFoto.corto}</b><small>{t.sacaleFotoDetalle.corto}</small></span>
           </button>
-          <button type="button" className="cm-escanear" onClick={() => irA("deposito/ingreso")} aria-label="Registrar la compra escaneando"><IconoDeDeposito nombre="scan-barcode" tam={26} /></button>
+          <button type="button" className="cm-escanear" onClick={() => irA("deposito/ingreso")} aria-label="Registrar la compra escaneando"><Icono nombre="scan-barcode" tam={26} /></button>
         </div>
       )}
 

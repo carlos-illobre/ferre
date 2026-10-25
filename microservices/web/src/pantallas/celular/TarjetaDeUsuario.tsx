@@ -3,8 +3,9 @@ import { ElegirRoles, type RolAsignable } from "../RolesDeUsuario";
 import { type Acceso, type CelularDeOtroFila, type SesionFila } from "../../negocio/usuarios";
 import { fecha } from "../../formato";
 import { TEXTOS } from "../textos";
-import { IconoN, Iniciales, iconoDeRol as iconoV2 } from "../iconos-de-negocio";
+import { Iniciales, iconoDeRol as iconoV2 } from "../iconos-de-negocio";
 import "./usuarios.css";
+import { Icono } from "../../ui/iconos";
 
 // Los íconos de cada rol (007-T032); un rol que armó el negocio lleva el escudo de los roles.
 const TRAZOS_DE_ROL: Record<string, string> = {
@@ -25,7 +26,7 @@ const ICONOS = {
   sesiones: "M3 5.5A1.5 1.5 0 0 1 4.5 4h10A1.5 1.5 0 0 1 16 5.5V14H3zM7 18h5M18 9h3v11h-5v-3",
 };
 // Como la v2 (decisión 148): el ícono de Lucide de cada rol, el mismo que en la computadora.
-export const iconoDeRol = (nombre: string, tam = 16) => <IconoN nombre={iconoV2(nombre)} tam={tam} />;
+export const iconoDeRol = (nombre: string, tam = 16) => <Icono nombre={iconoV2(nombre)} tam={tam} />;
 const Rol = ({ r }: { r: RolAsignable }) => <li className={r.nombre === "Administrador" ? "admin" : ""}>{iconoDeRol(r.nombre)}{r.nombre}</li>;
 
 export type Persona = { id: string; nombre: string; email: string; activo: boolean; creado_en?: string; roles?: RolAsignable[] };
@@ -75,7 +76,7 @@ export function TarjetaDeUsuario({ persona: u, disponibles, alCambiarRoles, alAc
           <span className="ut-correo">{u.email}</span>
           <RolesEnUnaLinea roles={actuales} nombre={u.nombre} />
         </span>
-        <span className="ut-flecha-abrir" aria-hidden="true"><IconoN nombre={abierta ? "chevron-up" : "chevron-down"} /></span>
+        <span className="ut-flecha-abrir" aria-hidden="true"><Icono nombre={abierta ? "chevron-up" : "chevron-down"} /></span>
       </button>
       {abierta && (
         <>
@@ -198,10 +199,10 @@ function AccesoDeUsuario({ nombre, sesiones, celulares, alCerrarSesion, alQuitar
         const esCelu = Boolean(c) || /celular|android|iphone|samsung|moto/i.test(n);
         return (
           <div key={clave} className="ua-disp" data-testid={s ? "sesion" : "celular-de-otro"}>
-            <span className="ua-ico"><IconoN nombre={esCelu ? "smartphone" : "monitor"} /></span>
-            <span className="ua-texto"><b>{n}</b><small>{s ? hace(s.ultimo_uso_en) : c ? (c.ultimo_uso_en ? `Último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : `Vinculado el ${fecha(c.creada_en.slice(0, 10))}`) : ""}{c && <> · <IconoN nombre="fingerprint" tam={16} /> con huella</>}</small></span>
+            <span className="ua-ico"><Icono nombre={esCelu ? "smartphone" : "monitor"} /></span>
+            <span className="ua-texto"><b>{n}</b><small>{s ? hace(s.ultimo_uso_en) : c ? (c.ultimo_uso_en ? `Último uso ${fecha(c.ultimo_uso_en.slice(0, 10))}` : `Vinculado el ${fecha(c.creada_en.slice(0, 10))}`) : ""}{c && <> · <Icono nombre="fingerprint" tam={16} /> con huella</>}</small></span>
             {s && c ? (
-              <button type="button" className="ua-boton icono" aria-expanded={menu === clave} aria-label={`Qué hacer con ${n} de ${nombre}`} onClick={() => setMenu(menu === clave ? null : clave)}><IconoN nombre="ellipsis" tam={18} /></button>
+              <button type="button" className="ua-boton icono" aria-expanded={menu === clave} aria-label={`Qué hacer con ${n} de ${nombre}`} onClick={() => setMenu(menu === clave ? null : clave)}><Icono nombre="ellipsis" tam={18} /></button>
             ) : s ? (
               <button type="button" className="ua-boton" onClick={() => alCerrarSesion(s)} aria-label={`Cerrar la sesión de ${nombre} en ${s.dispositivo}`}>Cerrar</button>
             ) : c ? (
@@ -224,9 +225,9 @@ function AccesoDeUsuario({ nombre, sesiones, celulares, alCerrarSesion, alQuitar
 export function AutorizarOtro({ alTocar }: { alTocar: () => void }) {
   return (
     <button type="button" className="ut-alta" onClick={alTocar} data-testid="autorizar">
-      <span className="ut-mas" aria-hidden="true"><IconoN nombre="user-plus" /></span>
+      <span className="ut-mas" aria-hidden="true"><Icono nombre="user-plus" /></span>
       <span><strong>{TEXTOS.usuarios.autorizarOtro.corto}</strong><small>{TEXTOS.usuarios.invitarAlguien.corto}</small></span>
-      <span className="ut-alta-flecha" aria-hidden="true"><IconoN nombre="chevron-right" /></span>
+      <span className="ut-alta-flecha" aria-hidden="true"><Icono nombre="chevron-right" /></span>
     </button>
   );
 }

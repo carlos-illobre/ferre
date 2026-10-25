@@ -2,7 +2,7 @@ import type { Evento } from "../negocio/actividad";
 import type { UsuarioFila as Usuario } from "../negocio/usuarios";
 import { fecha, hoyLocal, pesosCortos } from "../formato";
 import { nombreDeMedio } from "../negocio/ventas/venta";
-import type { IconoDeNegocio } from "./iconos-de-negocio";
+import { type NombreDeIcono } from "../ui/iconos";
 
 // «Quién hizo qué» en palabras, igual en el celular y en la computadora (decisión 47; la v2,
 // decisión 148): el nombre de cada acción con el ícono de su tipo (gris, salvo lo que el dueño
@@ -10,7 +10,7 @@ import type { IconoDeNegocio } from "./iconos-de-negocio";
 // cada dato con su nombre legible.
 type Contenido = Record<string, unknown>;
 type UsuarioFila = Pick<Usuario, "id" | "nombre" | "activo">;
-export type Que = { nombre: string; icono: IconoDeNegocio; tono?: "error" | "urgente" };
+export type Que = { nombre: string; icono: NombreDeIcono; tono?: "error" | "urgente" };
 
 const QUE: Record<string, Que> = {
   "venta.registrada": { nombre: "Venta cobrada", icono: "shopping-cart" },
@@ -52,7 +52,7 @@ const QUE: Record<string, Que> = {
 };
 
 // «Qué pasó»: los tipos que se cuentan aparte (los demás van en «Otras»). `tipo` es el filtro de la API.
-export const CATEGORIAS: { tipo: string; nombre: string; icono: IconoDeNegocio; tono?: "error" | "urgente" }[] = [
+export const CATEGORIAS: { tipo: string; nombre: string; icono: NombreDeIcono; tono?: "error" | "urgente" }[] = [
   { tipo: "venta.registrada", nombre: "Ventas", icono: "shopping-cart" },
   { tipo: "sesion.iniciada", nombre: "Entradas", icono: "log-in" },
   { tipo: "producto.precio_elegido", nombre: "Precios y márgenes", icono: "percent", tono: "urgente" },

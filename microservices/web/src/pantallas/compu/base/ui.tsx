@@ -7,106 +7,13 @@ import { alCambiarLaCola, enviarPendientes, pendientes } from "../../../datos/al
 import { urlDeFoto } from "../../../datos/conexion";
 import { MARGENES } from "../../../negocio/precios/vista-previa";
 import { UNIDADES, type Unidad } from "../../../negocio/catalogo";
+import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 
 // Piezas de Ferrebress v2. Todas las pantallas arman con estas y con las clases de
 // estilos/base.css; ninguna inventa su botón ni su ventana.
 
-const TRAZOS = {
-  vender: "M4 5h2l2.2 10.2a1 1 0 0 0 1 .8h8.3a1 1 0 0 0 1-.76L20 8H7M10 20.5h.01M17.5 20.5h.01",
-  ventas: "M6 3h12v18l-3-2-3 2-3-2-3 2ZM9 8h6M9 12h6",
-  productos: "M4 4h6.5v6.5H4zM13.500 4H20v6.5h-6.5zM4 13.500h6.5V20H4zM13.500 13.500H20V20h-6.5z",
-  listas: "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8ZM14 3v5h5M9 13h6M9 17h6",
-  duplicados: "M9.500 14.500 14.500 9.500M10.500 6.500l1-1a4.240 4.240 0 0 1 6 6l-1 1M13.500 17.500l-1 1a4.240 4.240 0 0 1-6-6l1-1",
-  stock: "M21 8.200a2 2 0 0 0-1-1.730l-7-4a2 2 0 0 0-2 0l-7 4a2 2 0 0 0-1 1.730v7.600a2 2 0 0 0 1 1.730l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.730ZM3.300 7.200 12 12.200l8.700-5M12 22V12.200",
-  compras: "M3 7h11v9H3zM14 10h4l3 3v3h-7M7.500 19a1.500 1.500 0 1 0 0-3 1.500 1.500 0 0 0 0 3ZM17.500 19a1.500 1.500 0 1 0 0-3 1.500 1.500 0 0 0 0 3Z",
-  contar: "M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 3h6v4H9zM9 13l2 2 4-4",
-  resumen: "M4 20V10M10 20V4M16 20v-7M22 20H2",
-  usuarios: "M16 20v-1.500a3.500 3.500 0 0 0-3.500-3.500h-5A3.500 3.500 0 0 0 4 18.500V20M10 11a3.500 3.500 0 1 0 0-7 3.500 3.500 0 0 0 0 7ZM20 20v-1.500a3.500 3.500 0 0 0-2.500-3.350M15.500 4.150a3.500 3.500 0 0 1 0 6.700",
-  actividad: "M12 7v5l3 2M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9Z",
-  sesiones: "M3.500 4h11a1.500 1.500 0 0 1 1.500 1.500v7a1.500 1.500 0 0 1-1.500 1.500h-11A1.500 1.500 0 0 1 2 12.500v-7A1.500 1.500 0 0 1 3.500 4ZM6 18h6M9 14v4M18.500 8h2A1.500 1.500 0 0 1 22 9.500v9a1.500 1.500 0 0 1-1.500 1.500h-2A1.500 1.500 0 0 1 17 18.500v-9A1.500 1.500 0 0 1 18.500 8Z",
-  roles: "M12 2.500 4 5.500v6c0 5 3.400 8.600 8 10 4.600-1.400 8-5 8-10v-6ZM8.500 12l2.500 2.500 4.500-5",
-  catalogo: "M4 4h6.5v6.5H4zM13.500 4H20v6.5h-6.5zM4 13.500h6.5V20H4zM13.500 13.500H20V20h-6.5z",
-  deposito: "M21 8.200a2 2 0 0 0-1-1.730l-7-4a2 2 0 0 0-2 0l-7 4a2 2 0 0 0-1 1.730v7.600a2 2 0 0 0 1 1.730l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.730ZM3.300 7.200 12 12.200l8.700-5M12 22V12.200",
-  negocio: "M4 20V10M10 20V4M16 20v-7M22 20H2",
-  buscar: "M11 18.500a7.500 7.500 0 1 0 0-15 7.500 7.500 0 0 0 0 15ZM20.500 20.500l-4.200-4.200",
-  escanear: "M3 8V6a2 2 0 0 1 2-2h2M17 4h2a2 2 0 0 1 2 2v2M21 16v2a2 2 0 0 1-2 2h-2M7 20H5a2 2 0 0 1-2-2v-2M7 9v6M11 9v6M14 9v6M17 9v6",
-  cerrar: "M18 6 6 18M6 6l12 12",
-  prohibido: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM5.6 5.6l12.8 12.8",
-  tilde: "m5 12.500 4.500 4.500L19 7.500",
-  derecha: "m9 6 6 6-6 6",
-  izquierda: "m15 6-6 6 6 6",
-  // El de la maqueta para achicar y agrandar el menú: el panel con la flecha adentro.
-  "achicar-menu": "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18M16 15l-3-3 3-3",
-  // El de la maqueta para ocultar el panel de la derecha: el panel con la flecha hacia afuera.
-  "ocultar-panel": "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM15 3v18M8 9l3 3-3 3",
-  "agrandar-menu": "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18M14 9l3 3-3 3",
-  abajo: "m6 9 6 6 6-6",
-  arriba: "m6 15 6-6 6 6",
-  subir: "M12 16V4M7 9l5-5 5 5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2",
-  bajar: "M12 4v12M7 11l5 5 5-5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2",
-  camara: "M4 8h3l2-3h6l2 3h3v11H4ZM12 16.500a3.500 3.500 0 1 0 0-7 3.500 3.500 0 0 0 0 7Z",
-  huella: "M12 10a2 2 0 0 0-2 2c0 1.020-.100 2.510-.260 4M14 13.120c0 2.380 0 6.380-1 8.880M17.290 21.020c.120-.600.430-2.300.500-3.020M2 12a10 10 0 0 1 18-6M2 16h.010M21.800 16c.200-2 .131-5.354 0-6M5 19.500C5.500 18 6 15 6 12a6 6 0 0 1 .340-2M8.650 22c.210-.660.450-1.320.570-2M9 6.800a6 6 0 0 1 9 5.200v2",
-  salir: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
-  mas: "M12 5v14M5 12h14",
-  // Los del menú, como la v2 (decisión 148): la etiqueta, las barras y los tres puntos.
-  "menu-catalogo": "m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.426 2.426 0 0 0 3.42 0l3.58-3.58a2.426 2.426 0 0 0 0-3.42zM6 9.5a.5.5 0 1 0 1 0a.5.5 0 1 0-1 0",
-  "menu-negocio": "M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3",
-  "menu-mas": "M5 12h.01M12 12h.01M19 12h.01",
-  menos: "M5 12h14",
-  celular: "M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM11 18h2",
-  alerta: "M12 9v4.500M12 17h.010M10.300 4 2.700 17.500A2 2 0 0 0 4.400 20.500h15.200a2 2 0 0 0 1.700-3L13.700 4a2 2 0 0 0-3.400 0Z",
-  info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM9.500 9.500a2.500 2.500 0 1 1 3.500 2.300c-.700.300-1 .800-1 1.500M12 16.500h.010",
-  error: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 8v5M12 16h.010",
-  ok: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8 12.500l2.700 2.700L16 9.500",
-  plata: "M12 3v18M16.500 7.500C16 6 14.500 5 12 5 9.500 5 7.500 6.300 7.500 8.300c0 4.400 9 2.200 9 7 0 2.200-2 3.700-4.500 3.700s-4.300-1-5-3",
-  ganancia: "m3 17 6-6 4 4 8-8M15 7h6v6",
-  caja: "M3 7h18v12H3zM3 11h18M7 15h3",
-  deshacer: "M4 9h10a5 5 0 0 1 0 10H8M4 9l4-4M4 9l4 4",
-  editar: "M4 20h4L19 9l-4-4L4 16ZM13.500 6.500l4 4",
-  basura: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
-  archivo: "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8ZM14 3v5h5",
-  proveedor: "M3 21V9l9-6 9 6v12M9 21v-7h6v7",
-  reloj: "M12 7v5l3 2M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9Z",
-  candado: "M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5Z",
-  reproducir: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM10 8.500v7l5.500-3.500Z",
-  ajustes: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M16 4v4M10 10v4M18 16v4",
-  // Los filtros y el carrito de «Agregar» del Catálogo (015), los mismos que en el celular.
-  filtros: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 6a2 2 0 1 0 4 0a2 2 0 1 0-4 0M8 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0M16 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0",
-  carrito: "M3 4h2.2l2.1 10.4a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.3M8.2 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0M15.7 19.5a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0-2.6 0",
-  procesos: "M3 4h7v6H3zM14 14h7v6h-7zM10 7h7v7",
-  excel: "M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M9 13l4 5M13 13l-4 5",
-  calendario: "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 10h18M8 3v4M16 3v4",
-  calculadora: "M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM8 6h8M16 14v4M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01",
-  estrella: "m12 3 2.700 5.800 6.300.700-4.700 4.300 1.300 6.200L12 16.900 6.400 20l1.300-6.200L3 9.500l6.300-.700Z",
-  google: "M21 12.200c0-.700-.060-1.300-.180-1.900H12v3.700h5a4.300 4.300 0 0 1-1.900 2.800v2.300h3A9 9 0 0 0 21 12.200ZM12 21a8.800 8.800 0 0 0 6.100-2.200l-3-2.300A5.500 5.500 0 0 1 6.900 13.600H3.800V16A9 9 0 0 0 12 21Z",
-  filtro: "M4 5h16l-6 7.500V19l-4-2v-4.500Z",
-  escudo: "M12 3l7 3v5c0 4.500-3 8.200-7 10-4-1.800-7-5.500-7-10V6ZM9 12l2 2 4-4",
-  nube: "M7 18h10a4 4 0 0 0 .500-8 6 6 0 0 0-11.400 1.500A3.300 3.300 0 0 0 7 18Z",
-  "sin-internet": "M12 20h.01M8.500 16.430a5 5 0 0 1 7 0M2 8.820a15 15 0 0 1 4.170-2.650M10.660 5c4.010-.360 8.140.900 11.340 3.760M16.850 11.250a10 10 0 0 1 2.220 1.680M5 13a10 10 0 0 1 5.240-2.760M2 2l20 20",
-  computadora: "M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM8 21h8M12 17v4",
-  dispositivos: "M3.500 4h11A1.500 1.500 0 0 1 16 5.500v8a1.500 1.500 0 0 1-1.500 1.500h-11A1.500 1.500 0 0 1 2 13.500v-8A1.500 1.500 0 0 1 3.500 4ZM6 19h6M9 15v4M18 9h3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z",
-  bandeja: "M3 13h5l2 3h4l2-3h5M3 13l2.600-7.200A1.500 1.500 0 0 1 7 5h10a1.500 1.500 0 0 1 1.400.800L21 13v5.500a1.500 1.500 0 0 1-1.500 1.500h-15A1.500 1.500 0 0 1 3 18.500Z",
-  repetir: "M4 12a8 8 0 0 1 13.700-5.700L20 8.500M20 4v4.500h-4.500M20 12a8 8 0 0 1-13.700 5.700L4 15.500M4 20v-4.500h4.500",
-  // Los de Listas y Duplicados como la v2 (decisión 148), los de Lucide de la maqueta.
-  correo: "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM22 7l-8.970 5.700a1.940 1.940 0 0 1-2.060 0L2 7",
-  "subir-archivo": "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7ZM14 2v4a2 2 0 0 0 2 2h4M12 18v-6M9 15l3-3 3 3",
-  edificio: "M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2M10 6h4M10 10h4M10 14h4M10 18h4",
-  unir: "M18 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 21V9a9 9 0 0 0 9 9",
-  separar: "M16 3h5v5M8 3H3v5M12 22v-8.300a4 4 0 0 0-1.170-2.870L3 3M15 9l6-6",
-  "codigo-de-barras": "M3 5v14M7 5v14M10 5v14M14 5v14M17 5v14M21 5v14",
-  texto: "M4 7V4h16v3M9 20h6M12 4v16",
-  capas: "M12.830 2.180a2 2 0 0 0-1.660 0L2.600 6.080a1 1 0 0 0 0 1.830l8.580 3.910a2 2 0 0 0 1.660 0l8.580-3.900a1 1 0 0 0 0-1.830ZM2 12a1 1 0 0 0 .580.910l8.600 3.910a2 2 0 0 0 1.650 0l8.580-3.900A1 1 0 0 0 22 12M2 17a1 1 0 0 0 .580.910l8.600 3.910a2 2 0 0 0 1.650 0l8.580-3.900A1 1 0 0 0 22 17",
-  flecha: "M5 12h14M12 5l7 7-7 7",
-} as const;
-export type NombreDeIcono = keyof typeof TRAZOS;
-
-export function Icono({ nombre, tam = 20, grosor = 2 }: { nombre: NombreDeIcono; tam?: number; grosor?: number }) {
-  return (
-    <svg width={tam} height={tam} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={grosor} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-      <path d={TRAZOS[nombre]} />
-    </svg>
-  );
-}
+// Los íconos son uno solo para toda la aplicación (ADR-028).
+export { Icono, type NombreDeIcono };
 
 // La marca: una tuerca ámbar con la F calada, y el nombre en Archivo ancha.
 export function Marca({ tam = 30, soloSimbolo }: { tam?: number; soloSimbolo?: boolean }) {

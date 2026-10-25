@@ -11,10 +11,11 @@ import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../../../negoci
 import { irA } from "../rutas";
 import { Aviso, Boton, Explicado, Hoja, Icono, Pagina, Progreso, Toast, Vacio, numero } from "../ui";
 import { BuscadorDeProducto, conSigno, mensajeDe, nombreUnidad, plural, useEnLinea, type Producto } from "./deposito-comun";
-import { IconoDeDeposito, type IconoDeDepositoNombre } from "../../../IconoDeDeposito";
+
 import { TEXTOS } from "../../../textos";
 import "../estilos/contar.css";
 import { AlLadoDeLasPestanas } from "../../../AlLadoDeLasPestanas";
+import { type NombreDeIcono } from "../../../../ui/iconos";
 
 // Contar, como la v2 («Sectores y conteo», decisión 148): arriba cuánto del stock está cargado y
 // qué falta contar; a la izquierda los sectores con su estado (en curso, nunca contado, la fecha
@@ -30,7 +31,7 @@ const t = TEXTOS.contar;
 const diasDesde = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
 const cuandoCorto = (iso: string) => (diasDesde(iso) === 0 ? "hoy" : diasDesde(iso) === 1 ? "ayer" : fecha(iso).slice(0, 5));
 const claseDif = (dif: number) => (dif === 0 ? "igual" : dif < 0 ? "falta" : "sobra");
-const estadoDe = (s: Sector): { clase: string; icono: IconoDeDepositoNombre; texto: string } =>
+const estadoDe = (s: Sector): { clase: string; icono: NombreDeIcono; texto: string } =>
   s.conteo_abierto ? { clase: "en-curso", icono: "hash", texto: t.enCurso.largo } : s.ultimo_conteo === null ? { clase: "nunca", icono: "circle-dashed", texto: t.nuncaContado.largo } : { clase: "contado", icono: "check", texto: `Contado el ${fecha(s.ultimo_conteo).slice(0, 5)}` };
 
 export function Contar() {
@@ -87,20 +88,20 @@ export function Contar() {
         <>
           <div className="ct-resumenes">
             <div className="ct-resumen" data-testid="stock-cargado">
-              <span className="ct-ico"><IconoDeDeposito nombre="layers-3" /></span>
+              <span className="ct-ico"><Icono nombre="layers-3" /></span>
               <span className="ct-res-texto"><span className="ct-et">{t.stockCargado.largo}</span><span className="ct-va">{contados} <small>de {plural(total, "sector", "sectores")}</small></span>
                 <span className="ct-riel"><i style={{ width: `${total ? (contados / total) * 100 : 0}%` }} /></span></span>
             </div>
             <div className="ct-resumen urgente" data-testid="nunca-contados">
-              <span className="ct-ico"><IconoDeDeposito nombre="circle-dashed" /></span>
+              <span className="ct-ico"><Icono nombre="circle-dashed" /></span>
               <span className="ct-res-texto"><span className="ct-et">{t.nuncaContados.largo}</span><span className="ct-va">{nunca} <small>{nunca === 1 ? "sector" : "sectores"}</small></span></span>
             </div>
             <div className="ct-resumen" data-testid="conteos-en-curso">
-              <span className="ct-ico accion"><IconoDeDeposito nombre="pause" /></span>
+              <span className="ct-ico accion"><Icono nombre="pause" /></span>
               <span className="ct-res-texto"><span className="ct-et">{t.conteosEnCurso.largo}</span><span className="ct-va">{enCurso}</span></span>
             </div>
             <div className="ct-resumen" data-testid="hoy-toca">
-              <span className="ct-ico"><IconoDeDeposito nombre="calendar-check" /></span>
+              <span className="ct-ico"><Icono nombre="calendar-check" /></span>
               <span className="ct-res-texto"><span className="ct-et">{t.hoyToca.largo}</span><span className="ct-va">— <small>productos</small></span>
                 <span className="ct-riel" /></span>
             </div>
@@ -120,7 +121,7 @@ export function Contar() {
                     <li key={s.id}>
                       <button type="button" className={`ct-sector ${s.id === elegido?.id ? "elegido" : ""}`} aria-current={s.id === elegido?.id} onClick={() => setElegidoId(s.id)} data-testid="sector"
                         aria-label={`${s.nombre}: ${e.texto}`}>
-                        <span className={`ct-sector-ico ${e.clase}`}><IconoDeDeposito nombre={e.icono} /></span>
+                        <span className={`ct-sector-ico ${e.clase}`}><Icono nombre={e.icono} /></span>
                         <span className="ct-sector-texto"><b>{s.nombre}</b><span><em className={e.clase}>{e.texto}</em> · {abierto ? `${abierto.renglones.length} de ${abierto.renglones.length + abierto.sin_contar.length}` : numero(Number(s.productos))}</span></span>
                         <span className="ct-sector-cuando">{abierto?.abierto_en ? cuandoCorto(abierto.abierto_en) : ""}</span>
                       </button>
@@ -320,8 +321,8 @@ function ConteoDeSector({ conteo, alActualizar, alCerrado, alOtro }: { conteo: C
     <div className="ct-conteo" data-testid="conteo">
       <AlLadoDeLasPestanas>
         <div className="ct-acciones">
-          {emparejado && <Boton tam="chico" onClick={pedirAlCelular} data-testid="pedir-lector"><IconoDeDeposito nombre="scan-barcode" tam={16} />{t.escanearConElCelular.largo} <kbd className="tecla">Alt E</kbd></Boton>}
-          <Boton tam="chico" variante="principal" className="ct-cerrar" disabled={conteo.renglones.length === 0} onClick={() => setCerrando(true)} data-testid="cerrar"><IconoDeDeposito nombre="square-check-big" tam={16} />{t.cerrarElSector.largo} <kbd className="tecla">Alt C</kbd></Boton>
+          {emparejado && <Boton tam="chico" onClick={pedirAlCelular} data-testid="pedir-lector"><Icono nombre="scan-barcode" tam={16} />{t.escanearConElCelular.largo} <kbd className="tecla">Alt E</kbd></Boton>}
+          <Boton tam="chico" variante="principal" className="ct-cerrar" disabled={conteo.renglones.length === 0} onClick={() => setCerrando(true)} data-testid="cerrar"><Icono nombre="square-check-big" tam={16} />{t.cerrarElSector.largo} <kbd className="tecla">Alt C</kbd></Boton>
         </div>
       </AlLadoDeLasPestanas>
       <div className="ct-cab">
@@ -351,7 +352,7 @@ function ConteoDeSector({ conteo, alActualizar, alCerrado, alOtro }: { conteo: C
           <div className="ct-contando-texto">
             <b>{producto.descripcion}</b>
             <span className="detalle">{[producto.marca, producto.codigo_proveedor && `Cód. ${producto.codigo_proveedor}`].filter(Boolean).join(" · ") || "Sin marca"}</span>
-            {previo && <span className="ct-previo" data-testid="ya-contado"><IconoDeDeposito nombre="history" tam={16} />Antes {conUnidad(previo.cantidad_contada, previo.unidad)}: lo que pongas lo reemplaza</span>}
+            {previo && <span className="ct-previo" data-testid="ya-contado"><Icono nombre="history" tam={16} />Antes {conUnidad(previo.cantidad_contada, previo.unidad)}: lo que pongas lo reemplaza</span>}
           </div>
           <label className="ct-cuantas" htmlFor={`${id}-cantidad`}>
             <span>¿Cuántas hay?</span>
@@ -406,7 +407,7 @@ function ConteoDeSector({ conteo, alActualizar, alCerrado, alOtro }: { conteo: C
                   <button type="button" className="ct-renglon" onClick={() => elegirPorId(p.producto_id, p.descripcion)} aria-label={`Contar ${p.descripcion}`}>
                     <FotoChica id={p.producto_id} />
                     <span className="ct-r-texto"><b>{p.descripcion}</b><span>{[p.marca, `el sistema dice ${conUnidad(p.stock_teorico, p.unidad)}`].filter(Boolean).join(" · ")}</span></span>
-                    <IconoDeDeposito nombre="chevron-right" className="ct-flecha" />
+                    <Icono nombre="chevron-right" className="ct-flecha" />
                   </button>
                 </li>
               ))}
@@ -426,7 +427,7 @@ function ConteoDeSector({ conteo, alActualizar, alCerrado, alOtro }: { conteo: C
 // La foto del producto si este dispositivo la tiene; si no, el ícono de la v2.
 function FotoChica({ id, grande }: { id: string; grande?: boolean }) {
   const url = urlDeFoto(productoEnMemoria(id)?.foto_url ?? null);
-  return <span className={`ct-foto ${grande ? "grande" : ""}`}>{url ? <img src={url} alt="" loading="lazy" /> : <IconoDeDeposito nombre="hash" tam={grande ? 22 : 18} />}</span>;
+  return <span className={`ct-foto ${grande ? "grande" : ""}`}>{url ? <img src={url} alt="" loading="lazy" /> : <Icono nombre="hash" tam={grande ? 22 : 18} />}</span>;
 }
 
 // Cerrar no se deshace: antes muestra qué se contó, qué tiene diferencia y qué quedó sin

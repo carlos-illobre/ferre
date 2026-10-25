@@ -13,12 +13,13 @@ import { DineroInvertido } from "../DineroInvertido";
 import { ComprasRecientes } from "./ComprasRecientes";
 import { EstadoDeConexion } from "./componentes/EstadoDeConexion";
 import { Hoja, Pasos } from "./componentes/base";
-import { IconoN, type IconoDeNegocio } from "../iconos-de-negocio";
+
 import { TEXTOS } from "../textos";
 import { agruparNoLlevados, compararConElAnterior, pasosDeLoVendido, type Comparado } from "../../negocio/ventas/tablero";
 import { diaAnterior, nombreDelDia, porHora, resumenDelDia } from "../../negocio/ventas/resumen-del-dia";
 import { hoyLocal, type Consulta } from "../../negocio/ventas/ventas-del-dia";
 import "./resumen.css";
+import { Icono, type NombreDeIcono } from "../../ui/iconos";
 
 // Más → Cómo va el negocio (decisión 95): las mismas tres secciones que en la computadora, cada
 // una con su permiso. La dirección de cada sección en el celular.
@@ -26,7 +27,7 @@ export const SUB_DE_SECCION: Record<SeccionDeNegocio, string> = { ventas: "negoc
 const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
 const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 
-const ICONO_DE_SECCION: Record<SeccionDeNegocio, IconoDeNegocio> = { ventas: "chart-column", compras: "truck", inventario: "boxes" };
+const ICONO_DE_SECCION: Record<SeccionDeNegocio, NombreDeIcono> = { ventas: "chart-column", compras: "truck", inventario: "boxes" };
 const diaCorto = (dia: string) => { const n = nombreDelDia(dia); return n.charAt(0).toUpperCase() + n.slice(1, 3) + n.slice(n.indexOf(" ")); };
 
 // Como la v2 («Tablero», decisión 148): las secciones como cuatro botones con ícono (Resultado
@@ -47,10 +48,10 @@ export function ComoVaElNegocio({ seccion }: { seccion: SeccionDeNegocio }) {
         <nav className="rc-secciones" aria-label="Secciones">
           {visibles.map((s) => (
             <button key={s.valor} type="button" className={`rc-sec ${s.valor === seccion ? "elegida" : ""}`} aria-current={s.valor === seccion ? "page" : undefined} onClick={() => irA(`mas/${SUB_DE_SECCION[s.valor]}`)} data-testid={`seccion-${s.valor}`}>
-              <IconoN nombre={ICONO_DE_SECCION[s.valor]} tam={22} />{s.nombre}
+              <Icono nombre={ICONO_DE_SECCION[s.valor]} tam={22} />{s.nombre}
             </button>
           ))}
-          <button type="button" className="rc-sec" disabled title={TEXTOS.tablero.sinResultado.corto}><IconoN nombre="scale" tam={22} />{TEXTOS.tablero.resultado.corto}</button>
+          <button type="button" className="rc-sec" disabled title={TEXTOS.tablero.sinResultado.corto}><Icono nombre="scale" tam={22} />{TEXTOS.tablero.resultado.corto}</button>
         </nav>
       )}
       {seccion === "ventas" ? <Ventas /> : seccion === "compras" ? <Compras /> : <DineroInvertido />}
@@ -86,7 +87,7 @@ function Ventas() {
 
       <div className="rc-tarjeta rc-heroe" data-testid="numero-vendido">
         <div className="rc-et"><span className="rc-etiqueta">{TEXTOS.tablero.vendido.corto}</span>
-          {hoy && <button type="button" className="rc-info" aria-label="Vendido hoy. Ver de dónde sale" onClick={() => setExplicando(true)} data-testid="explicacion"><IconoN nombre="info" tam={18} /></button>}
+          {hoy && <button type="button" className="rc-info" aria-label="Vendido hoy. Ver de dónde sale" onClick={() => setExplicando(true)} data-testid="explicacion"><Icono nombre="info" tam={18} /></button>}
         </div>
         <div className="rc-total">{r ? <Pesos valor={r.total} /> : "—"}</div>
         <div className="rc-comp">{r ? <Comparacion c={comp?.vendido ?? null} pesos actual={r.total} /> : <span className="rc-gris">Sin conexión: se ve cuando vuelva internet</span>}</div>
@@ -140,7 +141,7 @@ function Comparacion({ c, actual, pesos }: { c: Comparado | null; actual: number
   const tipo = Math.abs(p) <= 1 ? "igual" : p > 0 ? "sube" : "baja";
   const dif = Math.abs(actual - c.anterior);
   const f = (n: number) => (pesos ? pesosCortos(n) : n.toLocaleString("es-AR"));
-  return <><span className={`rc-delta ${tipo}`}>{tipo !== "igual" && <IconoN nombre={p > 0 ? "arrow-up-right" : "arrow-down-right"} tam={16} />}{Math.abs(p)} %</span>{tipo === "igual" ? `igual que ayer` : `${f(dif)} ${p > 0 ? "más" : "menos"} · ayer: ${f(c.anterior)}`}</>;
+  return <><span className={`rc-delta ${tipo}`}>{tipo !== "igual" && <Icono nombre={p > 0 ? "arrow-up-right" : "arrow-down-right"} tam={16} />}{Math.abs(p)} %</span>{tipo === "igual" ? `igual que ayer` : `${f(dif)} ${p > 0 ? "más" : "menos"} · ayer: ${f(c.anterior)}`}</>;
 }
 
 // La línea de abajo de un número chico: «↗ 3 más · antes 20», o «igual que ayer».
@@ -149,7 +150,7 @@ function Diferencia({ c, actual, pesos }: { c: Comparado | null; actual: number;
   const p = c.comparacion.porcentaje;
   const f = (n: number) => (pesos ? pesosCortos(n) : n.toLocaleString("es-AR"));
   if (Math.abs(p) <= 1) return <span className="rc-d gris">igual que ayer</span>;
-  return <span className={`rc-d ${p > 0 ? "" : "baja"}`}><IconoN nombre={p > 0 ? "arrow-up-right" : "arrow-down-right"} tam={16} />{pesos ? `${Math.abs(p)} % ${p > 0 ? "más" : "menos"}` : `${f(Math.abs(actual - c.anterior))} ${p > 0 ? "más" : "menos"} · antes ${f(c.anterior)}`}</span>;
+  return <span className={`rc-d ${p > 0 ? "" : "baja"}`}><Icono nombre={p > 0 ? "arrow-up-right" : "arrow-down-right"} tam={16} />{pesos ? `${Math.abs(p)} % ${p > 0 ? "más" : "menos"}` : `${f(Math.abs(actual - c.anterior))} ${p > 0 ? "más" : "menos"} · antes ${f(c.anterior)}`}</span>;
 }
 
 // Lo que preguntaron y no llevaron, agrupado («Disco de corte × 3»); «Ver las N» abre cada consulta.
@@ -164,11 +165,11 @@ function NoLlevaron({ consultas, deHoy }: { consultas: Consulta[] | null; deHoy:
       </div>
       {consultas.length === 0 && <p className="rc-detalle">Cuando alguien pregunta un precio y no compra, tocá «No llevó» en Vender.</p>}
       {!todas && grupos.slice(0, 3).map((g) => (
-        <div key={g.descripcion} className="rc-lrow" data-testid="consulta"><IconoN nombre="package" tam={16} /><span className="rc-lrow-nombre">{g.descripcion}</span><span className="rc-pastilla">× {g.veces}</span></div>
+        <div key={g.descripcion} className="rc-lrow" data-testid="consulta"><Icono nombre="package" tam={16} /><span className="rc-lrow-nombre">{g.descripcion}</span><span className="rc-pastilla">× {g.veces}</span></div>
       ))}
       {todas && consultas.map((c) => (
         <div key={c.id} className="rc-lrow con-detalle" data-testid="consulta">
-          <IconoN nombre="package" tam={16} />
+          <Icono nombre="package" tam={16} />
           <span className="rc-lrow-nombre">{c.descripcion}<small>{esDeHoy(c.fecha) ? hora(c.fecha) : fecha(c.fecha)}{c.motivo ? ` · ${c.motivo}` : ""}</small></span>
           <b>{c.precio_ofrecido ? pesosCortos(c.precio_ofrecido) : "—"}</b>
         </div>

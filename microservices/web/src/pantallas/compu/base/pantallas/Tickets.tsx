@@ -8,13 +8,14 @@ import { iniciales } from "../../../../negocio/apartados";
 import { MAXIMO_DE_FOTOS, crearTicket, diasAbierto, DIAS_DE_ESPERA, resumenDeTickets, useTickets, type Pendiente, type Ticket } from "../../../tickets";
 import { FotoGrande, Miniatura } from "../../../Tickets";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../../PedirFoto";
-import { IconoDeLaV2 } from "../../../IconoDeLaV2";
+
 import { TEXTOS } from "../../../textos";
 import { Hoja } from "../ui";
 import type { ResolucionDeTicket } from "@servidor/tickets";
 import "../../../mas-v2.css";
 import "../estilos/tickets-v2.css";
 import { VERSION } from "../../../../plataforma/ambiente";
+import { Icono } from "../../../../ui/iconos";
 
 // Mejoras y errores (RF-80) en la computadora, como la v2 del director de arte (variante 1, «El
 // buzón»; specs/008, decisión 148). A la izquierda se escribe: idea o error (la idea elegida al
@@ -91,7 +92,7 @@ export function Tickets() {
   return (
     <main id="contenido" className="pagina mv2 tkv" data-testid="tickets" tabIndex={-1}>
       <header className="tkv-cabeza">
-        <div><div className="tkv-migas">{TEXTOS.ticketsV2.mas.largo} <IconoDeLaV2 nombre="derecha" tam={16} /></div><h1>{t.titulo.largo}</h1></div>
+        <div><div className="tkv-migas">{TEXTOS.ticketsV2.mas.largo} <Icono nombre="derecha" tam={16} /></div><h1>{t.titulo.largo}</h1></div>
         <span className="mv-detalle">{t.loVenTodos.largo}</span>
       </header>
       <div className="tkv-cols">
@@ -99,7 +100,7 @@ export function Tickets() {
           <div className="tkv-eleccion" role="radiogroup" aria-label="Qué querés contar">
             {(["mejora", "error"] as const).map((v) => (
               <button key={v} type="button" role="radio" aria-checked={tipo === v} className={tipo === v ? "elegida" : ""} onClick={() => setTipo(v)} data-testid={`tipo-${v}`}>
-                <IconoDeLaV2 nombre={v === "error" ? "bicho" : "lamparita"} tam={24} />
+                <Icono nombre={v === "error" ? "bicho" : "lamparita"} tam={24} />
                 <span>{v === "error" ? t.encontreUnError.largo : t.tengoUnaIdea.largo}<small>{v === "error" ? t.algoQueNoAnda.largo : t.algoQueFalta.largo}</small></span>
               </button>
             ))}
@@ -114,40 +115,40 @@ export function Tickets() {
               {fotos.map((f, i) => (
                 <li key={`${f.name}-${f.size}-${i}`} className="tkv-mini">
                   <Miniatura origen={f} />
-                  <button type="button" className="quitar" aria-label={`Quitar la foto ${i + 1}`} onClick={() => { setFotos(fotos.filter((_, n) => n !== i)); setFalta(null); }}><IconoDeLaV2 nombre="cruz" tam={14} /></button>
+                  <button type="button" className="quitar" aria-label={`Quitar la foto ${i + 1}`} onClick={() => { setFotos(fotos.filter((_, n) => n !== i)); setFalta(null); }}><Icono nombre="cruz" tam={14} /></button>
                 </li>
               ))}
-              {fotos.length < MAXIMO_DE_FOTOS && <li><button type="button" className="tkv-agregar" onClick={() => void pegar()} data-testid="pegar-foto"><IconoDeLaV2 nombre="pegar" />{t.pegar.largo}</button></li>}
+              {fotos.length < MAXIMO_DE_FOTOS && <li><button type="button" className="tkv-agregar" onClick={() => void pegar()} data-testid="pegar-foto"><Icono nombre="pegar" />{t.pegar.largo}</button></li>}
             </ul>
           </div>
           <div className="tkv-via">
             <input ref={archivo} type="file" accept="image/*" multiple hidden onChange={(e) => { agregarFotos(Array.from(e.target.files ?? [])); e.target.value = ""; }} data-testid="archivo-foto" />
-            <button type="button" className="mv-btn chico" disabled={fotos.length >= MAXIMO_DE_FOTOS} onClick={() => archivo.current?.click()} aria-keyshortcuts="Alt+F" data-testid="agregar-foto"><IconoDeLaV2 nombre="clip" tam={16} />{t.elegirArchivos.largo} <span className="mv-kbd">Alt F</span></button>
-            {hayQueUsarElCelular() && <button type="button" className="mv-btn chico" disabled={pidiendo || fotos.length >= MAXIMO_DE_FOTOS} onClick={() => setPidiendo(true)} data-testid="foto-con-celular"><IconoDeLaV2 nombre="celular" tam={16} />{t.sacarConElCelular.largo}</button>}
+            <button type="button" className="mv-btn chico" disabled={fotos.length >= MAXIMO_DE_FOTOS} onClick={() => archivo.current?.click()} aria-keyshortcuts="Alt+F" data-testid="agregar-foto"><Icono nombre="clip" tam={16} />{t.elegirArchivos.largo} <span className="mv-kbd">Alt F</span></button>
+            {hayQueUsarElCelular() && <button type="button" className="mv-btn chico" disabled={pidiendo || fotos.length >= MAXIMO_DE_FOTOS} onClick={() => setPidiendo(true)} data-testid="foto-con-celular"><Icono nombre="celular" tam={16} />{t.sacarConElCelular.largo}</button>}
           </div>
           {pidiendo && <PedirFotoAlCelular para="una foto para el ticket" alCancelar={() => setPidiendo(false)} alRecibir={(f) => { setPidiendo(false); agregarFotos([f]); }} />}
           <div>
             <div className="mv-etiqueta tkv-va-con-titulo">{t.vaCon.largo}</div>
             <div className="tkv-va-con">
               {usuario && <span className="mv-pastilla contorno"><span className="tkv-av">{iniciales(usuario).slice(0, 1)}</span>{usuario}</span>}
-              <span className="mv-pastilla contorno"><IconoDeLaV2 nombre="pantalla" tam={16} />{describirDispositivo()}</span>
+              <span className="mv-pastilla contorno"><Icono nombre="pantalla" tam={16} />{describirDispositivo()}</span>
               <span className="mv-pastilla contorno">{t.version.largo} {VERSION}</span>
             </div>
           </div>
           {falta && <p className="mv-aviso error" id="tkv-falta" role="alert">{falta}</p>}
           {aviso && <p className="mv-aviso logro" role="status" data-testid="mensaje">{aviso}</p>}
           <button type="button" className="mv-btn accion grande tkv-enviar" disabled={enviando} onClick={() => void enviar()} aria-keyshortcuts="Control+Enter" data-testid="enviar">
-            <IconoDeLaV2 nombre="enviar" />{enviando ? "Enviando…" : `${t.enviar.largo} ${tipoTexto.largo}`} <span className="mv-kbd">Ctrl Enter</span>
+            <Icono nombre="enviar" />{enviando ? "Enviando…" : `${t.enviar.largo} ${tipoTexto.largo}`} <span className="mv-kbd">Ctrl Enter</span>
           </button>
         </section>
 
         <section className="tkv-seguir" aria-label="Tickets">
           <div className="tkv-resumenes">
-            <div className="mv-resumen"><span className="ico"><IconoDeLaV2 nombre="bandeja" /></span><div><div className="et">{t.abiertos.largo}</div><div className="va">{tickets ? r.abiertos : "—"}</div></div>
+            <div className="mv-resumen"><span className="ico"><Icono nombre="bandeja" /></span><div><div className="et">{t.abiertos.largo}</div><div className="va">{tickets ? r.abiertos : "—"}</div></div>
               <div className="tkv-barras" title={t.creadosYResueltos.largo} aria-hidden="true">{r.semanas.map((s, i) => <span key={i}><b style={{ height: `${(s.creados / maxBarra) * 100}%` }} /><b className="r" style={{ height: `${(s.resueltos / maxBarra) * 100}%` }} /></span>)}</div>
             </div>
-            <div className="mv-resumen urgente"><span className="ico"><IconoDeLaV2 nombre="reloj-de-arena" /></span><div><div className="et">{t.esperan.largo}</div><div className="va">{tickets ? r.esperan : "—"}</div></div></div>
-            <div className="mv-resumen logro"><span className="ico"><IconoDeLaV2 nombre="tilde-circulo" /></span><div><div className="et">{t.resueltosEn.largo} {r.mes}</div><div className="va">{tickets ? r.resueltosDelMes : "—"}</div></div></div>
+            <div className="mv-resumen urgente"><span className="ico"><Icono nombre="reloj-de-arena" /></span><div><div className="et">{t.esperan.largo}</div><div className="va">{tickets ? r.esperan : "—"}</div></div></div>
+            <div className="mv-resumen logro"><span className="ico"><Icono nombre="tilde-circulo" /></span><div><div className="et">{t.resueltosEn.largo} {r.mes}</div><div className="va">{tickets ? r.resueltosDelMes : "—"}</div></div></div>
           </div>
           <div className="tkv-filtros">
             <div className="tkv-segmentos" role="group" aria-label="Cuáles ver">
@@ -157,8 +158,8 @@ export function Tickets() {
             <span className="tkv-esp" />
             <div className="tkv-chips" role="group" aria-label="Ideas o errores">
               <button type="button" className={filtro === "todos" ? "elegido" : ""} aria-pressed={filtro === "todos"} onClick={() => setFiltro("todos")}>{t.todos.largo}</button>
-              <button type="button" className={filtro === "mejora" ? "elegido" : ""} aria-pressed={filtro === "mejora"} onClick={() => setFiltro("mejora")}><IconoDeLaV2 nombre="lamparita" tam={16} />{t.ideas.largo} {delEstado.filter((x) => x.tipo === "mejora").length}</button>
-              <button type="button" className={filtro === "error" ? "elegido" : ""} aria-pressed={filtro === "error"} onClick={() => setFiltro("error")}><IconoDeLaV2 nombre="bicho" tam={16} />{t.errores.largo} {delEstado.filter((x) => x.tipo === "error").length}</button>
+              <button type="button" className={filtro === "mejora" ? "elegido" : ""} aria-pressed={filtro === "mejora"} onClick={() => setFiltro("mejora")}><Icono nombre="lamparita" tam={16} />{t.ideas.largo} {delEstado.filter((x) => x.tipo === "mejora").length}</button>
+              <button type="button" className={filtro === "error" ? "elegido" : ""} aria-pressed={filtro === "error"} onClick={() => setFiltro("error")}><Icono nombre="bicho" tam={16} />{t.errores.largo} {delEstado.filter((x) => x.tipo === "error").length}</button>
             </div>
           </div>
           <div className="tkv-lista">
@@ -180,18 +181,18 @@ function Fila({ ticket: x, alAbrir }: { ticket: Ticket | Pendiente; alAbrir: () 
   const dias = enviado && x.estado === "abierto" ? diasAbierto(x) : 0;
   return (
     <button type="button" className={`tkv-tk ${enviado ? "" : "porenviar"}`} onClick={alAbrir} data-testid="ticket">
-      <span className={`tkv-tipo ${x.tipo}`}><IconoDeLaV2 nombre={x.tipo === "error" ? "bicho" : "lamparita"} /></span>
+      <span className={`tkv-tipo ${x.tipo}`}><Icono nombre={x.tipo === "error" ? "bicho" : "lamparita"} /></span>
       {/* El tipo se ve en el ícono; quien no ve la pantalla lo oye. */}
       <span className="solo-lectores">{x.tipo === "error" ? "Error" : "Mejora"}. </span>
       <span className="tx"><span className="texto">{x.descripcion}</span>
         <span className={`quien ${enviado ? "" : "urgente"}`}>{enviado ? [x.usuario, cuandoCorto(x.creado_en), x.dispositivo].filter(Boolean).join(" · ") : t.porEnviar.largo}</span></span>
       <span className="lado">
         {x.fotos.length > 0 && <span className="tkv-apilado">{x.fotos.slice(0, x.fotos.length > 2 ? 2 : 2).map((f, i) => <span key={i} className="tkv-mini chica"><Miniatura origen={f} /></span>)}{x.fotos.length > 2 && <span className="tkv-mini chica mas">+{x.fotos.length - 2}</span>}</span>}
-        {dias >= DIAS_DE_ESPERA && <span className="mv-pastilla urgente"><IconoDeLaV2 nombre="reloj-de-arena" tam={16} />{dias} días</span>}
+        {dias >= DIAS_DE_ESPERA && <span className="mv-pastilla urgente"><Icono nombre="reloj-de-arena" tam={16} />{dias} días</span>}
         {enviado && x.estado === "resuelto" && <span className="mv-pastilla logro">{t.resuelto.largo}</span>}
-        {!enviado && <IconoDeLaV2 nombre="nube-subir" />}
+        {!enviado && <Icono nombre="nube-subir" />}
       </span>
-      <IconoDeLaV2 nombre="derecha" tam={16} className="chev" />
+      <Icono nombre="derecha" tam={16} className="chev" />
     </button>
   );
 }
@@ -210,13 +211,13 @@ function Detalle({ ticket: x, alCerrar, alCambiar }: { ticket: Ticket | Pendient
   }
   return (
     <Hoja ancha testId="ticket-abierto" alCerrar={alCerrar} titulo={x.descripcion}
-      foto={<span className={`tkv-tipo grande ${x.tipo}`}><IconoDeLaV2 nombre={x.tipo === "error" ? "bicho" : "lamparita"} tam={24} /></span>}
+      foto={<span className={`tkv-tipo grande ${x.tipo}`}><Icono nombre={x.tipo === "error" ? "bicho" : "lamparita"} tam={24} /></span>}
       bajoTitulo={<span className="mv-detalle">{enviado ? [x.usuario, cuandoCorto(x.creado_en), x.dispositivo, x.version ? `versión ${x.version}` : null].filter(Boolean).join(" · ") : t.porEnviar.largo}</span>}
-      pie={!enviado ? <div className="mv-aviso urgente tkv-pie-aviso"><IconoDeLaV2 nombre="nube-subir" tam={16} /><span>{t.todaviaNoSalio.largo}</span></div>
-        : x.estado === "resuelto" ? <><div className="mv-aviso logro tkv-pie-aviso"><IconoDeLaV2 nombre="tilde-circulo" tam={16} /><span><b>{x.resuelto_por ?? "Alguien"} lo resolvió</b>{x.resuelto_en ? ` ${cuandoCorto(x.resuelto_en)}` : ""}{x.nota ? `: ${x.nota}` : ""}</span></div><button type="button" className="mv-btn" onClick={() => void pedir("reabrir")} data-testid="reabrir"><IconoDeLaV2 nombre="repetir" tam={16} />{t.reabrir.largo}</button></>
+      pie={!enviado ? <div className="mv-aviso urgente tkv-pie-aviso"><Icono nombre="nube-subir" tam={16} /><span>{t.todaviaNoSalio.largo}</span></div>
+        : x.estado === "resuelto" ? <><div className="mv-aviso logro tkv-pie-aviso"><Icono nombre="tilde-circulo" tam={16} /><span><b>{x.resuelto_por ?? "Alguien"} lo resolvió</b>{x.resuelto_en ? ` ${cuandoCorto(x.resuelto_en)}` : ""}{x.nota ? `: ${x.nota}` : ""}</span></div><button type="button" className="mv-btn" onClick={() => void pedir("reabrir")} data-testid="reabrir"><Icono nombre="repetir" tam={16} />{t.reabrir.largo}</button></>
         : <form className="tkv-resolver" onSubmit={(e) => { e.preventDefault(); void pedir("resolver"); }}>
             <input value={nota} onChange={(e) => setNota(e.target.value)} maxLength={2000} placeholder={t.notaParaQuienAviso.largo} aria-label={t.notaParaQuienAviso.largo} data-testid="nota" />
-            <button type="submit" className="mv-btn accion" data-testid="confirmar-resuelto"><IconoDeLaV2 nombre="tilde" tam={16} />{t.marcarResuelto.largo}</button>
+            <button type="submit" className="mv-btn accion" data-testid="confirmar-resuelto"><Icono nombre="tilde" tam={16} />{t.marcarResuelto.largo}</button>
           </form>}>
       <div className="mv2 tkv-detalle">
         {x.fotos.length > 0 && <ul className="tkv-minis grandes">{x.fotos.map((f, i) => <li key={i}><button type="button" className="tkv-mini" aria-label={`Ver la foto ${i + 1} en grande`} onClick={() => setGrande(f)}><Miniatura origen={f} /></button></li>)}</ul>}

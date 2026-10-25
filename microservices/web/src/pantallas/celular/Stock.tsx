@@ -10,9 +10,10 @@ import { irA } from "../../rutas";
 import { abreviarUnidad, conUnidad, enteras, unidadDe } from "../../negocio/catalogo";
 import { AvisoError, Buscador, Hoja, Toast } from "./componentes/base";
 import { Escaner, hayCamara } from "../../plataforma/camara/Escaner";
-import { IconoDeDeposito, type IconoDeDepositoNombre } from "../IconoDeDeposito";
+
 import type { Producto } from "./pantallas/Productos";
 import "./stock.css";
+import { Icono, type NombreDeIcono } from "../../ui/iconos";
 
 // Stock, como la v2 («La lista», decisión 148): tres números arriba (bajo el mínimo, sin stock y
 // negativo), el buscador con escanear, los filtros en pastillas y cada producto con su stock en
@@ -56,8 +57,8 @@ export function Stock() {
   }, [catalogo, consulta, buscarProductos, porId, filtro]);
 
   const elegir = (f: Filtro) => setFiltro(filtro === f ? "todos" : f);
-  const resumen = (valor: Filtro | null, clase: string, icono: IconoDeDepositoNombre, rotulo: string, cifra: string, testId: string) => {
-    const contenido = <><span className="st-et"><IconoDeDeposito nombre={icono} tam={16} />{rotulo}</span><span className="st-va">{cifra}</span></>;
+  const resumen = (valor: Filtro | null, clase: string, icono: NombreDeIcono, rotulo: string, cifra: string, testId: string) => {
+    const contenido = <><span className="st-et"><Icono nombre={icono} tam={16} />{rotulo}</span><span className="st-va">{cifra}</span></>;
     return valor
       ? <button type="button" className={`st-res ${clase}`} aria-pressed={filtro === valor} onClick={() => elegir(valor)} data-testid={testId}>{contenido}</button>
       : <div className={`st-res ${clase}`} data-testid={testId}>{contenido}</div>;
@@ -83,7 +84,7 @@ export function Stock() {
       <div className="st-chips" role="group" aria-label="Qué productos mostrar">
         <button type="button" className={`st-chip ${filtro === "revisar" ? "elegido" : ""}`} aria-pressed={filtro === "revisar"} onClick={() => setFiltro("revisar")} data-testid="filtro-revisar">{t.paraRevisar.corto} {num(cuenta.enCero + cuenta.negativos)}</button>
         <button type="button" className={`st-chip ${filtro === "todos" ? "elegido" : ""}`} aria-pressed={filtro === "todos"} onClick={() => setFiltro("todos")} data-testid="filtro-todos">{t.todos.corto} {num(cuenta.total)}</button>
-        <button type="button" className="st-chip" disabled data-testid="filtro-sin-codigo"><IconoDeDeposito nombre="barcode" tam={16} />{t.sinCodigo.corto} —</button>
+        <button type="button" className="st-chip" disabled data-testid="filtro-sin-codigo"><Icono nombre="barcode" tam={16} />{t.sinCodigo.corto} —</button>
       </div>
 
       <ul className="st-lista" data-testid="tabla-stock">
@@ -106,7 +107,7 @@ export function Stock() {
       {pidePedidos && (
         <div className="st-pedir">
           <span className="st-pedir-txt"><b>— {t.paraPedir.corto}</b>{t.aProveedores.corto}</span>
-          <button type="button" className="st-pedir-boton" onClick={() => irA("deposito/pedidos")} data-testid="que-pedir"><IconoDeDeposito nombre="truck" />{t.quePedir.corto}</button>
+          <button type="button" className="st-pedir-boton" onClick={() => irA("deposito/pedidos")} data-testid="que-pedir"><Icono nombre="truck" />{t.quePedir.corto}</button>
         </div>
       )}
 
@@ -117,7 +118,7 @@ export function Stock() {
   );
 }
 
-const ICONO_DEL_MOVIMIENTO: Record<string, { icono: IconoDeDepositoNombre; clase: string }> = {
+const ICONO_DEL_MOVIMIENTO: Record<string, { icono: NombreDeIcono; clase: string }> = {
   Venta: { icono: "shopping-cart", clase: "" }, Compra: { icono: "truck", clase: "compra" }, Ajuste: { icono: "square-pen", clase: "ajuste" }, Conteo: { icono: "clipboard-list", clase: "ajuste" },
 };
 
@@ -177,9 +178,9 @@ function HojaDeStock({ producto: p, fila, alCerrar, alAjustar }: { producto: Pro
           <div className="st-fila-c">
             <span className="st-et-c">¿Cuántas hay?</span>
             <span className="st-cantidad">
-              <button type="button" onClick={() => sumar(-1)} aria-label="Una menos"><IconoDeDeposito nombre="minus" /></button>
+              <button type="button" onClick={() => sumar(-1)} aria-label="Una menos"><Icono nombre="minus" /></button>
               <input inputMode={enteras(unidadDe(p)) ? "numeric" : "decimal"} value={real} onFocus={(e) => e.target.select()} onChange={(e) => { setReal(e.target.value); setError(null); }} onKeyDown={(e) => { if (e.key === "Enter") void guardar(); }} aria-label="Cuántas hay" data-testid="cantidad-real" />
-              <button type="button" onClick={() => sumar(1)} aria-label="Una más"><IconoDeDeposito nombre="plus" /></button>
+              <button type="button" onClick={() => sumar(1)} aria-label="Una más"><Icono nombre="plus" /></button>
             </span>
           </div>
           <p className="st-vista">{!valida ? <>El sistema dice <b>{num(cantidad)}</b></> : hay === cantidad ? "Coincide con el sistema" : <>Había <b>{num(cantidad)}</b>, hay <b>{num(hay)}</b></>}</p>
@@ -202,7 +203,7 @@ function Renglon({ m, queda }: { m: Movimiento; queda: number }) {
   const c = Number(m.cantidad);
   return (
     <li className="st-mov">
-      <span className={`st-mov-ic ${clase}`}><IconoDeDeposito nombre={icono} tam={16} /></span>
+      <span className={`st-mov-ic ${clase}`}><Icono nombre={icono} tam={16} /></span>
       <span className="st-mov-texto"><b>{nombre} · {fecha(m.fecha.slice(0, 10))}</b>{m.nota && <span>{m.nota}</span>}</span>
       <span className={`st-mov-q ${c > 0 ? "mas" : ""}`}>{c > 0 ? "+" : c < 0 ? "−" : ""}{num(Math.abs(c))}</span>
       <span className="st-mov-queda">{num(queda)}</span>

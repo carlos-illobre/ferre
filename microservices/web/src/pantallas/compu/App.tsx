@@ -110,7 +110,7 @@ const MENU: Parte[] = [
   { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Stock" }, { ruta: "compras", icono: "compras", nombre: "Compras", pide: ["negocio.gastos", "deposito.compras", "deposito.ingresos", "deposito.pedidos"] }, { ruta: "contar", icono: "contar", nombre: "Contar", pide: ["deposito.stock"] }] },
   { clave: "negocio", nombre: "Negocio", icono: "menu-negocio", pestanas: DE_LA_PARTE_NEGOCIO },
   // Anomalías es una opción de Más con pestañas: en el menú cuentan sus pestañas.
-  { clave: "mas", nombre: "Más", icono: "menu-mas", pestanas: DE_MAS.flatMap((d) => (d.ruta === "anomalias" ? DE_ANOMALIAS : [{ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide }])) },
+  { clave: "mas", nombre: "Más", icono: "ellipsis", pestanas: DE_MAS.flatMap((d) => (d.ruta === "anomalias" ? DE_ANOMALIAS : [{ ruta: d.ruta, nombre: d.nombre, icono: d.icono, pide: d.pide }])) },
 ];
 // Pantallas que no están en el menú pero tienen dirección.
 // «anular» era la pestaña de anular, que ahora está en «Ventas de hoy» (decisión 120): lleva ahí.
