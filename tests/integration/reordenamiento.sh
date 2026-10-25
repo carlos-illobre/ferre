@@ -26,7 +26,7 @@ grep -q "la-plataforma-no-depende-del-negocio" microservices/web/.dependency-cru
 # El CI corre `pnpm typecheck`, y el de cada paquete corre `pnpm capas`.
 grep -q "run: pnpm typecheck" .github/workflows/ci.yml || falla "010-E04: el CI no corre pnpm typecheck"
 for paquete in microservices/web microservices/api; do
-  grep -q '"typecheck": ".*pnpm capas"' "$paquete/package.json" || falla "010-E04: el typecheck de $paquete no corre el control de capas"
+  grep -q '"typecheck": ".*pnpm capas' "$paquete/package.json" || falla "010-E04: el typecheck de $paquete no corre el control de capas"
 done
 
 # 010-E07: no hay carpeta de librerías compartidas entre servicios.

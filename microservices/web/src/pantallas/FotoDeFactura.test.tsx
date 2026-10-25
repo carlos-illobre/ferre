@@ -49,7 +49,7 @@ describe("foto de la factura", () => {
   });
 
   it("023-E17: en la computadora, con el celular emparejado, pide la foto sin código QR y la recibe sola cuando el celular la manda", async () => {
-    localStorage.setItem("ferre.puesto", JSON.stringify({ id: "p1", expira_en: "2099-01-01T00:00:00Z" }));
+    localStorage.setItem("ferre.puesto.prueba", JSON.stringify({ id: "p1", expira_en: "2099-01-01T00:00:00Z" }));
     const alCambiar = vi.fn();
     render(<FotoDeFactura foto={null} alCambiar={alCambiar} conCelular nombre="factura" />);
     fireEvent.click(screen.getByTestId("foto-con-celular"));
@@ -64,7 +64,7 @@ describe("foto de la factura", () => {
     falso.enlace.llega({ tipo: "foto", id: pedido.id, imagen: "data:image/jpeg;base64,eA==" });
     await waitFor(() => expect(alCambiar).toHaveBeenCalledWith(FOTO));
     expect(subidas).toHaveLength(1); // la computadora la sube como si la hubiera elegido de un archivo
-    localStorage.removeItem("ferre.puesto");
+    localStorage.removeItem("ferre.puesto.prueba");
   });
 
   it("023-E24: sin celular emparejado, no hay código QR: dice que se elija un archivo o se vincule el celular", () => {

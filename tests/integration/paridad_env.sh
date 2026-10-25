@@ -46,7 +46,7 @@ fi
 # del .env. Se revisa el código que corre (sin pruebas); `ambiente.ts` de la web es donde se dice
 # qué valor del ambiente es producción.
 escrito=$(grep -rnE "localhost|127\.0\.0\.1|supabase|duckdns|:5432|\"(produccion|pruebas)\"" microservices/*/src microservices/procesos/*/src \
-  --include=*.ts --include=*.tsx --exclude=*.test.ts --exclude=*.test.tsx 2>/dev/null | grep -v "/pruebas/" | grep -v "^microservices/web/src/ambiente.ts:" || true)
+  --include=*.ts --include=*.tsx --exclude=*.test.ts --exclude=*.test.tsx 2>/dev/null | grep -v "/pruebas/" | grep -v "^microservices/web/src/plataforma/ambiente/ambiente.ts:" || true)
 if [[ -n "$escrito" ]]; then
   echo "El código tiene direcciones o ambientes escritos adentro:"
   echo "$escrito"
