@@ -266,27 +266,31 @@ Las reglas no van acá: van en `specs/`.
   Lleva [definir] porque el criterio para repartir los gastos fijos se define con Carlos
   (specs/preguntas-abiertas.md, RF-16).
 
-## Almacenamiento de datos
+## Microservicios y almacenamiento de datos
 
-Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con su carpeta en
-`specs/` cuando se empieza; la última cumple todas las restricciones.
+Rediseño por etapas (decisiones 150 y 164). Cada etapa es una funcionalidad nueva con su carpeta
+en `specs/` cuando se empieza. Primero se separan los servicios; las copias van casi al final
+(se hacen antes de empezar a usar producción, decisión 163) y la auditoría centralizada, al final.
 
 - [x] T139 [agente] [alta] Etapa 1: PostgreSQL en un contenedor de la máquina de Oracle, una base por servicio (mostrador y Procesos), mudanza desde Supabase, capa de datos aparte con 100 % de cobertura y todo lo que cambia entre ambientes en el .env (specs/022-base-de-datos-propia)
-- [ ] T140 [agente] Etapa 2: copia cifrada por noche de la base y los archivos de producción (pruebas no se copia, decisión 161) fuera de Oracle, guía de restauración probada, y Tickets en su propio servicio con su base. Se hace antes de empezar a usar producción (fase 3), no antes (decisión 163) (depende de T139)
+- [ ] T154 [agente] Etapa 2: el gateway (Caddy) como única puerta de la web, que reparte por ruta y le pregunta al servicio de las sesiones quién es cada uno; la carpeta y el servicio `api` pasan a llamarse `comercial`; Procesos detrás del gateway, anotando sus propios eventos en su base (decisión 164) (depende de T139)
+- [ ] T155 [agente] Etapa 3: Tickets en su propio servicio, con su base y sus eventos (decisión 164) (depende de T154)
+- [ ] T144 [agente] Etapa 4: Acceso en su propio servicio, con su base y sus eventos: usuarios, roles, permisos, sesiones, huellas, vincular el celular y sus ajustes; el gateway le pregunta a Acceso quién es cada uno (decisión 164) (depende de T155)
+- [ ] T141 [agente] Etapa 5: el dispositivo guarda todos los cambios del mostrador, con tope por espacio y sin borrar lo no confirmado; pide al navegador no borrar los datos; sin almacenamiento local no trabaja sin conexión (depende de T139)
+- [ ] T143 [agente] Etapa 6: usuarios de la base con lo mínimo, los históricos no se pueden modificar desde la base, unir duplicados sin reescribir filas (depende de T144)
+- [ ] T145 [agente] Etapa 7: archivos para análisis (Parquet con DuckDB) (depende de T143)
+- [ ] T140 [agente] Etapa 8: copia cifrada por noche de las bases y los archivos de producción (pruebas no se copia, decisión 161) fuera de Oracle y guía de restauración probada. Se hace antes de empezar a usar producción (fase 3), aunque no estén terminadas las etapas anteriores (decisión 163) (depende de T139)
   Propuesta (2026-10-25), a confirmar en su especificación:
-  - Qué: las bases del mostrador, Procesos y Tickets (pg_dump) y el volumen de archivos (listas, fotos, copia del catálogo) de producción.
+  - Qué: las bases de cada servicio (pg_dump) y el volumen de archivos (listas, fotos, copia del catálogo) de producción.
   - Cuándo: de madrugada (producción se usa de 9 a 17). Dónde: cifrado en la máquina y subido a Cloudflare R2 (10 GB gratis, bajar no cuesta).
   - Cuánto: las últimas 7 noches y una por semana de las últimas 4 semanas.
   - Cómo: una pieza más del compose, que en pruebas no hace nada porque su .env no tiene destino de copias.
-  - Si falla: aviso por ntfy, el canal del despliegue (los avisos completos son de la etapa 4).
+  - Si falla: aviso por ntfy, el canal del despliegue (los avisos completos son de la etapa 9).
   - Restauración: guía paso a paso, en la misma máquina o en una nueva, probada restaurando una copia real en una base aparte.
   - Carlos: crear la cuenta de R2 (T146) y guardar la clave de cifrado en su gestor de contraseñas; sin ella las copias no sirven.
-  - Preguntas para la especificación: si 7 noches y 4 semanas alcanzan, si quiere el aviso por ntfy, y si Tickets va en esta etapa o después.
-- [ ] T141 [agente] Etapa 3: el dispositivo guarda todos los cambios del mostrador, con tope por espacio y sin borrar lo no confirmado; pide al navegador no borrar los datos; sin almacenamiento local no trabaja sin conexión (depende de T139)
-- [ ] T142 [agente] Etapa 4: copia continua de la base (perder como mucho un minuto), avisos del monitor externo, prueba mensual de restauración, archivos en un almacenamiento de objetos y las listas de proveedores con su base (depende de T140)
-- [ ] T143 [agente] Etapa 5: usuarios de la base con lo mínimo, los históricos no se pueden modificar desde la base, unir duplicados sin reescribir filas, copia semanal inmutable en un segundo proveedor (depende de T142)
-- [ ] T144 [agente] Usuarios y acceso en su propio servicio con su base, cuando un tercer servicio necesite iniciar sesión (depende de T143)
-- [ ] T145 [agente] Etapa 6: réplica en caliente en una segunda máquina y archivos para análisis (Parquet con DuckDB) (depende de T143)
+  - Preguntas para la especificación: si 7 noches y 4 semanas alcanzan y si quiere el aviso por ntfy.
+- [ ] T142 [agente] Etapa 9: copia continua de la base (perder como mucho un minuto), avisos del monitor externo, prueba mensual de restauración, archivos en un almacenamiento de objetos, copia semanal inmutable en un segundo proveedor y réplica en caliente en una segunda máquina (depende de T140)
+- [ ] T156 [agente] Etapa 10: Auditoría en su propio servicio, que junta los eventos de todos y arma los reportes, con un broker de mensajes entre los servicios (NATS con JetStream); sin perder eventos ni guardar datos de auditoría en la base de los otros servicios. Se reanaliza al empezar: la propuesta era que cada servicio escriba el evento en el registro interno de su base (pg_logical_emit_message) y un relevo lo publique en el broker (decisión 164) (depende de T142)
 - [ ] T146 [carlos] Crear las cuentas gratuitas de Cloudflare R2, Backblaze B2 y Healthchecks.io (antes de T140; para la etapa 2 alcanza con R2, y no hace falta hasta el uso en producción, decisión 163)
 - [x] T150 [carlos] [alta] Pasar los dos ambientes a la base propia (022): pruebas el 2026-10-25 y producción el mismo día, al promover 4c86d71; secretos de Supabase fuera de GitHub (depende de T139)
 - [x] T153 [carlos] [alta] Un usuario de Linux por ambiente en la máquina (decisión 161, 001-T049): ferre-pruebas y ferre-produccion corren cada uno su ambiente con su Docker rootless desde el 2026-10-25; el usuario ferre se borró el mismo día, con su Docker y su carpeta

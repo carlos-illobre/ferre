@@ -18,7 +18,7 @@ riesgos:
     probabilidad: 2
     impacto: 5
     respuesta: mitigar
-    plan: "Antes de usar producción (decisión 163): copia cifrada por noche fuera de Oracle y restauración probada (T140, etapa 2); después, copia continua, prueba mensual y copia semanal en otro proveedor (T142, T143)"
+    plan: "Antes de usar producción (decisión 163): copia cifrada por noche fuera de Oracle y restauración probada (T140, etapa 2); después, copia continua, prueba mensual y copia semanal en otro proveedor (T142)"
     contingencia: Reconstruir desde las ventas de los últimos 7 días que guarda cada dispositivo
     disparador: "La base del contenedor no responde o falta información, o se empieza a usar producción sin T140 hecha"
     responsable: Carlos

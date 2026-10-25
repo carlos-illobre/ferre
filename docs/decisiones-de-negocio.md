@@ -1378,3 +1378,28 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      almacenamiento (copias por noche, guía de restauración probada y Tickets en su servicio)
      queda documentada y se hace antes de empezar a usar producción, no ahora. Hasta entonces,
      perder la base no pierde nada real.
+
+164. **Los microservicios, por funcionalidad y sin transacciones compartidas** (2026-10-25). Carlos:
+     cada servicio tiene una sola responsabilidad y es lo bastante grande para que ninguna
+     transacción cruce de un servicio a otro. Mirando las transacciones del código, quedan:
+     - **Comercial** (hoy el mostrador, en `api`, que se renombra): la mercadería y la plata del
+       local. Catálogo, precios, proveedores, listas aplicadas, ventas, cambios y correcciones,
+       caja, clientes y cuenta corriente, stock, conteos, compras, pedidos, faltantes, consultas y
+       duplicados van juntos porque la venta, la compra, el conteo y unir duplicados mueven stock,
+       costos y productos en la misma transacción. No se parte.
+     - **Acceso**: usuarios, roles, permisos, sesiones, huellas, vincular el celular y sus
+       ajustes.
+     - **Tickets**: lo que la gente reporta.
+     - **Procesos**: como está.
+     - **Lectura de listas**: entiende el Excel o el PDF de un proveedor y no guarda nada. Deja sin
+       efecto la «base propia de las listas» de la decisión 150: aplicar una lista cambia
+       productos y costos, que son de Comercial.
+     - **Gateway**: la única puerta de la web, con Caddy. Reparte por ruta y le pregunta al
+       servicio de las sesiones quién es cada uno. Así ni la web ni Comercial saben cuántos
+       servicios hay atrás.
+     Cada servicio guarda sus eventos de «Quién hizo qué» en su propia base, dentro de su
+     transacción. Un servicio de Auditoría que los junte, con un broker de mensajes entre los
+     servicios, es complejo (no perder eventos sin guardar datos de auditoría en los otros
+     servicios) y va en su propia etapa, después de las copias, donde se vuelve a analizar.
+     Orden de las etapas: gateway y nombres, Tickets, Acceso, dispositivo, seguridad en la base,
+     análisis, copias, copias completas y disponibilidad, y Auditoría (`proyecto/tasks.md`).

@@ -233,7 +233,7 @@ cd ~/ferre/pruebas && docker compose down
 
 | Volumen | Qué guarda | Si se pierde |
 |---|---|---|
-| `ferre-<ambiente>_db-data` | la base del mostrador y la de Procesos | se pierde todo: hasta la etapa 2 del almacenamiento no hay copias (`docs/operacion/DEPLOYMENT.md`, «Respaldo y recuperación») |
+| `ferre-<ambiente>_db-data` | la base del mostrador y la de Procesos | se pierde todo: hasta la etapa de copias (T140, antes de usar producción) no hay copias (`docs/operacion/DEPLOYMENT.md`, «Respaldo y recuperación») |
 | `ferre-<ambiente>_listas-data` | los Excel originales de cada lista cargada, las fotos y la copia del catálogo | no se pueden reprocesar listas viejas ni ver las fotos; los precios aplicados están en la base |
 
 ## Los límites del plan gratuito que importan

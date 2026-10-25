@@ -126,7 +126,7 @@ RF-09:
     - "En el servidor, varios temas (catálogo, listas, duplicados, sesiones y vínculo, compras, pedidos, conteos, usuarios y roles) escriben su SQL a mano: tiene el tipo de lo que devuelve, pero un nombre de columna mal escrito no lo detecta el compilador sino las pruebas"
     - "La foto no se muestra en el conteo de stock"
     - "Sin prueba: reemplazar la foto de un producto que ya tiene una"
-    - "Las fotos y los archivos de las listas se guardan en el volumen de la máquina, sin copia hasta la etapa 2 del almacenamiento (T140)"
+    - "Las fotos y los archivos de las listas se guardan en el volumen de la máquina, sin copia hasta la etapa de copias (T140, antes de usar producción)"
 
 RF-09b:
   estado: "Nuevo, segunda versión"

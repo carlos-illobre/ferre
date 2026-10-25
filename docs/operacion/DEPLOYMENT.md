@@ -132,9 +132,10 @@ La base vive en la máquina y no se alcanza desde internet: el monitor no la con
 **Todavía no hay copias de la base** (etapa 1 del almacenamiento, decisión 150): si se pierde el
 disco de la máquina, se pierde la base. Es aceptado mientras no haya datos reales: las copias se
 arman antes de empezar a usar producción, después de la prueba con el empleado (decisión 163;
-la propuesta está en `proyecto/tasks.md`, T140). Llegan por etapas (`proyecto/tasks.md`, «Almacenamiento de
-datos»): la copia por noche fuera de Oracle en la etapa 2; la copia continua, la prueba de
-restauración y los avisos en la etapa 4; la copia semanal en otro proveedor en la etapa 5.
+la propuesta está en `proyecto/tasks.md`, T140). Llegan por etapas (`proyecto/tasks.md`, «Microservicios y
+almacenamiento de datos»): la copia por noche fuera de Oracle y la restauración probada en la
+etapa 8; la copia continua, la prueba mensual, los avisos, la copia semanal en otro proveedor y
+la réplica en la etapa 9.
 
 Ante pérdida de la máquina: crear otra, copiar el `.env`, `docker compose pull && up`. La base
 arranca vacía hasta que haya copias. El mostrador sigue vendiendo desde la PWA mientras tanto.
