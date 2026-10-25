@@ -59,3 +59,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T048 [ajuste] Los logs de cada contenedor no pasan de 10 MB: dos archivos de 5 MB que rotan (decisión 161)
 - [x] T049 [ajuste] Un usuario de Linux por ambiente en la máquina, cada uno con su Docker: la instalación es por ambiente y la guía lo explica (decisión 161)
 - [x] T050 [ajuste] La guía de la máquina dice cómo pasar un ambiente de un usuario a otro sin que un aviso lo vuelva a levantar (decisión 161)
+- [x] T051 [ajuste] El despliegue de la máquina lee los servicios y las imágenes del compose de cada versión y, al volver atrás, baja también el compose anterior: un servicio nuevo o renombrado se despliega sin reinstalar el script (prepara 026)

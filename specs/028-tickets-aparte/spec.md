@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-25
 
-**Status**: Borrador, para aprobar
+**Status**: Aprobada (Carlos, 2026-10-25)
 
 **Maquetas**: No lleva pantallas
 

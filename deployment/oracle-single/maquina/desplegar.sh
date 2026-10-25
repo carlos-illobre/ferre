@@ -15,7 +15,9 @@ set -euo pipefail
 
 REPO=carlos-illobre/ferre
 BASE="${FERRE_BASE:-$HOME/ferre}"
-SERVICIOS=(db gestion-del-local listas-de-proveedores procesos)
+# Los servicios salen del compose de cada versión (`docker compose config --services`), no de
+# una lista escrita acá: una versión que agrega o renombra un servicio se despliega sin
+# reinstalar este script.
 
 ok()    { printf '  \033[0;32m✓\033[0m %s\n' "$1"; }
 info()  { printf '    %s\n' "$1"; }
@@ -34,12 +36,17 @@ flock -w 600 9 || { fallo "otro despliegue lleva más de 10 minutos"; exit 1; }
 
 rama_de() { case "$1" in pruebas) echo master ;; produccion) echo produccion ;; *) return 1 ;; esac; }
 
+servicios() { (cd "$BASE/$1" && docker compose config --services); }
+
 sano() { # ambiente
     local dir="$BASE/$1"
-    for servicio in "${SERVICIOS[@]}"; do
+    for servicio in $(servicios "$1"); do
         local listo=no
         for _ in $(seq 1 30); do
-            [ "$(cd "$dir" && docker compose ps --format '{{.Health}}' "$servicio" 2>/dev/null)" = healthy ] && { listo=si; break; }
+            # Sano: con control de salud, "healthy"; sin él, corriendo.
+            case "$(cd "$dir" && docker compose ps --format '{{.Health}}/{{.State}}' "$servicio" 2>/dev/null)" in
+                healthy/*|/running) listo=si; break ;;
+            esac
             sleep 4
         done
         [ "$listo" = si ] || { (cd "$dir" && docker compose logs --tail 40 "$servicio") || true; return 1; }
@@ -48,14 +55,31 @@ sano() { # ambiente
 
 fijar_tag() { sed -i '/^IMAGEN_TAG=/d' "$BASE/$1/.env" && printf 'IMAGEN_TAG=%s\n' "$2" >> "$BASE/$1/.env"; }
 
-# Lo que corre DE VERDAD: la etiqueta de la imagen del contenedor sano, no lo que diga el
-# .env. Si el .env quedó con un SHA que nunca levantó, acá se ve vacío y se vuelve a
-# intentar en vez de creer que "ya está corriendo".
+# Lo que corre DE VERDAD: la etiqueta de las imágenes de los contenedores, no lo que diga el
+# .env, y solo si todos están sanos y con la misma etiqueta. Si el .env quedó con un SHA que
+# nunca levantó, acá se ve vacío y se vuelve a intentar en vez de creer que "ya está corriendo".
 version_corriendo() { # ambiente
-    local fila
-    fila=$(cd "$BASE/$1" && docker compose ps --format '{{.Image}} {{.Health}}' gestion-del-local 2>/dev/null | head -1)
-    [ "${fila##* }" = healthy ] || return 0
-    fila=${fila%% *}; echo "${fila##*:}"
+    local filas etiquetas
+    filas=$(cd "$BASE/$1" && docker compose ps --format '{{.Image}} {{.Health}}' 2>/dev/null | grep "ghcr.io/$REPO/" || true)
+    [ -n "$filas" ] || return 0
+    printf '%s\n' "$filas" | awk '$2 != "healthy" { mal = 1 } END { exit mal }' || return 0
+    etiquetas=$(printf '%s\n' "$filas" | awk '{ n = split($1, p, ":"); print p[n] }' | sort -u)
+    [ "$(printf '%s\n' "$etiquetas" | wc -l)" -eq 1 ] && echo "$etiquetas"
+}
+
+# El compose de un commit, a su carpeta. Volver a una versión anterior baja también su compose:
+# los servicios y sus imágenes pueden haber cambiado de nombre.
+bajar_compose() { # ambiente sha
+    curl -sf "https://raw.githubusercontent.com/$REPO/$2/docker-compose.yml" -o "$BASE/$1/docker-compose.yml.nuevo" \
+        && mv "$BASE/$1/docker-compose.yml.nuevo" "$BASE/$1/docker-compose.yml"
+}
+
+# Las imágenes de un SHA tienen que estar todas: si CI todavía no las publicó, el próximo aviso lo resuelve.
+imagenes_publicadas() { # ambiente sha
+    local imagen
+    for imagen in $(cd "$BASE/$1" && IMAGEN_TAG="$2" docker compose config --images); do
+        docker manifest inspect "$imagen" >/dev/null 2>&1 || return 1
+    done
 }
 
 desplegar() { # ambiente [sha]
@@ -76,13 +100,13 @@ desplegar() { # ambiente [sha]
     if [ "$actual" = "$sha" ]; then ok "ya está corriendo $sha, nada que hacer"; return 0; fi
     [ -n "$actual" ] && info "corriendo ahora: $actual" || info "no hay ningún contenedor sano corriendo"
 
-    # La imagen de ese SHA tiene que existir: si CI todavía no la publicó, el próximo aviso lo resuelve.
-    if ! docker manifest inspect "ghcr.io/$REPO/gestion-del-local:$sha" >/dev/null 2>&1; then
-        info "la imagen $sha todavía no está en GHCR; se reintenta con el próximo aviso"; return 0
+    cp "$dir/docker-compose.yml" "$dir/docker-compose.yml.anterior" 2>/dev/null || true
+    bajar_compose "$amb" "$sha" || { fallo "no pude bajar el compose del commit $sha"; return 1; }
+    if ! imagenes_publicadas "$amb" "$sha"; then
+        info "las imágenes de $sha todavía no están todas en GHCR; se reintenta con el próximo aviso"
+        mv "$dir/docker-compose.yml.anterior" "$dir/docker-compose.yml" 2>/dev/null || true
+        return 0
     fi
-    curl -sf "https://raw.githubusercontent.com/$REPO/$sha/docker-compose.yml" -o "$dir/docker-compose.yml.nuevo" \
-        || { fallo "no pude bajar el compose del commit $sha"; return 1; }
-    mv "$dir/docker-compose.yml.nuevo" "$dir/docker-compose.yml"
 
     fijar_tag "$amb" "$sha"
     (cd "$dir" && docker compose pull --quiet && docker compose up -d --remove-orphans) \
@@ -94,6 +118,7 @@ desplegar() { # ambiente [sha]
         fallo "$amb con $sha no quedó sano"
         if [ -n "$actual" ]; then
             info "volviendo a $actual"
+            bajar_compose "$amb" "$actual" || mv "$dir/docker-compose.yml.anterior" "$dir/docker-compose.yml" 2>/dev/null || true
             fijar_tag "$amb" "$actual"
             (cd "$dir" && docker compose up -d --remove-orphans) || true
             sano "$amb" && ok "$amb de vuelta en $actual" || fallo "$amb tampoco quedó sano en $actual"
