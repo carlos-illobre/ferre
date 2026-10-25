@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { alCambiarElVinculo, estadoDelVinculo, probarDirecta, type EstadoDelVinculo } from "../enlace";
 import { alAvisoDelEspejo, pausarEspejo, useEspejo } from "../espejo";
 import { puestoRemoto } from "../puesto";
+import { useComandos } from "../plataforma/comandos";
 import { TEXTOS, TEXTOS_DEL_VINCULO, texto, type Texto } from "./textos";
 
 import "./indicador-del-vinculo.css";
@@ -78,10 +79,11 @@ export function IndicadorDelVinculo({ celular = false }: { celular?: boolean }) 
 function Detalle({ v, clave, nombre, celular, pausado, alCerrar }: { v: Vinculo; clave: Clave; nombre: string; celular: boolean; pausado: boolean; alCerrar: () => void }) {
   const x = (tx: Texto) => texto(tx, celular);
   const porServidor = v.conexion === "servidor";
+  useComandos({ cerrar: alCerrar }, { encima: true });
   return (
     <>
       {celular && <div className="iv-velo" onClick={alCerrar} aria-hidden="true" />}
-      <div className="iv-detalle" role="dialog" aria-label="Conexión con el otro dispositivo" data-testid="detalle-del-vinculo" onKeyDown={(e) => { if (e.key === "Escape") alCerrar(); }}>
+      <div className="iv-detalle" role="dialog" aria-label="Conexión con el otro dispositivo" data-testid="detalle-del-vinculo">
         <h3><span className={`iv-punto ${clave}`} aria-hidden="true" />{nombre}</h3>
         <Datos v={v} x={x} />
         {porServidor && <p className="iv-por" data-testid="por-que-servidor">{porQue(v, x)}</p>}

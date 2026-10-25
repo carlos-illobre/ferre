@@ -8,6 +8,8 @@ import { DE_DUPLICADOS } from "./duplicados";
 import { DE_LISTAS } from "./listas";
 import { DEL_DEPOSITO } from "./deposito";
 import { DE_COMPRAS } from "./compras";
+import { DEL_NEGOCIO } from "./negocio";
+import { DE_MAS } from "./mas";
 
 // Las teclas de la computadora: qué tecla pide cada acción que ofrecen las pantallas (ADR-029).
 // Las teclas mismas se rehacen en T147.
@@ -21,6 +23,8 @@ export const TABLA_DE_LA_COMPU: Linea[] = [
   ...DE_LISTAS,
   ...DEL_DEPOSITO,
   ...DE_COMPRAS,
+  ...DEL_NEGOCIO,
+  ...DE_MAS,
 ];
 
 // Etiquetas que no son de una sola tecla.

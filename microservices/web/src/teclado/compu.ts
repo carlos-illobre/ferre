@@ -1,4 +1,3 @@
-import { zonasConTeclasPropias } from "../plataforma/teclado";
 import { instalarAtajos } from "./motor/atajos";
 import { instalarFlechas, type DisposicionParaFlechas } from "./motor/flechas";
 import { instalarTabla } from "./motor/instalar";
@@ -39,11 +38,10 @@ export function instalarTecladoDeLaCompu(): void {
   instalarFicha();
   instalarGruposDeOpciones();
   instalarFilasPropias();
-  zonasConTeclasPropias(ZONAS);
   // La tabla antes que «← al menú»: una pantalla que usa ← (Duplicados) se queda con la tecla.
   instalarTabla(TABLA_DE_LA_COMPU, ZONAS);
   instalarFlechaAlMenu();
-  instalarFlechas(DISPOSICION);
+  instalarFlechas(DISPOSICION, ZONAS);
   // Las flechas por las filas no son una acción de la pantalla: sus etiquetas, para las ayudas.
   etiquetar({ "filas.siguiente": "↓", "filas.anterior": "↑", ...ETIQUETAS_DE_LA_COMPU });
   instalarAtajos({ alFinal: ".lateral", ocupadas: letrasConAlt(TABLA_DE_LA_COMPU) });

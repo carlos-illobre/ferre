@@ -50,10 +50,12 @@ Para los estilos:
 ```
 src/
   app/            arranque: elige celular o computadora, monta la sesión y los datos
+  teclado/        todo lo que sabe de teclas (ADR-029): el motor, las tablas de qué tecla pide
+                  cada acción y lo que va por la forma de la pantalla; solo lo instala app/
   plataforma/     técnica que sirve para cualquier aplicación; nada de la ferretería
     almacenamiento/   IndexedDB en general: abrir una base, guardar y leer
     servidor/ tiempo-real/ sin-conexion/   pedir, escuchar, encolar, en general
-    teclado/          atajos, flechas y foco: lógica, sin dibujar
+    comandos/         acciones con nombre que ofrece lo que está a la vista (ADR-029)
     navegacion/ camara/ imagenes/ busqueda/ animacion/ …
   datos/          cómo habla Ferrebress con el servidor y qué guarda en el dispositivo
     conexion/         la API de Ferrebress, la memoria de lo pedido, el enlace con el otro dispositivo
@@ -82,11 +84,12 @@ Cada capa importa solo de las de abajo:
 | `negocio/` | `datos/` y `plataforma/` |
 | `pantallas/comun/` | `ui/`, `negocio/` y `plataforma/` |
 | `pantallas/celular/` y `pantallas/compu/` | `comun/`, `ui/`, `negocio/` y `plataforma/`; nunca una de la otra |
+| `teclado/` | `plataforma/` |
 | `app/` | todo |
 
 Además:
 
-- **Puerta de entrada:** de otra carpeta de primer nivel de una capa (`plataforma/teclado/`,
+- **Puerta de entrada:** de otra carpeta de primer nivel de una capa (`plataforma/comandos/`,
   `datos/conexion/`, `negocio/ventas/`) se usa solo su `index.ts`. Las pruebas pueden entrar
   a lo de adentro, para reemplazarlo.
 - **Sin ciclos:** ningún archivo depende, a la larga, de sí mismo.
@@ -96,8 +99,8 @@ Además:
 
 - **Una pantalla solo dibuja.** Un hook de `negocio/` le da el estado y las acciones (por
   ejemplo `useVenta()`).
-- **El teclado se declara.** Cada pantalla pasa una tabla de qué tecla hace qué, y
-  `plataforma/teclado/` la ejecuta. Se arma con T147 (rehacer las teclas).
+- **El teclado está aparte (ADR-029).** Cada pantalla ofrece acciones con nombre y no sabe qué
+  tecla las pide; las tablas de `teclado/` lo dicen. Las teclas mismas se rehacen en T147.
 - **Una pieza por archivo**, con su `.module.css` al lado; las piezas de una misma pantalla pueden
   compartir el de la pantalla. Lo que cambia entre celular y computadora (tamaños, separaciones) va
   en variables de la paleta, no en una copia de la pieza.

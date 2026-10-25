@@ -1,4 +1,3 @@
-import { usarTeclasPorDefecto } from "../../plataforma/teclado";
 import { filasDeLaPantalla, fijarDisposicion, laDisposicion, type DisposicionParaFlechas } from "./disposicion";
 import { abrir, filaMarcada, marcar } from "./marca";
 import "./flechas.css";
@@ -72,13 +71,20 @@ function manejar(e: KeyboardEvent): void {
   if (e.key === "Enter") enter(e, foco); else mover(e, foco);
 }
 
-// Las flechas por la lista de la pantalla, para toda la aplicación. Devuelve cómo sacarlas.
-export function instalarFlechas(deLaAplicacion: DisposicionParaFlechas): () => void {
+// Con el foco en una zona que se recorre por su cuenta (el menú, las pestañas), las teclas de
+// moverse son de la zona: no mueven también la lista de la pantalla.
+const DE_LA_ZONA = /^(Arrow|Enter$|Escape$|Tab$| $|Home$|End$)/;
+const enLaZona = (e: KeyboardEvent, zonas?: string) => Boolean(zonas && DE_LA_ZONA.test(e.key) && e.target instanceof Element && e.target.closest(zonas));
+
+// Las flechas por la lista de la pantalla, para toda la aplicación: solo si nadie usó la tecla
+// antes (por eso se instalan después de la tabla). Devuelve cómo sacarlas.
+export function instalarFlechas(deLaAplicacion: DisposicionParaFlechas, zonas?: string): () => void {
   fijarDisposicion(deLaAplicacion);
-  usarTeclasPorDefecto(manejar);
+  const alTeclear = (e: KeyboardEvent) => { if (!e.defaultPrevented && !enLaZona(e, zonas)) manejar(e); };
+  window.addEventListener("keydown", alTeclear);
   // Al cambiar de pantalla o al usar el mouse, la marca de las flechas se va.
   const quitar = () => marcar(null);
   window.addEventListener("hashchange", quitar);
   window.addEventListener("mousedown", quitar);
-  return () => { usarTeclasPorDefecto(null); window.removeEventListener("hashchange", quitar); window.removeEventListener("mousedown", quitar); quitar(); };
+  return () => { window.removeEventListener("keydown", alTeclear); window.removeEventListener("hashchange", quitar); window.removeEventListener("mousedown", quitar); quitar(); };
 }

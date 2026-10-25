@@ -10,7 +10,7 @@ import { FichaDeUsuario } from "./FichaDeUsuario";
 import { KpisDeUsuarios } from "./KpisDeUsuarios";
 import { BuscadorDeUsuarios } from "./BuscadorDeUsuarios";
 import { TablaDeUsuarios } from "./TablaDeUsuarios";
-import { useTeclasDeUsuarios } from "./useTeclasDeUsuarios";
+import { useAccionesDeUsuarios } from "./useAccionesDeUsuarios";
 import { useUsuariosDeLaCompu, type Avisar, type Mensaje } from "./useUsuariosDeLaCompu";
 import "./negocio.css";
 import css from "./Usuarios.module.css";
@@ -34,7 +34,7 @@ export function Usuarios() {
 function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) {
   const puedeEsto = usePuede();
   const x = useUsuariosDeLaCompu(avisar);
-  const teclas = useTeclasDeUsuarios(x, enLinea, puedeEsto("admin.roles"));
+  const lugares = useAccionesDeUsuarios(x, enLinea, puedeEsto("admin.roles"));
   const { lista, elegida } = x;
   return (
     <>
@@ -46,8 +46,8 @@ function Autorizados({ enLinea, avisar }: { enLinea: boolean; avisar: Avisar }) 
           <h2 id="usuarios-autorizados-titulo" className="solo-lectores">Usuarios autorizados</h2>
           <div className={css.izq}>
             <KpisDeUsuarios filas={x.filas} sesiones={x.sesiones.datos} celulares={x.celulares.datos} />
-            <BuscadorDeUsuarios filtro={x.filtro} roles={x.disponibles} filas={x.filas} buscador={teclas.buscador} />
-            <TablaDeUsuarios x={x} lista={teclas.lista} alMoverse={teclas.moverse} />
+            <BuscadorDeUsuarios filtro={x.filtro} roles={x.disponibles} filas={x.filas} buscador={lugares.buscador} />
+            <TablaDeUsuarios x={x} lista={lugares.lista} />
           </div>
           {elegida && (
             <FichaDeUsuario key={elegida.id} u={elegida} yo={x.yo} acceso={x.accesoDeLaFila(elegida)} disponibles={x.disponibles} enLinea={enLinea} ocupada={x.ocupada === elegida.id} error={x.errorDe(elegida)}

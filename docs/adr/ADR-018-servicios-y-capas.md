@@ -18,7 +18,8 @@ repartido en la raíz, entre la documentación. Carlos aprobó el informe (decis
 2. **Un solo front**, no uno para el celular y otro para la computadora. Adentro, tres capas:
    `plataforma/` (tecnología reutilizable, sin dependencias del negocio), `negocio/` (cada
    regla una sola vez) y `pantallas/` (celular y computadora, que solo muestran). Una
-   verificación automática impide que `plataforma/` dependa del negocio.
+   verificación automática impide que `plataforma/` dependa del negocio. El detalle de las
+   capas de hoy (con `datos/`, `ui/`, `teclado/` y `app/`) está en ADR-028 y ADR-029.
 3. **No hay librerías compartidas entre servicios.** Lo que el front necesita saber de la
    forma de los datos lo recibe del servidor al compilar. El cálculo de precios vive en el
    servidor; el front solo muestra la vista previa de un margen o precio tipeado.

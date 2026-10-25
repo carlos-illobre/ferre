@@ -32,8 +32,8 @@ al terminar de escribir el número (Enter o salir de la caja).
 
 - Las dos tienen los mismos renglones, los mismos tramos y dicen lo mismo; en la computadora las
   líneas explican más, en el celular van resumidas (decisión 47).
-- En la computadora, todo con teclado: Tab llega a cada grupo de tramos, ← → recorren los tramos y
-  Enter o espacio elige; − y + y el número también con teclado.
+- En la computadora, todo con teclado (las teclas se rehacen en T147, decisión 159): Tab llega a
+  cada grupo de tramos, ← → recorren los tramos (es un grupo de opciones) y Enter o espacio elige; − y + y el número también con teclado.
 - En el celular, cada tramo y cada botón mide al menos 44 px de alto.
 
 **Estados:**

@@ -170,13 +170,11 @@ describe("el manual de uso", () => {
 
   it("012-E12: abre en Computadora; al elegir Celular todo el manual muestra lo del celular y la próxima vez abre así", () => {
     const { unmount } = render(<Manual />);
-    const grupo = screen.getByRole("radiogroup", { name: "¿Dónde lo usás?" });
+    expect(screen.getByRole("radiogroup", { name: "¿Dónde lo usás?" })).toBeTruthy();
     expect(screen.getByTestId("manual-dispositivo-compu").getAttribute("aria-checked")).toBe("true");
     expect(screen.getByTestId("manual-consejo").textContent).toContain("Vincular");
-    // Con las flechas, como un grupo de opciones.
-    fireEvent.keyDown(grupo, { key: "ArrowRight" });
+    elegir("celu");
     expect(screen.getByTestId("manual-dispositivo-celu").getAttribute("aria-checked")).toBe("true");
-    expect(document.activeElement).toBe(screen.getByTestId("manual-dispositivo-celu"));
     expect(screen.getByTestId("manual-migas").textContent).toContain("Celular");
     expect(screen.getByTestId("manual-consejo").textContent).toContain("huella");
     expect(screen.getAllByTestId("manual-relacionado").map((r) => r.querySelector("strong")?.textContent)).toEqual(["Si algo no funciona", "Entrar con la huella", "Entrar con Google"]);

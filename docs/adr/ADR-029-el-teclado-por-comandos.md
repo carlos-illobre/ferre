@@ -47,6 +47,13 @@ menor acoplamiento y fácil de cambiar (decisión 159).
   - `app/` lo instala en la interfaz que corresponde.
 - **Reglas que controla `pnpm capas`:** nada de `ui/`, `negocio/` ni `pantallas/` importa
   `teclado/`, y el teclado solo importa `plataforma/`.
+- **Regla que controla `pnpm limites`:** fuera de `teclado/` nadie escucha teclas (`onKeyDown`,
+  `addEventListener("keydown")`) ni pregunta cuál se apretó (`e.key`, `e.code`).
+- **Cómo se agrega, se cambia o se saca una tecla:** una línea en la tabla de su parte
+  (`tablas/compu/<parte>.ts`); si la acción no existe, la pantalla la ofrece con `useComandos` (de
+  la pantalla) o `useAccionesDelLugar` (de una caja, un renglón, un formulario). Lo que va por la
+  forma de la pantalla (el menú, las pestañas, las filas, los grupos de opciones, las letras con Alt)
+  es un módulo de `teclado/compu/` que se instala o se saca en `teclado/compu.ts`.
 - **Lo que queda en un componente:** lo que el navegador ya hace solo con los elementos de siempre
   (un formulario que se manda con Enter, Escape en un `<dialog>`, un grupo de opciones que se
   recorre con las flechas por ser un `radiogroup`). No es código de teclas.

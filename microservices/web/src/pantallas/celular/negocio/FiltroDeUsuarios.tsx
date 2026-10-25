@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
 import { partesResaltadas, type FiltroDeLaLista } from "../../../negocio/usuarios";
 import type { RolAsignable } from "../../RolesDeUsuario";
 import { TEXTOS } from "../../textos";
@@ -42,11 +43,13 @@ function cuantosSon(filas: Persona[] | undefined) {
 
 function CajaDeBusqueda<U extends Persona>({ f }: { f: FiltroDeLaLista<U> }) {
   const t = TEXTOS.usuarios;
+  const caja = useRef<HTMLInputElement>(null);
+  useAccionesDelLugar(caja, f.enLaCaja);
   return (
     <div className={css.caja}>
       <svg className={css.lupa} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
-      <input {...f.combo} type="search" value={f.texto} placeholder={t.nombreOCorreo.corto} aria-label={t.buscar.corto} autoComplete="off" autoCapitalize="none" spellCheck={false}
-        onChange={(e) => f.escribir(e.target.value)} onKeyDown={f.alTeclear} onBlur={f.cerrar} data-testid="buscar-usuario" />
+      <input ref={caja} {...f.combo} type="search" value={f.texto} placeholder={t.nombreOCorreo.corto} aria-label={t.buscar.corto} autoComplete="off" autoCapitalize="none" spellCheck={false}
+        onChange={(e) => f.escribir(e.target.value)} onBlur={f.cerrar} data-testid="buscar-usuario" />
       {f.texto && <button type="button" className={css.borrar} onClick={f.borrar} aria-label={t.borrarBusqueda.corto}>✕</button>}
     </div>
   );

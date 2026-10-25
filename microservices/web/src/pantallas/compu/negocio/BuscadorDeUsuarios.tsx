@@ -1,6 +1,6 @@
 import { useState, type ReactNode, type RefObject } from "react";
 import { TEXTOS } from "../../textos";
-import { Icono } from "../base/ui";
+import { Atajo, Icono } from "../base/ui";
 import { partesResaltadas, type EstadoDeUsuario, type FiltroDeLaLista, type UsuarioFila } from "../../../negocio/usuarios";
 import type { RolAsignable } from "../../RolesDeUsuario";
 import { PanelDeFiltrosDeUsuarios } from "./PanelDeFiltrosDeUsuarios";
@@ -8,7 +8,7 @@ import css from "./Usuarios.module.css";
 
 type Props = { filtro: FiltroDeLaLista<UsuarioFila>; roles: RolAsignable[]; filas: UsuarioFila[]; buscador: RefObject<HTMLInputElement> };
 
-// Arriba de la lista, como la v2: el buscador (con sus sugerencias y la tecla /), «Todos (N)» y
+// Arriba de la lista, como la v2: el buscador (con sus sugerencias y su tecla), «Todos (N)» y
 // «Activos (N)», y «Rol», que abre el panel con los roles, el estado y el orden (decisiones 98 y 102).
 export function BuscadorDeUsuarios({ filtro: f, roles, filas, buscador }: Props) {
   const t = TEXTOS.usuarios;
@@ -20,7 +20,7 @@ export function BuscadorDeUsuarios({ filtro: f, roles, filas, buscador }: Props)
         <span className="solo-lectores">{t.buscar.largo}</span>
         <Icono nombre="search" />
         <input ref={buscador} {...f.combo} type="search" value={f.texto} placeholder="Buscá nombre o correo" autoComplete="off" autoCapitalize="none" spellCheck={false}
-          onChange={(e) => f.escribir(e.target.value)} onKeyDown={f.alTeclear} onBlur={f.cerrar} data-testid="buscar-usuario" />
+          onChange={(e) => f.escribir(e.target.value)} onBlur={f.cerrar} data-testid="buscar-usuario" />
         <BorrarOBarra f={f} />
         {f.sugerencias.length > 0 && <Sugerencias f={f} />}
       </label>
@@ -38,7 +38,7 @@ export function BuscadorDeUsuarios({ filtro: f, roles, filas, buscador }: Props)
 }
 
 function BorrarOBarra({ f }: { f: FiltroDeLaLista<UsuarioFila> }) {
-  if (!f.texto) return <span className={css.kbd} aria-hidden="true">/</span>;
+  if (!f.texto) return <Atajo accion="usuarios.buscar" className={css.kbd} />;
   return <button type="button" className="usuarios-borrar" onClick={f.borrar} aria-label={TEXTOS.usuarios.borrarBusqueda.largo}>✕</button>;
 }
 

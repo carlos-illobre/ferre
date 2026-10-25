@@ -1,4 +1,5 @@
 import { TEXTOS } from "../../textos";
+import { useComandos } from "../../../plataforma/comandos";
 import { Boton } from "../base/ui";
 import type { EstadoDeUsuario, FiltroDeLaLista, OrdenDeUsuarios, UsuarioFila } from "../../../negocio/usuarios";
 import type { RolAsignable } from "../../RolesDeUsuario";
@@ -26,9 +27,10 @@ export function PanelDeFiltrosDeUsuarios({ filtro: f, roles, alCerrar }: { filtr
   const t = TEXTOS.usuarios;
   const estados: [EstadoDeUsuario, string][] = [["todos", t.todos.largo], ["activos", t.activos.largo], ["inactivos", t.inactivos.largo]];
   const ordenes: [OrdenDeUsuarios, string][] = [["correo", t.porCorreo.largo], ["estado", t.porEstado.largo]];
+  useComandos({ cerrar: alCerrar }, { encima: true });
   const deRoles: Opcion<string>[] = [{ valor: "", nombre: t.todos.largo, elegida: f.roles.length === 0 }, ...roles.map((r) => ({ valor: r.id, nombre: r.nombre, elegida: f.roles.includes(r.id) }))];
   return (
-    <div className="usuarios-panel" role="dialog" aria-label={t.filtros.largo} data-testid="panel-filtros" onKeyDown={(e) => { if (e.key === "Escape") { e.stopPropagation(); alCerrar(); } }}>
+    <div className="usuarios-panel" role="dialog" aria-label={t.filtros.largo} data-testid="panel-filtros">
       <Opciones titulo={t.roles.largo} bajada={t.unoOMas.largo} opciones={deRoles} alElegir={(id) => (id ? f.alternarRol(id) : f.todosLosRoles())} />
       <Opciones titulo={t.estado.largo} opciones={estados.map(([valor, nombre]) => ({ valor, nombre, elegida: f.estado === valor, punto: valor !== "todos" }))} alElegir={f.elegirEstado} />
       <Opciones titulo={t.ordenarPor.largo} opciones={ordenes.map(([valor, nombre]) => ({ valor, nombre, elegida: f.orden === valor, testId: `ordenar-${valor}` }))} alElegir={f.elegirOrden} />

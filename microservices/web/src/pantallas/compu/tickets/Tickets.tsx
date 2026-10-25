@@ -7,7 +7,7 @@ import { Icono } from "../../../ui/iconos";
 import { DetalleDelTicket } from "./DetalleDelTicket";
 import { EscribirTicket } from "./EscribirTicket";
 import { SeguirTickets } from "./SeguirTickets";
-import { useTeclasDeTickets } from "./useTeclasDeTickets";
+import { useComandos } from "../../../plataforma/comandos";
 import "../../mas-v2.css";
 import css from "./Tickets.module.css";
 
@@ -27,7 +27,9 @@ export function Tickets() {
   // Al abrir, el cursor ya está en la caja de texto: así se nota que ahí se escribe.
   const caja = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { caja.current?.focus({ preventScroll: true }); }, []);
-  useTeclasDeTickets(caja, Boolean(abierto) || pidiendo, () => void nuevo.enviar(), () => archivo.current?.click());
+  // Enviar y elegir archivos, salvo con un ticket abierto o pidiéndole la foto al celular.
+  const libre = !abierto && !pidiendo;
+  useComandos({ "tickets.enviar": () => void nuevo.enviar(), "tickets.archivos": () => archivo.current?.click() }, { activo: libre });
 
   return (
     <main id="contenido" className="pagina mv2 tkv" data-testid="tickets" tabIndex={-1}>

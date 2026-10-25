@@ -71,21 +71,6 @@ describe("Más → Sistema", () => {
     expect(screen.queryByTestId("sis-vinculo-error")).toBeNull();
   });
 
-  it("con el teclado, ← → recorren los tramos sin elegir, y Enter elige", async () => {
-    render(<Sistema />);
-    await waitFor(() => expect(elegido("sis-sesion")).toBe("1 min"));
-    const uno = screen.getByTestId("sis-sesion-60");
-    uno.focus();
-    fireEvent.keyDown(uno, { key: "ArrowRight" });
-    expect(document.activeElement).toBe(screen.getByTestId("sis-sesion-300"));
-    fireEvent.keyDown(document.activeElement!, { key: "ArrowLeft" });
-    fireEvent.keyDown(document.activeElement!, { key: "ArrowLeft" });
-    expect(document.activeElement).toBe(screen.getByTestId("sis-sesion-30"));
-    expect(puts()).toEqual([]);
-    fireEvent.click(document.activeElement!); // Enter o espacio sobre un botón lo activan
-    await waitFor(() => expect(puts()).toEqual([{ sesion_segundos: 30 }]));
-  });
-
   it("si el servidor lo rechaza, dice su mensaje y el valor vuelve a lo guardado", async () => {
     render(<Sistema />);
     await waitFor(() => expect(elegido("sis-sesion")).toBe("1 min"));

@@ -5,6 +5,8 @@ import { nombreDeProducto } from "../../../negocio/formato";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../../../ui/iconos";
+import { useEtiqueta } from "../../../plataforma/comandos";
+import { Atajo } from "../base/ui";
 import { FotoDeProducto, ICONO_DEL_CAMBIO, Pesos } from "../../comun/anomalias/piezas";
 import css from "./Anomalias.module.css";
 
@@ -90,10 +92,10 @@ function SiLoAceptas({ v }: { v: VistaDelCambio }) {
 function Pie({ v, habilitado, alDecidir }: { v: VistaDelCambio; habilitado: boolean; alDecidir: (d: Decision) => void }) {
   return (
     <div className={css.pie}>
-      <span className="nav"><span className="mv-kbd">↑</span><span className="mv-kbd">↓</span>{t.otroCambio.largo}</span>
+      <span className="nav"><Atajo accion="revisar.anterior" className="mv-kbd" /><Atajo accion="revisar.siguiente" className="mv-kbd" />{t.otroCambio.largo}</span>
       <div className="der">
-        <button type="button" className="mv-btn peligro" disabled={!habilitado} onClick={() => alDecidir("descartar")} aria-keyshortcuts="D" data-testid="descartar-apartado"><Icono nombre="cruz" tam={16} />{t.descartar.largo} <span className="mv-kbd">D</span></button>
-        <button type="button" className="mv-btn accion" disabled={!habilitado} onClick={() => alDecidir("aceptar")} aria-keyshortcuts="A" data-testid="aceptar-apartado"><Icono nombre="tilde" tam={16} />{v.boton} <span className="mv-kbd">A</span></button>
+        <button type="button" className="mv-btn peligro" disabled={!habilitado} onClick={() => alDecidir("descartar")} aria-keyshortcuts={useEtiqueta("revisar.descartar")} data-testid="descartar-apartado"><Icono nombre="cruz" tam={16} />{t.descartar.largo} <Atajo accion="revisar.descartar" className="mv-kbd" /></button>
+        <button type="button" className="mv-btn accion" disabled={!habilitado} onClick={() => alDecidir("aceptar")} aria-keyshortcuts={useEtiqueta("revisar.aceptar")} data-testid="aceptar-apartado"><Icono nombre="tilde" tam={16} />{v.boton} <Atajo accion="revisar.aceptar" className="mv-kbd" /></button>
       </div>
     </div>
   );

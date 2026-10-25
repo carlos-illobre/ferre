@@ -1,4 +1,4 @@
-import type { KeyboardEvent, RefObject } from "react";
+import type { RefObject } from "react";
 import { Icono } from "../base/ui";
 import { resumenDelAcceso, rolesEnElRenglon, rolesEnOrden, type Acceso, type UsuarioFila } from "../../../negocio/usuarios";
 import { Iniciales } from "../../iconos-de-negocio";
@@ -7,9 +7,9 @@ import type { UsuariosDeLaCompu } from "./useUsuariosDeLaCompu";
 import css from "./Usuarios.module.css";
 
 // Una persona por renglón: sus iniciales, nombre y correo, los roles que entran y su acceso.
-export function TablaDeUsuarios({ x, lista, alMoverse }: { x: UsuariosDeLaCompu; lista: RefObject<HTMLDivElement>; alMoverse: (e: KeyboardEvent) => void }) {
+export function TablaDeUsuarios({ x, lista }: { x: UsuariosDeLaCompu; lista: RefObject<HTMLDivElement> }) {
   return (
-    <div className={css.tabla} data-testid="usuarios" ref={lista} onKeyDown={alMoverse}>
+    <div className={css.tabla} data-testid="usuarios" ref={lista}>
       <div className={css.cab} aria-hidden="true" data-testid="cabeza-de-usuarios"><span /><span>Persona</span><span>Roles</span><span>Acceso</span><span /></div>
       {x.visibles.map((u) => <FilaDeUsuario key={u.id} u={u} esVos={u.id === x.yo} elegida={u.id === x.elegida?.id} acceso={x.accesoDeLaFila(u)} alElegir={() => x.elegir(u.id)} />)}
     </div>

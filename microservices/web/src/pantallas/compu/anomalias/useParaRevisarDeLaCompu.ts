@@ -1,19 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { decidir, elQueSigue, porPersona, useParaRevisar, type CambioApartado } from "../../../negocio/apartados";
 import { useEnLinea } from "../../../plataforma/sin-conexion";
-import { useTeclasGlobales } from "../../../plataforma/teclado";
+import { useComandos } from "../../../plataforma/comandos";
+import { hayUnaVentanaAbierta } from "../base/ui";
 
 type Decision = "aceptar" | "descartar";
 
-// Las teclas de la bandeja, sin modificadores y con ninguna ventana abierta.
-function teclaDeLaBandeja(e: KeyboardEvent): string | null {
-  if (e.ctrlKey || e.metaKey || e.altKey || document.querySelector("dialog[open]")) return null;
-  const k = e.key.toLowerCase();
-  return ["arrowdown", "arrowup", "a", "d"].includes(k) ? k : null;
-}
 
 // La bandeja de la computadora: el elegido (el primero si no se eligió), decidirlo de a uno (con
-// su error al lado) y las teclas: ↑ ↓ eligen, A acepta y D descarta (014-E09).
+// su error al lado) y lo que ofrece: elegir el de al lado, aceptar y descartar (014-E09), con
+// ninguna ventana abierta.
 export function useParaRevisarDeLaCompu() {
   const { datos, error, recargar } = useParaRevisar();
   const conRed = useEnLinea();
@@ -34,15 +30,14 @@ export function useParaRevisarDeLaCompu() {
     finally { setEnCurso(false); }
   }, [conRed, enCurso, orden]);
 
-  const teclas = useCallback((e: KeyboardEvent) => {
-    const k = teclaDeLaBandeja(e);
-    if (!k || !elegido) return;
-    e.preventDefault();
-    if (k === "a" || k === "d") { void hacer(elegido, k === "a" ? "aceptar" : "descartar"); return; }
-    const i = orden.indexOf(elegido) + (k === "arrowdown" ? 1 : -1);
-    setElegidoId(orden[Math.max(0, Math.min(orden.length - 1, i))]!.id);
-  }, [elegido, orden, hacer]);
-  useTeclasGlobales(teclas);
+  const conElegido = (hacerlo: (c: CambioApartado) => void) => () => (!elegido || hayUnaVentanaAbierta() ? false : hacerlo(elegido));
+  const mover = (paso: number) => conElegido((c) => setElegidoId(orden[Math.max(0, Math.min(orden.length - 1, orden.indexOf(c) + paso))]!.id));
+  useComandos({
+    "revisar.siguiente": mover(1),
+    "revisar.anterior": mover(-1),
+    "revisar.aceptar": conElegido((c) => void hacer(c, "aceptar")),
+    "revisar.descartar": conElegido((c) => void hacer(c, "descartar")),
+  });
 
   return { datos, error, recargar, conRed, grupos, orden, elegido, elegir: setElegidoId, errores, enCurso, hacer, lista };
 }

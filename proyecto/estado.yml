@@ -80,7 +80,7 @@ RF-07:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
-    - microservices/web/src/plataforma/teclado/teclas.test.tsx
+    - microservices/web/src/teclado/motor/motor.test.tsx
   defectos:
     - "La búsqueda no tolera errores de tipeo"
     - "Los resultados no muestran el precio por bulto"
@@ -140,7 +140,7 @@ RF-10:
     - tests/e2e/escritorio/03-productos.spec.ts
     - tests/e2e/celular/03-productos.spec.ts
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
-    - microservices/web/src/plataforma/teclado/teclas.test.tsx
+    - microservices/web/src/teclado/motor/motor.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - microservices/api/src/rutas/productos.test.ts
     - microservices/api/src/precios.test.ts
@@ -941,7 +941,7 @@ RNF-05:
   pruebas:
     - microservices/web/src/app/vista.test.ts
     - tests/e2e/escritorio/00-arranque.spec.ts
-    - microservices/web/src/plataforma/teclado/teclas.test.tsx
+    - microservices/web/src/teclado/motor/motor.test.tsx
     - tests/e2e/escritorio/04-vender.spec.ts
   defectos:
     - "Las animaciones de navegación del celular no se vieron en un teléfono. Medido en el navegador de pruebas: entrar a una pantalla tarda 0,4 s con el deslizamiento corriendo"
@@ -1198,7 +1198,7 @@ RNF-60:
   estado: "Hecho (010-T001 a 010-T020): todo el código bajo microservices/; en el front, plataforma/ sin dependencias del negocio, el negocio una sola vez en negocio/ y las pantallas de cada interfaz en pantallas/ (cada una con sus piezas, decisión 85); el servidor en tres capas y con los precios; la forma de los datos llega del servidor (contratos) y Zod valida lo que llega (decisión 89); la navegación es de React Router. Lo controlan pnpm capas y tests/integration/reordenamiento.sh en cada subida"
   pruebas:
     - microservices/web/.dependency-cruiser.cjs
-    - microservices/web/src/plataforma/teclado/teclas.test.tsx
+    - microservices/web/src/teclado/motor/motor.test.tsx
     - microservices/web/src/datos/almacenamiento/guardado.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - microservices/web/src/negocio/ventas/venta.test.tsx

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { diasValidos, DIAS_MAX, DIAS_MIN } from "../../../negocio/sistema";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
 
 const ESPERA_DE_LOS_DIAS_MS = 700; // − y + seguidos se guardan juntos
 
@@ -17,6 +18,8 @@ export function DiasDelVinculo({ guardados, apagado, alGuardar }: { guardados: n
     setMal(false);
     if (d !== guardados) alGuardar(d);
   }
+  const caja = useRef<HTMLInputElement>(null);
+  useAccionesDelLugar(caja, { "campo.listo": () => guardar(escrito) });
   function paso(delta: number) {
     const base = diasValidos(escrito) ?? guardados ?? DIAS_MIN;
     const nuevo = String(Math.min(DIAS_MAX, Math.max(DIAS_MIN, base + delta)));
@@ -27,9 +30,8 @@ export function DiasDelVinculo({ guardados, apagado, alGuardar }: { guardados: n
   return (
     <div className={`cfg-numero ${mal ? "cfg-mal" : ""}`}>
       <button type="button" className="paso" aria-label="Un día menos" disabled={apagado} onClick={() => paso(-1)} data-testid="sis-vinculo-menos">−</button>
-      <input inputMode="numeric" aria-labelledby="sis-vinculo" aria-invalid={mal} value={escrito} disabled={apagado}
+      <input ref={caja} inputMode="numeric" aria-labelledby="sis-vinculo" aria-invalid={mal} value={escrito} disabled={apagado}
         onChange={(e) => { setEscrito(e.target.value.replace(/\D/g, "")); setMal(false); }}
-        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); guardar(escrito); } }}
         onBlur={() => { if (!apagado) guardar(escrito); }} data-testid="sis-vinculo" />
       <button type="button" className="paso" aria-label="Un día más" disabled={apagado} onClick={() => paso(1)} data-testid="sis-vinculo-mas">+</button>
       <span className="unidad">días</span>

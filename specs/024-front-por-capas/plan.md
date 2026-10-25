@@ -62,8 +62,9 @@ Cada una deja todo en verde y se sube sola.
    - lo común a las dos interfaces a `pantallas/comun/<capacidad>/`;
    - cada pantalla, partida en piezas de menos de 40 líneas, con su `.module.css`;
    - su parte de la lista de excepciones, vacía.
-5. **Teclado** (con T147): `plataforma/teclado/` ejecuta la tabla de teclas que declara cada
-   pantalla.
+5. **Teclado aparte** (ADR-029, T012 y T016 a T020): las pantallas ofrecen acciones con nombre
+   (`plataforma/comandos/`) y `teclado/` tiene las tablas de qué tecla pide cada una; las teclas
+   mismas se rehacen en T147.
 6. **Cierre:** la lista de excepciones vacía, la documentación al día y la revisión (paso 7).
 
 ## Project Structure

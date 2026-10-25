@@ -1,4 +1,5 @@
-import { useId, useState, type KeyboardEvent } from "react";
+import { useId, useState } from "react";
+import type { Acciones } from "../../plataforma/comandos";
 import { cuantosQuedan, filtrarUsuarios, hayFiltros, ordenarUsuarios, sugerenciasDeUsuarios, type EstadoDeUsuario, type FiltroDeUsuarios, type OrdenDeUsuarios } from "./filtro";
 
 // El buscador con sugerencias, «Filtros» (roles y estado) y «Ordenar» de Más → Usuarios
@@ -22,16 +23,18 @@ export function useFiltroDeUsuarios<U extends Buscable>(filas: U[]) {
   const conLosFiltros = filtrarUsuarios(filas, { ...filtro, texto: "" }).length;
 
   const elegir = (u: U) => { setTexto(u.email); setAbiertas(false); setActiva(-1); };
-  function alTeclear(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Escape" && sugerencias.length) { e.preventDefault(); e.stopPropagation(); setAbiertas(false); return; }
-    if (!sugerencias.length) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); setActiva((i) => (i + 1) % sugerencias.length); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setActiva((i) => (i <= 0 ? sugerencias.length : i) - 1); }
-    else if (e.key === "Enter" && activa >= 0) { e.preventDefault(); elegir(sugerencias[activa]!); }
-  }
+  // Con el foco en el buscador: marcar la sugerencia de al lado (dando la vuelta), elegir la
+  // marcada y cerrar las sugerencias. Sin sugerencias, nada de eso aplica.
+  const conSugerencias = (hacer: () => void) => () => (sugerencias.length ? hacer() : false);
+  const enLaCaja: Acciones = {
+    "lista.siguiente": conSugerencias(() => setActiva((i) => (i + 1) % sugerencias.length)),
+    "lista.anterior": conSugerencias(() => setActiva((i) => (i <= 0 ? sugerencias.length : i) - 1)),
+    "lista.elegir": () => (sugerencias.length && activa >= 0 ? elegir(sugerencias[activa]!) : false),
+    "lista.salir": conSugerencias(() => setAbiertas(false)),
+  };
   const listaId = `${id}-sugerencias`;
   return {
-    texto, roles, estado, orden, visibles, sugerencias, activa, resumen, conLosFiltros, elegir, alTeclear,
+    texto, roles, estado, orden, visibles, sugerencias, activa, resumen, conLosFiltros, elegir, enLaCaja,
     filtrado: hayFiltros(filtro),
     escribir: (t: string) => { setTexto(t); setAbiertas(true); setActiva(-1); },
     borrar: () => { setTexto(""); setAbiertas(false); setActiva(-1); },

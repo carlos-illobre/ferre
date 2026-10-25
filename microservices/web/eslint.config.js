@@ -31,5 +31,18 @@ export default tseslint.config(
       "unused-imports/no-unused-vars": ["error", { args: "none", ignoreRestSiblings: true, caughtErrors: "none" }],
     },
   },
+  // Las teclas son solo del teclado (ADR-029): fuera de src/teclado/ nadie escucha teclas ni
+  // pregunta cuál se apretó; las pantallas ofrecen acciones con nombre y el teclado las pide.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/teclado/**", "src/**/*.test.{ts,tsx}", "src/pruebas/**"],
+    rules: {
+      "no-restricted-syntax": ["error",
+        { selector: "JSXAttribute[name.name=/^onKey(Down|Up|Press)$/]", message: "Las teclas van en src/teclado/ (ADR-029): ofrecé una acción con useComandos o useAccionesDelLugar." },
+        { selector: "CallExpression[callee.property.name='addEventListener'][arguments.0.value=/^key(down|up|press)$/]", message: "Las teclas van en src/teclado/ (ADR-029)." },
+        { selector: "MemberExpression[property.name=/^(key|code)$/][object.name=/^(e|ev|evento|event)$/]", message: "Las teclas van en src/teclado/ (ADR-029)." },
+      ],
+    },
+  },
   ...(excepciones.length ? [{ files: excepciones, rules: Object.fromEntries(Object.keys(LIMITES).map((r) => [r, "off"])) }] : []),
 );

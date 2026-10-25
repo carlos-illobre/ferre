@@ -8,6 +8,8 @@ import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
 import { TEXTOS } from "../../textos";
 import { VERSION } from "../../../plataforma/ambiente";
 import { Icono } from "../../../ui/iconos";
+import { useEtiqueta } from "../../../plataforma/comandos";
+import { Atajo } from "../base/ui";
 import css from "./Tickets.module.css";
 
 const t = TEXTOS.ticketsV2;
@@ -36,20 +38,20 @@ export function EscribirTicket({ nuevo: n, caja, archivo, pidiendo, alPedir }: P
       <VaCon />
       {n.falta && <p className="mv-aviso error" id="tkv-falta" role="alert">{n.falta}</p>}
       {n.aviso && <p className="mv-aviso logro" role="status" data-testid="mensaje">{n.aviso}</p>}
-      <button type="button" className={`mv-btn accion grande ${css.enviar}`} disabled={n.enviando} onClick={() => void n.enviar()} aria-keyshortcuts="Control+Enter" data-testid="enviar">
-        <Icono nombre="enviar" />{n.enviando ? "Enviando…" : `${t.enviar.largo} ${(n.tipo === "error" ? t.error : t.idea).largo}`} <span className="mv-kbd">Ctrl Enter</span>
+      <button type="button" className={`mv-btn accion grande ${css.enviar}`} disabled={n.enviando} onClick={() => void n.enviar()} aria-keyshortcuts={useEtiqueta("tickets.enviar")} data-testid="enviar">
+        <Icono nombre="enviar" />{n.enviando ? "Enviando…" : `${t.enviar.largo} ${(n.tipo === "error" ? t.error : t.idea).largo}`} <Atajo accion="tickets.enviar" className="mv-kbd" />
       </button>
     </section>
   );
 }
 
-// Elegir archivos (Alt F) o, si hace falta, sacar la foto con el celular.
+// Elegir archivos o, si hace falta, sacar la foto con el celular.
 function OtrasVias({ n, archivo, pidiendo, alPedir }: Omit<Props, "nuevo" | "caja"> & { n: TicketNuevo }) {
   return (
     <>
       <div className={css.via}>
         <input ref={archivo} type="file" accept="image/*" multiple hidden onChange={(e) => { n.agregarFotos(Array.from(e.target.files ?? [])); e.target.value = ""; }} data-testid="archivo-foto" />
-        <button type="button" className="mv-btn chico" disabled={n.lleno} onClick={() => archivo.current?.click()} aria-keyshortcuts="Alt+F" data-testid="agregar-foto"><Icono nombre="clip" tam={16} />{t.elegirArchivos.largo} <span className="mv-kbd">Alt F</span></button>
+        <button type="button" className="mv-btn chico" disabled={n.lleno} onClick={() => archivo.current?.click()} aria-keyshortcuts={useEtiqueta("tickets.archivos")} data-testid="agregar-foto"><Icono nombre="clip" tam={16} />{t.elegirArchivos.largo} <Atajo accion="tickets.archivos" className="mv-kbd" /></button>
         {hayQueUsarElCelular() && <button type="button" className="mv-btn chico" disabled={pidiendo || n.lleno} onClick={() => alPedir(true)} data-testid="foto-con-celular"><Icono nombre="celular" tam={16} />{t.sacarConElCelular.largo}</button>}
       </div>
       {pidiendo && <PedirFotoAlCelular para="una foto para el ticket" alCancelar={() => alPedir(false)} alRecibir={(f) => { alPedir(false); n.agregarFotos([f]); }} />}

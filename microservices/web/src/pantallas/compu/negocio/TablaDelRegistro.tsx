@@ -6,10 +6,10 @@ import { fechaCompleta } from "./negocio-comun";
 import type { ActividadDeLaCompu } from "./useActividadDeLaCompu";
 import css from "./Actividad.module.css";
 
-// La tabla de a 10: hora, quién, qué y el detalle. Tocar elige; doble toque (o Enter) abre todo.
+// La tabla de a 10: hora, quién, qué y el detalle. Tocar elige; doble toque abre todo.
 export function TablaDelRegistro({ x }: { x: ActividadDeLaCompu }) {
   return (
-    <div className={`${css.tabla} ${x.cargando ? "actividad-cargando" : ""}`} data-testid="auditoria" aria-busy={x.cargando} ref={x.tabla} onKeyDown={x.teclear}>
+    <div className={`${css.tabla} ${x.cargando ? "actividad-cargando" : ""}`} data-testid="auditoria" aria-busy={x.cargando} ref={x.tabla}>
       <div className={`${css.fila} cab`} aria-hidden="true"><span>Hora</span><span>Quién</span><span>Qué</span><span>Detalle</span><span /></div>
       {x.eventos.map((e, i) => {
         const que = queFue(e);

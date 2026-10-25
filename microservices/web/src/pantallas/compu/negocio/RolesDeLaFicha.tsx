@@ -1,5 +1,6 @@
 import { TEXTOS } from "../../textos";
-import { Icono } from "../base/ui";
+import { useEtiqueta } from "../../../plataforma/comandos";
+import { Atajo, Icono } from "../base/ui";
 import { loQuePermiten, type CambioDeRoles, type UsuarioFila } from "../../../negocio/usuarios";
 import { ElegirYGuardarRoles, type RolAsignable } from "../../RolesDeUsuario";
 import { iconoDeRol } from "../../iconos-de-negocio";
@@ -19,13 +20,14 @@ function RolesQueTiene({ roles, descripcion }: { roles: { id: string; nombre: st
   );
 }
 
-// Sus roles con lo que permiten en palabras y «Cambiar» (R), que abre la elección de roles.
+// Sus roles con lo que permiten en palabras y «Cambiar», que abre la elección de roles.
 export function RolesDeLaFicha({ u, disponibles, enLinea, ocupada, cambio: c }: { u: UsuarioFila; disponibles: RolAsignable[]; enLinea: boolean; ocupada: boolean; cambio: CambioDeRoles }) {
   const roles = u.roles ?? [];
   const descripcion = loQuePermiten(roles, disponibles);
+  const tecla = useEtiqueta("usuarios.cambiar-roles");
   return (
     <div data-testid="roles-de-usuario">
-      <h3>{TEXTOS.usuarios.roles.largo}{!c.cambiando && <button type="button" className={`${css.boton} suave`} disabled={ocupada || !enLinea} onClick={c.abrir} aria-keyshortcuts="R" aria-label={`Cambiar los roles de ${u.nombre}`} data-testid="cambiar-roles"><Icono nombre="pencil" tam={16} />Cambiar <span className={css.kbd}>R</span></button>}</h3>
+      <h3>{TEXTOS.usuarios.roles.largo}{!c.cambiando && <button type="button" className={`${css.boton} suave`} disabled={ocupada || !enLinea} onClick={c.abrir} aria-keyshortcuts={tecla} aria-label={`Cambiar los roles de ${u.nombre}`} data-testid="cambiar-roles"><Icono nombre="pencil" tam={16} />Cambiar <Atajo accion="usuarios.cambiar-roles" className={css.kbd} /></button>}</h3>
       {c.cambiando ? <ElegirYGuardarRoles nombre={u.nombre} disponibles={disponibles} cambio={c} /> : <RolesQueTiene roles={roles} descripcion={descripcion} />}
     </div>
   );

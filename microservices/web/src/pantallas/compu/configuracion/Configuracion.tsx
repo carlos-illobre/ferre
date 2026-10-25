@@ -1,6 +1,5 @@
-import { useCallback } from "react";
 import { cambiarPreferencia, cambiarSinConexion, guardaEnElDispositivo, useMiVinculo, usePreferencias, useReducirMovimiento } from "../../../negocio/configuracion";
-import { useTeclasGlobales } from "../../../plataforma/teclado";
+import { useComandos } from "../../../plataforma/comandos";
 import { TEXTOS } from "../../textos";
 import { DatosSinConexion } from "./DatosSinConexion";
 import { MisCelulares } from "./MisCelulares";
@@ -11,27 +10,23 @@ import css from "./Configuracion.module.css";
 
 // Configuración (RF-83, decisión 79) en la computadora, como la v2 del director de arte (variante 1,
 // «Dos columnas»; specs/009, decisión 148). A la izquierda, «Esta computadora»: cada preferencia un
-// renglón con su baldosa, su llave y su tecla (Alt A, Alt B), y lo de trabajar sin conexión. A la
-// derecha, «Tu cuenta»: los celulares con huella y el vínculo con el celular (Alt O, Alt U).
+// renglón con su baldosa, su llave y su tecla, y lo de trabajar sin conexión. A la derecha, «Tu
+// cuenta»: los celulares con huella y el vínculo con el celular.
 const t = TEXTOS.configuracionV2;
 
-// Alt A: las animaciones; con el celular vinculado, Alt O desconecta y Alt U desvincula.
-function queHace(e: KeyboardEvent, animaciones: boolean, v: ReturnType<typeof useMiVinculo>): (() => void) | null {
-  if (!e.altKey || e.ctrlKey || e.metaKey) return null;
-  const k = e.key.toLowerCase();
-  if (k === "a") return () => cambiarPreferencia("animaciones", !animaciones);
-  if (!v.emparejado) return null;
-  return k === "o" ? v.alternarPausa : k === "u" ? v.desvincular : null;
+// Ofrece cambiar las animaciones y, con el celular vinculado, desconectarlo y desvincularlo.
+function useAccionesDeConfiguracion(animaciones: boolean, v: ReturnType<typeof useMiVinculo>) {
+  useComandos({
+    "configuracion.animaciones": () => cambiarPreferencia("animaciones", !animaciones),
+    "configuracion.desconectar": v.emparejado ? v.alternarPausa : null,
+    "configuracion.desvincular": v.emparejado ? v.desvincular : null,
+  });
 }
 
 export function Configuracion({ alCambiarElGuardado }: { alCambiarElGuardado?: () => void } = {}) {
   const { animaciones } = usePreferencias();
   const v = useMiVinculo();
-  const teclas = useCallback((e: KeyboardEvent) => {
-    const accion = queHace(e, animaciones, v);
-    if (accion) { e.preventDefault(); accion(); }
-  }, [animaciones, v]);
-  useTeclasGlobales(teclas);
+  useAccionesDeConfiguracion(animaciones, v);
 
   return (
     <main id="contenido" className="pagina mv2 cfgv" tabIndex={-1} data-testid="configuracion">
@@ -67,7 +62,7 @@ function EstaComputadora({ animaciones, alCambiarElGuardado }: { animaciones: bo
 function Animaciones({ animaciones }: { animaciones: boolean }) {
   const reducir = useReducirMovimiento();
   return (
-    <RenglonDeAjuste icono="destellos" titulo={t.animaciones.largo} id="cfg-animaciones" tecla="Alt A" encendida={animaciones} alCambiar={() => cambiarPreferencia("animaciones", !animaciones)} testId="cfg-animaciones"
+    <RenglonDeAjuste icono="destellos" titulo={t.animaciones.largo} id="cfg-animaciones" accion="configuracion.animaciones" encendida={animaciones} alCambiar={() => cambiarPreferencia("animaciones", !animaciones)} testId="cfg-animaciones"
       detalle={animaciones ? t.animacionesSi.largo : t.animacionesNo.largo}>
       {reducir && animaciones && <p className="mv-aviso urgente" data-testid="cfg-reducir-movimiento">{t.reducirMovimiento.largo}</p>}
       <div className={css.muestra}><span className={`${css.mueve} ${animaciones ? "" : "quieto"}`} aria-hidden="true"><i /><b /></span><span className="mv-detalle">{animaciones ? t.asiSeMueve.largo : t.asiAparece.largo}</span></div>

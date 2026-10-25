@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type KeyboardEvent, type ReactNode, type RefObject } from "react";
+import { useLayoutEffect, useRef, type ReactNode, type RefObject } from "react";
 import { Boton } from "./Boton";
 import { Icono } from "./iconos";
 import { useAccionesDelLugar, type Acciones } from "../plataforma/comandos";
@@ -8,7 +8,7 @@ import { useAccionesDelLugar, type Acciones } from "../plataforma/comandos";
 // `acciones`: lo que ofrece con el foco en la caja (marcar, elegir, salir), sin saber qué tecla las pide.
 type Props = {
   valor: string; alCambiar: (v: string) => void; placeholder: string; etiqueta?: string; alEscanear?: () => void; chico?: boolean;
-  autoFoco?: boolean; disabled?: boolean; onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void; cajaRef?: RefObject<HTMLInputElement>; acciones?: Acciones;
+  autoFoco?: boolean; disabled?: boolean; cajaRef?: RefObject<HTMLInputElement>; acciones?: Acciones;
   testId?: string; controla?: string; activo?: string; extra?: ReactNode;
 };
 
@@ -30,7 +30,7 @@ const BotonDeEscanear = ({ alEscanear }: { alEscanear?: () => void }) =>
 const combobox = (controla?: string, activo?: string) =>
   controla ? { role: "combobox", "aria-controls": controla, "aria-expanded": Boolean(activo), "aria-activedescendant": activo, "aria-autocomplete": "list" as const } : {};
 
-export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, chico, autoFoco, disabled, onKeyDown, cajaRef, testId = "busqueda", controla, activo, extra, acciones = SIN_ACCIONES }: Props) {
+export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, chico, autoFoco, disabled, cajaRef, testId = "busqueda", controla, activo, extra, acciones = SIN_ACCIONES }: Props) {
   const propia = useRef<HTMLInputElement>(null);
   const caja = cajaRef ?? propia;
   useAccionesDelLugar(caja, acciones);
@@ -40,7 +40,7 @@ export function Buscador({ valor, alCambiar, placeholder, etiqueta, alEscanear, 
       <div className="buscador-caja">
         <Icono nombre="buscar" tam={chico ? 18 : 22} grosor={2.2} className="lupa" />
         <input ref={caja} type="search" value={valor} onChange={(e) => alCambiar(e.target.value)} placeholder={placeholder} aria-label={etiqueta ?? placeholder}
-          autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="search" disabled={disabled} onKeyDown={onKeyDown} data-testid={testId} {...combobox(controla, activo)} />
+          autoComplete="off" autoCorrect="off" spellCheck={false} enterKeyHint="search" disabled={disabled} data-testid={testId} {...combobox(controla, activo)} />
         {valor && <button type="button" className="borrar" aria-label="Borrar la búsqueda" onClick={() => { alCambiar(""); caja.current?.focus(); }}><Icono nombre="cerrar" tam={18} /></button>}
       </div>
       <BotonDeEscanear alEscanear={alEscanear} />
