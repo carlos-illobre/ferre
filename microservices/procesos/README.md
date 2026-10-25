@@ -34,8 +34,10 @@ llevarlo a otro proyecto: no usa nada de Ferrebress. Por qué está armado así:
   persona y le pasa estas cabeceras.
 - **Lo que se hizo.** El servicio anota cada cambio que sale bien (crear, importar, renombrar,
   borrar, marcar vigente, descartar el borrador, y el borrador el primer guardado de cada
-  persona y uno cada media hora) en `procesos.evento`, con quién lo hizo, en la misma
-  transacción que el cambio.
+  persona y uno cada media hora) con quién lo hizo, en la misma transacción que el cambio, en
+  la bandeja del kit de auditoría (`microservices/auditoria-kit`, contrato en
+  `docs/auditoria/contrato-v1.md`), que lo entrega a Auditoría. `AUDITORIA_URL` dice dónde está;
+  sin ella, el servicio funciona igual y no anota nada.
 
 ### A las pantallas
 

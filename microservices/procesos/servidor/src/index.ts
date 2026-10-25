@@ -3,6 +3,7 @@ import { crearApp } from "./rutas.js";
 import { crearReglas } from "./reglas.js";
 import { crearBase, esperarLaBase } from "./persistencia/conexion.js";
 import { migrar } from "./persistencia/migrar.js";
+import { crearBandeja } from "./persistencia/auditoria.js";
 import { almacenEnPostgres } from "./persistencia/procesos.js";
 
 // El servicio de Procesos. Sin valores por omisión: si falta una variable, no arranca.
@@ -18,8 +19,13 @@ await esperarLaBase(base, 30, 2000);
 const aplicadas = await migrar(base);
 if (aplicadas.length) console.log(`procesos: migraciones aplicadas ${aplicadas.join(", ")}`);
 
+// Auditoría es opcional: sin AUDITORIA_URL, Procesos funciona igual y no manda sus eventos (specs/027).
+const bandeja = crearBandeja(base, { conexion: obligatoria("DATABASE_URL"), auditoria: process.env.AUDITORIA_URL || undefined, token: obligatoria("TOKEN_SERVICIO") });
+await bandeja.iniciar();
+console.log(bandeja.encendida ? "procesos: la bandeja manda a Auditoría" : "procesos: auditoría apagada (sin AUDITORIA_URL)");
+
 const app = crearApp({
-  reglas: crearReglas(almacenEnPostgres(base)),
+  reglas: crearReglas(almacenEnPostgres(base, bandeja.anotar)),
   token: obligatoria("TOKEN_SERVICIO"),
   permisos: { ver: obligatoria("PERMISO_VER"), dibujar: obligatoria("PERMISO_DIBUJAR") },
 });

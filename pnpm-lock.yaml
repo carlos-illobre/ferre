@@ -161,6 +161,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.13.0
         version: 1.19.17(hono@4.13.7)
+      auditoria-kit:
+        specifier: workspace:*
+        version: link:../../auditoria-kit
       bpmn-moddle:
         specifier: 10.3.1
         version: 10.3.1

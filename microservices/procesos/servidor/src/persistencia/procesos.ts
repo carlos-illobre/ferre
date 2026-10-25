@@ -1,4 +1,5 @@
-import { sql, type Transaction } from "kysely";
+import type { EventoDeAuditoria } from "auditoria-kit";
+import { sql, type Kysely, type Transaction } from "kysely";
 import type { Almacen, Anotacion, FilaDeVersion, NuevaVersion, ProcesoGuardado } from "../almacen.js";
 import type { Base } from "./conexion.js";
 import type { DB } from "./tablas.js";
@@ -41,15 +42,17 @@ const subir = (trx: Trx, id: string, revision: number) =>
   sql<{ revision: number; nombre: string }>`UPDATE procesos.proceso SET revision = revision + 1, actualizado_en = now() WHERE id = ${id} AND revision = ${revision} RETURNING revision, nombre`
     .execute(trx).then((r) => r.rows[0] ?? null);
 
-// Lo que se hizo, con quién (026-E10), en la transacción del cambio. Sin anotación, nada.
-const anotar = async (trx: Trx, anotacion: Anotacion | undefined, proceso: { id: string; nombre: string }) => {
-  if (anotacion) await sql`INSERT INTO procesos.evento (tipo, usuario_id, usuario_nombre, contenido) VALUES (${anotacion.tipo}, ${anotacion.autor.id}, ${anotacion.autor.nombre}, ${JSON.stringify(proceso)})`.execute(trx);
-};
+/** Cómo se anota un evento de auditoría en la transacción: la bandeja del kit (specs/027). */
+export type Anotador = (trx: Kysely<DB>, evento: EventoDeAuditoria) => Promise<void>;
 
 const insertarVersion = (trx: Trx, id: string, estado: string, v: NuevaVersion) =>
   sql`INSERT INTO procesos.version (proceso_id, estado, bpmn, pasos, hecha_por_id, hecha_por) VALUES (${id}, ${estado}, ${v.bpmn}, ${v.pasos}, ${v.autor.id}, ${v.autor.nombre})`.execute(trx);
 
-export function almacenEnPostgres(base: Base): Almacen {
+export function almacenEnPostgres(base: Base, auditoria: Anotador): Almacen {
+  // Lo que se hizo, con quién (026-E10), en la transacción del cambio, para Auditoría. Sin anotación, nada.
+  const anotar = async (trx: Trx, a: Anotacion | undefined, proceso: { id: string; nombre: string }) => {
+    if (a) await auditoria(trx, { tipo: a.tipo, quien: a.autor, titulo: a.titulo, detalle: proceso.nombre, grupo: a.grupo, importancia: a.importancia, referencias: [{ cosa: "proceso", id: proceso.id }], contenido: proceso });
+  };
   // Si la revisión es la esperada, la sube, hace el cambio y lo anota, todo junto; si no, null.
   const conRevision = (id: string, revision: number, anotacion: Anotacion | undefined, hacer: (trx: Trx) => Promise<unknown>) =>
     base.transaction().execute(async (trx) => {

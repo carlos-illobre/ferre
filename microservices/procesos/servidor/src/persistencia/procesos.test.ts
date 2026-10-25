@@ -1,5 +1,6 @@
 import { sql } from "kysely";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { crearBandeja } from "./auditoria.js";
 import { migrar } from "./migrar.js";
 import { almacenEnPostgres } from "./procesos.js";
 import { baseDePrueba } from "./pruebas/base.js";
@@ -10,8 +11,10 @@ const version = (pasos: number) => ({ bpmn: `<bpmn pasos="${pasos}"/>`, pasos, a
 // Los datos de Procesos en Postgres (011): revisión, borrador, vigente e historial.
 describe("los procesos en Postgres", () => {
   const base = baseDePrueba();
-  const almacen = almacenEnPostgres(base);
-  beforeAll(() => migrar(base));
+  const bandeja = crearBandeja(base, { conexion: process.env.BASE_DE_PROCESOS!, auditoria: "http://auditoria.prueba", token: "t" });
+  const almacen = almacenEnPostgres(base, bandeja.anotar);
+  beforeAll(async () => { await migrar(base); await bandeja.iniciar(); });
+  afterAll(() => bandeja.parar());
 
   it("011-E17: se crea con su borrador y se encuentra por nombre, sin importar mayúsculas", async () => {
     const id = await almacen.crear("Venta en el mostrador", version(3));
@@ -53,8 +56,10 @@ describe("los procesos en Postgres", () => {
   });
 
   it("026-E10 026-E12: cada cambio anota su evento en la misma transacción, con el proceso; sin anotación o si no cambió, nada", async () => {
-    const anota = (tipo: string) => ({ tipo, autor });
-    const eventos = async (id: string) => (await base.withSchema("procesos").selectFrom("evento").select(["tipo", "usuario_id", "usuario_nombre", "contenido"]).where(sql`contenido->>'id'`, "=", id).orderBy("fecha").execute());
+    const anota = (tipo: string) => ({ tipo, autor, titulo: `Título de ${tipo}`, grupo: "Procesos", importancia: "normal" as const });
+    // Lo que queda en la bandeja de auditoría, para mandar (specs/027).
+    const eventos = async (id: string) => (await sql<{ evento: Record<string, unknown> }>`SELECT evento FROM auditoria_bandeja WHERE evento->'contenido'->>'id' = ${id} ORDER BY anotado_en`.execute(base)).rows
+      .map(({ evento: e }) => ({ tipo: e.tipo, quien: e.quien, titulo: e.titulo, detalle: e.detalle, referencias: e.referencias, contenido: e.contenido }));
     const id = await almacen.crear("Cobro", version(1), anota("proceso.creado"));
     expect(await almacen.renombrar(id, "Cobro en caja", anota("proceso.renombrado"))).toBe(true);
     expect(await almacen.guardarBorrador(id, 1, version(2), anota("proceso.borrador_cambiado"))).toBe(2);
@@ -66,12 +71,12 @@ describe("los procesos en Postgres", () => {
     expect(await almacen.borrar(id, anota("proceso.borrado"))).toBe(false);
     expect(await almacen.renombrar(id, "Otro", anota("proceso.renombrado"))).toBe(false);
     expect(await eventos(id)).toEqual([
-      { tipo: "proceso.creado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro" } },
-      { tipo: "proceso.renombrado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
-      { tipo: "proceso.borrador_cambiado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
-      { tipo: "proceso.vigente", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
-      { tipo: "proceso.borrador_descartado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
-      { tipo: "proceso.borrado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.creado", quien: autor, titulo: "Título de proceso.creado", detalle: "Cobro", referencias: [{ cosa: "proceso", id }], contenido: { id, nombre: "Cobro" } },
+      { tipo: "proceso.renombrado", quien: autor, titulo: "Título de proceso.renombrado", detalle: "Cobro en caja", referencias: [{ cosa: "proceso", id }], contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.borrador_cambiado", quien: autor, titulo: "Título de proceso.borrador_cambiado", detalle: "Cobro en caja", referencias: [{ cosa: "proceso", id }], contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.vigente", quien: autor, titulo: "Título de proceso.vigente", detalle: "Cobro en caja", referencias: [{ cosa: "proceso", id }], contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.borrador_descartado", quien: autor, titulo: "Título de proceso.borrador_descartado", detalle: "Cobro en caja", referencias: [{ cosa: "proceso", id }], contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.borrado", quien: autor, titulo: "Título de proceso.borrado", detalle: "Cobro en caja", referencias: [{ cosa: "proceso", id }], contenido: { id, nombre: "Cobro en caja" } },
     ]);
   });
 });

@@ -223,8 +223,8 @@ describe("lo que se anota", () => {
     await r.descartarBorrador(p.id, { revision: b.revision }, dibuja);
     await r.borrar(importado.id, otro);
     expect(tipos(almacen)).toEqual(["proceso.creado", "proceso.importado", "proceso.renombrado", "proceso.vigente", "proceso.borrador_cambiado", "proceso.borrador_descartado", "proceso.borrado"]);
-    expect(almacen.eventos[2]).toEqual({ tipo: "proceso.renombrado", usuario: { id: "u2", nombre: "Ana" }, proceso: { id: p.id, nombre: "Venta en el mostrador" } });
-    expect(almacen.eventos.at(-1)).toEqual({ tipo: "proceso.borrado", usuario: { id: "u2", nombre: "Ana" }, proceso: { id: importado.id, nombre: "Compra" } });
+    expect(almacen.eventos[2]).toEqual({ tipo: "proceso.renombrado", usuario: { id: "u2", nombre: "Ana" }, titulo: "Proceso con otro nombre", importancia: "normal", proceso: { id: p.id, nombre: "Venta en el mostrador" } });
+    expect(almacen.eventos.at(-1)).toEqual({ tipo: "proceso.borrado", usuario: { id: "u2", nombre: "Ana" }, titulo: "Proceso borrado", importancia: "anulacion", proceso: { id: importado.id, nombre: "Compra" } });
   });
 
   it("026-E11: el borrador se anota la primera vez y, si sigue, uno cada media hora, por persona y proceso", async () => {

@@ -6,10 +6,10 @@ module.exports = {
   forbidden: [
     {
       name: "procesos-no-importa-nada-de-afuera",
-      comment: "El módulo se tiene que poder copiar solo: nada de Ferrebress ni de otra carpeta del repositorio.",
+      comment: "El módulo se tiene que poder copiar solo: nada de Ferrebress ni de otra carpeta del repositorio. El kit de auditoría es un paquete que va con él: tampoco sabe de Ferrebress (specs/027).",
       severity: "error",
       from: { path: "^src/" },
-      to: { path: "^\\.\\./", pathNot: "node_modules/" },
+      to: { path: "^\\.\\./", pathNot: "node_modules/|auditoria-kit/" },
     },
     {
       name: "solo-la-persistencia-usa-la-base-y-el-disco",

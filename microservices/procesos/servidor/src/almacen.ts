@@ -21,8 +21,8 @@ export type ProcesoGuardado = FilaDeProceso & { vigente: FilaDeVersion | null; b
 
 export type NuevaVersion = { bpmn: string; pasos: number; autor: Autor };
 
-/** Lo que se anota de un cambio (specs/026): el tipo y quién; el almacén le agrega el proceso. */
-export type Anotacion = { tipo: string; autor: Autor };
+/** Lo que se anota de un cambio (specs/026, 027): el tipo, quién y sus palabras; el almacén le agrega el proceso. */
+export type Anotacion = { tipo: string; autor: Autor; titulo: string; grupo: string; importancia: "normal" | "anulacion" };
 
 export interface Almacen {
   listar(): Promise<ProcesoGuardado[]>;

@@ -1,4 +1,4 @@
-import type { Almacen, Autor, FilaDeVersion, ProcesoGuardado } from "./almacen.js";
+import type { Almacen, Anotacion, Autor, FilaDeVersion, ProcesoGuardado } from "./almacen.js";
 import { BpmnInvalido, bpmnInicial, leerBpmn } from "./bpmn.js";
 import type { Proceso, ProcesoEnLista, Version, VersionEnHistorial } from "./contrato.js";
 
@@ -64,9 +64,19 @@ function paraQuien(p: ProcesoGuardado, quien: Quien): Proceso {
 // proceso y, si sigue, uno cada media hora, para que se sepa quién lo cambió sin llenar el registro.
 export const ANOTAR_BORRADOR_CADA_MS = 30 * 60 * 1000;
 
+// Cada cambio con sus palabras, como se lee en «Quién hizo qué» (specs/027): Auditoría no conoce
+// los tipos de Procesos. Borrar un proceso se marca como anulación.
+const TITULOS: Record<string, string> = {
+  "proceso.creado": "Proceso nuevo", "proceso.importado": "Proceso importado", "proceso.renombrado": "Proceso con otro nombre",
+  "proceso.vigente": "Proceso vigente", "proceso.borrador_cambiado": "Cambio en el borrador de un proceso",
+  "proceso.borrador_descartado": "Borrador de un proceso descartado", "proceso.borrado": "Proceso borrado",
+};
+
 export function crearReglas(almacen: Almacen) {
   const borradorAnotado = new Map<string, number>();
-  const anotacion = (tipo: string, quien: Quien) => ({ tipo, autor: { id: quien.id, nombre: quien.nombre } });
+  const anotacion = (tipo: keyof typeof TITULOS, quien: Quien): Anotacion => ({
+    tipo, autor: { id: quien.id, nombre: quien.nombre }, titulo: TITULOS[tipo]!, grupo: "Procesos", importancia: tipo === "proceso.borrado" ? "anulacion" : "normal",
+  });
   function anotacionDelBorrador(id: string, quien: Quien) {
     const clave = `${quien.id}/${id}`;
     const ahora = Date.now();

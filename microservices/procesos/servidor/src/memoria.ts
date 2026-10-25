@@ -5,14 +5,14 @@ import type { Almacen, Anotacion, FilaDeVersion, NuevaVersion, ProcesoGuardado }
 // base de datos. Hace lo mismo que datos.ts, con las mismas reglas de unicidad.
 
 type Guardado = { id: string; nombre: string; revision: number; actualizado: Date; versiones: FilaDeVersion[] };
-/** Lo anotado (026-E10), como lo guarda la base: el tipo, quién y el proceso. */
-export type EventoEnMemoria = { tipo: string; usuario: { id: string; nombre: string }; proceso: { id: string; nombre: string } };
+/** Lo anotado (026-E10), como se manda a Auditoría: el tipo, quién, sus palabras y el proceso. */
+export type EventoEnMemoria = { tipo: string; usuario: { id: string; nombre: string }; titulo: string; importancia: string; proceso: { id: string; nombre: string } };
 
 export function almacenEnMemoria(): Almacen & { eventos: EventoEnMemoria[] } {
   const procesos = new Map<string, Guardado>();
   const eventos: EventoEnMemoria[] = [];
   const anotar = (a: Anotacion | undefined, proceso: { id: string; nombre: string }) => {
-    if (a) eventos.push({ tipo: a.tipo, usuario: { id: a.autor.id, nombre: a.autor.nombre }, proceso });
+    if (a) eventos.push({ tipo: a.tipo, usuario: { id: a.autor.id, nombre: a.autor.nombre }, titulo: a.titulo, importancia: a.importancia, proceso });
   };
   const ahora = () => new Date();
   const fila = (v: NuevaVersion, estado: FilaDeVersion["estado"]): FilaDeVersion => ({
