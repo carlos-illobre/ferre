@@ -62,11 +62,12 @@ export function motivoDeAnulacion(elegido: string, comentario: string): string {
 // Buscar una venta por un producto, el importe o el cliente, y filtrar por medio de pago
 // (003-T005, 017 E22–E23). El importe se compara sin puntos ni signo: «58.000» encuentra la de $58.000.
 export const plano = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+function coincide(v: VentaDelDia, buscado: string, cifras: string): boolean {
+  if (!buscado || v.items.some((i) => plano(i.descripcion).includes(buscado)) || plano(v.cliente ?? "").includes(buscado)) return true;
+  return cifras.length > 0 && cifras === buscado.replace(/[$.\s]/g, "") && String(Math.round(Number(v.total))).includes(cifras);
+}
 export function buscarVentas(ventas: VentaDelDia[], texto: string, medio: VentaDelDia["medio_pago"] | null): VentaDelDia[] {
   const buscado = plano(texto);
   const cifras = buscado.replace(/\D/g, "");
-  return ventas.filter((v) => (!medio || v.medio_pago === medio) && (!buscado
-    || v.items.some((i) => plano(i.descripcion).includes(buscado))
-    || plano(v.cliente ?? "").includes(buscado)
-    || (cifras.length > 0 && cifras === buscado.replace(/[$.\s]/g, "") && String(Math.round(Number(v.total))).includes(cifras))));
+  return ventas.filter((v) => (!medio || v.medio_pago === medio) && coincide(v, buscado, cifras));
 }

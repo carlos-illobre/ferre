@@ -98,8 +98,9 @@ Además:
   ejemplo `useVenta()`).
 - **El teclado se declara.** Cada pantalla pasa una tabla de qué tecla hace qué, y
   `plataforma/teclado/` la ejecuta. Se arma con T147 (rehacer las teclas).
-- **Una pieza por archivo**, con su `.module.css` al lado. Lo que cambia entre celular y
-  computadora (tamaños, separaciones) va en variables de la paleta, no en una copia de la pieza.
+- **Una pieza por archivo**, con su `.module.css` al lado; las piezas de una misma pantalla pueden
+  compartir el de la pantalla. Lo que cambia entre celular y computadora (tamaños, separaciones) va
+  en variables de la paleta, no en una copia de la pieza.
 
 ### Límites
 
@@ -138,6 +139,13 @@ Las pruebas no cuentan para el tamaño.
   (que es lo que usa el código), y la preparación común de las pruebas no importa módulos de
   datos ni de negocio antes de que cada prueba ponga sus reemplazos.
 - Mover archivos se hace con `microservices/web/scripts/mover.mjs`, que corrige cada import.
+- Pasar una hoja global a CSS Modules se hace con `microservices/web/scripts/a-modulo.mjs`: las clases
+  de la pantalla pasan al módulo y las demás quedan globales dentro del selector, así cada regla pesa
+  lo mismo que antes y nada cambia a la vista; lo que ninguna pantalla usa se poda.
+- Las hojas globales de las piezas compartidas (como la de los medios de pago) se cargan al arrancar
+  cada interfaz, antes que los módulos de las pantallas.
+- Cada etapa se compara con la anterior, pantalla por pantalla y en varios estados, con capturas de
+  las dos versiones lado a lado: tiene que dar igual.
 
 ## Cuándo revisar esta decisión
 

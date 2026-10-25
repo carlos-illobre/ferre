@@ -28,7 +28,7 @@ function Sugerencia({ producto: p, marcada, stock, alElegir, alMarcar }: { produ
   const precio = precioDelProducto(p).valor;
   return (
     <li id={`sug-${p.id}`} role="option" aria-selected={marcada} className={css.renglon} onMouseDown={(e) => { e.preventDefault(); alElegir(); }} onMouseEnter={alMarcar}>
-      <MiniaturaDeProducto producto={p} tam={18} />
+      <MiniaturaDeProducto url={p.foto_url} />
       <span className={css.texto}><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className="detalle">{detalleDe(p) || " "}</span></span>
       <StockDelProducto stock={stock} unidad={p.unidad ?? "unidad"} />
       <span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span>

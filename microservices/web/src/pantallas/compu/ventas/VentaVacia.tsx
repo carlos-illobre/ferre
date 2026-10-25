@@ -30,7 +30,7 @@ function UltimoVendido({ producto: p, alAgregar }: { producto: Producto; alAgreg
   const precio = precioDe(p);
   return (
     <button type="button" className={css.ultimo} onClick={alAgregar}>
-      <MiniaturaDeProducto producto={p} tam={20} />
+      <MiniaturaDeProducto url={p.foto_url} tam={20} />
       <span className={css.texto}><span className="nombre">{nombreDeProducto(p.descripcion)}</span><span className={precio === null ? "falta-texto" : "importe"}>{precio === null ? "Sin precio" : pesosCortos(precio)}</span></span>
     </button>
   );

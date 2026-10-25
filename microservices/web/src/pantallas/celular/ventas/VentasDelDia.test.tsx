@@ -7,7 +7,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 // 17/10/2026 a las 12:00; el servidor de mentira contesta las ventas de cada día.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-import { VentasDeHoy } from "./VentasDeHoy";
+import { VentasDelDia } from "./VentasDelDia";
 import { consultas } from "../../../datos/conexion";
 import { ErrorApi } from "../../../datos/conexion";
 
@@ -31,7 +31,7 @@ beforeEach(() => {
   apiFalsa.mockImplementation(async (ruta: string) => { if (ruta === "/clientes") return []; const d = ruta.match(/dia=(.*)$/)?.[1] ?? "2026-10-17"; return dia(d, dias[d] ?? []); });
 });
 afterEach(() => { vi.useRealTimers(); });
-const abrir = async () => { render(<VentasDeHoy />); await screen.findByTestId("total-de-hoy"); await screen.findByTestId("comparacion"); };
+const abrir = async () => { render(<VentasDelDia />); await screen.findByTestId("total-de-hoy"); await screen.findByTestId("comparacion"); };
 // «Otro día» abre el panel con los últimos siete días; uno más viejo, con el calendario (decisión 141).
 const elegirDia = (d: string) => {
   fireEvent.click(screen.getByTestId("cambiar-fecha"));
@@ -62,7 +62,7 @@ describe("«Hoy» · celular", () => {
     fireEvent.click(barras[1]!);
     expect(screen.getByTestId("globo").textContent).toBe("10 h · $223.000");
     // Como la v2 (017-T012): la elegida queda y las demás bajan; lo de ayer a cada hora, marcado.
-    expect(screen.getByTestId("grafico").querySelector(".hoy-barras")!.className).toContain("con-elegida");
+    expect(screen.getByTestId("grafico").firstElementChild!.className).toContain("con-elegida");
     expect(barras[1]!.parentElement!.className).toContain("elegida");
     expect(within(screen.getByTestId("grafico")).getAllByTestId("marca-ayer")).toHaveLength(2);
     fireEvent.click(barras[1]!);
@@ -166,14 +166,14 @@ describe("«Hoy» · celular", () => {
 
   it("017-E21: sin conexión y sin nada bajado, hoy dice que se ve cuando vuelva internet", async () => {
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
-    render(<VentasDeHoy />);
+    render(<VentasDelDia />);
     expect((await screen.findByTestId("sin-conexion")).textContent).toBe("Sin conexión: las ventas de hoy se ven cuando vuelva internet.");
   });
 
   it("017-E02: igual que ayer dice 0 %, sin flecha", async () => {
     dias["2026-10-16"] = [venta("y", a("2026-10-16", 9), "efectivo", 293000, [renglon("x", "1", 293000)])];
     await abrir();
-    const pastilla = screen.getByTestId("comparacion").querySelector(".hoy-pastilla")!;
+    const pastilla = screen.getByTestId("comparacion").firstElementChild!;
     expect(pastilla.className).toContain("igual");
     expect(pastilla.textContent).toBe("0 %");
     expect(pastilla.querySelector("svg")).toBeNull();
@@ -221,7 +221,7 @@ describe("«Hoy» · celular", () => {
   });
 
   it("017-E29: en otro día, solo quien anula ventas de cualquier día ve «Anular»", async () => {
-    render(<VentasDeHoy anulaHoy anulaCualquierDia={false} />);
+    render(<VentasDelDia anulaHoy anulaCualquierDia={false} />);
     await screen.findByTestId("total-de-hoy");
     fireEvent.click(within(screen.getAllByTestId("venta-dia")[1]!).getByRole("button"));
     expect(screen.getByTestId("anular")).toBeTruthy();
@@ -234,7 +234,7 @@ describe("«Hoy» · celular", () => {
 
   it("sin permiso de ver ventas el servidor lo dice y no hay resumen", async () => {
     apiFalsa.mockRejectedValue(new ErrorApi(403, "No tenés permiso para esto"));
-    render(<VentasDeHoy />);
+    render(<VentasDelDia />);
     expect((await screen.findByText("No tenés permiso para esto")).textContent).toBeTruthy();
     expect(screen.queryByTestId("resumen-hoy")).toBeNull();
   });
@@ -245,7 +245,7 @@ describe("corregir y cambio en el celular (019, T007 y T010)", () => {
   const conIds = () => HOY.forEach((v: any) => v.items.forEach((i: any, n: number) => { i.id ??= `${v.id}-${n}`; i.producto_id ??= `p-${v.id}-${n}`; i.devuelto ??= "0"; v.version ??= v.fecha; }));
   const abrirVenta = async (n: number) => {
     conIds();
-    render(<VentasDeHoy anulaHoy />);
+    render(<VentasDelDia anulaHoy />);
     await screen.findByTestId("total-de-hoy");
     fireEvent.click(within(screen.getAllByTestId("venta-dia")[n]!).getByRole("button"));
     return screen.getByTestId("hoja-venta");
@@ -284,7 +284,7 @@ describe("corregir y cambio en el celular (019, T007 y T010)", () => {
 
   it("019-E11: «Cambio» arriba de la lista busca la venta por el producto que vuelve", async () => {
     conIds();
-    render(<VentasDeHoy anulaHoy />);
+    render(<VentasDelDia anulaHoy />);
     await screen.findByTestId("total-de-hoy");
     apiFalsa.mockImplementation(async (ruta: string) => ruta.startsWith("/ventas/para-cambio")
       ? [{ id: "v2", fecha: a("2026-10-17", 10, 40), medio_pago: "mercado_pago", cliente: null, total: "223000", items: [{ id: "v2-0", producto_id: "p", descripcion: "Taladro inalámbrico 18 V", cantidad: "1", foto_url: null, por_devolver: 1, pagado: 223000 }] }]
@@ -297,7 +297,7 @@ describe("corregir y cambio en el celular (019, T007 y T010)", () => {
 
   it("019-E24: sin permiso no hay Corregir ni Cambio", async () => {
     conIds();
-    render(<VentasDeHoy />);
+    render(<VentasDelDia />);
     await screen.findByTestId("total-de-hoy");
     expect(screen.queryByTestId("registrar-cambio")).toBeNull();
     fireEvent.click(within(screen.getAllByTestId("venta-dia")[0]!).getByRole("button"));

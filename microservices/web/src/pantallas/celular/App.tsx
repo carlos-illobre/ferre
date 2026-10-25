@@ -1,3 +1,6 @@
+// Las hojas de las piezas que comparten las pantallas, antes que los módulos de cada pantalla:
+// un módulo pisa lo de ellas con el mismo peso (specs/024).
+import "../medios.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas/venta-en-espejo";
 import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";

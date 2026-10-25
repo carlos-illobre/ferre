@@ -1,6 +1,6 @@
-import { NOMBRE_DE_MEDIO, type Cobro } from "../../../negocio/ventas";
-import { IconoDeMedio } from "../../IconoDeMedio";
-import { Aviso, Boton, Hoja, Icono, hora, pesosCortos } from "../base/ui";
+import type { Cobro } from "../../../negocio/ventas";
+import { LoCobrado } from "../../comun/ventas/LoCobrado";
+import { Aviso, Boton, Hoja, Icono, pesosCortos } from "../base/ui";
 import css from "./VentaRegistrada.module.css";
 
 // La venta registrada (como en el celular): el total, el medio, cuántos productos y la hora;
@@ -14,7 +14,7 @@ export function VentaRegistrada({ cobro, alCerrar, alVerHoy }: { cobro: Cobro; a
         <span className={`${css.tilde} ${cobro.encolado ? css.pendiente : ""}`}><Icono nombre={cobro.encolado ? "nube" : "tilde"} tam={34} grosor={3} /></span>
         <strong className={`importe ${css.total}`} data-testid="exito-total">{pesosCortos(cobro.total)}</strong>
         {cobro.encolado && <Aviso tipo="alerta">Sin conexión: quedó guardada en este dispositivo y se envía sola cuando vuelva internet.</Aviso>}
-        <p className="detalle"><IconoDeMedio medio={cobro.medio} tam={16} />{NOMBRE_DE_MEDIO[cobro.medio]}{cobro.cliente ? ` · ${cobro.cliente}` : ""} · {cobro.productos} {cobro.productos === 1 ? "producto" : "productos"} · {hora(cobro.fecha)}{cobro.encolado ? "" : ". El stock ya se descontó."}</p>
+        <p className="detalle"><LoCobrado cobro={cobro} tam={16} largo /></p>
       </div>
     </Hoja>
   );

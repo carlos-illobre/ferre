@@ -2,7 +2,7 @@ import { irA } from "../../../rutas";
 import { usePuede } from "../../permisos";
 import { SinPermiso } from "../../SinPermiso";
 import { EstadoDeConexion } from "../componentes/EstadoDeConexion";
-import { VentasDeHoy } from "../pantallas/VentasDeHoy";
+import { VentasDelDia } from "./VentasDelDia";
 import { Pestanas } from "../Pestanas";
 import { PIDE } from "./permisos-de-vender";
 import { Vender } from "./Vender";
@@ -30,7 +30,7 @@ export function ParteVender({ sub }: { sub: string | null }) {
   return (
     <main className={`contenido ${css.pantalla}`}>
       <div className="encabezado"><h1 className="titulo">Vender</h1><EstadoDeConexion testId="conexion-vender" />{pestanas}</div>
-      <VentasDeHoy anulaHoy={puede("ventas.anular", "ventas.anular_cualquiera")} anulaCualquierDia={puede("ventas.anular_cualquiera")} />
+      <VentasDelDia anulaHoy={puede("ventas.anular", "ventas.anular_cualquiera")} anulaCualquierDia={puede("ventas.anular_cualquiera")} />
     </main>
   );
 }

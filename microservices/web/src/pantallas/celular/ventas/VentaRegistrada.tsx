@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import { NOMBRE_DE_MEDIO, type Cobro } from "../../../negocio/ventas";
+import type { Cobro } from "../../../negocio/ventas";
 import { pesosCortos } from "../../../formato";
-import { IconoDeMedio } from "../../IconoDeMedio";
+import { LoCobrado } from "../../comun/ventas/LoCobrado";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
 import css from "./VentaRegistrada.module.css";
@@ -9,7 +9,6 @@ import css from "./VentaRegistrada.module.css";
 // La venta registrada (decisión 119): una ventana con el tilde, el total, el medio, el cliente,
 // cuántos productos y la hora, «Ver en Ventas del día» y «Seguir vendiendo». Sin conexión dice que
 // quedó guardada en el celular y que se envía sola.
-const hora = (iso: string) => new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false });
 type Props = { cobro: Cobro; veHoy: boolean; alCerrar: () => void; alVerHoy: () => void };
 
 export function VentaRegistrada({ cobro, veHoy, alCerrar, alVerHoy }: Props) {
@@ -24,7 +23,7 @@ export function VentaRegistrada({ cobro, veHoy, alCerrar, alVerHoy }: Props) {
         <div className={`${css.total} importe`} data-testid="exito-total">{pesosCortos(cobro.total)}</div>
         {cobro.encolado && <div className={css.sinRed}><Icono nombre="alerta" tam={18} />{TEXTOS.vender.seEnviaSola.corto}</div>}
         <p className={css.detalle}>
-          <IconoDeMedio medio={cobro.medio} tam={18} />{NOMBRE_DE_MEDIO[cobro.medio]}{cobro.cliente ? ` · ${cobro.cliente}` : ""} · <span data-testid="exito-cuantos">{cobro.productos} {cobro.productos === 1 ? "producto" : "productos"}</span> · {hora(cobro.fecha)}
+          <LoCobrado cobro={cobro} tam={18} />
         </p>
         <div className={css.botones}>
           {veHoy && <button type="button" className="boton" onClick={alVerHoy} data-testid="ver-en-hoy"><Icono nombre="lista" tam={18} />Ver en Ventas del día</button>}

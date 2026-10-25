@@ -1,6 +1,9 @@
 import { createPortal } from "react-dom";
 import { saltar } from "../../plataforma/animacion/animacion";
 import "../../plataforma/animacion/animacion.css";
+// Las hojas de las piezas que comparten las pantallas, antes que los módulos de cada pantalla:
+// un módulo pisa lo de ellas con el mismo peso (specs/024).
+import "../medios.css";
 import { useEffect, type KeyboardEvent as ReactKeyboardEvent, useMemo, useRef, useState } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas/venta-en-espejo";
 import { useVentaEnCurso } from "../../negocio/ventas/venta-en-curso";
@@ -29,7 +32,7 @@ import { EstadoDeConexion, Icono, Marca, type NombreDeIcono } from "./base/ui";
 import { Entrar } from "./base/pantallas/Entrar";
 import { Manual } from "./base/pantallas/Manual";
 import { VincularCelular } from "./base/pantallas/VincularCelular";
-import { Hoy } from "./base/pantallas/Hoy";
+import { VentasDelDia } from "./ventas/VentasDelDia";
 import { Productos } from "./base/pantallas/Productos";
 import { Listas } from "./base/pantallas/Listas";
 import { Duplicados } from "./base/pantallas/Duplicados";
@@ -467,7 +470,7 @@ function Pantallas() {
           : actual === "mas" ? <Mas atajoDe={atajoDe} opciones={deMas} />
           : actual === "roles" ? <Roles />
           : actual === "pedidos" ? <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`ingreso?pedido=${id}`)} /></main>
-          : actual === "hoy" ? <Hoy /> : actual === "productos" ? <Productos /> : actual === "ingreso" ? <Ingreso />
+          : actual === "hoy" ? <VentasDelDia /> : actual === "productos" ? <Productos /> : actual === "ingreso" ? <Ingreso />
           // Compras, como la v2: el escritorio de las compras, o el ingreso o los pedidos (decisión 153).
           : actual === "compras" ? { escritorio: <main id="contenido" className="pagina pagina-compras" tabIndex={-1}><ComprasRecientes /></main>, ingreso: <Ingreso />,
             pedidos: <main id="contenido" className="pagina" tabIndex={-1}><Pedidos alIngresar={(id) => irA(`ingreso?pedido=${id}`)} /></main> }[pantallaDeCompras((...p) => puede(usuario, ...p))]

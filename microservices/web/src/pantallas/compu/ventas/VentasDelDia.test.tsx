@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { conPermisos } from "../../../../pruebas/sesion";
+import { conPermisos } from "../../../pruebas/sesion";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
@@ -7,9 +7,9 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 // (specs/019). El dispositivo cree que es el sábado 17/10/2026 a las 12:00; el servidor de mentira
 // contesta las ventas de cada día.
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
-vi.mock("../../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-import { Hoy } from "./Hoy";
-import { consultas } from "../../../../datos/conexion";
+vi.mock("../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+import { VentasDelDia } from "./VentasDelDia";
+import { consultas } from "../../../datos/conexion";
 
 const a = (dia: string, h: number, m = 0) => new Date(`${dia}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`).toISOString();
 let n = 0;
@@ -35,7 +35,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => { vi.useRealTimers(); });
-const abrir = async () => { render(<Hoy />); await screen.findByTestId("total-de-hoy"); await screen.findByTestId("comparacion"); };
+const abrir = async () => { render(<VentasDelDia />); await screen.findByTestId("total-de-hoy"); await screen.findByTestId("comparacion"); };
 const elegida = () => screen.getByTestId("venta-elegida");
 const filas = () => screen.getAllByTestId("venta-dia");
 

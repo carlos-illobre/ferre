@@ -1,5 +1,5 @@
 import { confirmadas, hoyLocal, useVentasDelDia, type VentaDelDia } from "./ventas-del-dia";
-import { MEDIOS, type Medio } from "./venta";
+import { MEDIOS, type Medio } from "./medios";
 
 // «Hoy» renovada (specs/017): lo que se calcula de las ventas de un día, una sola vez para el
 // celular y la computadora. Las anuladas no suman en nada.
@@ -62,21 +62,36 @@ export function nombreDelDia(dia: string): string {
   return `${d.toLocaleDateString("es-AR", { weekday: "long" })} ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
+// Lo del día anterior: el total hasta la misma hora (para comparar) y lo de cada hora (la raya
+// punteada de la v2).
+function delDiaAnterior(ventas: VentaDelDia[] | undefined, total: number | null, minuto: number | null) {
+  return {
+    comparacion: total !== null && ventas ? comparar(total, totalHasta(ventas, minuto)) : null,
+    anteriorPorHora: new Map((ventas ? porHora(ventas) : []).map((b) => [b.hora, b.total])),
+  };
+}
+
+// Lo del día que se mira: el resumen, las barras hasta la hora actual (hoy) y la lista, de la más
+// reciente a la más vieja.
+function delDia(ventas: VentaDelDia[] | null, horaActual: number | null) {
+  if (!ventas) return { resumen: null, barras: [], lista: null };
+  return { resumen: resumenDelDia(ventas), barras: porHora(ventas, horaActual), lista: [...ventas].sort((a, b) => b.fecha.localeCompare(a.fecha)) };
+}
+
 // Todo lo de «Hoy» para un día (sin día, hoy): sus ventas, el resumen, las barras y la
 // comparación con el día anterior. La comparación espera a tener los dos días.
+// Hoy, se mira hasta la hora actual; otro día, el día entero.
+const hasta = (esHoy: boolean, ahora: Date) => (esHoy ? { hora: ahora.getHours(), minuto: ahora.getHours() * 60 + ahora.getMinutes() } : { hora: null, minuto: null });
+const ventasDe = (c: { datos?: { ventas: VentaDelDia[] } | null }) => c.datos?.ventas ?? null;
+
 export function useResumenDelDia(dia: string | null, ahora: Date = new Date()) {
   const elegido = dia && dia !== hoyLocal() ? dia : null;
   const esHoy = elegido === null;
-  const delDia = useVentasDelDia(elegido);
-  const anterior = useVentasDelDia(diaAnterior(elegido ?? hoyLocal()));
-  const ventas = delDia.datos?.ventas ?? null;
-  const minuto = esHoy ? ahora.getHours() * 60 + ahora.getMinutes() : null;
-  const resumen = ventas ? resumenDelDia(ventas) : null;
-  const barras = ventas ? porHora(ventas, esHoy ? ahora.getHours() : null) : [];
-  const comparacion = resumen && anterior.datos ? comparar(resumen.total, totalHasta(anterior.datos.ventas, minuto)) : null;
-  // Lo del día anterior en cada hora, para marcarlo en la barra (la raya punteada de la v2).
-  const anteriorPorHora = new Map((anterior.datos ? porHora(anterior.datos.ventas) : []).map((b) => [b.hora, b.total]));
-  // De la más reciente a la más vieja.
-  const lista = ventas ? [...ventas].sort((a, b) => b.fecha.localeCompare(a.fecha)) : null;
-  return { esHoy, dia: elegido ?? hoyLocal(), diaAnterior: diaAnterior(elegido ?? hoyLocal()), ventas: lista, resumen, barras, anteriorPorHora, comparacion, error: delDia.error, cargando: delDia.cargando };
+  const elDia = elegido ?? hoyLocal();
+  const consulta = useVentasDelDia(elegido);
+  const anterior = useVentasDelDia(diaAnterior(elDia));
+  const h = hasta(esHoy, ahora);
+  const d = delDia(ventasDe(consulta), h.hora);
+  const a = delDiaAnterior(ventasDe(anterior) ?? undefined, d.resumen ? d.resumen.total : null, h.minuto);
+  return { esHoy, dia: elDia, diaAnterior: diaAnterior(elDia), ventas: d.lista, resumen: d.resumen, barras: d.barras, ...a, error: consulta.error, cargando: consulta.cargando };
 }
