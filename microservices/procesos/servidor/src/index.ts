@@ -18,6 +18,10 @@ await esperarLaBase(base, 30, 2000);
 const aplicadas = await migrar(base);
 if (aplicadas.length) console.log(`procesos: migraciones aplicadas ${aplicadas.join(", ")}`);
 
-const app = crearApp({ reglas: crearReglas(almacenEnPostgres(base)), token: obligatoria("TOKEN_SERVICIO") });
+const app = crearApp({
+  reglas: crearReglas(almacenEnPostgres(base)),
+  token: obligatoria("TOKEN_SERVICIO"),
+  permisos: { ver: obligatoria("PERMISO_VER"), dibujar: obligatoria("PERMISO_DIBUJAR") },
+});
 const port = Number(obligatoria("PORT"));
 serve({ fetch: app.fetch, port }, () => console.log(`procesos escuchando en ${port}`));

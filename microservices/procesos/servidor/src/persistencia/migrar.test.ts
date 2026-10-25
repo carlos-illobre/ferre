@@ -17,9 +17,9 @@ describe("las migraciones de Procesos", () => {
   });
 
   it("022-E08: en una base vacía aplica las del módulo una sola vez, en el esquema procesos", async () => {
-    expect(await migrar(base)).toEqual(["0001_procesos.sql"]);
+    expect(await migrar(base)).toEqual(["0001_procesos.sql", "0002_eventos.sql"]);
     expect(await migrar(base)).toEqual([]);
     const { rows } = await sql<{ table_name: string }>`SELECT table_name FROM information_schema.tables WHERE table_schema = 'procesos' ORDER BY 1`.execute(base);
-    expect(rows.map((r) => r.table_name)).toEqual(["kysely_migration", "kysely_migration_lock", "proceso", "version"]);
+    expect(rows.map((r) => r.table_name)).toEqual(["evento", "kysely_migration", "kysely_migration_lock", "proceso", "version"]);
   });
 });

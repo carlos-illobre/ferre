@@ -59,7 +59,22 @@ function paraQuien(p: ProcesoGuardado, quien: Quien): Proceso {
   };
 }
 
+// Qué se anota de cada cambio (026-E10, E11): todo lo que sale bien, con quién. El borrador se
+// guarda solo a cada rato mientras se dibuja: se anota el primer guardado de cada persona en cada
+// proceso y, si sigue, uno cada media hora, para que se sepa quién lo cambió sin llenar el registro.
+export const ANOTAR_BORRADOR_CADA_MS = 30 * 60 * 1000;
+
 export function crearReglas(almacen: Almacen) {
+  const borradorAnotado = new Map<string, number>();
+  const anotacion = (tipo: string, quien: Quien) => ({ tipo, autor: { id: quien.id, nombre: quien.nombre } });
+  function anotacionDelBorrador(id: string, quien: Quien) {
+    const clave = `${quien.id}/${id}`;
+    const ahora = Date.now();
+    if (ahora - (borradorAnotado.get(clave) ?? -Infinity) < ANOTAR_BORRADOR_CADA_MS) return undefined;
+    borradorAnotado.set(clave, ahora);
+    return anotacion("proceso.borrador_cambiado", quien);
+  }
+
   async function existente(id: string) {
     const p = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ? await almacen.leer(id) : null;
     if (!p) throw new ErrorDeProcesos(404, NO_EXISTE);
@@ -103,7 +118,7 @@ export function crearReglas(almacen: Almacen) {
       const bpmn = datos.bpmn === undefined ? bpmnInicial() : datos.bpmn;
       const { pasos } = await bpmnValido(bpmn);
       await nombreLibre(nombre);
-      const id = await almacen.crear(nombre, { bpmn: bpmn as string, pasos, autor: quien });
+      const id = await almacen.crear(nombre, { bpmn: bpmn as string, pasos, autor: quien }, anotacion(datos.bpmn === undefined ? "proceso.creado" : "proceso.importado", quien));
       return paraQuien(await existente(id), quien);
     },
 
@@ -112,7 +127,7 @@ export function crearReglas(almacen: Almacen) {
       const limpio = nombreValido(nombre);
       await existente(id);
       await nombreLibre(limpio, id);
-      await almacen.renombrar(id, limpio);
+      await almacen.renombrar(id, limpio, anotacion("proceso.renombrado", quien));
       return paraQuien(await existente(id), quien);
     },
 
@@ -120,7 +135,7 @@ export function crearReglas(almacen: Almacen) {
     async borrar(id: string, quien: Quien): Promise<void> {
       exigirDibujar(quien);
       await existente(id);
-      if (!(await almacen.borrar(id))) throw new ErrorDeProcesos(404, NO_EXISTE);
+      if (!(await almacen.borrar(id, anotacion("proceso.borrado", quien)))) throw new ErrorDeProcesos(404, NO_EXISTE);
     },
 
     /** E10, E21, E41. */
@@ -129,7 +144,11 @@ export function crearReglas(almacen: Almacen) {
       const revision = revisionValida(datos.revision);
       const { pasos } = await bpmnValido(datos.bpmn);
       await existente(id);
-      return siSigueIgual(id, quien, await almacen.guardarBorrador(id, revision, { bpmn: datos.bpmn as string, pasos, autor: quien }));
+      const anotada = anotacionDelBorrador(id, quien);
+      const nueva = await almacen.guardarBorrador(id, revision, { bpmn: datos.bpmn as string, pasos, autor: quien }, anotada);
+      // Si otro guardó antes, no se anotó nada: la media hora no empieza a contar.
+      if (nueva === null && anotada) borradorAnotado.delete(`${quien.id}/${id}`);
+      return siSigueIgual(id, quien, nueva);
     },
 
     /** E24. */
@@ -139,7 +158,7 @@ export function crearReglas(almacen: Almacen) {
       const p = await existente(id);
       if (!p.borrador) throw new ErrorDeProcesos(409, "Este proceso no tiene borrador");
       if (!p.vigente) throw new ErrorDeProcesos(409, "Este proceso no tiene una versión vigente a la que volver: para sacarlo, borralo");
-      return siSigueIgual(id, quien, await almacen.descartarBorrador(id, revision));
+      return siSigueIgual(id, quien, await almacen.descartarBorrador(id, revision, anotacion("proceso.borrador_descartado", quien)));
     },
 
     /** E22. */
@@ -148,7 +167,7 @@ export function crearReglas(almacen: Almacen) {
       const revision = revisionValida(datos.revision);
       const p = await existente(id);
       if (!p.borrador) throw new ErrorDeProcesos(409, "Este proceso no tiene cambios en borrador");
-      return siSigueIgual(id, quien, await almacen.marcarVigente(id, revision));
+      return siSigueIgual(id, quien, await almacen.marcarVigente(id, revision, anotacion("proceso.vigente", quien)));
     },
 
     /** E23: vigente y anteriores, más reciente primero. */

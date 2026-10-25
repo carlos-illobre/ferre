@@ -6,6 +6,27 @@ const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof im
 vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { app } = await import("../app.js");
 
+// Quién es (026, ADR-031): la puerta lo pregunta antes de pasar un pedido a un servicio que no
+// sabe de sesiones, y copia estas cabeceras.
+describe("GET /sesiones/quien", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
+
+  it("026-E02: con sesión, dice quién es y todos sus permisos en cabeceras, sin cuerpo", async () => {
+    const r = await pedir(app, "GET", "/sesiones/quien", { rol: "mostrador" });
+    expect(r.status).toBe(204);
+    expect(r.headers.get("X-Usuario-Id")).toBe(usuarios.mostrador!.id);
+    expect(decodeURIComponent(r.headers.get("X-Usuario-Nombre")!)).toBe(usuarios.mostrador!.nombre);
+    expect(r.headers.get("X-Permisos")!.split(",")).toEqual(usuarios.mostrador!.permisos);
+  });
+
+  it("026-E03: sin sesión, el 401 de siempre, que la puerta le devuelve al navegador", async () => {
+    const r = await pedir(app, "GET", "/sesiones/quien", { rol: null });
+    expect(r.status).toBe(401);
+    expect(await r.json()).toEqual({ error: "Hay que iniciar sesión" });
+    expect(r.headers.get("X-Usuario-Id")).toBeNull();
+  });
+});
+
 // Entrar a la computadora con el celular (RF-76, decisión 57): volvió el 2026-10-12, sin paso
 // de confirmar. La computadora pide un código, el celular lo aprueba y la computadora retira su sesión.
 describe("entrar a la computadora con el celular", () => {

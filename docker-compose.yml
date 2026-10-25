@@ -35,8 +35,33 @@ services:
       # y agota el cupo de Let's Encrypt.
       - caddy-data:/data
     depends_on:
+      puerta:
+        condition: service_healthy
+
+  # La puerta (specs/026, ADR-031): lo único que se publica, en la interfaz local de la máquina,
+  # donde la alcanza el reverse proxy. Reparte por ruta y pregunta quién es la persona.
+  puerta:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/puerta:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build: ./microservices/puerta
+    restart: unless-stopped
+    logging: *logs
+    depends_on:
       comercial:
         condition: service_healthy
+      procesos:
+        condition: service_healthy
+    environment:
+      ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
+      TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
+    ports:
+      # Solo en la interfaz local: desde internet no se llega sin pasar por el reverse proxy.
+      - "127.0.0.1:${PUERTO_API:?falta PUERTO_API en el .env}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/puerta/salud"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
 
   comercial:
     image: ${REGISTRO:?falta REGISTRO en el .env}/comercial:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
@@ -56,15 +81,11 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?falta GOOGLE_CLIENT_ID en el .env}
       # No cambia entre ambientes: el otro servicio siempre vive en la misma red del compose.
       LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
-      # Procesos (ADR-019): el servidor le pasa los pedidos de /procesos por la red interna.
-      PROCESOS_URL: http://procesos:8090
       CARPETA_LISTAS: /app/datos/listas
       # Solo informativa: /health la devuelve para saber qué corre. No cambia el comportamiento.
       VERSION: ${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
       PORT: "8080"
-    ports:
-      # Solo en la interfaz local: desde internet no se llega sin pasar por el reverse proxy.
-      - "127.0.0.1:${PUERTO_API:?falta PUERTO_API en el .env}:8080"
+    # Sin puertos: solo lo alcanza la puerta, por la red interna (026).
     volumes:
       # Archivos originales de las listas cargadas, para reprocesar (issue #12).
       - listas-data:/app/datos/listas
@@ -91,7 +112,7 @@ services:
       start_period: 15s
 
   # Procesos (ADR-019): un módulo aparte que se lleva a otros proyectos. Tiene su propia base en la
-  # misma instancia (ADR-026) y solo lo alcanza comercial por la red interna: no publica puertos.
+  # misma instancia (ADR-026) y solo lo alcanza la puerta por la red interna: no publica puertos.
   procesos:
     image: ${REGISTRO:?falta REGISTRO en el .env}/procesos:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
     build:
@@ -105,6 +126,9 @@ services:
     environment:
       DATABASE_URL: postgres://procesos:${CLAVE_BASE_PROCESOS:?falta CLAVE_BASE_PROCESOS en el .env}@db:5432/procesos
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
+      # Los nombres que Ferrebress les da a los dos permisos de Procesos (026): no cambian entre ambientes.
+      PERMISO_VER: procesos.ver
+      PERMISO_DIBUJAR: procesos.dibujar
       PORT: "8090"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8090/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]

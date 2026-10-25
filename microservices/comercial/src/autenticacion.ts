@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import type { Context, MiddlewareHandler } from "hono";
 import { OAuth2Client } from "google-auth-library";
 import { config } from "./config.js";
@@ -17,6 +18,14 @@ export function tokenDe(c: Context): string | null {
   const cabecera = c.req.header("Authorization") ?? "";
   return cabecera.startsWith("Bearer ") ? cabecera.slice(7) : null;
 }
+
+// Solo atiende a la puerta y a los otros servicios (026, RNF-72): todo pedido trae el token entre
+// servicios, que la puerta agrega y el navegador no conoce.
+const igual = (a: string, b: string) => a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
+export const exigirTokenDeServicio: MiddlewareHandler = async (c, next) => {
+  if (!igual(c.req.header("X-Token-Servicio") ?? "", config.tokenServicio)) return c.json({ error: "Este servicio solo atiende pedidos que pasan por la puerta" }, 401);
+  await next();
+};
 
 export const exigirSesion: MiddlewareHandler = async (c, next) => {
   // Un pedido que el servidor se hace a sí mismo para aceptar lo apartado (ADR-021) trae en su

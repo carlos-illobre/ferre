@@ -28,12 +28,26 @@ describe("GET /health", () => {
 describe("lo que va a cuestas en cada respuesta", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
 
-  it("025-E09: cualquier respuesta, también un error, lleva X-Avisos con la versión y el origen de la aplicación puede leerla", async () => {
+  // Que el navegador la pueda leer (Access-Control-Expose-Headers) lo dice la puerta desde 026:
+  // lo comprueba tests/integration/puerta.sh.
+  it("025-E09: cualquier respuesta, también un error, lleva X-Avisos con la versión", async () => {
     const { config } = await import("./config.js");
     for (const ruta of ["/health", "/no-existe", "/sesiones/actual"]) {
-      const r = await app.request(ruta, { headers: { Origin: config.origenWeb } });
+      const r = await app.request(ruta, { headers: { "X-Token-Servicio": config.tokenServicio } });
       expect(JSON.parse(r.headers.get("X-Avisos")!)).toEqual({ version: config.version });
-      expect(r.headers.get("Access-Control-Expose-Headers")).toContain("X-Avisos");
     }
+  });
+});
+
+// Solo la puerta llega a Comercial (026, ADR-031).
+describe("el token entre servicios", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
+
+  it("026-E07: sin el token entre servicios, rechaza el pedido; la salud, que usa el control del contenedor, no lo pide", async () => {
+    const sin = await app.request("/sesiones/actual", { headers: { Authorization: "Bearer token-dueño" } });
+    expect(sin.status).toBe(401);
+    expect(await sin.json()).toEqual({ error: "Este servicio solo atiende pedidos que pasan por la puerta" });
+    expect((await app.request("/sesiones/actual", { headers: { Authorization: "Bearer token-dueño", "X-Token-Servicio": "otro" } })).status).toBe(401);
+    expect((await app.request("/health")).status).toBe(200);
   });
 });

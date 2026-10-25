@@ -6,7 +6,11 @@ import { TOPE_DE_BPMN } from "./bpmn.js";
 
 // Las rutas solo traducen: leen el pedido, llaman a la regla y eligen el código. Quien llama lo
 // dice la aplicación que usa el módulo, con el token entre servicios (ADR-019): el navegador
-// nunca habla directo con este servicio.
+// nunca habla directo con este servicio. Los permisos llegan con los nombres de esa aplicación
+// (X-Permisos); su configuración dice cuál es «ver» y cuál «dibujar» (026, ADR-031).
+
+/** Los nombres que la aplicación les da a los dos permisos de Procesos. */
+export type NombresDePermisos = { ver: string; dibujar: string };
 
 type Variables = { quien: Quien };
 
@@ -16,7 +20,7 @@ const igual = (a: string, b: string) => {
   return x.length === y.length && timingSafeEqual(x, y);
 };
 
-function quienLlama(c: Context): Quien | null {
+function quienLlama(c: Context, permisos: NombresDePermisos): Quien | null {
   const id = c.req.header("X-Usuario-Id")?.trim();
   if (!id) return null;
   let nombre = id;
@@ -25,19 +29,19 @@ function quienLlama(c: Context): Quien | null {
   } catch {
     return null;
   }
-  const puede = new Set((c.req.header("X-Puede") ?? "").split(",").map((p) => p.trim()));
-  const dibujar = puede.has("dibujar");
-  return { id, nombre, puede: { dibujar, ver: dibujar || puede.has("ver") } };
+  const tiene = new Set((c.req.header("X-Permisos") ?? "").split(",").map((p) => p.trim()));
+  const dibujar = tiene.has(permisos.dibujar);
+  return { id, nombre, puede: { dibujar, ver: dibujar || tiene.has(permisos.ver) } };
 }
 
-export function crearApp({ reglas, token }: { reglas: Reglas; token: string }) {
+export function crearApp({ reglas, token, permisos }: { reglas: Reglas; token: string; permisos: NombresDePermisos }) {
   const app = new Hono<{ Variables: Variables }>();
 
   app.get("/health", (c) => c.json({ ok: true }));
 
   const acceso = async (c: Context<{ Variables: Variables }>, next: () => Promise<void>) => {
     if (!igual(c.req.header("X-Token-Servicio") ?? "", token)) return c.json({ error: "Este servicio solo atiende a la aplicación que lo usa" }, 401);
-    const quien = quienLlama(c);
+    const quien = quienLlama(c, permisos);
     if (!quien) return c.json({ error: "Falta quién hace el pedido" }, 401);
     if (!quien.puede.ver) return c.json({ error: "No tenés permiso para esto. Hace falta: Ver procesos o Dibujar procesos" }, 403);
     c.set("quien", quien);

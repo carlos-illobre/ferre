@@ -2,5 +2,5 @@
 # Oracle no se usa: ahí el reverse proxy lo administra la máquina para todas sus apps.
 {$SITIO} {
     encode gzip
-    reverse_proxy comercial:8080
+    reverse_proxy puerta:8080
 }

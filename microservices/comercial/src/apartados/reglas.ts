@@ -1,3 +1,4 @@
+import { config } from "../config.js";
 import { base } from "../persistencia/conexion.js";
 import { enTransaccion } from "../persistencia/transaccion.js";
 import { anotarEvento } from "../persistencia/eventos.js";
@@ -77,7 +78,7 @@ async function repetir(cambio: { metodo: string; ruta: string; cuerpo: unknown }
   const { app } = await import("../app.js");
   const respuesta = await app.request(cambio.ruta, {
     method: cambio.metodo,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-Token-Servicio": config.tokenServicio },
     body: cambio.metodo === "DELETE" || cambio.cuerpo === null ? undefined : JSON.stringify(cambio.cuerpo),
   }, { sesionInterna: sesion });
   if (respuesta.ok) return null;

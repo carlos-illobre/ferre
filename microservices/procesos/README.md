@@ -15,7 +15,8 @@ llevarlo a otro proyecto: no usa nada de Ferrebress. Por qué está armado así:
 
 ### Al servicio
 
-- **Variables:** `DATABASE_URL` (Postgres 13 o más nuevo), `TOKEN_SERVICIO` y `PORT`. Al
+- **Variables:** `DATABASE_URL` (Postgres 13 o más nuevo), `TOKEN_SERVICIO`, `PORT`, y los
+  nombres que la aplicación les da a sus dos permisos: `PERMISO_VER` y `PERMISO_DIBUJAR`. Al
   arrancar crea el esquema `procesos` y aplica sus migraciones (`servidor/migraciones/`),
   con su propia tabla de registro (`procesos.migracion`). No toca nada fuera de ese esquema.
 - **Quién llama.** El servicio no tiene sesiones: confía en la aplicación, que tiene que
@@ -26,11 +27,15 @@ llevarlo a otro proyecto: no usa nada de Ferrebress. Por qué está armado así:
 | `X-Token-Servicio` | El mismo `TOKEN_SERVICIO`. Sin él, 401 |
 | `X-Usuario-Id` | El identificador de quien llama |
 | `X-Usuario-Nombre` | Su nombre, con `encodeURIComponent` |
-| `X-Puede` | `ver`, `dibujar` o `ver,dibujar`. `dibujar` incluye ver |
+| `X-Permisos` | Los permisos de quien llama, separados por coma, con los nombres de la aplicación. Puede ver si tiene `PERMISO_VER` o `PERMISO_DIBUJAR`; dibujar, si tiene `PERMISO_DIBUJAR` |
 
-  El servicio no se publica: solo lo alcanza la aplicación, por la red interna.
-  En Ferrebress lo hace `microservices/comercial/src/rutas/procesos.ts`, que además anota cada
-  cambio en su registro de eventos.
+  El servicio no se publica: solo lo alcanza la aplicación, por la red interna. En Ferrebress
+  lo hace la puerta (`microservices/puerta`, ADR-031): le pregunta a la aplicación quién es la
+  persona y le pasa estas cabeceras.
+- **Lo que se hizo.** El servicio anota cada cambio que sale bien (crear, importar, renombrar,
+  borrar, marcar vigente, descartar el borrador, y el borrador el primer guardado de cada
+  persona y uno cada media hora) en `procesos.evento`, con quién lo hizo, en la misma
+  transacción que el cambio.
 
 ### A las pantallas
 

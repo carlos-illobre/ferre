@@ -1,5 +1,5 @@
 import { sql, type Transaction } from "kysely";
-import type { Almacen, FilaDeVersion, NuevaVersion, ProcesoGuardado } from "../almacen.js";
+import type { Almacen, Anotacion, FilaDeVersion, NuevaVersion, ProcesoGuardado } from "../almacen.js";
 import type { Base } from "./conexion.js";
 import type { DB } from "./tablas.js";
 
@@ -36,40 +36,57 @@ function agrupar(filas: Fila[]): ProcesoGuardado[] {
 type Trx = Transaction<DB>;
 const cambio = (r: { numAffectedRows?: bigint }) => Number(r.numAffectedRows) > 0;
 
-// Sube la revisión si sigue siendo la esperada; null si otro cambió antes.
+// Sube la revisión si sigue siendo la esperada (y dice el nombre, para anotar); null si otro cambió antes.
 const subir = (trx: Trx, id: string, revision: number) =>
-  sql<{ revision: number }>`UPDATE procesos.proceso SET revision = revision + 1, actualizado_en = now() WHERE id = ${id} AND revision = ${revision} RETURNING revision`
-    .execute(trx).then((r) => r.rows[0]?.revision ?? null);
+  sql<{ revision: number; nombre: string }>`UPDATE procesos.proceso SET revision = revision + 1, actualizado_en = now() WHERE id = ${id} AND revision = ${revision} RETURNING revision, nombre`
+    .execute(trx).then((r) => r.rows[0] ?? null);
+
+// Lo que se hizo, con quién (026-E10), en la transacción del cambio. Sin anotación, nada.
+const anotar = async (trx: Trx, anotacion: Anotacion | undefined, proceso: { id: string; nombre: string }) => {
+  if (anotacion) await sql`INSERT INTO procesos.evento (tipo, usuario_id, usuario_nombre, contenido) VALUES (${anotacion.tipo}, ${anotacion.autor.id}, ${anotacion.autor.nombre}, ${JSON.stringify(proceso)})`.execute(trx);
+};
 
 const insertarVersion = (trx: Trx, id: string, estado: string, v: NuevaVersion) =>
   sql`INSERT INTO procesos.version (proceso_id, estado, bpmn, pasos, hecha_por_id, hecha_por) VALUES (${id}, ${estado}, ${v.bpmn}, ${v.pasos}, ${v.autor.id}, ${v.autor.nombre})`.execute(trx);
 
 export function almacenEnPostgres(base: Base): Almacen {
-  // Si la revisión es la esperada, la sube y hace el cambio, todo junto; si no, null.
-  const conRevision = (id: string, revision: number, hacer: (trx: Trx) => Promise<unknown>) =>
+  // Si la revisión es la esperada, la sube, hace el cambio y lo anota, todo junto; si no, null.
+  const conRevision = (id: string, revision: number, anotacion: Anotacion | undefined, hacer: (trx: Trx) => Promise<unknown>) =>
     base.transaction().execute(async (trx) => {
-      const nueva = await subir(trx, id, revision);
-      if (nueva !== null) await hacer(trx);
-      return nueva;
+      const subido = await subir(trx, id, revision);
+      if (!subido) return null;
+      await hacer(trx);
+      await anotar(trx, anotacion, { id, nombre: subido.nombre });
+      return subido.revision;
     });
 
   return {
     listar: async () => agrupar((await sql<Fila>`${SELECCION}`.execute(base)).rows),
     leer: async (id) => agrupar((await sql<Fila>`${SELECCION} WHERE p.id = ${id}`.execute(base)).rows)[0] ?? null,
     conNombre: (nombre) => sql<{ id: string }>`SELECT id FROM procesos.proceso WHERE lower(nombre) = lower(${nombre})`.execute(base).then((r) => r.rows[0]?.id ?? null),
-    crear: (nombre, borrador) => base.transaction().execute(async (trx) => {
+    crear: (nombre, borrador, anotacion) => base.transaction().execute(async (trx) => {
       const { rows } = await sql<{ id: string }>`INSERT INTO procesos.proceso (nombre) VALUES (${nombre}) RETURNING id`.execute(trx);
       await insertarVersion(trx, rows[0]!.id, "borrador", borrador);
+      await anotar(trx, anotacion, { id: rows[0]!.id, nombre });
       return rows[0]!.id;
     }),
-    renombrar: (id, nombre) => sql`UPDATE procesos.proceso SET nombre = ${nombre}, actualizado_en = now() WHERE id = ${id}`.execute(base).then(cambio),
-    borrar: (id) => sql`DELETE FROM procesos.proceso WHERE id = ${id}`.execute(base).then(cambio),
-    guardarBorrador: (id, revision, v) => conRevision(id, revision, async (trx) => {
+    renombrar: (id, nombre, anotacion) => base.transaction().execute(async (trx) => {
+      if (!cambio(await sql`UPDATE procesos.proceso SET nombre = ${nombre}, actualizado_en = now() WHERE id = ${id}`.execute(trx))) return false;
+      await anotar(trx, anotacion, { id, nombre });
+      return true;
+    }),
+    borrar: (id, anotacion) => base.transaction().execute(async (trx) => {
+      const { rows } = await sql<{ nombre: string }>`DELETE FROM procesos.proceso WHERE id = ${id} RETURNING nombre`.execute(trx);
+      if (!rows[0]) return false;
+      await anotar(trx, anotacion, { id, nombre: rows[0].nombre });
+      return true;
+    }),
+    guardarBorrador: (id, revision, v, anotacion) => conRevision(id, revision, anotacion, async (trx) => {
       const r = await sql`UPDATE procesos.version SET bpmn = ${v.bpmn}, pasos = ${v.pasos}, hecha_por_id = ${v.autor.id}, hecha_por = ${v.autor.nombre}, actualizada_en = now() WHERE proceso_id = ${id} AND estado = 'borrador'`.execute(trx);
       if (!cambio(r)) await insertarVersion(trx, id, "borrador", v);
     }),
-    descartarBorrador: (id, revision) => conRevision(id, revision, (trx) => sql`DELETE FROM procesos.version WHERE proceso_id = ${id} AND estado = 'borrador'`.execute(trx)),
-    marcarVigente: (id, revision) => conRevision(id, revision, async (trx) => {
+    descartarBorrador: (id, revision, anotacion) => conRevision(id, revision, anotacion, (trx) => sql`DELETE FROM procesos.version WHERE proceso_id = ${id} AND estado = 'borrador'`.execute(trx)),
+    marcarVigente: (id, revision, anotacion) => conRevision(id, revision, anotacion, async (trx) => {
       await sql`UPDATE procesos.version SET estado = 'anterior' WHERE proceso_id = ${id} AND estado = 'vigente'`.execute(trx);
       await sql`UPDATE procesos.version SET estado = 'vigente', actualizada_en = now() WHERE proceso_id = ${id} AND estado = 'borrador'`.execute(trx);
     }),

@@ -13,7 +13,7 @@ export const VENTA = readFileSync(path.resolve(__dirname, "../modelo/ejemplos/ve
 const TOKEN = "token-de-prueba";
 
 export function servicio() {
-  const app = crearApp({ reglas: crearReglas(almacenEnMemoria()), token: TOKEN });
+  const app = crearApp({ reglas: crearReglas(almacenEnMemoria()), token: TOKEN, permisos: { ver: "procesos.ver", dibujar: "procesos.dibujar" } });
   let sinConexion = false;
   const pedidos: string[] = [];
   const como = (puede: Puede): Pedir => async (ruta, init = {}) => {
@@ -21,7 +21,7 @@ export function servicio() {
     if (sinConexion) throw Object.assign(new Error("Sin conexión"), { estado: 0 });
     const r = await app.request(ruta, {
       ...init,
-      headers: { "Content-Type": "application/json", "X-Token-Servicio": TOKEN, "X-Usuario-Id": "u1", "X-Usuario-Nombre": "Carlos", "X-Puede": [puede.ver && "ver", puede.dibujar && "dibujar"].filter(Boolean).join(",") },
+      headers: { "Content-Type": "application/json", "X-Token-Servicio": TOKEN, "X-Usuario-Id": "u1", "X-Usuario-Nombre": "Carlos", "X-Permisos": [puede.ver && "procesos.ver", puede.dibujar && "procesos.dibujar"].filter(Boolean).join(",") },
     });
     const datos = r.status === 204 ? undefined : await r.json();
     if (!r.ok) throw Object.assign(new Error((datos as { error: string }).error), { estado: r.status, datos });

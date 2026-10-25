@@ -4,10 +4,13 @@ import { crearReglas } from "./reglas.js";
 import { almacenEnMemoria } from "./memoria.js";
 
 const TOKEN = "token-de-prueba";
-const app = () => crearApp({ reglas: crearReglas(almacenEnMemoria()), token: TOKEN });
+const PERMISOS = { ver: "procesos.ver", dibujar: "procesos.dibujar" };
+const app = () => crearApp({ reglas: crearReglas(almacenEnMemoria()), token: TOKEN, permisos: PERMISOS });
+// «ver», «dibujar» o los dos, con los nombres de la aplicación que lo usa.
+const permisos = (puede: string) => puede.split(",").filter(Boolean).map((p) => PERMISOS[p.trim() as keyof typeof PERMISOS] ?? p).join(",");
 
 function cabeceras(puede: string, extra: Record<string, string> = {}) {
-  return { "X-Token-Servicio": TOKEN, "X-Usuario-Id": "u1", "X-Usuario-Nombre": encodeURIComponent("José Núñez"), "X-Puede": puede, "Content-Type": "application/json", ...extra };
+  return { "X-Token-Servicio": TOKEN, "X-Usuario-Id": "u1", "X-Usuario-Nombre": encodeURIComponent("José Núñez"), "X-Permisos": permisos(puede), "Content-Type": "application/json", ...extra };
 }
 
 describe("quién llama", () => {
@@ -15,7 +18,7 @@ describe("quién llama", () => {
     const a = app();
     expect((await a.request("/procesos")).status).toBe(401);
     expect((await a.request("/procesos", { headers: { ...cabeceras("dibujar"), "X-Token-Servicio": "otro" } })).status).toBe(401);
-    expect((await a.request("/procesos", { headers: { "X-Token-Servicio": TOKEN, "X-Puede": "dibujar" } })).status).toBe(401);
+    expect((await a.request("/procesos", { headers: { "X-Token-Servicio": TOKEN, "X-Permisos": "procesos.dibujar" } })).status).toBe(401);
   });
 
   it("011-E37 011-E39 sin ver ni dibujar no se puede ni leer la lista", async () => {

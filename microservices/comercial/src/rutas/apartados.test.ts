@@ -16,7 +16,7 @@ const cambio = (o: Partial<{ orden: number; tipo: string; metodo: string; ruta: 
   ({ orden: 1_760_000_000_000_000, creado_en: "2026-10-17T08:47:00.000Z", tipo: "venta", metodo: "POST", ruta: "/ventas", cuerpo: VENTA, ...o });
 
 function subir(cuerpo: unknown, token: string | null = "token-de-ana") {
-  const cabeceras = new Headers({ "Content-Type": "application/json" });
+  const cabeceras = new Headers({ "Content-Type": "application/json", "X-Token-Servicio": process.env.TOKEN_SERVICIO! });
   if (token) cabeceras.set("Authorization", `Bearer ${token}`);
   return app.request(new Request("http://api.prueba/apartados", { method: "POST", headers: cabeceras, body: JSON.stringify(cuerpo) }));
 }
@@ -56,7 +56,7 @@ describe("POST /apartados: el dispositivo sube lo que quedó sin mandar", () => 
 
   it("014-E14: con la sesión cerrada no se puede hacer nada más", async () => {
     sesionDeAna(false);
-    const cabeceras = new Headers({ Authorization: "Bearer token-de-ana", "Content-Type": "application/json" });
+    const cabeceras = new Headers({ Authorization: "Bearer token-de-ana", "Content-Type": "application/json", "X-Token-Servicio": process.env.TOKEN_SERVICIO! });
     const r = await app.request(new Request("http://api.prueba/ventas", { method: "POST", headers: cabeceras, body: JSON.stringify(VENTA) }));
     expect(r.status).toBe(401);
   });

@@ -1272,10 +1272,10 @@ RF-94:
     - "Un BPMN de casi 5 MB puede pasar el tope al ir dentro del JSON y decir que pesa más de 5 MB #119"
 
 RF-95:
-  estado: "Hecho (011-T004): «Ver procesos» y «Dibujar procesos», controlados en Ferrebress y en el servicio; los dos en el rol Gerente"
+  estado: "Hecho (011-T004, 026): «Ver procesos» y «Dibujar procesos», controlados en el servicio con los permisos que le pasa la puerta; los dos en el rol Gerente"
   pruebas:
     - microservices/procesos/servidor/src/rutas.test.ts
-    - microservices/comercial/src/rutas/procesos.test.ts
+    - tests/integration/puerta.sh
     - microservices/comercial/src/rutas/roles.test.ts
     - microservices/web/src/pantallas/Procesos.test.tsx
     - tests/e2e/escritorio/18-procesos.spec.ts
@@ -1720,31 +1720,38 @@ RNF-71:
   defectos: []
 
 RF-146:
-  estado: "Nuevo (027): especificación en borrador"
+  estado: "Nuevo (027): especificación aprobada"
   pruebas: []
   defectos: []
 
 RNF-72:
-  estado: "Nuevo (026): especificación en borrador"
-  pruebas: []
+  estado: "Hecho (026): la puerta (Caddy) reparte por ruta, pregunta quién es la persona a Comercial, borra las cabeceras de identidad del navegador, atiende el CORS y es lo único que se publica; Comercial y Procesos exigen el token entre servicios"
+  pruebas:
+    - tests/integration/puerta.sh
+    - microservices/comercial/src/rutas/sesiones.test.ts
+    - microservices/comercial/src/salud.test.ts
+    - microservices/procesos/servidor/src/rutas.test.ts
+    - microservices/procesos/servidor/src/reglas.test.ts
+    - microservices/procesos/servidor/src/persistencia/procesos.test.ts
   defectos: []
 
 RNF-73:
-  estado: "Nuevo (026): especificación en borrador"
-  pruebas: []
+  estado: "Hecho (026): el servidor del mostrador se llama comercial en la carpeta, el paquete, el servicio, la imagen y la documentación; la base sigue siendo mostrador"
+  pruebas:
+    - tests/integration/reordenamiento.sh
   defectos: []
 
 RNF-74:
-  estado: "Nuevo (027): especificación en borrador"
+  estado: "Nuevo (027): especificación aprobada"
   pruebas: []
   defectos: []
 
 RNF-75:
-  estado: "Nuevo (028): especificación en borrador"
+  estado: "Nuevo (028): especificación aprobada"
   pruebas: []
   defectos: []
 
 RNF-76:
-  estado: "Nuevo (029): especificación en borrador"
+  estado: "Nuevo (029): especificación aprobada"
   pruebas: []
   defectos: []

@@ -14,6 +14,16 @@ export function responder(c: Context, r: reglas.Resultado) {
   return r.cuerpo !== undefined ? c.json(r.cuerpo, r.estado ?? 200) : c.body(null, 204);
 }
 
+// Quién es: la puerta lo pregunta antes de pasar un pedido a un servicio que no sabe de sesiones
+// (026, ADR-031) y le copia estas cabeceras. Sin sesión, el 401 de siempre, que la puerta devuelve.
+sesiones.get("/quien", exigirSesion, (c) => {
+  const { usuario } = c.get("sesion");
+  c.header("X-Usuario-Id", usuario.id);
+  c.header("X-Usuario-Nombre", encodeURIComponent(usuario.nombre));
+  c.header("X-Permisos", usuario.permisos.join(","));
+  return c.body(null, 204);
+});
+
 sesiones.get("/google/cliente", (c) => c.json({ clienteId: clienteDeGoogle() } satisfies ClienteDeGoogle));
 
 sesiones.post("/google", limitarIntentos(10), async (c) => {

@@ -14,8 +14,6 @@ export const config = {
   databaseUrl: obligatoria("DATABASE_URL"),
   tokenServicio: obligatoria("TOKEN_SERVICIO"),
   listasDeProveedoresUrl: obligatoria("LISTAS_DE_PROVEEDORES_URL"),
-  // El servicio de Procesos (ADR-019), en la red interna: el servidor le pasa los pedidos de /procesos.
-  procesosUrl: obligatoria("PROCESOS_URL"),
   // Origen del cliente web (GitHub Pages en producción). Es el único al que la API le
   // responde desde el navegador (CORS).
   origenWeb: obligatoria("ORIGEN_WEB"),

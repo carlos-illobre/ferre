@@ -127,7 +127,8 @@ las aplicaciones. Ferre necesita de él exactamente esto:
 
 1. Ferre publica cada API **solo en la interfaz local** de la máquina, nunca hacia
    internet: producción en `127.0.0.1:8081` y pruebas en `127.0.0.1:8082` (`PUERTO_API`
-   en el `.env` de cada ambiente; si hay que cambiarlos, avisar al proxy).
+   en el `.env` de cada ambiente; si hay que cambiarlos, avisar al proxy). Lo que se publica
+   ahí es la puerta del servidor, que reparte cada pedido a su servicio (ADR-031).
 2. El proxy enruta por nombre de dominio hacia esos puertos, con HTTPS y certificado
    válido, porque el cliente web está en otro origen y el navegador no acepta una API
    sin TLS:

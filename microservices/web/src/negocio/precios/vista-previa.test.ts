@@ -80,7 +80,7 @@ describe("la vista previa y el servidor", () => {
   // Las pruebas corren desde la carpeta del front.
   it("hacen exactamente la misma cuenta", () => {
     const cuenta = (texto: string) => texto.split("\n").filter((l) => !l.trim().startsWith("//")).join("\n").trim();
-    const delServidor = readFileSync(resolve(process.cwd(), "../api/src/precios.ts"), "utf8");
+    const delServidor = readFileSync(resolve(process.cwd(), "../comercial/src/precios.ts"), "utf8");
     const deAca = readFileSync(resolve(process.cwd(), "src/negocio/precios/vista-previa.ts"), "utf8");
     expect(cuenta(deAca)).toBe(cuenta(delServidor));
   });

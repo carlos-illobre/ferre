@@ -1,0 +1,73 @@
+# La puerta del servidor (specs/026, ADR-031): lo único que se publica. Reparte cada pedido al
+# servicio que lo atiende según su ruta; a los que no saben de sesiones les pregunta antes quién
+# es la persona. No tiene reglas del negocio ni datos: sumar un servicio es sumar su ruta acá.
+{
+	admin off
+	auto_https off
+	servers {
+		# Adelante está el reverse proxy de la máquina (o el de desarrollo): su X-Forwarded-For
+		# dice quién llama, y Comercial lo usa para limitar los intentos de entrar.
+		trusted_proxies static private_ranges
+	}
+}
+
+:8080 {
+	# Quién es la persona lo dice solo la puerta: lo que mande el navegador con estos nombres
+	# se borra antes de cualquier otra cosa.
+	request_header -X-Usuario-Id
+	request_header -X-Usuario-Nombre
+	request_header -X-Permisos
+	request_header -X-Token-Servicio
+
+	# La aplicación vive en otro origen (ADR-010): solo ese origen puede llamar desde el
+	# navegador, y puede leer lo que va a cuestas en cada respuesta (X-Avisos, decisión 157).
+	header Access-Control-Allow-Origin {$ORIGEN_WEB}
+	header Access-Control-Expose-Headers X-Avisos
+	header Vary Origin
+	@consultaPrevia {
+		method OPTIONS
+		header Access-Control-Request-Method *
+	}
+	handle @consultaPrevia {
+		header Access-Control-Allow-Methods "GET, HEAD, PUT, POST, DELETE, PATCH"
+		header Access-Control-Allow-Headers "Authorization, Content-Type, X-Temas, X-Canal"
+		respond 204
+	}
+
+	# La salud de la puerta misma, para el control del contenedor.
+	handle /puerta/salud {
+		respond "ok" 200
+	}
+
+	# Procesos (ADR-019) no sabe de sesiones: la puerta pregunta quién es y qué puede.
+	handle /procesos* {
+		forward_auth comercial:8080 {
+			uri /sesiones/quien
+			header_up X-Token-Servicio {$TOKEN_SERVICIO}
+			copy_headers X-Usuario-Id X-Usuario-Nombre X-Permisos
+		}
+		request_body {
+			max_size 6MB
+		}
+		reverse_proxy procesos:8090 {
+			header_up X-Token-Servicio {$TOKEN_SERVICIO}
+		}
+	}
+
+	# Un servicio que no responde: se dice con palabras, como cualquier otro error (026-E08).
+	handle_errors 502 503 504 {
+		header Access-Control-Allow-Origin {$ORIGEN_WEB}
+		header Access-Control-Expose-Headers X-Avisos
+		header Content-Type application/json
+		respond `{"error":"Esa parte del sistema no responde ahora. Probá de nuevo en un rato"}` {err.status_code}
+	}
+
+	# Lo demás es de Comercial, que sabe de sesiones. Lo que queda abierto (el canal de avisos)
+	# se manda en el momento, sin juntarlo.
+	handle {
+		reverse_proxy comercial:8080 {
+			header_up X-Token-Servicio {$TOKEN_SERVICIO}
+			flush_interval -1
+		}
+	}
+}

@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { beforeAll, describe, expect, it } from "vitest";
 import { migrar } from "./migrar.js";
 import { almacenEnPostgres } from "./procesos.js";
@@ -49,5 +50,28 @@ describe("los procesos en Postgres", () => {
     expect(await almacen.borrar(id)).toBe(true);
     expect(await almacen.borrar(id)).toBe(false);
     expect(await almacen.historial(id)).toEqual([]);
+  });
+
+  it("026-E10 026-E12: cada cambio anota su evento en la misma transacción, con el proceso; sin anotación o si no cambió, nada", async () => {
+    const anota = (tipo: string) => ({ tipo, autor });
+    const eventos = async (id: string) => (await base.selectFrom("procesos.evento").select(["tipo", "usuario_id", "usuario_nombre", "contenido"]).where(sql`contenido->>'id'`, "=", id).orderBy("fecha").execute());
+    const id = await almacen.crear("Cobro", version(1), anota("proceso.creado"));
+    expect(await almacen.renombrar(id, "Cobro en caja", anota("proceso.renombrado"))).toBe(true);
+    expect(await almacen.guardarBorrador(id, 1, version(2), anota("proceso.borrador_cambiado"))).toBe(2);
+    expect(await almacen.guardarBorrador(id, 1, version(3), anota("proceso.borrador_cambiado"))).toBeNull();
+    expect(await almacen.marcarVigente(id, 2, anota("proceso.vigente"))).toBe(3);
+    expect(await almacen.guardarBorrador(id, 3, version(4))).toBe(4);
+    expect(await almacen.descartarBorrador(id, 4, anota("proceso.borrador_descartado"))).toBe(5);
+    expect(await almacen.borrar(id, anota("proceso.borrado"))).toBe(true);
+    expect(await almacen.borrar(id, anota("proceso.borrado"))).toBe(false);
+    expect(await almacen.renombrar(id, "Otro", anota("proceso.renombrado"))).toBe(false);
+    expect(await eventos(id)).toEqual([
+      { tipo: "proceso.creado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro" } },
+      { tipo: "proceso.renombrado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.borrador_cambiado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.vigente", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.borrador_descartado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
+      { tipo: "proceso.borrado", usuario_id: "u1", usuario_nombre: "Carlos", contenido: { id, nombre: "Cobro en caja" } },
+    ]);
   });
 });

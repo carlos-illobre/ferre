@@ -21,21 +21,26 @@ export type ProcesoGuardado = FilaDeProceso & { vigente: FilaDeVersion | null; b
 
 export type NuevaVersion = { bpmn: string; pasos: number; autor: Autor };
 
+/** Lo que se anota de un cambio (specs/026): el tipo y quién; el almacén le agrega el proceso. */
+export type Anotacion = { tipo: string; autor: Autor };
+
 export interface Almacen {
   listar(): Promise<ProcesoGuardado[]>;
   leer(id: string): Promise<ProcesoGuardado | null>;
   /** El identificador del proceso con ese nombre, sin importar mayúsculas. */
   conNombre(nombre: string): Promise<string | null>;
-  crear(nombre: string, borrador: NuevaVersion): Promise<string>;
-  renombrar(id: string, nombre: string): Promise<boolean>;
-  borrar(id: string): Promise<boolean>;
+  // Cada cambio recibe, si se anota, qué anotar: se escribe en la misma transacción que el cambio
+  // y solo si el cambio se hizo, con el identificador y el nombre del proceso.
+  crear(nombre: string, borrador: NuevaVersion, anotacion?: Anotacion): Promise<string>;
+  renombrar(id: string, nombre: string, anotacion?: Anotacion): Promise<boolean>;
+  borrar(id: string, anotacion?: Anotacion): Promise<boolean>;
   /**
    * Cambia el borrador (o lo crea) solo si el proceso sigue en `revision`; si no, no hace nada
    * y devuelve null. Lo mismo para descartar y marcar vigente: todo cambio sube la revisión.
    */
-  guardarBorrador(id: string, revision: number, version: NuevaVersion): Promise<number | null>;
-  descartarBorrador(id: string, revision: number): Promise<number | null>;
+  guardarBorrador(id: string, revision: number, version: NuevaVersion, anotacion?: Anotacion): Promise<number | null>;
+  descartarBorrador(id: string, revision: number, anotacion?: Anotacion): Promise<number | null>;
   /** El borrador pasa a vigente y el vigente, a anterior. */
-  marcarVigente(id: string, revision: number): Promise<number | null>;
+  marcarVigente(id: string, revision: number, anotacion?: Anotacion): Promise<number | null>;
   historial(id: string): Promise<FilaDeVersion[]>;
 }

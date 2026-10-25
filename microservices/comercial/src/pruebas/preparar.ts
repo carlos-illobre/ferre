@@ -7,7 +7,6 @@ process.env.PORT ??= "0";
 process.env.DATABASE_URL ??= "postgres://prueba";
 process.env.TOKEN_SERVICIO ??= "token-servicio";
 process.env.LISTAS_DE_PROVEEDORES_URL ??= "http://listas.prueba";
-process.env.PROCESOS_URL ??= "http://procesos.prueba";
 process.env.ORIGEN_WEB ??= "http://web.prueba";
 process.env.GOOGLE_CLIENT_ID ??= "cliente-google";
 process.env.VERSION ??= "prueba";

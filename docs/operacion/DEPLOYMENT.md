@@ -33,7 +33,9 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   ([ADR-013](../adr/ADR-013-despliegue-por-aviso-y-gateway-compartido.md)). Pasar a
   producción: `git push origin master:produccion`.
 - Máquina Always Free (Ampere, arm64): dos proyectos de compose, uno por ambiente, con `db`,
-  `comercial`, `listas-de-proveedores` y `procesos`. Cada ambiente corre con su propio
+  `puerta`, `comercial`, `listas-de-proveedores` y `procesos`. La puerta es lo único que se
+  publica: reparte cada pedido al servicio que lo atiende y le pregunta a Comercial quién es la
+  persona (ADR-031). Cada ambiente corre con su propio
   usuario y su propio Docker rootless (`ferre-produccion` y `ferre-pruebas`, decisión 161), para
   que un error en uno no pueda tocar el otro. Publicados solo en `127.0.0.1` (8081 y 8082), detrás del
   reverse proxy de la máquina, que no es parte de este proyecto (contrato en la guía).

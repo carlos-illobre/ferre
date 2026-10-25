@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { crearReglas, ErrorDeProcesos, type Quien } from "./reglas.js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { ANOTAR_BORRADOR_CADA_MS, crearReglas, ErrorDeProcesos, type Quien } from "./reglas.js";
 import { almacenEnMemoria } from "./memoria.js";
 import { bpmnInicial } from "./bpmn.js";
 
@@ -203,5 +203,56 @@ describe("dos personas a la vez", () => {
     expect(error.proceso?.borrador?.pasos).toBe(3);
     expect(error.proceso?.borrador?.hechaPor).toBe("Carlos");
     await falla(r.guardarBorrador(p.id, { bpmn: conPasos(7) }, otro), 400, /sobre qué versión/);
+  });
+});
+
+// Lo que se hace en Procesos lo anota Procesos (specs/026): antes lo anotaba la aplicación al
+// pasarle el pedido.
+describe("lo que se anota", () => {
+  afterEach(() => { vi.useRealTimers(); });
+  const conAlmacen = () => { const almacen = almacenEnMemoria(); return { almacen, r: crearReglas(almacen) }; };
+  const tipos = (almacen: ReturnType<typeof almacenEnMemoria>) => almacen.eventos.map((e) => e.tipo);
+
+  it("026-E10: crear, importar, renombrar, marcar vigente, descartar el borrador y borrar se anotan con quién y el proceso", async () => {
+    const { almacen, r } = conAlmacen();
+    const p = await r.crear({ nombre: "Venta" }, dibuja);
+    const importado = await r.crear({ nombre: "Compra", bpmn: conPasos(2) }, dibuja);
+    await r.renombrar(p.id, "Venta en el mostrador", otro);
+    const v = await r.marcarVigente(p.id, { revision: p.revision }, dibuja);
+    const b = await r.guardarBorrador(p.id, { bpmn: conPasos(3), revision: v.revision }, dibuja);
+    await r.descartarBorrador(p.id, { revision: b.revision }, dibuja);
+    await r.borrar(importado.id, otro);
+    expect(tipos(almacen)).toEqual(["proceso.creado", "proceso.importado", "proceso.renombrado", "proceso.vigente", "proceso.borrador_cambiado", "proceso.borrador_descartado", "proceso.borrado"]);
+    expect(almacen.eventos[2]).toEqual({ tipo: "proceso.renombrado", usuario: { id: "u2", nombre: "Ana" }, proceso: { id: p.id, nombre: "Venta en el mostrador" } });
+    expect(almacen.eventos.at(-1)).toEqual({ tipo: "proceso.borrado", usuario: { id: "u2", nombre: "Ana" }, proceso: { id: importado.id, nombre: "Compra" } });
+  });
+
+  it("026-E11: el borrador se anota la primera vez y, si sigue, uno cada media hora, por persona y proceso", async () => {
+    vi.useFakeTimers();
+    const { almacen, r } = conAlmacen();
+    const p = await r.crear({ nombre: "Venta" }, dibuja);
+    let rev = p.revision;
+    const guardar = async (quien: Quien) => { rev = (await r.guardarBorrador(p.id, { bpmn: conPasos(2), revision: rev }, quien)).revision; };
+    await guardar(dibuja);
+    await guardar(dibuja);
+    await guardar(otro);
+    vi.advanceTimersByTime(ANOTAR_BORRADOR_CADA_MS - 1);
+    await guardar(dibuja);
+    vi.advanceTimersByTime(1);
+    await guardar(dibuja);
+    expect(almacen.eventos.filter((e) => e.tipo === "proceso.borrador_cambiado").map((e) => e.usuario.nombre)).toEqual(["Carlos", "Ana", "Carlos"]);
+  });
+
+  it("026-E12: lo que no sale bien no se anota, y un guardado que perdió con otro no cuenta para la media hora", async () => {
+    const { almacen, r } = conAlmacen();
+    const p = await r.crear({ nombre: "Venta" }, dibuja);
+    await falla(r.crear({ nombre: "Venta" }, dibuja), 409);
+    await falla(r.renombrar(p.id, "", dibuja), 400);
+    await falla(r.borrar("no-existe", dibuja), 404);
+    await falla(r.crear({ nombre: "Otra" }, mira), 403);
+    await falla(r.guardarBorrador(p.id, { bpmn: conPasos(2), revision: p.revision + 5 }, dibuja), 409);
+    expect(tipos(almacen)).toEqual(["proceso.creado"]);
+    await r.guardarBorrador(p.id, { bpmn: conPasos(2), revision: p.revision }, dibuja);
+    expect(tipos(almacen)).toEqual(["proceso.creado", "proceso.borrador_cambiado"]);
   });
 });

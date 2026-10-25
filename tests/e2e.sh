@@ -90,7 +90,7 @@ sin_recordar_la_sesion() {
 
 # El stack del compose y el cliente contra su API: lo que usa el CI y la computadora.
 preparar() {
-  docker compose up -d --wait
+  docker compose up -d --wait --remove-orphans
   sin_recordar_la_sesion
   # El cliente vive en otro origen que la API (ADR-010): se sirve aparte, como en producción.
   construir_web "${API_URL:-http://localhost}" dist
@@ -99,9 +99,9 @@ preparar() {
 
 # Los dos stacks a la vez: mientras arrancan, se construyen los dos clientes.
 preparar_los_dos() {
-  docker compose up -d --wait >/tmp/ferre-stack.log 2>&1 & local uno=$!
+  docker compose up -d --wait --remove-orphans >/tmp/ferre-stack.log 2>&1 & local uno=$!
   # shellcheck disable=SC2086
-  docker compose $CELULAR_COMPOSE up -d --wait >/tmp/ferre-stack-celular.log 2>&1 & local dos=$!
+  docker compose $CELULAR_COMPOSE up -d --wait --remove-orphans >/tmp/ferre-stack-celular.log 2>&1 & local dos=$!
   construir_web http://localhost dist
   construir_web "$CELULAR_API" dist-celular
   wait "$uno" || { cat /tmp/ferre-stack.log; exit 1; }

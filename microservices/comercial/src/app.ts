@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { cors } from "hono/cors";
+import { exigirTokenDeServicio } from "./autenticacion.js";
 import { VERSION_DE_PRECIOS } from "./precios.js";
 import { config } from "./config.js";
 import { baseResponde } from "./persistencia/conexion.js";
@@ -23,17 +23,12 @@ import { tickets } from "./rutas/tickets.js";
 import { pedidos } from "./rutas/pedidos.js";
 import { anomalias } from "./rutas/anomalias.js";
 import { permisos, roles } from "./rutas/roles.js";
-import { procesos } from "./rutas/procesos.js";
 import { apartados } from "./rutas/apartados.js";
 import { sistema } from "./rutas/sistema.js";
 import { canal } from "./rutas/canal.js";
 import { aCuestas } from "./avisos/canales.js";
-import { CABECERA_A_CUESTAS, CABECERA_DE_TEMAS } from "conexion-entre-dispositivos/servidor";
 
 export const app = new Hono();
-
-// El cliente web vive en otro origen (ADR-010): solo ese origen puede llamar desde el navegador.
-app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders: ["Authorization", "Content-Type", CABECERA_DE_TEMAS, "X-Canal"], exposeHeaders: [CABECERA_A_CUESTAS] }));
 
 // Cada respuesta lleva a cuestas lo permanente (la versión, decisión 157): la aplicación se entera
 // con lo que ya pide, sin consultas propias (ADR-030).
@@ -49,6 +44,9 @@ app.get("/health", async (c) => {
   const db = await baseResponde();
   return c.json({ ok: db, db: db ? "ok" : "sin-respuesta", version: config.version, calculoDePrecios: VERSION_DE_PRECIOS }, db ? 200 : 503);
 });
+
+// Lo demás solo por la puerta (026, ADR-031): con el token entre servicios.
+app.use("/*", exigirTokenDeServicio);
 
 // Quien cambia el catálogo lo ve en su pedido siguiente (specs/018, RF-124): antes de contestar, la
 // copia del servidor lee lo que cambió. Los demás lo ven cuando llega el aviso de la base.
@@ -82,7 +80,6 @@ app.route("/pedidos", pedidos);
 app.route("/anomalias", anomalias);
 app.route("/roles", roles);
 app.route("/permisos", permisos);
-app.route("/procesos", procesos);
 app.route("/apartados", apartados);
 app.route("/sistema", sistema);
 app.route("/canal", canal);

@@ -133,6 +133,7 @@ solo con `CARGA=1`.
 | `health.sh` | Cada servicio responde 200 en `/health` con el stack arriba | Primera verificación después de cualquier despliegue |
 | `migraciones.sh` | Todas las migraciones aplicadas y existen las doce tablas de la primera migración | Verifica el arranque real de la API contra la base |
 | `listas.sh` | Alta de proveedores, carga con detección automática, vista previa, aplicación, reaplicar no duplica, descartar, archivo irreconocible; la lista real de Ixnova si está en `privado/` | Es el circuito completo de precios contra los dos servicios |
+| `puerta.sh` | La puerta del servidor: reparte por ruta, pregunta quién es la persona, borra las cabeceras de identidad que manda el navegador, atiende el CORS y es lo único que se publica (specs/026) | Es la seguridad de la entrada, que las unitarias no ven |
 | `base-propia.sh` | La base del ambiente: una base y un usuario por servicio, que no abre las otras; publicada solo en 127.0.0.1; los datos sobreviven a recrear el contenedor; el primer usuario con la base vacía (specs/022) | Es la seguridad de la base, que las unitarias no ven |
 | `autenticacion.sh` | 401 sin sesión, 403 por rol, alta de usuario, auditoría, cierre de sesión | Es la puerta de todo; se prueba sin Google sembrando sesiones |
 
