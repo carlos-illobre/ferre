@@ -1,0 +1,104 @@
+/* La ficha del producto en el celular (specs/016), con el aspecto de la v2 (decisión 145): a
+   pantalla entera, sobre el fondo gris, con el menú de abajo a la vista. */
+:global(.hoja-fondo):has(> :global(.hoja-pantalla)) { z-index: 25; bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom)); background: var(--p-fondo); animation: none; }
+:global(.hoja):global(.hoja-pantalla) { height: 100%; max-height: none; border-radius: 0; background: var(--p-fondo); padding: 0 16px; gap: 12px; animation: ficha-entra 0.32s cubic-bezier(0.32, 0.72, 0, 1); }
+:global(.hoja):global(.hoja-pantalla) :global(.manija) { display: none; }
+@keyframes ficha-entra { from { transform: translateX(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { :global(.hoja):global(.hoja-pantalla) { animation: none; } }
+.arriba { position: sticky; top: 0; z-index: 2; margin: 0 -16px; padding: calc(4px + env(safe-area-inset-top)) 12px 4px 8px; background: var(--p-fondo); display: flex; align-items: center; }
+.volver { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 8px; border: 0; background: none; color: var(--p-verde); font-size: 17px; font-weight: 700; }
+/* La foto grande, con el stock arriba a la izquierda y «Cambiar foto» abajo a la derecha. */
+:global(.ficha-foto).hero { width: 100%; height: 180px; border-radius: 20px; background: var(--p-relleno); }
+:global(.ficha-foto).hero :global(.foto-chica), :global(.ficha-foto).hero:global(.sin) button:global(.foto-chica):empty { width: 100%; height: 100%; border-radius: 20px; border: 0; background: var(--p-relleno); }
+:global(.ficha-foto).hero :global(.foto-chica) img { object-fit: contain; padding: 12px; }
+.stock { position: absolute; z-index: 1; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgb(26 29 27 / .12); font-size: 15px; font-weight: 700; white-space: nowrap; }
+.stock::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.stock:global(.hay) { color: var(--p-verde-texto); }
+.stock:global(.no) { color: var(--p-rojo, #ae281d); }
+:global(.ficha-foto).hero :global(.ficha-cambiar-foto) { left: auto; right: 12px; bottom: 12px; min-height: 36px; padding: 0 12px; border: 1px solid var(--p-borde); background: #fff; font-size: 15px; }
+:global(.hoja-pantalla) :global(.ficha-titulo) { gap: 2px; }
+:global(.hoja-pantalla) :global(.ficha-nombre) { font-size: 22px; line-height: 27px; }
+/* El precio, sin bajar: grande, con el margen y «Así se calcula» a la derecha. */
+.precio { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; padding: 12px 14px; border-radius: 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); box-shadow: 0 1px 2px rgb(26 29 27 / .05); }
+.precio > div { display: flex; flex-direction: column; }
+.precio :global(.ficha-precio) { font-size: 36px; line-height: 40px; }
+.precio :global(.ficha-sin-precio) { font-size: 26px; line-height: 40px; font-weight: 800; color: var(--p-amarillo-texto); }
+.margen { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-height: 44px; border: 0; background: none; text-align: right; font-size: 14px; color: var(--p-texto-2); }
+.margen b { font-size: 16px; color: var(--p-verde-texto); }
+.margen b:global(.falta) { color: var(--p-amarillo-texto); }
+.margen span { display: inline-flex; align-items: center; gap: 4px; }
+.calculo :global(.ficha-tarjeta-titulo) { display: flex; justify-content: space-between; align-items: baseline; color: var(--p-tinta); font-size: 16px; }
+.segmentos { display: flex; gap: 2px; padding: 3px; border-radius: 12px; background: var(--p-relleno); }
+.segmentos > button, .otroCaja { flex: 1; min-width: 0; min-height: 40px; padding: 0 4px; border: 0; border-radius: 9px; background: none; color: var(--p-texto-medio); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.segmentos > button:global(.activo) { background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .14); }
+.segmentos > button:disabled { opacity: .45; }
+.otroCaja { flex: 1.4; display: inline-flex; align-items: center; gap: 2px; background: var(--p-superficie); }
+.otroCaja input { width: 100%; min-width: 0; height: 36px; border: 0; outline: 0; background: none; font: inherit; text-align: right; color: var(--p-tinta); }
+:global(.hoja)[data-testid="ficha-producto"] { gap: 12px; padding-left: 16px; padding-right: 16px; }
+:global(.ficha-cabeza) { align-items: flex-start; }
+:global(.ficha-foto) { position: relative; flex: none; width: 128px; height: 128px; }
+:global(.ficha-cabeza) :global(.ficha-foto) :global(.foto-chica) { width: 128px; height: 128px; border-radius: 18px; border: 1px solid var(--p-borde-suave); }
+/* Sin foto: un lugar neutro, no el recuadro naranja de las listas (que invita a sacar una en la tarjeta). */
+:global(.ficha-foto):global(.sin) button:global(.foto-chica):empty { background: var(--p-fondo-2); border: 1px solid var(--p-borde); }
+:global(.ficha-foto):global(.sin) button:global(.foto-chica):empty::after { opacity: 0.35; background: var(--p-texto-2); }
+:global(.ficha-cambiar-foto) { position: absolute; left: 8px; right: 8px; bottom: 8px; min-height: 36px; border-radius: 12px; background: #ffffffeb; color: var(--p-tinta); font-size: 13.5px; font-weight: 700; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 0 6px; box-shadow: 0 1px 4px #0002; }
+:global(.ficha-foto-error) { position: absolute; top: 100%; left: 0; width: 240px; margin: 4px 0 0; font-size: 13px; color: var(--p-naranja-texto); }
+:global(.ficha-titulo) { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding-top: 2px; }
+:global(.ficha-titulo) :global(.etiqueta-stock) { align-self: flex-start; margin: 0; }
+:global(.ficha-nombre) { margin: 0; font-size: 20px; line-height: 1.15; font-weight: 800; text-transform: uppercase; color: var(--p-tinta); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+:global(.ficha-titulo) small { font-size: 15px; color: var(--p-texto-2); }
+
+:global(.ficha-tarjeta) { border: 1px solid var(--p-borde); border-radius: 18px; box-shadow: none; gap: 10px; }
+:global(.ficha-tarjeta-titulo) { margin: 0; font-size: 17px; font-weight: 700; color: var(--p-verde); }
+:global(.hoja) :global(.cb) { border-radius: 18px; }
+
+:global(.ficha-proveedor) { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 6px 10px 12px; border: 1px solid var(--p-borde-suave); border-radius: 14px; background: #fff; text-align: left; color: inherit; }
+:global(.ficha-proveedor):disabled { opacity: 1; cursor: default; }
+:global(.ficha-inicial) { flex: none; width: 40px; height: 40px; border-radius: 10px; background: var(--p-verde); color: #fff; font-weight: 800; font-size: 18px; display: grid; place-items: center; }
+:global(.ficha-inicial):global(.otro) { background: var(--p-relleno); color: var(--p-texto-2); }
+.prov { display: flex; align-items: center; gap: 12px; }
+.provDer { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.provDer strong { font-size: 18px; font-weight: 800; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+.mas { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; margin: -4px -4px -6px 0; padding: 0 4px; border: 0; background: none; font-size: 14px; color: var(--p-texto-2); }
+:global(.ficha-proveedor-texto) { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+:global(.ficha-proveedor-nombre) { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-weight: 700; font-size: 16px; color: var(--p-tinta); }
+:global(.ficha-estrella) { display: inline-flex; color: #c98a00; }
+:global(.ficha-estrella) svg { fill: currentColor; }
+:global(.ficha-detalle) { font-size: 14px; color: var(--p-texto-2); margin: 0; }
+:global(.ficha-chip) { white-space: nowrap; font-size: 12.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--p-verde-suave); color: var(--p-verde-texto); }
+:global(.ficha-costo) { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: 4px; font-size: 14px; color: var(--p-texto-2); }
+:global(.ficha-costo) strong { font-size: 19px; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+:global(.ficha-flecha) { flex: none; color: var(--p-texto-2); display: grid; place-items: center; transition: transform 0.15s; }
+:global(.ficha-flecha):global(.abierta) { transform: rotate(90deg); }
+:global(.ficha-otros) { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+:global(.ficha-otros) li { display: flex; align-items: center; gap: 10px; padding: 10px 4px 10px 12px; border-top: 1px solid var(--p-borde-suave); }
+:global(.ficha-otros) strong { font-variant-numeric: tabular-nums; }
+:global(.ficha-otros) :global(.boton):global(.chico) { height: 36px; border-radius: 12px; padding: 0 14px; font-size: 14px; }
+
+:global(.ficha-precio-fila) { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+:global(.ficha-precio) { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+:global(.ficha-sin-precio) { font-size: 20px; font-weight: 700; color: var(--p-naranja-texto); }
+:global(.ficha-tarjeta) :global(.cuadricula-5) :global(.boton) { height: 44px; font-size: 16px; }
+:global(.ficha-calculo) { border-radius: 14px; background: var(--p-naranja-suave); border: 1px solid var(--p-naranja-borde); }
+:global(.ficha-calculo-cabeza) { width: 100%; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; background: none; font-size: 16px; font-weight: 700; color: var(--p-naranja-texto-fuerte); text-align: left; }
+:global(.ficha-calculo-cabeza) span { flex: 1; }
+:global(.ficha-cuenta) { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 0 14px 12px; font-size: 15px; color: var(--p-texto-medio); font-variant-numeric: tabular-nums; }
+:global(.ficha-cuenta) b { text-align: right; color: var(--p-tinta); }
+:global(.ficha-cuenta) :global(.ficha-cuenta-detalle) { grid-column: 1 / -1; margin-top: -2px; font-size: 14px; color: var(--p-texto-2); }
+:global(.ficha-cuenta) :global(.total) { border-top: 1px solid var(--p-naranja-borde); padding-top: 6px; font-weight: 700; color: var(--p-tinta); }
+:global(.ficha-cuenta) :global(.cobra) { grid-column: 1 / -1; display: flex; justify-content: space-between; margin: 6px -8px 0; padding: 4px 8px; border-radius: 8px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-weight: 650; }
+:global(.ficha-cuenta) :global(.cobra) b { font-size: 17px; color: var(--p-verde-texto); }
+:global(.ficha-cuenta) p, :global(.ficha-calculo-falta) { grid-column: 1 / -1; margin: 2px 0 0; font-size: 13.5px; color: var(--p-texto-2); }
+:global(.ficha-calculo-falta) { padding: 0 14px 12px; }
+
+:global(.ficha-archivo) { display: flex; align-items: center; gap: 12px; }
+:global(.ficha-archivo-icono) { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--p-verde-suave); color: var(--p-verde-texto); display: grid; place-items: center; }
+:global(.ficha-archivo-nombre) { font-size: 15px; color: var(--p-tinta); overflow-wrap: anywhere; }
+:global(.ficha-descargar) { width: 100%; height: 40px; border-width: 1px; border-color: var(--p-borde); }
+
+/* «Listo» y «Agregar a la venta», fijos abajo mientras la ficha baja. */
+:global(.ficha-pie) { position: sticky; bottom: 0; margin: auto -16px 0; padding: 10px 16px 12px; background: var(--p-fondo); border-top: 1px solid var(--p-borde); display: grid; grid-template-columns: 112px 1fr; gap: 8px; z-index: 1; }
+:global(.ficha-pie) :global(.boton) { height: 52px; padding: 0 16px; font-size: 17px; font-weight: 700; border-radius: 14px; }
+:global(.ficha-pie) :global(.boton):global(.coral) { justify-content: center; gap: 8px; }
+:global(.ficha-pie) :global(.boton):only-child { grid-column: 1 / -1; }
+:global(.solo-lectores) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

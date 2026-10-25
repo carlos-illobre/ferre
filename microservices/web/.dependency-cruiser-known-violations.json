@@ -114,68 +114,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaAlLado.tsx",
-    "to": "src/pantallas/celular/pantallas/Productos.tsx",
-    "unresolvedTo": "../../../celular/pantallas/Productos",
-    "dependencyTypes": [
-      "local",
-      "type-only",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "la-computadora-no-usa-el-celular"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.tsx",
-    "to": "src/pantallas/celular/pantallas/Productos.tsx",
-    "unresolvedTo": "../../../celular/pantallas/Productos",
-    "dependencyTypes": [
-      "local",
-      "type-only",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "la-computadora-no-usa-el-celular"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
-    "to": "src/pantallas/celular/pantallas/Productos.tsx",
-    "unresolvedTo": "../../../celular/pantallas/Productos",
-    "dependencyTypes": [
-      "local",
-      "type-only",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "la-computadora-no-usa-el-celular"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/App.tsx",
     "to": "src/datos/sesion/index.ts",
     "unresolvedTo": "../../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../datos/conexion",
     "dependencyTypes": [
       "local",
       "import"
@@ -299,20 +240,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/FichaProducto.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/FotoDeProducto.tsx",
     "to": "src/datos/conexion/index.ts",
     "unresolvedTo": "../../datos/conexion",
@@ -372,20 +299,6 @@
     "from": "src/pantallas/celular/pantallas/Configuracion.tsx",
     "to": "src/datos/almacenamiento/index.ts",
     "unresolvedTo": "../../../datos/almacenamiento",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/pantallas/Listas.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../datos/conexion",
     "dependencyTypes": [
       "local",
       "import"
@@ -537,20 +450,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Duplicados.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/Entrar.tsx",
     "to": "src/datos/conexion/index.ts",
     "unresolvedTo": "../../../../datos/conexion",
@@ -593,48 +492,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaAlLado.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Listas.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/negocio-comun.tsx",
     "to": "src/datos/conexion/index.ts",
     "unresolvedTo": "../../../../datos/conexion",
@@ -652,20 +509,6 @@
     "from": "src/pantallas/compu/base/pantallas/OfrecerHuella.tsx",
     "to": "src/datos/credenciales/index.ts",
     "unresolvedTo": "../../../../datos/credenciales",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
     "dependencyTypes": [
       "local",
       "import"
@@ -1307,104 +1150,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.tsx",
-    "to": "src/negocio/catalogo/precio.ts",
-    "unresolvedTo": "../../negocio/catalogo/precio",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.tsx",
-    "to": "src/negocio/catalogo/stock-y-filtros.ts",
-    "unresolvedTo": "../../negocio/catalogo/stock-y-filtros",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.tsx",
-    "to": "src/negocio/precios/vista-previa.ts",
-    "unresolvedTo": "../../negocio/precios/vista-previa",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../negocio/ventas/venta-en-curso",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.tsx",
-    "to": "src/plataforma/camara/Escaner.tsx",
-    "unresolvedTo": "../../plataforma/camara/Escaner",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Catalogo.tsx",
-    "to": "src/plataforma/tiempo/debounce.ts",
-    "unresolvedTo": "../../plataforma/tiempo/debounce",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
     "to": "src/negocio/ventas/resumen-del-dia.ts",
     "unresolvedTo": "../../negocio/ventas/resumen-del-dia",
@@ -1559,76 +1304,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/FichaProducto.tsx",
-    "to": "src/negocio/catalogo/ficha.ts",
-    "unresolvedTo": "../../negocio/catalogo/ficha",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/FichaProducto.tsx",
-    "to": "src/negocio/catalogo/precio.ts",
-    "unresolvedTo": "../../negocio/catalogo/precio",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/FichaProducto.tsx",
-    "to": "src/negocio/catalogo/stock-y-filtros.ts",
-    "unresolvedTo": "../../negocio/catalogo/stock-y-filtros",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/FichaProducto.tsx",
-    "to": "src/negocio/precios/vista-previa.ts",
-    "unresolvedTo": "../../negocio/precios/vista-previa",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/FichaProducto.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../negocio/ventas/venta-en-curso",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/Lector.tsx",
     "to": "src/plataforma/camara/Escaner.tsx",
     "unresolvedTo": "../../plataforma/camara/Escaner",
@@ -1646,34 +1321,6 @@
     "from": "src/pantallas/celular/pantallas/Anomalias.tsx",
     "to": "src/negocio/ventas/venta.ts",
     "unresolvedTo": "../../../negocio/ventas/venta",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/pantallas/Duplicados.tsx",
-    "to": "src/negocio/catalogo/duplicados.ts",
-    "unresolvedTo": "../../../negocio/catalogo/duplicados",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/pantallas/Listas.tsx",
-    "to": "src/negocio/catalogo/listas.ts",
-    "unresolvedTo": "../../../negocio/catalogo/listas",
     "dependencyTypes": [
       "local",
       "import"
@@ -1937,261 +1584,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Duplicados.tsx",
-    "to": "src/negocio/catalogo/duplicados.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/duplicados",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Duplicados.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/Entrar.tsx",
     "to": "src/plataforma/servidor/useResponde.ts",
     "unresolvedTo": "../../../../plataforma/servidor/useResponde",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaAlLado.tsx",
-    "to": "src/negocio/catalogo/ficha.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/ficha",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaAlLado.tsx",
-    "to": "src/negocio/catalogo/precio.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/precio",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaAlLado.tsx",
-    "to": "src/negocio/catalogo/stock-y-filtros.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/stock-y-filtros",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.tsx",
-    "to": "src/negocio/catalogo/ficha.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/ficha",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.tsx",
-    "to": "src/negocio/catalogo/precio.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/precio",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.tsx",
-    "to": "src/negocio/catalogo/stock-y-filtros.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/stock-y-filtros",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.tsx",
-    "to": "src/negocio/precios/vista-previa.ts",
-    "unresolvedTo": "../../../../negocio/precios/vista-previa",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/FichaProducto.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../../../negocio/ventas/venta-en-curso",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Listas.tsx",
-    "to": "src/negocio/catalogo/listas.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/listas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Listas.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
-    "to": "src/negocio/catalogo/precio.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/precio",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
-    "to": "src/negocio/catalogo/stock-y-filtros.ts",
-    "unresolvedTo": "../../../../negocio/catalogo/stock-y-filtros",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
-    "to": "src/negocio/precios/vista-previa.ts",
-    "unresolvedTo": "../../../../negocio/precios/vista-previa",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
-    "to": "src/negocio/ventas/venta-en-curso.ts",
-    "unresolvedTo": "../../../../negocio/ventas/venta-en-curso",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Productos.tsx",
-    "to": "src/plataforma/tiempo/debounce.ts",
-    "unresolvedTo": "../../../../plataforma/tiempo/debounce",
     "dependencyTypes": [
       "local",
       "import"

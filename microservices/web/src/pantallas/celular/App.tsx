@@ -26,7 +26,7 @@ import { Roles } from "../Roles";
 import { animarNavegacion, ConRutas, irA, useRuta } from "../../rutas";
 import { destinoDelCodigo, Entrar } from "./Entrar";
 import { VincularCelular } from "./pantallas/VincularCelular";
-import { Catalogo } from "./Catalogo";
+import { Catalogo } from "./catalogo/Catalogo";
 import { Icono as IconoDeMas, type NombreDeIcono } from "../compu/base/ui";
 import { Deposito } from "./Deposito";
 import { Negocio, type Parte } from "./Negocio";

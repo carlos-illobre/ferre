@@ -207,6 +207,8 @@ test("sin mouse: recorrer el menú y las pestañas con las flechas, y cobrar una
   const busqueda = page.getByTestId("busqueda");
   await expect(busqueda).toBeFocused();
   const fila = () => page.evaluate(() => [...document.querySelectorAll("[data-testid=producto]")].findIndex((f) => f.getAttribute("aria-selected") === "true"));
+  // La fila elegida se mira con la lista ya cargada: antes no hay ninguna.
+  await expect(page.getByTestId("producto").first()).toBeVisible();
   const elegida = await fila();
 
   // En Catálogo, ↑ desde la primera fila devuelve la marca de las flechas a la pestaña.

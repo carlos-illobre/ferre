@@ -43,7 +43,7 @@ test("cargar una lista de precios y aplicarla", async ({ page }) => {
   await page.getByRole("button", { name: /^Listas/ }).click();
   // El orden de la pantalla: primero cargar, después las últimas cargas (hasta tres) y al final los proveedores.
   await expect(page.getByTestId("zona-de-carga")).toBeVisible();
-  await expect.poll(() => page.locator("h2.lv-cab b").allInnerTexts().then((t) => t.filter((x) => ["Últimas cargas", "Proveedores"].includes(x)))).toEqual(["Últimas cargas", "Proveedores"]);
+  await expect.poll(() => page.locator("main h2 b").allInnerTexts().then((t) => t.filter((x) => ["Últimas cargas", "Proveedores"].includes(x)))).toEqual(["Últimas cargas", "Proveedores"]);
   expect(await page.locator('[data-testid="historial"] li').count()).toBeLessThanOrEqual(3);
 
   // Alta del proveedor con su configuración de costo (descuento por contado 5 %).

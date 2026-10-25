@@ -36,3 +36,16 @@ export function useEmparejadoConLaCompu(): boolean {
   }, []);
   return emparejado;
 }
+
+// Lo que lee el celular emparejado a este puesto, mientras `activo`: para buscar escaneando.
+export function useLoQueLeeElCelular(alCodigo: (codigo: string) => void, activo: boolean) {
+  const manejar = useRef(alCodigo);
+  useEffect(() => { manejar.current = alCodigo; }, [alCodigo]);
+  const [emparejado, setEmparejado] = useState(() => puestoLocal()?.id ?? null);
+  useEffect(() => { const mirar = () => setEmparejado(puestoLocal()?.id ?? null); window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar); return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); }, []);
+  useEffect(() => {
+    if (!emparejado || !activo) return;
+    return escucharPuesto(emparejado, (codigo) => manejar.current(codigo));
+  }, [activo, emparejado]);
+  return emparejado;
+}

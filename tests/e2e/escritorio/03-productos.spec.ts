@@ -117,7 +117,7 @@ test("buscar un producto, elegir el margen y tipear otro margen a mano", async (
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("ArrowDown");
   await expect(page.getByTestId("producto").nth(2)).toHaveAttribute("aria-selected", "true");
-  await expect(ficha).toContainText(await page.getByTestId("producto").nth(2).locator(".pv-nombre").innerText());
+  await expect(ficha).toContainText(await page.getByTestId("producto").nth(2).getByTestId("nombre").innerText());
   // Estas tuercas no tienen costo: sin costo no se puede elegir margen.
   await expect(ficha.getByTestId("margen-200")).toBeDisabled();
 

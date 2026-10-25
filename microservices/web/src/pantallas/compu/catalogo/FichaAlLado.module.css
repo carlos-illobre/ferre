@@ -1,0 +1,80 @@
+/* La ficha del producto al lado de la lista, en la computadora (la v2, decisión 145): una hoja
+   blanca con la cabeza (foto, stock, nombre, precio y márgenes), el código, los proveedores al
+   lado de «Así se calcula», el archivo y el pie fijo con las teclas, «Listo» y «Agregar a la venta». */
+:global(.fal) { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 20px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 6px 18px rgb(26 29 27 / .06); overflow: hidden; }
+.cuerpo { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 12px; position: relative; }
+.cabeza { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; }
+:global(.fal) :global(.ficha-foto) { width: 120px; height: 120px; }
+:global(.fal) :global(.ficha-foto) :global(.foto-chica) { width: 120px; height: 120px; border-radius: 16px; border: 0; background: var(--p-relleno); }
+:global(.fal) :global(.ficha-foto) :global(.foto-chica) img { object-fit: contain; padding: 8px; }
+:global(.fal) :global(.ficha-cambiar-foto) { left: 8px; right: auto; bottom: 8px; min-height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--p-borde); font-size: 14px; background: #ffffffeb; }
+.titulos { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.stock { display: inline-flex; align-items: center; gap: 6px; min-height: 26px; padding: 0 10px; border-radius: 999px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.stock::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.stock:global(.hay) { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.stock:global(.no) { background: var(--rojo-suave); color: var(--rojo); }
+.nombre { margin: 6px 0 0; font-size: 22px; line-height: 27px; font-weight: 800; letter-spacing: -0.015em; text-transform: uppercase; color: var(--p-tinta); overflow-wrap: anywhere; }
+.detalle { margin: 0; font-size: 14px; line-height: 20px; color: var(--p-texto-2); }
+.precioFila { align-self: stretch; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+.precioCaja { display: flex; flex-direction: column; }
+.etiqueta { font-size: 14px; font-weight: 650; color: var(--p-texto-2); }
+.precio { font-size: 36px; line-height: 40px; font-weight: 800; letter-spacing: -0.02em; color: var(--p-tinta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sinPrecio { font-size: 22px; line-height: 40px; font-weight: 800; color: var(--p-amarillo-texto); white-space: nowrap; }
+/* Los márgenes como segmentos: una tira gris con el elegido en blanco. */
+.margen { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 12px; background: var(--p-relleno); }
+.margen :global(.margenes) { gap: 2px; }
+:global(.fal) .margen :global(.margenes) button, .otro { min-height: 34px; min-width: 0; padding: 0 11px; border: 0; border-radius: 9px; background: none; box-shadow: none; color: var(--p-texto-medio); font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; }
+:global(.fal) .margen :global(.margenes) button:hover:not(:disabled), .otro:hover:not(:disabled) { background: rgb(255 255 255 / .6); border: 0; }
+:global(.fal) .margen :global(.margenes) button[aria-checked="true"], .otro[aria-pressed="true"] { background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .14); }
+:global(.fal) .margen :global(.margenes) button:disabled, .otro:disabled { opacity: .45; cursor: default; }
+.otroCaja { display: inline-flex; align-items: center; gap: 4px; min-height: 34px; padding: 0 10px 0 4px; border-radius: 9px; background: var(--p-superficie); box-shadow: 0 1px 2px rgb(26 29 27 / .14); font-weight: 700; }
+.otroCaja input { width: 64px; height: 30px; border: 0; outline: 0; background: none; font: inherit; text-align: right; color: var(--p-tinta); }
+
+/* El código de barras: la caja blanca dentro de una franja gris, con «Escanear» oscuro al lado. */
+:global(.fal) :global(.cb) { padding: 8px; border: 0; border-radius: 14px; background: var(--p-relleno); gap: 8px; }
+:global(.fal) :global(.cb-titulo) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+:global(.fal) :global(.cb-fila) { flex-wrap: nowrap; align-items: center; gap: 12px; }
+:global(.fal) :global(.cb-caja) { background: var(--p-superficie); border: 1px solid var(--p-borde); padding: 6px 6px 6px 12px; gap: 12px; }
+:global(.fal) :global(.cb-barras) { width: 72px; height: 36px; }
+:global(.fal) :global(.cb) code { font-size: 18px; background: none; border: 0; padding: 0; }
+:global(.fal) :global(.cb-fila) :global(.cb-boton) { max-width: none; white-space: nowrap; }
+:global(.fal) :global(.cb-ok), :global(.fal) :global(.cb-aviso), :global(.fal) :global(.cb-panel), :global(.fal) :global(.cb-copiado), :global(.fal) :global(.cb-error) { margin: 0 4px 4px; }
+
+/* Los bloques: proveedores y «Así se calcula» lado a lado; el archivo. */
+.dos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.bloque { min-width: 0; border: 1px solid var(--p-borde); border-radius: 14px; padding: 10px 14px; }
+.bloque h3 { margin: 0 0 4px; display: flex; align-items: center; gap: 8px; font-size: 16px; line-height: 22px; font-weight: 750; color: var(--p-tinta); }
+.der { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: var(--p-texto-2); }
+.provs { list-style: none; margin: 0; padding: 0; }
+.prov { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 4px 0; }
+.prov + .prov { border-top: 1px dashed var(--p-borde); }
+.ini { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-weight: 800; font-size: 14px; background: var(--p-relleno); color: var(--p-texto-2); }
+.ini:global(.uso) { background: var(--p-verde); color: #fff; }
+.provTexto { min-width: 0; display: flex; flex-direction: column; }
+.provNombre { display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 15px; line-height: 20px; color: var(--p-tinta); }
+.estrella { display: inline-flex; color: #c98a00; }
+.estrella svg { fill: currentColor; }
+.provCosto { display: flex; flex-direction: column; align-items: flex-end; font-variant-numeric: tabular-nums; }
+.provCosto b { font-weight: 800; font-size: 15px; color: var(--p-tinta); }
+.provCosto small { font-size: 14px; font-weight: 650; color: var(--p-verde-texto); }
+:global(.fal) .usar { min-height: 32px; padding: 0 12px; border: 0; background: var(--p-relleno); box-shadow: none; font-weight: 700; }
+:global(.fal) .usar:hover:not(:disabled) { background: var(--p-relleno-fuerte); }
+.plegar { all: unset; flex: 1; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.plegar:focus-visible { outline: 3px solid var(--p-verde-texto); outline-offset: 2px; border-radius: 6px; }
+.cuenta { display: grid; grid-template-columns: 1fr auto; font-size: 14px; line-height: 24px; color: var(--p-texto-2); font-variant-numeric: tabular-nums; }
+.cuenta b { text-align: right; font-weight: 700; color: var(--p-tinta); }
+.cuentaDetalle { grid-column: 1 / -1; margin: -4px 0 2px; font-size: 14px; line-height: 19px; color: var(--p-texto-2); }
+.cuenta :global(.cobra) { grid-column: 1 / -1; display: flex; justify-content: space-between; margin: 4px -8px 0; padding: 2px 8px; border-radius: 8px; background: var(--p-verde-suave); color: var(--p-verde-texto); font-weight: 650; }
+.cuenta :global(.cobra) b { font-size: 16px; color: var(--p-verde-texto); }
+.archivo { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.xls { width: 36px; height: 36px; border-radius: 8px; background: var(--p-verde-suave); color: var(--p-verde-texto); display: grid; place-items: center; }
+.archivoNombre { font-weight: 700; font-size: 15px; line-height: 20px; color: var(--p-tinta); overflow-wrap: anywhere; }
+
+/* El pie, fijo: las teclas a la izquierda, «Listo» y «Agregar a la venta» a la derecha. */
+.pie { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--p-borde); background: var(--p-fondo-2); }
+.teclas { margin-right: auto; display: flex; flex-wrap: nowrap; white-space: nowrap; gap: 4px 14px; font-size: 14px; color: var(--p-texto-2); }
+.teclas span { display: inline-flex; align-items: center; gap: 6px; }
+:global(.fal) .listo { border-color: transparent; background: none; box-shadow: none; font-weight: 700; }
+:global(.fal) .listo:hover:not(:disabled) { background: var(--p-relleno); }
+.pie :global(.boton):global(.principal) { min-height: 46px; padding: 0 18px; border-radius: 12px; font-weight: 750; }
+.pie :global(.boton):global(.principal) :global(.tecla) { background: rgb(255 255 255 / .2); color: #fff; border-color: rgb(255 255 255 / .45); }

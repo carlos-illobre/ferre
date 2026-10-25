@@ -65,3 +65,20 @@ export function diferenciaDeCosto(costo: string | number, enUso: number | null):
   const texto = Math.abs(pct).toLocaleString("es-AR", { maximumFractionDigits: 1 });
   return texto === "0" ? "mismo costo" : `${pct > 0 ? "+" : "−"}${texto} %`;
 }
+
+// Por qué un producto no tiene precio: le falta el costo o el margen (que elige quien puede fijarlo).
+export type FaltaParaElPrecio = "sinCosto" | "eligeMargen" | "sinMargen";
+export const faltaParaElPrecio = (costo: number | null, fijaMargen: boolean): FaltaParaElPrecio => (costo === null ? "sinCosto" : fijaMargen ? "eligeMargen" : "sinMargen");
+
+// Los proveedores de la ficha: el del que sale el costo (por su id o, si no, por su nombre), el
+// más barato (el primero), los demás y si el en uso es el más barato.
+export function proveedoresDeLaFicha(p: Producto) {
+  const todos = p.proveedores ?? [];
+  const masBarato = todos[0]?.proveedor_id;
+  const enUso = todos.find((v) => v.proveedor_id === p.proveedor_id) ?? todos.find((v) => v.proveedor === p.proveedor);
+  return {
+    todos, masBarato, enUso, otros: todos.filter((v) => v !== enUso),
+    elMasBarato: enUso ? enUso.proveedor_id === masBarato : todos.length <= 1,
+    costoEnUso: p.costo_neto === null ? null : Number(p.costo_neto),
+  };
+}

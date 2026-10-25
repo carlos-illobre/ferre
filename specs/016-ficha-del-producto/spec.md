@@ -24,6 +24,13 @@ venta, la categoría ni el estado «Activo».
 - Q: ¿Qué es la «última lectura» del código? → A: La última vez que se cargó o se cambió el código de ese producto (desde su ficha o al asociar un código desconocido); escanearlo para buscar o vender no la cambia (decisión 107).
 - Q: ¿Qué maqueta? → A: La A, como la referencia: una tarjeta por tema, en el orden código, proveedor, precio y archivo, con «Listo» y «Agregar a la venta» fijos abajo. Se acepta que el precio no se vea sin bajar.
 
+### Desde la v2 (decisión 145, specs/021)
+
+En la computadora la ficha ya no es una ventana: está siempre abierta al lado de la lista. Ahí los
+proveedores se ven todos, sin flecha (E16), y «Así se calcula» arranca abierto y F1 lo pliega,
+dejando lo que se cobra (E18). «Agregar a la venta» lo avisa la lista (E25). Lo demás de esta
+especificación vale igual; en el celular, la ficha sigue siendo una hoja.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Reconocer el producto de un vistazo (Priority: P1)
