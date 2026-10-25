@@ -26,17 +26,20 @@ import { permisos, roles } from "./rutas/roles.js";
 import { procesos } from "./rutas/procesos.js";
 import { apartados } from "./rutas/apartados.js";
 import { sistema } from "./rutas/sistema.js";
+import { canal } from "./rutas/canal.js";
+import { aCuestas } from "./avisos/canales.js";
+import { CABECERA_A_CUESTAS, CABECERA_DE_TEMAS } from "conexion-entre-dispositivos/servidor";
 
 export const app = new Hono();
 
 // El cliente web vive en otro origen (ADR-010): solo ese origen puede llamar desde el navegador.
-app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders: ["Authorization", "Content-Type"], exposeHeaders: ["X-Version"] }));
+app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders: ["Authorization", "Content-Type", CABECERA_DE_TEMAS, "X-Canal"], exposeHeaders: [CABECERA_A_CUESTAS] }));
 
-// Cada respuesta dice qué versión es: cuando cambia, la aplicación busca la suya nueva, sin timer
-// (decisión 157, ADR-020).
+// Cada respuesta lleva a cuestas lo permanente (la versión, decisión 157): la aplicación se entera
+// con lo que ya pide, sin consultas propias (ADR-030).
 app.use("/*", async (c, next) => {
   await next();
-  c.header("X-Version", config.version);
+  c.header(...aCuestas.cabecera());
 });
 
 // Dice si el proceso anda, si la base responde y qué versión es (022-E05): el compose no da por
@@ -82,6 +85,7 @@ app.route("/permisos", permisos);
 app.route("/procesos", procesos);
 app.route("/apartados", apartados);
 app.route("/sistema", sistema);
+app.route("/canal", canal);
 
 app.onError((error, c) => {
   console.error(error);

@@ -739,7 +739,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       para quien tiene «Ver las compras», aunque sumándolas se saquen los gastos de la semana.
 
 97. **Al desactivar a alguien o cerrarle una sesión a distancia, el dispositivo sale solo**
-    (2026-10-17; los 30 segundos los sacó la decisión 158). Carlos pidió que el usuario desactivado salga automáticamente:
+    (2026-10-17; los 30 segundos los sacó la decisión 158, y la consulta al volver, la 160). Carlos pidió que el usuario desactivado salga automáticamente:
     - Con la aplicación abierta y conexión, el dispositivo vuelve a la entrada en menos de 30
       segundos, sin que nadie toque nada; si estaba en otra ventana, apenas vuelve. Sin conexión,
       al recuperarla. Antes salía recién en su próximo pedido al servidor.
@@ -1315,7 +1315,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      último, y en empate el de la computadora (specs/023). Probó la conexión entre el celular y la
      computadora en el local y anda.
 
-157. **La versión nueva se busca sin timer** (2026-10-25). Carlos: «elimina cualquier
+157. **La versión nueva se busca sin timer** (2026-10-25; precisada por la 160: tampoco se busca al volver a la aplicación ni al volver la red). Carlos: «elimina cualquier
      temporizador, no quiero temporizadores. Si no se puede hacer orientado a eventos entonces
      elimina esa lógica y agrega un botón». Se puede: la aplicación busca al abrirse, al volver a
      la vista, al volver la conexión y cuando el servidor contesta con una versión distinta de la
@@ -1326,7 +1326,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      abierta se actualiza sola; si no, el aviso) sigue igual. El control de la sesión cada 30
      segundos (RF-74) no es de esto y queda como está.
 
-158. **Sin timer para enterarse de una sesión cerrada** (2026-10-25). Carlos eligió sacar la
+158. **Sin timer para enterarse de una sesión cerrada** (2026-10-25; precisada por la 160: tampoco se pregunta al volver a la aplicación ni al volver la red). Carlos eligió sacar la
      pregunta cada 30 segundos de la decisión 97. La sesión cerrada a distancia, o la de alguien
      desactivado, sigue sin servir en el momento: el servidor rechaza cualquier pedido con ella.
      El dispositivo vuelve a la entrada en su primer pedido, al volver a la aplicación o al

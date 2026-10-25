@@ -10,7 +10,7 @@ import * as datos from "../persistencia/acceso.js";
 import { guardar } from "../persistencia/sistema.js";
 import { crearSesion, generarToken, revocarSesion, usuarioConPermisos, type SesionActiva } from "./sesiones.js";
 import { adoptarVinculos, anotarDispositivo, cortarVinculosDe, diasDeVinculo, emparejar, sellarVinculo, soltarAnteriores, vinculosDelUsuario } from "./vinculo.js";
-import { central, cerrarAlVencer, cerrarSalas } from "./salas.js";
+import { canales, cerrarCanalesDe, cerrarSesiones, cerrarVinculos, TEMA } from "../avisos/canales.js";
 import type { CodigoAprobado, CodigoDeEntrada, EstadoDelCodigo, SesionAbierta, SesionNueva } from "../contratos/sesiones.js";
 import type { Enviable } from "../enviable.js";
 import type { DiasDelVinculo, EstadoDelPuesto, PuestoParaVincular, Vinculado, VinculosDeLaSesion } from "../contratos/puestos.js";
@@ -53,14 +53,17 @@ export async function pedirCodigoDeEntrada(dispositivo: string): Promise<CodigoD
 export async function aprobarCodigoDeEntrada(sesion: SesionActiva, codigo: string, dispositivoId: unknown): Promise<Resultado<CodigoAprobado>> {
   await anotarDispositivo(base, sesion.id, dispositivoId);
   const aprobada = await datos.aprobarVinculacion(codigo, sesion.usuario.id, sesion.id);
-  return aprobada ? bien({ dispositivo: aprobada.dispositivo }) : mal(410, SIN_CODIGO);
+  if (!aprobada) return mal(410, SIN_CODIGO);
+  // La computadora que espera con el código en pantalla se entera en el momento (025-E01).
+  canales.avisar(TEMA.entrada(aprobada.id), { listo: true });
+  return bien({ dispositivo: aprobada.dispositivo });
 }
 
 // La computadora pregunta cómo va su código. Si fue aprobado, retira la sesión: una sola vez.
 // El celular que la dejó entrar queda emparejado con esta computadora (decisión 58).
 export async function estadoDelCodigo(id: string, clave: string, dispositivoId: unknown): Promise<Resultado<EstadoDelCodigo>> {
   const aprobada = await datos.retirarVinculacion(id, clave);
-  if (!aprobada) return bien({ estado: (await datos.vinculacionVigente(id, clave)) ? "pendiente" : "vencida" });
+  if (!aprobada) return bien({ estado: (await datos.estadoDeVinculacion(id, clave)) === "pendiente" ? "pendiente" : "vencida" });
   const usuario = await usuarioConPermisos(base, aprobada.aprobada_por);
   if (!usuario) return bien({ estado: "vencida" });
   const sesion = await crearSesion(base, usuario.id, aprobada.dispositivo);
@@ -69,7 +72,7 @@ export async function estadoDelCodigo(id: string, clave: string, dispositivoId: 
   await anotarEvento(base, { tipo: "sesion.iniciada", usuarioId: usuario.id, contenido: { sesionId: sesion.id, dispositivo: aprobada.dispositivo, medio: "celular" } });
   const emparejado = aprobada.celular_sesion_id ? await emparejar(base, sesion.id, aprobada.celular_sesion_id, aprobada.dispositivo).catch(() => null) : null;
   const puesto = emparejado && { id: emparejado.id, expira_en: emparejado.expira_en };
-  if (emparejado) cerrarSalas(emparejado.soltados);
+  if (emparejado) cerrarVinculos(emparejado.soltados);
   if (puesto) await anotarEvento(base, { tipo: "puesto.vinculado", usuarioId: usuario.id, contenido: { puestoId: puesto.id, medio: "entrada" } });
   return bien({ estado: "aprobada", token: sesion.token, usuario, puesto });
 }
@@ -77,6 +80,7 @@ export async function estadoDelCodigo(id: string, clave: string, dispositivoId: 
 // ---------- Sesiones ----------
 export async function salir(sesion: SesionActiva) {
   await revocarSesion(base, sesion.id);
+  cerrarCanalesDe(sesion.id);
   await anotarEvento(base, { tipo: "sesion.cerrada", usuarioId: sesion.usuario.id, contenido: { sesionId: sesion.id } });
 }
 // La de quien pregunta no va: se cierra con «Salir» (decisión 99).
@@ -84,7 +88,8 @@ export const sesionesAbiertas = (salvo: string): Promise<Enviable<SesionAbierta>
 // Cerrar a distancia la sesión de un dispositivo corta también su vínculo (decisión 73).
 export async function cerrarSesion(sesionId: string, actorId: string) {
   await revocarSesion(base, sesionId);
-  cerrarSalas(await cortarVinculosDe(base, sesionId));
+  cerrarSesiones([sesionId]);
+  cerrarVinculos(await cortarVinculosDe(base, sesionId));
   await anotarEvento(base, { tipo: "sesion.revocada", usuarioId: actorId, contenido: { sesionId } });
 }
 
@@ -196,9 +201,11 @@ export async function vincular(sesion: SesionActiva, codigo: string, dispositivo
   const dias = await diasDeVinculo();
   const puesto = await datos.vincularPorCodigo(codigo, sesion.id, dias);
   if (!puesto) return mal(404, "El código venció o ya se usó. Generá otro en la computadora.");
-  cerrarSalas(await soltarAnteriores(base, puesto.sesion_id, sesion.id, puesto.id));
+  cerrarVinculos(await soltarAnteriores(base, puesto.sesion_id, sesion.id, puesto.id));
   await sellarVinculo(base, puesto.id);
   await anotarEvento(base, { tipo: "puesto.vinculado", usuarioId: sesion.usuario.id, contenido: { puestoId: puesto.id, medio: "codigo" } });
+  // La computadora que muestra el código se entera en el momento (025-E02).
+  canales.avisar(TEMA.puesto(puesto.id), { expira_en: puesto.expira_en });
   return bien({ id: puesto.id, nombre: puesto.nombre, expira_en: puesto.expira_en, dias });
 }
 
@@ -230,18 +237,16 @@ export async function estadoDelPuesto(puestoId: string, sesionId: string): Promi
 
 export async function soltar(puestoId: string, sesion: SesionActiva): Promise<boolean> {
   if (!(await datos.soltarPuesto(puestoId, sesion.id))) return false;
-  central.cerrar(puestoId);
+  cerrarVinculos([puestoId]);
   await anotarEvento(base, { tipo: "puesto.desvinculado", usuarioId: sesion.usuario.id, contenido: { puestoId } });
   return true;
 }
 
-// Al desactivar a una persona se cierran las salas de sus vínculos (ADR-027).
-export const cerrarSalasDelUsuario = async (usuarioId: string) => cerrarSalas(await vinculosDelUsuario(base, usuarioId));
-
-// La conexión entre los dos dispositivos de un vínculo: escuchar la sala y mandar por ella.
-// Escuchar la sala cierra la sala sola cuando vence el vínculo (023-E26).
-export function escucharSala(puestoId: string, lado: string, expiraEn: Date) {
-  cerrarAlVencer(puestoId, expiraEn);
-  return central.escuchar(puestoId, lado);
+// Al desactivar a una persona se avisa a sus sesiones y se cierran sus vínculos (ADR-027, 025-E32).
+export async function cerrarCanalesDelUsuario(usuarioId: string, sesiones: string[]) {
+  cerrarSesiones(sesiones);
+  cerrarVinculos(await vinculosDelUsuario(base, usuarioId));
 }
-export const mandarPorLaSala = (puestoId: string, lado: string, cuerpo: string) => central.recibir(puestoId, lado, cuerpo);
+
+// Cómo está un código de entrada, para quien tiene su clave (el canal de la entrada: 025-E30).
+export const estadoDeEntrada = datos.estadoDeVinculacion;

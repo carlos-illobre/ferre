@@ -55,7 +55,7 @@ describe("usuarios y roles", () => {
     expect(await datos.cambiarUsuario(base, id, false, null)).toBe(true);
     expect(await datos.cambiarUsuario(base, crypto.randomUUID(), true, "x")).toBe(false);
     expect(await base.selectFrom("usuario").select(["activo", "nombre"]).where("id", "=", id).executeTakeFirst()).toEqual({ activo: false, nombre: "Beto" });
-    await datos.cerrarSesionesDe(base, id);
+    expect(await datos.cerrarSesionesDe(base, id)).toEqual([s]);
     expect((await base.selectFrom("sesion").select("revocada_en").where("id", "=", s).executeTakeFirstOrThrow()).revocada_en).not.toBeNull();
   });
 });

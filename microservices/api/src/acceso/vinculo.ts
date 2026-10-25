@@ -34,13 +34,13 @@ export async function adoptarVinculos(db: Ejecutor, sesionId: string, usuarioId:
 }
 
 export const sellarVinculo = datos.sellarVinculo;
-// Los vínculos vigentes de un usuario: al desactivarlo se cierran sus salas.
+// Los vínculos vigentes de un usuario: al desactivarlo se cierran sus temas del canal.
 export const vinculosDelUsuario = datos.vinculosDelUsuario;
 // Un administrador cerró a distancia la sesión de un dispositivo: sus vínculos se cortan.
-// Devuelve cuáles, para cerrar sus salas (ADR-027).
+// Devuelve cuáles, para cerrar sus temas del canal (ADR-027, ADR-030).
 export const cortarVinculosDe = datos.cortarVinculosDe;
 // Deja sin efecto los emparejamientos anteriores de esa computadora o de ese celular. Devuelve
-// cuáles, para cerrar sus salas (ADR-027).
+// cuáles, para cerrar sus temas del canal (ADR-027, ADR-030).
 export const soltarAnteriores = (db: Ejecutor, compuSesionId: string, celularSesionId: string, salvo: string | null = null) => datos.soltarAnteriores(db, compuSesionId, celularSesionId, salvo);
 
 // Vincular de nuevo (o entrar a la computadora con el celular) reemplaza al vínculo anterior:

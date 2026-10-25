@@ -4,12 +4,15 @@ import { crearConfiable } from "./confiable.js";
 import { intentarDirecta, type CanalDirecto, type IntentoDirecto } from "./directa.js";
 import { almacenEnMemoria, crearMemoria, type Almacen } from "./memoria.js";
 import { esperarReal, type Esperar } from "./reloj.js";
-import { crearCaminoServidor, type EstadoDelServidor } from "./servidor.js";
+import type { Central, EstadoDelTema } from "./central.js";
+import { crearCaminoServidor } from "./servidor.js";
 
-// El enlace de un dispositivo con el otro (ADR-027): lo único que usa la aplicación. Escucha la
-// sala en el servidor; cuando están los dos, prueba la conexión directa; si no se puede, sigue por
-// el servidor y lo recuerda, sin volver a probar sola (decisión 152). Lo que se manda llega una
-// sola vez y en orden por cualquiera de los dos caminos, y el estado dice cómo están.
+// El enlace de un dispositivo con el otro (ADR-027): lo único que usa la aplicación. Escucha el
+// tema del vínculo en el canal del dispositivo (ADR-030); cuando están los dos, prueba la conexión
+// directa y, armada, deja el tema: el servidor solo sirve para encontrarse (025-E21). Si la directa
+// no se puede, sigue por el servidor y lo recuerda, sin volver a probar sola (decisión 152). Lo
+// que se manda llega una sola vez y en orden por cualquiera de los dos caminos, y el estado dice
+// cómo están.
 
 // «solo»: el otro no está abierto. «conectando»: están los dos y se está probando la directa.
 export type Conexion = "sin-conexion" | "conectando" | "solo" | "directa" | "servidor";
@@ -24,21 +27,24 @@ export type EstadoDelEnlace = {
 };
 
 export type OpcionesDelEnlace = {
-  // La dirección de la sala en el servidor: se escucha con GET y se manda con POST.
+  // La central de avisos del dispositivo, el tema del vínculo en su canal, de qué lado está este
+  // dispositivo y dónde se manda por el servidor (POST).
+  central: Central;
+  tema: string;
+  lado: string;
   url: string;
   // Quién arma la conexión directa: uno solo de los dos lados.
   inicia: boolean;
-  cabeceras?: () => Record<string, string>;
   // Dónde recordar que la directa no se pudo (por omisión, en la memoria de la página).
   almacen?: Almacen;
   clave?: string;
   // Lo que se toma del navegador; se reemplaza en las pruebas.
-  red?: Partial<{ fetch: typeof fetch; Conexion: typeof RTCPeerConnection | undefined; ahora: () => number; esperar: Esperar; epoca: string }>;
+  // (Los pedidos al servidor usan el `fetch` de la central.)
+  red?: Partial<{ Conexion: typeof RTCPeerConnection | undefined; ahora: () => number; esperar: Esperar; epoca: string }>;
 };
 
 export function crearEnlace(o: OpcionesDelEnlace) {
   const red = {
-    fetch: ((...a) => fetch(...a)) as typeof fetch,
     Conexion: (globalThis as { RTCPeerConnection?: typeof RTCPeerConnection }).RTCPeerConnection,
     ahora: Date.now,
     esperar: esperarReal,
@@ -49,7 +55,7 @@ export function crearEnlace(o: OpcionesDelEnlace) {
   const cambios = crearAvisos<EstadoDelEnlace>();
   const cerrada = crearAvisos<void>();
   const memoria = crearMemoria(o.almacen ?? almacenEnMemoria(), o.clave ?? `conexion:${o.url}`);
-  const servidor = crearCaminoServidor({ url: o.url, cabeceras: o.cabeceras ?? (() => ({})), fetch: red.fetch, esperar: red.esperar });
+  const servidor = crearCaminoServidor({ central: o.central, tema: o.tema, lado: o.lado, url: o.url });
   let conectado = false;
   let otro = false;
   let porServidor = false;
@@ -91,17 +97,24 @@ export function crearEnlace(o: OpcionesDelEnlace) {
     intento = null;
     canal = c;
     porServidor = false;
+    // El tema del servidor se suelta recién cuando llega algo del otro por la directa: así se
+    // sabe que también la abrió (si se soltara antes, el otro vería irse a este y cortaría su
+    // intento a medio armar).
+    const soltarAlOirlo = c.mensajes.escuchar(() => { soltarAlOirlo(); servidor.soltar(); });
     c.mensajes.escuchar(alTexto);
     c.cerrado.escuchar(() => seCerro(c));
     confiable.saludar();
     actualizar();
   }
-  // La directa que andaba se cortó: se sigue por el servidor; al volver a encontrarse, se rearma.
+  // La directa que andaba se cortó: se vuelve al servidor; al volver a encontrarse, se rearma.
   function seCerro(c: CanalDirecto) {
     if (canal !== c) return;
     canal = null;
     c.cerrar();
     porServidor = true;
+    // Si el tema ya se había soltado, lo que se sabía del otro es de antes de la directa: se vuelve
+    // a saber por el canal. Si se seguía escuchando, lo que se sabe está al día.
+    if (servidor.tomar()) { conectado = false; otro = false; }
     confiable.saludar();
     actualizar();
   }
@@ -128,13 +141,32 @@ export function crearEnlace(o: OpcionesDelEnlace) {
     else probar();
     confiable.saludar();
   }
-  function alServidor(e: EstadoDelServidor) {
+  function alServidor(e: EstadoDelTema) {
     const llego = e.otro && !otro;
     conectado = e.conectado;
     otro = e.otro;
     if (!otro) intento?.cancelar();
     if (llego && !canal) seEncontraron();
     actualizar();
+  }
+
+  // Cada página del otro saluda con su época. Si por el servidor saluda una época nueva mientras
+  // acá hay una directa abierta, la directa era con la página de antes (el otro se recargó): se la
+  // deja y se vuelven a encontrar. Un canal que solo se volvió a abrir no cambia de época.
+  let epocaDelOtro: string | null = null;
+  function alTextoDelServidor(texto: string) {
+    const m = leer(texto);
+    if (m?.t === "hola") {
+      const nueva = epocaDelOtro !== null && m.e !== epocaDelOtro;
+      epocaDelOtro = m.e;
+      if (nueva && canal) dejarLaDirecta(canal);
+    }
+    alTexto(texto);
+  }
+  function dejarLaDirecta(c: CanalDirecto) {
+    canal = null;
+    c.cerrar();
+    seEncontraron();
   }
 
   // ---- Lo que llega, por cualquiera de los dos caminos ----
@@ -165,19 +197,20 @@ export function crearEnlace(o: OpcionesDelEnlace) {
     actualizar();
   });
   servidor.estado.escuchar(alServidor);
-  servidor.mensajes.escuchar(alTexto);
+  servidor.mensajes.escuchar(alTextoDelServidor);
 
   function cerrar() {
     const c = canal;
     canal = null;
     c?.cerrar();
     intento?.cancelar();
-    servidor.cerrar();
+    servidor.soltar();
   }
   servidor.cerrada.escuchar(() => {
     cerrar();
     cerrada.avisar();
   });
+  servidor.tomar();
 
   return {
     // Lo que el otro manda (cualquier valor que se pueda pasar a JSON), en orden y una vez.
@@ -185,9 +218,9 @@ export function crearEnlace(o: OpcionesDelEnlace) {
     // Cada cambio de estado; `estado()` dice el de ahora.
     cambios,
     estado: () => estado,
-    // La central cerró la sala (se soltó el emparejamiento): el enlace ya no sirve.
+    // El servidor cerró el tema (se soltó el emparejamiento): el enlace ya no sirve.
     cerrada,
-    // El servidor no deja escuchar la sala (401, 403 o 404).
+    // El servidor no deja escuchar el tema (401, 403 o 404).
     rechazado: servidor.rechazado,
     // Mandar un valor; la promesa se cumple cuando el otro lo recibió.
     mandar: (dato: unknown) => confiable.mandar(JSON.stringify(dato)),

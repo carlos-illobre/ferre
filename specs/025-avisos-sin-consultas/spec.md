@@ -103,7 +103,7 @@ cambia sin que la aplicación haya preguntado nada a ritmo fijo.
 
 **Acceptance Scenarios**:
 
-- **E12** **Given** la entrada de la computadora, **When** abre la conexión para esperar el código QR, **Then** dice «En línea»; si esa conexión se corta, dice «Sin conexión» en el momento; mientras la abre, «Conectando…».
+- **E12** **Given** la entrada de la computadora, **When** abre la conexión para esperar el código QR, **Then** dice «En línea»; si esa conexión se corta, dice «Sin conexión» en el momento y vuelve sola; mientras la abre, «Conectando…». Si al abrir la entrada el servidor no contesta (con la red bien), dice «Sin conexión» y el código se vuelve a pedir cuando alguien toca la pantalla o vuelve a la ventana, o cuando el navegador avisa que volvió la red: no a ritmo fijo.
 - **E13** **Given** cualquier indicador, **When** el navegador avisa que se fue la red, **Then** dice «Sin conexión» en el momento.
 - **E14** **Given** un indicador sin una conexión abierta, **When** pasa el tiempo sin pedidos, **Then** sigue diciendo lo último que se supo; el próximo pedido lo corrige (si falla por la red, «Sin conexión»; si contesta, «En línea»).
 - **E15** **Given** un wifi conectado sin salida a internet y sin una conexión abierta, **When** nadie hace nada, **Then** el indicador puede seguir en «En línea» hasta el próximo pedido. Es aceptado.
@@ -145,7 +145,7 @@ una conexión abierta con el servidor; mandar un código y una foto.
 **Acceptance Scenarios**:
 
 - **E21** **Given** un celular y una computadora vinculados en un wifi que deja la directa, **When** se arma, **Then** los dos cierran la conexión con el servidor y siguen hablándose; el indicador dice «Directa».
-- **E22** **Given** la directa armada, **When** uno de los dos se cierra o se va del wifi, **Then** el otro se entera por la directa y lo dice el indicador («Solo en …»), sin el servidor.
+- **E22** **Given** la directa armada, **When** uno de los dos se cierra o se va del wifi, **Then** el otro se entera por la directa y vuelve al canal a esperarlo; el indicador lo dice («Solo en …»).
 - **E23** **Given** la directa que se cortó o que no se pudo armar, **When** hace falta, **Then** abren el canal con el servidor para volver a encontrarse o para ir por el servidor (specs/023: no se reintenta la directa sola si los dispositivos o la red no la soportan).
 - **E24** **Given** el vínculo por el servidor (sin directa), **When** la aplicación queda oculta, **Then** cierra el canal y lo abre al volver a la vista; lo que el otro mande mientras tanto le llega al volver, como cuando la aplicación está cerrada.
 - **E25** **Given** un dispositivo vinculado por el servidor que además muestra un código QR, **When** están las dos cosas, **Then** usa una sola conexión abierta (E07).
@@ -175,13 +175,16 @@ del servidor, y ver que llega, sin código nuevo de red.
 - **El servidor se reinicia (una versión nueva) con un código QR en pantalla:** la conexión se corta, vuelve sola y el servidor cuenta cómo está lo esperado (E06); la versión nueva llega en la misma conexión (E11).
 - **Se pierde un aviso** (llegó justo cuando la conexión se cortaba): al volver la conexión, el servidor cuenta el estado de lo esperado, no la lista de avisos; nada depende de recibir cada aviso.
 - **Muchas pantallas abiertas en la misma computadora:** cada pestaña tiene su canal solo mientras espera algo.
+- **Se suelta el vínculo con la directa armada:** quien lo suelta cierra su lado, la directa se corta y el otro vuelve al canal, donde el servidor ya no le da el tema: deja de figurar (023-E26). Si el vínculo vence o se cierra la sesión con la directa armada, el servidor no tiene por dónde avisar: siguen hablándose hasta que uno se cierre o haga un pedido (la sesión cerrada vuelve a la entrada, E10).
+- **La sesión vence con un canal abierto:** no pasa en la práctica (la sesión se estira con el uso y el canal solo está abierto con la aplicación a la vista); si pasara, al volver a abrirse el canal el servidor no lo da y la aplicación vuelve a la entrada.
+- **Una pantalla que muestra datos del servidor** (tickets, Configuración, Ajustes) los vuelve a traer al volver la red: es la transacción de esa pantalla, que queda fuera de este rediseño.
 - **El servidor no guarda avisos para nadie:** lo que importa (que se aprobó la entrada, que se vinculó) ya está guardado como estado; los avisos son la forma de enterarse rápido.
 
 ### Seguridad
 
 - **E30** **Given** un canal para esperar la entrada con código QR (todavía sin sesión), **When** se abre, **Then** el servidor exige el secreto de ese código; sin él, no se abre, y la sesión nueva viaja solo a quien lo tiene.
 - **E31** **Given** un canal con sesión, **When** alguien pide temas que no son suyos (el vínculo de otro, la entrada de otra computadora), **Then** el servidor no se los da.
-- **E32** **Given** que la sesión del canal se cierra o vence, **When** pasa, **Then** el servidor cierra el canal.
+- **E32** **Given** que la sesión del canal se cierra (a distancia, al salir o al desactivar a la persona), **When** pasa, **Then** el servidor cierra los canales de esa sesión; si se cerró a distancia o al desactivar, antes lo avisa por el tema de la sesión.
 - **E33** **Given** demasiados canales abiertos desde el mismo dispositivo o en total, **When** se pide otro, **Then** el servidor lo rechaza y no se satura; el dispositivo lo dice como «Sin conexión».
 - **E34** **Given** un aviso que llega por el canal, **When** no tiene la forma esperada, **Then** se descarta sin romper nada.
 
@@ -192,7 +195,7 @@ del servidor, y ver que llega, sin código nuevo de red.
 - **RF-141**: Lo que una pantalla espera en un momento puntual (el código QR de entrada y el de vincular el celular) llega en el momento por un canal abierto solo mientras esa pantalla lo espera; mientras tanto la aplicación no pregunta nada a ritmo fijo. La cuenta regresiva del código, que no usa la red, se queda.
 - **RF-142**: Lo que puede pasar en cualquier momento (la versión nueva, la sesión cerrada) no tiene consultas propias: viaja en las respuestas a los pedidos que la aplicación ya hace, o por un canal que ya esté abierto por otro motivo. Si la aplicación no se usa, no consulta nada, tampoco al volver a ella ni al volver la red. Precisa RF-96 (009) y RF-74 (007).
 - **RF-143**: Los indicadores de conexión no preguntan nada: dicen lo que muestran las respuestas del servidor, los avisos del navegador y los canales abiertos. Son exactos con un canal abierto; sin él, dicen lo último que se supo. Un indicador nuevo se arma diciendo qué mira.
-- **RF-144**: Con «Trabajar sin conexión» habilitado (RF-84), lo pendiente se manda cuando el navegador avisa que volvió la red o cuando el servidor vuelve a contestar un pedido; no hay reintentos a ritmo fijo. Sin nada pendiente, no se hace nada.
+- **RF-144**: Con «Trabajar sin conexión» habilitado (RF-84), lo pendiente se manda al abrir la aplicación, cuando el navegador avisa que volvió la red o cuando el servidor vuelve a contestar un pedido; si algo quedó sin salir con el servidor contestando (un error suyo), sale con la próxima respuesta del servidor pasado un minuto. No hay reintentos a ritmo fijo. Sin nada pendiente, no usa la red.
 - **RF-145**: Cada dispositivo tiene a lo sumo un canal abierto con el servidor, que comparten todas las esperas y el respaldo del vínculo. El celular y la computadora vinculados lo usan para armar la conexión directa y, armada, lo cierran; queda abierto solo como respaldo si la directa no se pudo o mientras esperan encontrarse. Con la aplicación oculta, el canal se cierra; al volver a la vista se abre si algo lo necesita.
 
 ### Non-Functional Requirements

@@ -1,23 +1,29 @@
-// Dos dispositivos de prueba, cada uno con su enlace, unidos por una central de verdad. El `fetch`
-// de cada uno le pasa los pedidos a la central, con el lado en una cabecera.
-import { crearCentral } from "../servidor/index.js";
-import { crearEnlace, type Enlace, type EstadoDelEnlace } from "../navegador/index.js";
+// Dos dispositivos de prueba, cada uno con su central y su enlace, unidos por canales de verdad.
+// El `fetch` de cada uno le pasa los pedidos a los canales, con el lado en una cabecera.
+import { crearCanales } from "../servidor/index.js";
+import { leerTemas } from "../comun/temas.js";
+import { crearCentral, crearEnlace, type Enlace, type EstadoDelEnlace } from "../navegador/index.js";
 import { almacenEnMemoria } from "../navegador/memoria.js";
 import { relojDePrueba } from "./red.js";
+import { vistaDePrueba } from "./vista.js";
 
-export function centralDePrueba() {
-  const central = crearCentral({ cadaTanto: () => () => {} });
+export const TEMA = "vinculo:1";
+
+export function canalesDePrueba() {
+  const canales = crearCanales({ cadaTanto: () => () => {} });
   const posts: string[] = [];
   const flujos: Array<{ cortar(): void }> = [];
   let caida = false;
-  const fetch = (async (url: string, init: RequestInit = {}) => {
+  const fetch = (async (_url: string, init: RequestInit = {}) => {
     if (caida) throw new Error("sin red");
-    const lado = (init.headers as Record<string, string>).lado!;
+    const cabeceras = init.headers as Record<string, string>;
+    const lado = cabeceras.lado!;
     if (init.method === "POST") {
       posts.push(init.body as string);
-      return new Response(null, { status: central.recibir(url, lado, init.body as string) });
+      return new Response(null, { status: canales.recibir(TEMA, lado, init.body as string) });
     }
-    const lector = central.escuchar(url, lado).body!.getReader();
+    const temas = leerTemas(cabeceras["X-Temas"])!.map((p) => ({ tema: p.t, lado: p.l }));
+    const lector = canales.abrir(lado, lado, temas).body!.getReader();
     let control!: ReadableStreamDefaultController<Uint8Array>;
     const cuerpo = new ReadableStream<Uint8Array>({
       start: (c) => { control = c; },
@@ -29,7 +35,7 @@ export function centralDePrueba() {
     return new Response(cuerpo, { status: 200 });
   }) as unknown as typeof globalThis.fetch;
   return {
-    central, posts, fetch,
+    canales, posts, fetch,
     // Se cae la conexión con el servidor (los flujos abiertos se cortan) o vuelve.
     caer() { caida = true; flujos.splice(0).forEach((f) => f.cortar()); },
     volver() { caida = false; },
@@ -37,20 +43,23 @@ export function centralDePrueba() {
 }
 
 export function dispositivos(Conexion: { compu?: typeof RTCPeerConnection; celu?: typeof RTCPeerConnection }) {
-  const red = centralDePrueba();
+  const red = canalesDePrueba();
   const reloj = relojDePrueba();
   const almacenes = { computadora: almacenEnMemoria(), celular: almacenEnMemoria() };
   let epocas = 0;
   const abrir = (lado: "computadora" | "celular") => {
+    const vista = vistaDePrueba();
+    const entorno = { fetch: red.fetch, esperar: reloj.esperar, vista, red: { alCambiar: () => () => {} } };
+    const central = crearCentral({ url: "/canal", cabeceras: () => ({ lado }), entorno });
     const enlace = crearEnlace({
-      url: "/sala", inicia: lado === "computadora", cabeceras: () => ({ lado }), almacen: almacenes[lado],
-      red: { fetch: red.fetch, Conexion: lado === "computadora" ? Conexion.compu : Conexion.celu, ahora: reloj.ahora, esperar: reloj.esperar, epoca: `${lado}-${epocas++}` },
+      central, tema: TEMA, lado, url: "/canal/vinculo", inicia: lado === "computadora", almacen: almacenes[lado],
+      red: { Conexion: lado === "computadora" ? Conexion.compu : Conexion.celu, ahora: reloj.ahora, esperar: reloj.esperar, epoca: `${lado}-${epocas++}` },
     });
     const recibido: unknown[] = [];
     const estados: EstadoDelEnlace[] = [];
     enlace.recibidos.escuchar((d) => recibido.push(d));
     enlace.cambios.escuchar((e) => estados.push(e));
-    return { enlace, recibido, estados, conexion: () => enlace.estado().conexion };
+    return { enlace, central, vista, recibido, estados, conexion: () => enlace.estado().conexion };
   };
   return { red, reloj, almacenes, abrir };
 }

@@ -36,9 +36,12 @@ PIDS=/tmp/ferre-preview.pid
 # La huella de lo que entra en el cliente web: si no cambió desde la última construcción, no se
 # vuelve a construir (tarda medio minuto).
 huella_web() {
-  { echo "$1"; grep -E '^(AMBIENTE|IMAGEN_TAG)=' .env; git ls-files -s microservices/web microservices/procesos/web package.json pnpm-lock.yaml
-    git diff HEAD -- microservices/web microservices/procesos/web
-    git ls-files --others --exclude-standard microservices/web microservices/procesos/web | xargs -r sha1sum
+  # También el módulo de comunicación (microservices/conexion), que va adentro del cliente.
+  local carpetas="microservices/web microservices/procesos/web microservices/conexion"
+  # shellcheck disable=SC2086
+  { echo "$1"; grep -E '^(AMBIENTE|IMAGEN_TAG)=' .env; git ls-files -s $carpetas package.json pnpm-lock.yaml
+    git diff HEAD -- $carpetas
+    git ls-files --others --exclude-standard $carpetas | xargs -r sha1sum
   } | sha1sum | cut -c1-40
 }
 # $1: la API a la que apunta; $2: la carpeta de salida, dentro de microservices/web. El ambiente y

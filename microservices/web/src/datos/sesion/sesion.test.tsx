@@ -7,7 +7,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 // (fetch); la sesión y el cliente son los de verdad. Casos D4 a D6 de docs/pruebas-manuales/entrar.md.
 vi.unmock("./index"); // la preparación reemplaza la sesión por su index
 const { ProveedorDeSesion, useSesion } = await import("./sesion");
-const { api } = await import("../conexion");
+const { api, avisos } = await import("../conexion");
 const { agregarALaVenta, ventaActual } = await import("../../negocio/ventas/venta-en-curso");
 
 const CARLOS = { id: "u-1", email: "carlos@ferre.test", nombre: "Carlos", roles: [], permisos: [] };
@@ -65,22 +65,35 @@ describe("el servidor da por terminada la sesión", () => {
     } finally { vi.useRealTimers(); }
   });
 
-  it("escenario 4: si estaba en otra ventana, sale apenas vuelve a la aplicación", async () => {
-    servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
+  it("025-E08, E10: al volver a la aplicación o al volver la red no pregunta nada: el próximo pedido rechazado la saca", async () => {
+    const pedidos: string[] = [];
+    servidor = async (ruta) => { pedidos.push(ruta); return respuesta(200, { id: "s-1", usuario: CARLOS }); };
     render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
     await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
-    servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
-    await act(async () => { document.dispatchEvent(new Event("visibilitychange")); });
-    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("sin-sesion"));
+    const antes = pedidos.length;
+    await act(async () => { document.dispatchEvent(new Event("visibilitychange")); window.dispatchEvent(new Event("online")); });
+    expect(pedidos).toHaveLength(antes);
   });
 
-  it("escenario 4b: sin conexión sigue trabajando; al recuperarla, vuelve a la entrada", async () => {
-    servidor = async () => { throw new TypeError("Failed to fetch"); };
+  it("025-E11: si el canal está abierto por otra cosa, el aviso de sesión cerrada la saca en el momento", async () => {
+    let flujo: ReadableStreamDefaultController<Uint8Array> | null = null;
+    const temas: string[] = [];
+    vi.stubGlobal("fetch", vi.fn((url: string, init: RequestInit = {}) => {
+      if (new URL(url).pathname !== "/canal") return servidor(new URL(url).pathname);
+      temas.push((init.headers as Record<string, string>)["X-Temas"]!);
+      return Promise.resolve(new Response(new ReadableStream<Uint8Array>({ start: (c) => { flujo = c; } }), { status: 200 }));
+    }));
+    servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
+    // Otra cosa abre el canal antes de que se sepa la sesión (el vínculo, al cargar): al saberse,
+    // el canal se vuelve a abrir con ella.
+    const dejar = avisos.vigilar({ tema: "otra", temporaria: true });
     render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
-    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro sin conexión"));
-    servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
-    await act(async () => { window.dispatchEvent(new Event("online")); });
+    await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
+    await waitFor(() => expect(temas.at(-1)).toContain("sesion:s-1"));
+    await act(async () => { flujo!.enqueue(new TextEncoder().encode('data: {"t":"sesion:s-1","c":true}\n\n')); });
     await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("sin-sesion"));
+    expect(localStorage.getItem("ferre.sesion.prueba")).toBeNull();
+    dejar();
   });
 
   it("D1: con una sesión que vale, al abrir entra directo, sin pedir Google ni la huella", async () => {

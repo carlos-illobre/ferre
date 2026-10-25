@@ -43,11 +43,14 @@ test.beforeAll(() => {
 
 test.afterEach(cerrarLasOtrasVentanas);
 
-test("023-E15: vincular el celular y que lo escaneado aparezca en la laptop", async ({ browser }) => {
+test("023-E15 025-E02: vincular el celular (sin preguntar si ya lo leyó) y que lo escaneado aparezca en la laptop", async ({ browser }) => {
   const laptop = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
   await laptop.addInitScript((t) => localStorage.setItem("ferre.sesion.desarrollo", t), TOKEN_LAPTOP);
   await laptop.goto("/#/vender");
   await expect(laptop.getByTestId("busqueda")).toBeEnabled();
+  // Mientras muestra el código, la laptop espera por su canal: no pregunta si el celular ya lo leyó.
+  const pedidosDeLaLaptop: string[] = [];
+  laptop.on("request", (r) => pedidosDeLaLaptop.push(`${r.method()} ${new URL(r.url()).pathname}`));
   await laptop.getByTestId("emparejar-celular").click();
   // El código tarda un instante en llegar: se espera la imagen, no el recuadro vacío.
   await expect(laptop.getByTestId("qr-vincular").locator("img")).toBeVisible();
@@ -60,6 +63,7 @@ test("023-E15: vincular el celular y que lo escaneado aparezca en la laptop", as
   await celular.goto(enlace.replace(/^https?:\/\/[^/]+/, ""));
   await expect(celular.getByTestId("vinculacion-ok")).toContainText("quedó vinculado");
   await expect(laptop.getByTestId("celular-vinculado")).toBeVisible({ timeout: 10000 });
+  expect(pedidosDeLaLaptop.filter((p) => /^GET \/puestos\/[0-9a-f-]{36}$/.test(p))).toEqual([]);
 
   // El celular, como lector de la computadora (decisión 59), manda un código conocido: la laptop
   // lo agrega a la venta. Viaja por la conexión directa entre los dos (specs/023).

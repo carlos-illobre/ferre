@@ -6,7 +6,7 @@ import type { z } from "zod";
 import type { cambiosDeRol, cambiosDeUsuario, rolNuevo, usuarioNuevo } from "./esquemas.js";
 import * as datos from "../persistencia/administracion.js";
 import { olvidarSesiones } from "../acceso/sesiones.js";
-import { cerrarSalasDelUsuario } from "../acceso/reglas.js";
+import { cerrarCanalesDelUsuario } from "../acceso/reglas.js";
 import type { Rol, Usuario } from "../contratos/usuarios.js";
 import type { Enviable } from "../enviable.js";
 
@@ -108,6 +108,7 @@ export async function autorizar(u: z.output<typeof usuarioNuevo>, actorId: strin
 
 async function cambiarUsuarioSinOlvidar(id: string, u: z.output<typeof cambiosDeUsuario>, actorId: string): Promise<Resultado> {
   if (actorId === id && u.activo === false) return mal(400, "No podés desactivarte a vos mismo: lo tiene que hacer otra persona");
+  let cerradas: string[] = [];
   const r = await enTransaccion(async (trx) => {
     if (!(await datos.cambiarUsuario(trx, id, u.activo ?? null, u.nombre?.trim() || null))) throw new Deshacer(mal(404, "No existe ese usuario"));
     if (u.roles !== undefined) {
@@ -115,12 +116,12 @@ async function cambiarUsuarioSinOlvidar(id: string, u: z.output<typeof cambiosDe
       await datos.asignarRoles(trx, id, u.roles, true);
     }
     await siguenAdministrando(trx, actorId, actorId === id);
-    if (u.activo === false) await datos.cerrarSesionesDe(trx, id);
+    if (u.activo === false) cerradas = await datos.cerrarSesionesDe(trx, id);
     await anotarEvento(trx, { tipo: "usuario.modificado", usuarioId: actorId, contenido: { id, cambios: u } });
     return { ok: true } as Resultado;
   });
-  // Desactivada, sus dos dispositivos dejan de hablarse en el momento (023-E26).
-  if (r.ok && u.activo === false) await cerrarSalasDelUsuario(id);
+  // Desactivada, sus dispositivos se enteran y dejan de hablarse en el momento (023-E26, 025-E32).
+  if (r.ok && u.activo === false) await cerrarCanalesDelUsuario(id, cerradas);
   return r;
 }
 

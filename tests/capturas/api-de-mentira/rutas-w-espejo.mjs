@@ -1,5 +1,5 @@
-// La conexión entre la computadora y el celular, de mentira (specs/023): una central como la del
-// servidor, que presenta a los dos lados de la sala y les pasa lo que se mandan. Las aplicaciones
+// La conexión entre la computadora y el celular, de mentira (specs/023 y 025): canales como los del
+// servidor, que presentan a los dos lados del vínculo y les pasan lo que se mandan. Las aplicaciones
 // arman solas lo demás (la conexión directa, si el navegador la deja). Para el clip del manual que
 // muestra cómo la computadora sigue al celular (tests/capturas/tutorial/espejo.py).
 //
@@ -13,25 +13,35 @@
 // que la computadora pide le llega sola a los ocho segundos (RF-50).
 const vence = "2099-01-01T00:00:00Z";
 const puesto = { id: "pu-1", nombre: "computadora del mostrador", expira_en: vence };
-const oyentes = { computadora: new Set(), celular: new Set() };
+const VINCULO = "vinculo:pu-1";
 const ladoDe = (headers) => (String(headers.authorization ?? "").startsWith("Bearer celular") ? "celular" : "computadora");
-const otro = (lado) => (lado === "computadora" ? "celular" : "computadora");
-const avisarPresencia = () => { for (const l of ["computadora", "celular"]) oyentes[l].forEach((o) => o("m", { p: oyentes[otro(l)].size > 0 })); };
+
+// Los canales de mentira (specs/025, ADR-030), como los del servidor: cada `GET /canal` abre un
+// flujo con los temas de la cabecera X-Temas. El vínculo tiene lados (presencia); los demás temas,
+// no. `avisarTema` le avisa algo a quien escuche un tema (la entrada aprobada, por ejemplo).
+const canales = new Set();
+const conTema = (tema) => [...canales].filter((c) => c.temas.has(tema));
+export function avisarTema(tema, datos, salvoLado) {
+  for (const c of conTema(tema)) if (salvoLado === undefined || c.temas.get(tema) !== salvoLado) c.enviar("m", { t: tema, d: datos });
+}
+const avisarPresencia = (tema) => {
+  const oyentes = conTema(tema).filter((c) => c.temas.get(tema));
+  for (const c of oyentes) c.enviar("m", { t: tema, p: oyentes.some((o) => o.temas.get(tema) !== c.temas.get(tema)) });
+};
 
 // El celular de mentira habla el protocolo del enlace (microservices/conexion): un saludo y datos numerados.
 let numero = 1;
 const comoCelular = (dato) => {
   const n = numero++;
-  for (const o of oyentes.computadora) {
-    o("m", { m: JSON.stringify({ t: "hola", e: "mentira", desde: n, re: "", rh: 0 }) });
-    o("m", { m: JSON.stringify({ t: "dato", e: "mentira", n, d: JSON.stringify(dato), s: false }) });
-  }
+  avisarTema(VINCULO, JSON.stringify({ t: "hola", e: "mentira", desde: n, re: "", rh: 0 }), "celular");
+  avisarTema(VINCULO, JSON.stringify({ t: "dato", e: "mentira", n, d: JSON.stringify(dato), s: false }), "celular");
 };
+const hayCelular = () => conTema(VINCULO).some((c) => c.temas.get(VINCULO) === "celular");
 // Una imagen chica, como la foto que mandaría el celular (la aplicación acepta JPEG, PNG o WebP).
 const PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 // Lo que la computadora manda: si pide una foto y no hay celular de verdad, la manda el de mentira.
 function alMandarLaComputadora(textos) {
-  if (oyentes.celular.size > 0) return;
+  if (hayCelular()) return;
   for (const t of textos) {
     try {
       const m = JSON.parse(t);
@@ -48,22 +58,26 @@ export default {
     if (d.startsWith("celular-vinculado")) return { comoComputadora: null, comoCelular: puesto };
     return { comoComputadora: null, comoCelular: null };
   },
-  "GET /puestos/:id/enlace": ({ headers }) => ({
+  "GET /canal": ({ headers }) => ({
     flujo: (enviar, alCerrar) => {
       const lado = ladoDe(headers);
-      oyentes[lado].add(enviar);
-      avisarPresencia();
-      alCerrar(() => { oyentes[lado].delete(enviar); avisarPresencia(); });
+      let pedidos = [];
+      try { pedidos = JSON.parse(String(headers["x-temas"] ?? "[]")); } catch { /* sin temas */ }
+      const canal = { temas: new Map(pedidos.map((p) => [p.t, p.t.startsWith("vinculo:") ? lado : undefined])), enviar };
+      canales.add(canal);
+      enviar("m", { a: { version: "mock" } });
+      canal.temas.forEach((_lado, tema) => avisarPresencia(tema));
+      alCerrar(() => { canales.delete(canal); canal.temas.forEach((_lado, tema) => avisarPresencia(tema)); });
     },
   }),
-  "POST /puestos/:id/enlace": ({ headers, body }) => {
+  "POST /canal/:tema": ({ headers, params, body }) => {
     const lado = ladoDe(headers);
     const textos = Array.isArray(body) ? body : [];
-    for (const m of textos) oyentes[otro(lado)].forEach((o) => o("m", { m }));
+    for (const m of textos) avisarTema(params.tema, m, lado);
     if (lado === "computadora") alMandarLaComputadora(textos);
     return undefined;
   },
-  "PUT /mentira/escanear": ({ body }) => { comoCelular({ tipo: "codigo", codigo: String(body?.codigo ?? "") }); return { oyentes: oyentes.computadora.size }; },
+  "PUT /mentira/escanear": ({ body }) => { comoCelular({ tipo: "codigo", codigo: String(body?.codigo ?? "") }); return { oyentes: conTema(VINCULO).length }; },
   // Para volver a empezar entre una grabación y otra.
   "PUT /mentira/espejo": () => ({}),
 };

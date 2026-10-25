@@ -30,6 +30,14 @@ export const exigirSesion: MiddlewareHandler = async (c, next) => {
   await next();
 };
 
+// Para lo que sirve con o sin sesión (el canal de la entrada con código QR): la sesión, si viene y vale.
+export const sesionSiHay: MiddlewareHandler = async (c, next) => {
+  const token = tokenDe(c);
+  const sesion = token ? await buscarSesion(base, token) : null;
+  if (sesion) c.set("sesion", sesion);
+  await next();
+};
+
 // Pasa quien tenga alguno de los permisos pedidos (ADR-017). Si no, 403 diciendo cuál falta:
 // no es un problema de sesión, así que no se le cierra.
 export function exigirPermiso(...claves: Permiso[]): MiddlewareHandler {

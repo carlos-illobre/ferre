@@ -4,7 +4,7 @@ export type Pedido = { url: string; metodo: string; cabeceras: Record<string, st
 
 export function fetchDePrueba() {
   const pedidos: Pedido[] = [];
-  const flujos: Array<{ escribir(t: string): void; terminar(): void; fallar(): void }> = [];
+  const flujos: Array<{ escribir(t: string): void; terminar(): void; fallar(): void; cerrado: boolean }> = [];
   // Cómo contestar cada pedido: por omisión, un flujo abierto a un GET y 204 a un POST.
   let contestar: (p: Pedido) => Response | Promise<Response> | "flujo" = (p) => (p.metodo === "GET" ? "flujo" : new Response(null, { status: 204 }));
   const codificador = new TextEncoder();
@@ -15,8 +15,9 @@ export function fetchDePrueba() {
     if (r !== "flujo") return r;
     let control!: ReadableStreamDefaultController<Uint8Array>;
     const cuerpo = new ReadableStream<Uint8Array>({ start: (c) => { control = c; } });
-    const flujo = { escribir: (t: string) => control.enqueue(codificador.encode(t)), terminar: () => control.close(), fallar: () => control.error(new Error("corte")) };
-    init.signal?.addEventListener("abort", flujo.fallar);
+    const flujo = { escribir: (t: string) => control.enqueue(codificador.encode(t)), terminar: () => control.close(), fallar: () => control.error(new Error("corte")), cerrado: false };
+    // Quien lo abrió lo corta (cierra el canal o reconecta).
+    init.signal?.addEventListener("abort", () => { flujo.cerrado = true; flujo.fallar(); });
     flujos.push(flujo);
     return new Response(cuerpo, { status: 200 });
   }) as unknown as typeof fetch;

@@ -91,7 +91,8 @@ indicador es la de la última confirmación: no hay latidos ni preguntas para me
 
 ### En Ferrebress
 
-- La ruta `/puestos/:id/enlace` (`GET` escucha, `POST` manda) pide sesión y que el dispositivo
+- La ruta `/puestos/:id/enlace` (`GET` escucha, `POST` manda; desde ADR-030, `/canal` y
+  `/canal/vinculo:<id>`) pide sesión y que el dispositivo
   sea un lado de ese emparejamiento; después le pasa el pedido a la central. Desvincular, cerrar
   una sesión a distancia o vencer el vínculo cierra la sala, y la central se lo dice a los dos.
 - Lo que hoy viaja por el espejo, los códigos y los avisos pasa a ser mensajes del enlace. El

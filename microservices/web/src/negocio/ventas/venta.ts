@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ErrorApi } from "../../datos/conexion";
-import { borrarAnterioresA, enviarPendientes } from "../../datos/almacenamiento";
+import { borrarAnterioresA } from "../../datos/almacenamiento";
 import { pedirClientes, useCatalogo, type Producto } from "../catalogo";
 import { anotarNoLlevo, haySinPrecio, porQueNoSeCobra, registrarVenta, totalDe, type Cobro, type MotivoDeNoCobrar } from "./cobrar";
 import type { Medio } from "./medios";
@@ -31,16 +31,11 @@ export type OpcionesDeVenta = {
   alCobrar?: (cobro: Cobro) => void;
 };
 
-// Al abrir Vender: los clientes (no en cada pantalla, specs/018), reintentar lo pendiente al volver
-// la conexión y borrar las ventas de más de 7 días del dispositivo (ADR-002).
+// Al abrir Vender: los clientes (no en cada pantalla, specs/018) y borrar las ventas de más de 7
+// días del dispositivo (ADR-002). Lo pendiente sale solo al volver la conexión (RF-144).
 function useAlAbrirVender() {
   useEffect(() => { pedirClientes(); }, []);
-  useEffect(() => {
-    const reintentar = () => { enviarPendientes().catch(() => undefined); };
-    window.addEventListener("online", reintentar);
-    borrarAnterioresA("ventas", "fecha", new Date(Date.now() - 7 * 86400000).toISOString()).catch(() => undefined);
-    return () => window.removeEventListener("online", reintentar);
-  }, []);
+  useEffect(() => { borrarAnterioresA("ventas", "fecha", new Date(Date.now() - 7 * 86400000).toISOString()).catch(() => undefined); }, []);
 }
 
 export function useVenta(opciones: OpcionesDeVenta) {

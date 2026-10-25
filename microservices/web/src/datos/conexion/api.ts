@@ -1,3 +1,4 @@
+import { CABECERA_A_CUESTAS, crearCentral, crearIndicador } from "conexion-entre-dispositivos/navegador";
 import { crearCliente, ErrorDelServidor, esFaltaDeRed } from "../../plataforma/servidor";
 import { reducirImagen } from "../../plataforma/imagenes";
 import type { FotoSubida } from "@servidor/productos";
@@ -14,8 +15,6 @@ if (origen === undefined) throw new Error("Falta VITE_API_URL al construir el cl
 // catálogo, el stock): quien lo tenga se entera y lo vuelve a pedir cuando haga falta.
 export const EVENTO_CAMBIO = "ferre:cambio-guardado";
 export const EVENTO_SESION_CERRADA = "sesion-cerrada";
-// La versión que dijo el servidor en una respuesta (la cabecera X-Version, decisión 157).
-export const EVENTO_VERSION_DEL_SERVIDOR = "ferre:version-del-servidor";
 
 const cliente = crearCliente({
   origen,
@@ -24,11 +23,34 @@ const cliente = crearCliente({
   // él se sube lo que la persona dejó sin mandar, si la desactivaron (cola.ts, ADR-021).
   alPerderLaSesion: (token) => window.dispatchEvent(new CustomEvent(EVENTO_SESION_CERRADA, { detail: { token } })),
   alGuardar: (ruta) => window.dispatchEvent(new CustomEvent(EVENTO_CAMBIO, { detail: ruta })),
-  alContestar: (respuesta) => {
-    const version = respuesta.headers?.get("X-Version");
-    if (version) window.dispatchEvent(new CustomEvent(EVENTO_VERSION_DEL_SERVIDOR, { detail: version }));
+  // Cada respuesta trae a cuestas lo permanente (la versión); un pedido que no llega dice que no
+  // hay conexión (ADR-030).
+  alContestar: (respuesta) => avisos.respondio(respuesta.headers?.get(CABECERA_A_CUESTAS) ?? null),
+  alNoLlegar: () => avisos.fallo(),
+});
+
+// La central de avisos del dispositivo (specs/025, ADR-030): lo que se espera del otro lado, por el
+// canal único con la sesión puesta. El canal lleva un nombre por pestaña: abrir otro reemplaza al
+// anterior de la misma pestaña, no al de otra.
+const pestana = crypto.randomUUID();
+export const avisos = crearCentral({
+  url: cliente.url("/canal"),
+  cabeceras: () => {
+    const token = cliente.leerToken();
+    return { "X-Canal": pestana, ...(token ? { Authorization: `Bearer ${token}` } : {}) };
   },
 });
+// Si hay conexión con el servidor, sin preguntar: lo que muestran las respuestas, el navegador y el
+// canal (RF-143). Arranca con lo que dice el navegador.
+export const conexion = crearIndicador(avisos.sucesos, typeof navigator !== "undefined" && navigator.onLine === false ? "sin-conexion" : "en-linea");
+
+// La sesión se cerró en el servidor (avisado por el canal): como un 401, vuelve a la entrada.
+export function perderLaSesion() {
+  const token = cliente.leerToken();
+  if (!token) return;
+  cliente.borrarToken();
+  window.dispatchEvent(new CustomEvent(EVENTO_SESION_CERRADA, { detail: { token } }));
+}
 
 export { ErrorDelServidor as ErrorApi, esFaltaDeRed };
 export const urlApi = cliente.url;

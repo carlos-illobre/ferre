@@ -74,8 +74,8 @@ import { createHash } from "node:crypto";
 const hashDe = (token: string) => createHash("sha256").update(token).digest("hex");
 
 // Pedido a la app con la sesión del rol indicado (o sin sesión).
-export function pedir(app: Hono, metodo: string, ruta: string, opciones: { rol?: keyof typeof usuarios | null; cuerpo?: unknown; formulario?: FormData } = {}) {
-  const cabeceras = new Headers();
+export function pedir(app: Hono, metodo: string, ruta: string, opciones: { rol?: keyof typeof usuarios | null; cuerpo?: unknown; formulario?: FormData; cabeceras?: Record<string, string> } = {}) {
+  const cabeceras = new Headers(opciones.cabeceras);
   if (opciones.rol !== null) cabeceras.set("Authorization", `Bearer token-${opciones.rol ?? "dueño"}`);
   let body: BodyInit | undefined;
   if (opciones.formulario) body = opciones.formulario;

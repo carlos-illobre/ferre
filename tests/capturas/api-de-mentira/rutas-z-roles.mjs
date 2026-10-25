@@ -1,3 +1,4 @@
+import { avisarTema } from "./rutas-w-espejo.mjs";
 // Roles y permisos (RF-72, RF-75): la sesión trae sus permisos, los roles se arman con ellos y
 // cada usuario tiene varios. Se llama «z» para cargarse último y ganarles a los demás en /usuarios y en la sesión.
 // `PUT /mentira/permisos` deja la sesión con los permisos que se le pasan (o con todos), para
@@ -63,7 +64,8 @@ export default {
   // Entrar a la computadora con el celular (RF-76): el código nunca se aprueba solo; con
   // `PUT /mentira/aprobar-codigo` la próxima consulta de la computadora la deja entrar.
   "POST /sesiones/vinculaciones": () => [201, { id: "v-1", codigo: "codigo-de-mentira", clave: "clave-de-mentira", expiraEnSegundos: 300 }],
-  "PUT /mentira/aprobar-codigo": () => { codigoAprobado = true; return {}; },
+  // La computadora que espera con el código se entera por su canal, como con el servidor (025-E01).
+  "PUT /mentira/aprobar-codigo": () => { codigoAprobado = true; avisarTema("entrada:v-1", { listo: true }); return {}; },
   "POST /sesiones/vinculaciones/aprobar": ({ body }) => (body?.codigo === "vencido" ? [410, { error: "Ese código venció o ya se usó. Leé el que la computadora muestra ahora." }] : { dispositivo: "computadora · Chrome" }),
   "POST /sesiones/vinculaciones/:id/estado": () => { if (!codigoAprobado) return { estado: "pendiente" }; codigoAprobado = false; return { estado: "aprobada", token: "token-de-mentira", usuario: sesion() }; },
   "GET /permisos": () => PERMISOS,

@@ -98,7 +98,7 @@ la huella. Nada más: sin sesión no se ve ningún dato del negocio.
 | Demasiados intentos | El texto de la regla |
 | Sin conexión | Que para entrar se necesita internet, y reintento |
 | Google no responde | Que Google no responde; la huella sigue disponible donde esté vinculada |
-| Sesión cerrada a distancia o vencida, o usuario desactivado | Se vuelve solo a la entrada, con «Hay que iniciar sesión». En cuanto se la usa o se vuelve a ella; sin conexión, al recuperarla. Sin tocarla, no se entera: no hay timer (decisión 158) |
+| Sesión cerrada a distancia o vencida, o usuario desactivado | Se vuelve solo a la entrada, con «Hay que iniciar sesión». Con su primer pedido al servidor (si tiene el canal abierto, en el momento). Sin usarla, no se entera: no hay timer ni consultas propias (decisiones 158 y 160) |
 
 ## Historia 1b: entrar a la computadora con el celular (RF-76)
 
@@ -524,8 +524,8 @@ y `maquetas/compu-usuarios-acceso.png`.
 - «Salir» lleva a la entrada.
 - «Salir» está al alcance de cualquier usuario desde cualquier parte, en un paso.
 - El dispositivo al que le cerraron la sesión vuelve solo a la entrada, con «Hay que iniciar
-  sesión»: en cuanto se la usa o se vuelve a la aplicación; sin conexión, al recuperarla. Sin
-  tocarla no se entera: no hay timer (decisión 158). Lo mismo pasa
+  sesión»: con su primer pedido al servidor, o en el momento si tiene el canal abierto por otra
+  cosa. Sin usarla no se entera: no hay timer ni consultas propias (decisiones 158 y 160). Lo mismo pasa
   al desactivar a alguien (decisión 97).
 - «Salir» sin conexión: [NEEDS CLARIFICATION: P9 de la spec: si el dispositivo no tiene internet, ¿«Salir» lo lleva igual a la entrada y la sesión se cierra en el servidor cuando reconecte, o no se puede salir sin conexión?]
 

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
-import { api, ErrorApi } from "../../datos/conexion";
+import { api, avisos, ErrorApi } from "../../datos/conexion";
 import { dispositivoId, guardarPuestoLocal, guardarPuestoRemoto } from "../../datos/vinculo";
 import type { ClienteDeGoogle, EntradaConGoogle, SesionNueva } from "@servidor/sesiones";
-import type { EstadoDelPuesto, PuestoNuevo, PuestoParaVincular, Vinculacion, Vinculado } from "@servidor/puestos";
+import type { PuestoNuevo, PuestoParaVincular, Vinculacion, Vinculado } from "@servidor/puestos";
 
 // El vínculo entre el celular y la computadora (decisiones 58 y 73) y la entrada con Google,
 // una sola vez para las dos interfaces (RNF-60). Las pantallas solo muestran.
@@ -25,16 +25,26 @@ export function vincularConCodigo(codigo: string): Promise<Vinculado> {
   return pedido;
 }
 
-// En la computadora: pide un código, lo muestra como QR y consulta cada 2 s si el celular ya
-// lo leyó. Vence a los 5 minutos (lo dice el servidor) y deja de consultar al vencer, al
-// cerrarse o al desmontarse la pantalla.
+// En la computadora: pide un código, lo muestra como QR y espera por el canal a que el celular lo
+// lea (RF-141): se entera en el momento, sin preguntar a ritmo fijo. Vence a los 5 minutos (lo dice
+// el servidor; la cuenta no usa la red) y deja de esperar al vencer, al cerrarse o al desmontarse.
 export function useCodigoParaVincular(alVincular: (puestoId: string) => void, qr: { ancho: number; oscuro?: string }) {
   const [imagen, setImagen] = useState<string | null>(null);
   const [vencido, setVencido] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const consulta = useRef<ReturnType<typeof setInterval> | null>(null);
-  const parar = () => { if (consulta.current) clearInterval(consulta.current); consulta.current = null; };
+  const espera = useRef<() => void>(() => {});
+  const parar = () => { espera.current(); espera.current = () => {}; };
   useEffect(() => parar, []);
+
+  // Vinculado: queda anotado en la computadora y deja de esperar.
+  function vinculado(id: string, datos: unknown) {
+    const expira = (datos as { expira_en?: string } | null)?.expira_en;
+    if (!expira) return;
+    parar(); setImagen(null);
+    guardarPuestoLocal({ id, expira_en: expira });
+    alVincular(id);
+  }
+  const vencio = () => { parar(); setImagen(null); setVencido(true); };
 
   async function generar() {
     parar(); setError(null); setVencido(false); setImagen(null);
@@ -44,12 +54,9 @@ export function useCodigoParaVincular(alVincular: (puestoId: string) => void, qr
       setImagen(await QRCode.toDataURL(enlace, { width: qr.ancho, margin: 1, ...(qr.oscuro ? { color: { dark: qr.oscuro, light: "#ffffff" } } : {}) }));
       // Para las pruebas automáticas: el enlace que el celular abriría.
       (window as unknown as { __enlaceVinculacion?: string }).__enlaceVinculacion = enlace;
-      const fin = Date.now() + expiraEnSegundos * 1000;
-      consulta.current = setInterval(async () => {
-        if (Date.now() > fin) { parar(); setImagen(null); setVencido(true); return; }
-        const estado = await api<EstadoDelPuesto>(`/puestos/${id}`).catch(() => null);
-        if (estado?.vinculado_en) { parar(); guardarPuestoLocal({ id, expira_en: estado.expira_en }); setImagen(null); alVincular(id); }
-      }, 2000);
+      const dejar = avisos.vigilar({ tema: `puesto:${id}`, temporaria: true, alAviso: (d) => vinculado(id, d), alRechazo: vencio });
+      const reloj = setTimeout(vencio, expiraEnSegundos * 1000);
+      espera.current = () => { dejar(); clearTimeout(reloj); };
     } catch (e) {
       setError(e instanceof ErrorApi ? e.message : "Sin conexión: para vincular el celular hace falta internet.");
     }

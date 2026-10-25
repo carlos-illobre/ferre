@@ -1,5 +1,5 @@
 import { crearEnlace, type Enlace, type EstadoDelEnlace } from "conexion-entre-dispositivos/navegador";
-import { leerToken, urlApi } from "../conexion";
+import { avisos, urlApi } from "../conexion";
 import { EVENTO_EMPAREJAMIENTO, guardarPuestoLocal, guardarPuestoRemoto, puestoLocal, puestoRemoto } from "./puesto";
 import { EVENTO_SESION_ABIERTA } from "../sesion";
 
@@ -61,10 +61,15 @@ function soltarEnlace() {
 
 // El enlace del vínculo, con lo que pasa con él: cada cambio de estado, cada mensaje, y el cierre.
 function armar(id: string, lado: Lado) {
+  // El vínculo es un tema del canal único del dispositivo (ADR-030): el servidor sirve para
+  // encontrarse y de respaldo; armada la directa, el canal se suelta.
+  const tema = `vinculo:${id}`;
   const e = crearEnlace({
-    url: urlApi(`/puestos/${id}/enlace`),
+    central: avisos,
+    tema,
+    lado,
+    url: urlApi(`/canal/${tema}`),
     inicia: lado === "computadora",
-    cabeceras: () => ({ Authorization: `Bearer ${leerToken() ?? ""}` }),
     almacen: almacenSeguro(),
     clave: `ferre.enlace.${id}`,
   });

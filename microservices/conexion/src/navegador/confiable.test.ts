@@ -30,6 +30,22 @@ function dosPuntas() {
 }
 
 describe("entrega confiable", () => {
+  it("si se pierde un dato, al llegar el siguiente se saluda una vez y el otro reenvía lo que falta", () => {
+    const t = dosPuntas();
+    t.puntas.a.c.saludar(); t.puntas.b.c.saludar(); t.ida_y_vuelta();
+    void t.puntas.a.c.mandar("uno");
+    void t.puntas.a.c.mandar("dos");
+    void t.puntas.a.c.mandar("tres");
+    // El primero se pierde en el camino; llegan el segundo y el tercero.
+    t.enCamino.b.shift();
+    t.recibir("b");
+    expect(t.puntas.b.recibidos).toEqual([]);
+    // b saludó una sola vez por el hueco (no por cada dato adelantado).
+    expect(t.enCamino.a.filter((x) => x.includes('"t":"hola"'))).toHaveLength(1);
+    t.ida_y_vuelta();
+    expect(t.puntas.b.recibidos).toEqual(["uno", "dos", "tres"]);
+  });
+
   it("entrega en orden y una sola vez, y confirma (023-E03)", async () => {
     const t = dosPuntas();
     t.puntas.a.c.saludar(); t.puntas.b.c.saludar(); t.ida_y_vuelta();

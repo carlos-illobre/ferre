@@ -23,6 +23,8 @@ export type OpcionesDeCliente = {
   alGuardar?: (ruta: string) => void;
   // Llegó una respuesta del servidor, cualquiera: para mirar sus cabeceras.
   alContestar?: (respuesta: Response) => void;
+  // Un pedido no llegó al servidor (falta de red).
+  alNoLlegar?: () => void;
 };
 
 async function fallar(respuesta: Response): Promise<never> {
@@ -60,6 +62,12 @@ export function crearCliente(opciones: OpcionesDeCliente) {
   }
   const guardarToken = (token: string): void => localStorage.setItem(opciones.claveDelToken, token);
   const borrarToken = (): void => localStorage.removeItem(opciones.claveDelToken);
+  // El pedido: si no llega al servidor, se avisa y sigue el error. Uno cancelado a propósito no
+  // dice nada de la conexión.
+  const llegar = (ruta: string, pedido: RequestInit) => fetch(url(ruta), pedido).catch((e: unknown) => {
+    if (!(e instanceof DOMException && e.name === "AbortError")) opciones.alNoLlegar?.();
+    throw e;
+  });
   // Un 401 significa que la sesión ya no vale: se borra y se avisa.
   function revisar(respuesta: Response, token: string | null): void {
     opciones.alContestar?.(respuesta);
@@ -69,7 +77,7 @@ export function crearCliente(opciones: OpcionesDeCliente) {
   // Todas las llamadas llevan el token de sesión si existe.
   async function pedir<T>(ruta: string, pedido: RequestInit = {}): Promise<T> {
     const token = leerToken();
-    const respuesta = await fetch(url(ruta), { ...pedido, headers: cabecerasDe(pedido, token) });
+    const respuesta = await llegar(ruta, { ...pedido, headers: cabecerasDe(pedido, token) });
     revisar(respuesta, token);
     if (!respuesta.ok) await fallar(respuesta);
     if (!esDeLectura(pedido)) opciones.alGuardar?.(ruta);
@@ -82,7 +90,7 @@ export function crearCliente(opciones: OpcionesDeCliente) {
     const token = leerToken();
     const cabeceras = new Headers();
     if (token) cabeceras.set("Authorization", `Bearer ${token}`);
-    const respuesta = await fetch(url(ruta), { headers: cabeceras });
+    const respuesta = await llegar(ruta, { headers: cabeceras });
     opciones.alContestar?.(respuesta);
     if (!respuesta.ok) await fallar(respuesta);
     guardarArchivo(await respuesta.blob(), nombre);

@@ -131,13 +131,13 @@ test("023-E16 023-E19: emparejados y abiertos los dos, van juntos: la parte, la 
     await new Promise((r) => setTimeout(r, 700));
     await ruta.fetch().then((r) => ruta.fulfill({ response: r })).catch(() => undefined).finally(() => { avisosEnVuelo--; });
   };
-  await compu.route("**/puestos/*/enlace", lenta);
+  await compu.route("**/canal/vinculo*", lenta);
   await celular.getByTestId("menu-deposito").click();
   await celular.waitForTimeout(450); // el segundo toque, antes de que llegue la respuesta del primero
   await celular.getByTestId("menu-mas").click();
   // Que la computadora termine de contestar los dos toques (lo que ella avisa va por el servidor al celular).
   await expect.poll(() => avisosEnVuelo).toBe(0);
-  await compu.unroute("**/puestos/*/enlace", lenta);
+  await compu.unroute("**/canal/vinculo*", lenta);
   await expect(celular.getByTestId("menu-mas")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("mas")).toBeVisible();
   await celular.getByTestId("menu-deposito").click();

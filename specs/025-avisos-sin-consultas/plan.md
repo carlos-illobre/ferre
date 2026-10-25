@@ -19,22 +19,19 @@ sin código repetido, poca complejidad). Ferrebress solo declara sus casos y aut
 ```
 microservices/conexion/src/
   comun/avisos.ts          (ya está) el observador mínimo: escuchar / avisar
-  comun/temas.ts           NUEVO la forma de un aviso {tema, datos} y de lo que viaja a cuestas
-  servidor/canales.ts      NUEVO el tablero: un canal SSE por dispositivo, con sus temas,
-                                 el latido, los límites y avisar(tema, datos)
-  servidor/central.ts      CAMBIA la sala del vínculo pasa a ser un tema del tablero
-                                 (presencia = quién del otro lado escucha el tema)
-  servidor/a-cuestas.ts    NUEVO lo permanente: arma la cabecera X-Avisos de cada respuesta
-                                 con los proveedores registrados (la versión, y lo que venga)
-  navegador/flujo.ts       (ya está) escuchar un flujo SSE con fetch; se reutiliza tal cual
-  navegador/canal.ts       NUEVO el único canal del dispositivo: abre el flujo con los temas
-                                 que hay, se cierra sin temas o con la aplicación oculta
-  navegador/central.ts     NUEVO la central: vigilar(espera), aCuestas(respuesta), falló(),
-                                 y reparte cada aviso a sus esperas
-  navegador/indicador.ts   NUEVO un indicador: un reductor puro de lo que pasa a un estado
-  navegador/enlace.ts      CAMBIA usa el canal de la central en vez de su propio camino;
-                                 armada la directa, suelta el tema del servidor
-  navegador/servidor.ts    CAMBIA queda solo el envío por POST (el flujo lo pone el canal)
+  comun/temas.ts           la forma de lo que viaja: temas pedidos, eventos, a cuestas, rechazos
+  servidor/canales.ts      los canales: uno SSE por dispositivo, con sus temas, presencia por lado,
+                           estado al abrir, tandas del vínculo, cierre de un tema o de un grupo,
+                           latido y topes (reemplaza a la central de ADR-027)
+  servidor/a-cuestas.ts    lo permanente de cada respuesta (cabecera X-Avisos)
+  navegador/flujo.ts       (ya está) escuchar un flujo SSE con fetch; reconecta con espera creciente
+  navegador/entorno.ts     la vista (visibilitychange) y la red (online/offline) del navegador
+  navegador/canal.ts       el único canal del dispositivo: abre con los temas que hay, se cierra
+                           sin temas o con la página oculta, suelta los temas rechazados
+  navegador/central.ts     la central: vigilar(espera), respondio(cabecera), fallo(), mandar()
+  navegador/indicador.ts   un indicador: una tabla de qué estado sale de cada suceso
+  navegador/servidor.ts    el camino por el servidor del enlace: el tema del vínculo y el POST
+  navegador/enlace.ts      usa el camino de arriba; suelta el tema al oír al otro por la directa
 ```
 
 ## Cómo se usa (lo que ve quien programe un caso nuevo)
@@ -44,7 +41,7 @@ microservices/conexion/src/
 const dejar = central.vigilar({ tema: `entrada:${id}`, temporario: true, alAviso: (d) => entrar(d) });
 
 // Dispositivo, permanente: nunca abre el canal; le llega a cuestas o por un canal ya abierto.
-central.vigilar({ tema: "version", alAviso: () => registro.update() });
+central.vigilar({ tema: "version", aCuestas: true, alAviso: () => registro.update() });
 
 // Dispositivo, indicador: mira lo que ya pasa.
 const enLinea = crearIndicador(central);
@@ -57,13 +54,20 @@ aCuestas.agregar("version", () => config.version);
 ```
 
 Una espera permanente se dispara solo cuando el valor de su tema **cambia** respecto del último
-visto (la primera vez queda como referencia). Una temporaria, con cada aviso.
+visto (la primera vez queda como referencia). Una temporaria, con cada aviso. Una permanente que
+se sabe solo a cuestas (`aCuestas: true`, la versión) no se pide como tema: el servidor la cuenta
+igual al abrir el canal. Si el servidor no da un tema permanente, la espera sigue (a cuestas) y el
+canal se abre sin él; si no da uno temporario, esa espera termina.
 
 ## El canal (temporario)
 
-- Una sola conexión `GET /canal` por dispositivo con los temas como parámetro y la sesión (o el
-  secreto del código QR) en las cabeceras. Si los temas cambian, se reconecta (un pedido chico,
-  solo cuando cambia una pantalla).
+- Una sola conexión `GET /canal` por dispositivo (por pestaña: cabecera `X-Canal`) con los temas
+  en la cabecera `X-Temas` y la sesión en `Authorization` (o, en la entrada, el secreto del código
+  dentro del tema pedido). Si los temas cambian, se reconecta (un pedido chico, solo cuando cambia
+  una pantalla); antes de volver a abrir avisa que se cerró, para que quien esperaba algo con el
+  de antes (la directa a medio armar) empiece de nuevo.
+- Si se corta, vuelve a conectar a los 3 s, y si sigue sin poder, cada vez el doble hasta un
+  minuto (un servidor caído o lleno no recibe un pedido cada 3 s).
 - Al abrir, el servidor manda el **estado** de cada tema (E06): por ejemplo, si la entrada ya se
   aprobó. Ningún caso depende de recibir cada aviso.
 - Se cierra cuando no quedan esperas temporarias o con la aplicación oculta (`visibilitychange`);
@@ -75,14 +79,14 @@ visto (la primera vez queda como referencia). Una temporaria, con cada aviso.
 
 | Caso | Declaración | El servidor avisa cuando |
 |---|---|---|
-| Entrada con QR | temporaria `entrada:<id>` (con el secreto del código) | el celular aprueba |
+| Entrada con QR | temporaria `entrada:<id>` (con el secreto del código); al aviso, retira la sesión con `POST /sesiones/vinculaciones/:id/estado`, una vez | el celular aprueba |
 | Vincular el celular | temporaria `puesto:<id>` | el celular lee el código |
-| Vínculo por el servidor | temporaria `vinculo:<sala>`, solo mientras no hay directa | el otro manda una tanda; entra o se va |
+| Vínculo por el servidor | temporaria `vinculo:<sala>`, hasta que llega algo del otro por la directa | el otro manda una tanda; entra o se va |
 | Versión nueva | permanente `version` → buscar la versión | cambia la versión (a cuestas) |
-| Sesión cerrada | permanente `sesion` → salir | se cierra (por el canal, si está abierto; si no, el 401 del próximo pedido, como hoy) |
+| Sesión cerrada | permanente `sesion:<id>` → salir | se cierra (por el canal, si está abierto; si no, el 401 del próximo pedido, como hoy) |
 | «En línea» de la entrada | indicador | — |
 | «En línea · todo enviado» | indicador | — |
-| Mandar lo pendiente | observador del indicador: al pasar a «en línea» | — |
+| Mandar lo pendiente | al abrir, al pasar el indicador a «en línea» y, si quedó algo, con la próxima respuesta pasado un minuto | — |
 
 Se sacan: las preguntas cada 2 s de los dos QR, `useResponde` con su pregunta cada 30 s, el
 reintento cada 60 s de lo pendiente, la búsqueda de versión y el control de la sesión al volver
@@ -95,9 +99,9 @@ Un reductor puro: de lo último que pasó sale el estado.
 
 | Pasó | Estado |
 |---|---|
-| el canal se abrió / una respuesta llegó | en línea |
-| el canal se cortó / un pedido falló por la red / el navegador dice `offline` | sin conexión |
-| se está abriendo el canal / el navegador dice `online` | conectando, hasta lo próximo |
+| el canal se abrió / una respuesta llegó / el navegador dice `online` | en línea |
+| el canal se cortó / un pedido no llegó por la red (no uno cancelado) / el navegador dice `offline` | sin conexión |
+| se está abriendo el canal | conectando |
 
 ## Pruebas
 
@@ -111,17 +115,18 @@ Un reductor puro: de lo último que pasó sale el estado.
 ## Seguridad
 
 - **Quién escucha qué** (E30, E31): el módulo no conoce sesiones; Ferrebress autoriza cada tema
-  antes de abrir el canal. `entrada:<id>` exige el secreto del código (en una cabecera, no en la
-  dirección, para que no quede en los registros). `puesto:<id>` y `vinculo:<sala>` exigen la sesión
-  dueña de ese vínculo. `sesion` es la del propio canal. Un tema no autorizado rechaza todo el
-  canal (403).
-- **La sesión nueva** viaja solo por el canal de quien tiene el secreto, igual que hoy en la
-  respuesta a la pregunta.
-- **Cierre** (E32): al cerrarse o vencer la sesión del canal, el servidor lo cierra (como hoy las
-  salas, con el temporizador del vencimiento que ya existe en el servidor).
-- **Saturación** (E33): un canal por dispositivo (el nuevo reemplaza al anterior del mismo
-  dispositivo), un tope de canales por sesión y uno total; el latido libera los muertos. Las
-  tandas conservan los límites de 023 (64 KB por mensaje, 1 MB por tanda).
+  antes de abrir el canal. `entrada:<id>` exige el secreto del código (en la cabecera `X-Temas`,
+  no en la dirección, para que no quede en los registros). `puesto:<id>` y `vinculo:<sala>` exigen
+  la sesión dueña de ese vínculo. `sesion:<id>` es la del propio canal. Si algún tema no se da, el
+  canal no se abre y la respuesta dice cuáles; el dispositivo los suelta y pide el resto.
+- **La sesión nueva** no viaja por el canal: el canal solo dice «listo» y la computadora la retira
+  con el secreto, como antes, una sola vez.
+- **Cierre** (E32): al cerrar una sesión a distancia o al desactivar a la persona, el servidor
+  avisa por su tema y cierra los canales de esa sesión; al salir, solo los cierra.
+- **Saturación** (E33): un canal por pestaña (el nuevo reemplaza al anterior), del grupo de su
+  sesión o, sin sesión, de su código de entrada; tope de 10 canales por grupo y 1000 en total;
+  hasta 10 temas por canal; hasta 120 aperturas por minuto por dirección; el latido libera los
+  muertos. Las tandas conservan los límites de 023 (64 KB por mensaje, 1 MB por tanda).
 - **Lo que llega** (E34): cada aviso se valida por su forma antes de entregarlo; uno que no la
   tiene se descarta.
 - **A cuestas**: solo lleva datos públicos para quien hace el pedido (la versión); nada de otra

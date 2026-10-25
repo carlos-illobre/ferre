@@ -24,16 +24,16 @@ describe("GET /health", () => {
   });
 });
 
-// Cada respuesta dice la versión, y el navegador la deja leer (009-E22, decisión 157).
-describe("la versión en cada respuesta", () => {
+// Cada respuesta lleva a cuestas la versión, y el navegador la deja leer (025-E09, decisión 157).
+describe("lo que va a cuestas en cada respuesta", () => {
   beforeEach(() => { base.actual = baseFalsa(); });
 
-  it("009-E22: cualquier respuesta, también un error, lleva X-Version y el origen de la aplicación puede leerla", async () => {
+  it("025-E09: cualquier respuesta, también un error, lleva X-Avisos con la versión y el origen de la aplicación puede leerla", async () => {
     const { config } = await import("./config.js");
     for (const ruta of ["/health", "/no-existe", "/sesiones/actual"]) {
       const r = await app.request(ruta, { headers: { Origin: config.origenWeb } });
-      expect(r.headers.get("X-Version")).toBe(config.version);
-      expect(r.headers.get("Access-Control-Expose-Headers")).toContain("X-Version");
+      expect(JSON.parse(r.headers.get("X-Avisos")!)).toEqual({ version: config.version });
+      expect(r.headers.get("Access-Control-Expose-Headers")).toContain("X-Avisos");
     }
   });
 });

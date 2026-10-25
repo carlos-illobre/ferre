@@ -40,20 +40,27 @@ describe("las sesiones", () => {
 });
 
 describe("entrar a la computadora con el celular", () => {
+  it("un código que venció sin aprobarse ya no está", async () => {
+    const id = crypto.randomUUID();
+    await datos.nuevaVinculacion(id, `codigo-${id}`, "clave", "computadora", -1);
+    expect(await datos.estadoDeVinculacion(id, "clave")).toBeNull();
+  });
+
   it("el código se aprueba una vez, se retira una vez y vence", async () => {
     const ana = await usuario();
     const celular = await sesion(ana);
     const id = crypto.randomUUID();
     await datos.nuevaVinculacion(id, "codigo", "clave", "computadora", 60);
-    expect(await datos.vinculacionVigente(id, "clave")).toBe(true);
-    expect(await datos.vinculacionVigente(id, "otra")).toBe(false);
-    expect(await datos.vinculacionVigente("no-es-un-uuid", "clave")).toBe(false);
+    expect(await datos.estadoDeVinculacion(id, "clave")).toBe("pendiente");
+    expect(await datos.estadoDeVinculacion(id, "otra")).toBeNull();
+    expect(await datos.estadoDeVinculacion("no-es-un-uuid", "clave")).toBeNull();
     expect(await datos.retirarVinculacion(id, "clave")).toBeNull();
     expect(await datos.aprobarVinculacion("codigo", ana, celular)).toEqual({ id, dispositivo: "computadora" });
     expect(await datos.aprobarVinculacion("codigo", ana, celular)).toBeNull();
+    expect(await datos.estadoDeVinculacion(id, "clave")).toBe("aprobada");
     expect(await datos.retirarVinculacion(id, "clave")).toEqual({ aprobada_por: ana, dispositivo: "computadora", celular_sesion_id: celular });
     expect(await datos.retirarVinculacion("no-es-un-uuid", "clave")).toBeNull();
-    expect(await datos.vinculacionVigente(id, "clave")).toBe(false);
+    expect(await datos.estadoDeVinculacion(id, "clave")).toBeNull();
     await datos.anotarSesionDeVinculacion(id, celular);
     expect((await base.selectFrom("vinculacion").select("sesion_id").where("id", "=", id).executeTakeFirstOrThrow()).sesion_id).toBe(celular);
   });

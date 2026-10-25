@@ -1,6 +1,4 @@
 import { Hono } from "hono";
-import { bodyLimit } from "hono/body-limit";
-import { MAXIMO_POR_TANDA } from "conexion-entre-dispositivos/servidor";
 import { exigirPermiso, exigirSesion } from "../autenticacion.js";
 import * as reglas from "../acceso/reglas.js";
 import { responder } from "./sesiones.js";
@@ -9,8 +7,8 @@ import type { DiasDelVinculo } from "../contratos/puestos.js";
 import { leerCuerpo } from "../validar.js";
 
 // Vínculo computadora–celular (issue #52, decisiones 58, 60 y 73). La ruta solo traduce
-// (ADR-018); las reglas están en `acceso/reglas.ts`. Lo que se mandan los dos va por su sala
-// (`/:id/enlace`, ADR-027).
+// (ADR-018); las reglas están en `acceso/reglas.ts`. Lo que se mandan los dos va por el canal
+// de cada uno (`/canal`, ADR-027 y ADR-030).
 export const puestos = new Hono();
 puestos.use("/*", exigirSesion);
 
@@ -37,21 +35,6 @@ puestos.put("/configuracion", exigirPermiso("admin.sistema"), async (c) => {
   const cuerpo = await leerCuerpo(c, diasDelVinculo);
   if (!cuerpo.ok) return c.json({ error: cuerpo.error }, 400);
   return responder(c, await reglas.cambiarDiasDelVinculo(cuerpo.datos.dias, c.get("sesion").usuario.id));
-});
-
-// ---------- La conexión entre los dos (ADR-027) ----------
-// Solo los dos dispositivos del vínculo escuchan su sala y mandan por ella (023-E25). Lo que
-// pasa por acá es el respaldo cuando no pueden hablarse directo; el servidor no lo guarda.
-const NO_EMPAREJADO = "Este dispositivo no está emparejado";
-puestos.get("/:id/enlace", async (c) => {
-  const vinculo = await reglas.vinculoEnElPuesto(c.req.param("id"), c.get("sesion").id);
-  return vinculo ? reglas.escucharSala(c.req.param("id"), vinculo.lado, vinculo.expira_en) : c.json({ error: NO_EMPAREJADO }, 404);
-});
-// El cuerpo se corta antes de leerlo entero: la central acepta hasta 1 MB por tanda (023-E27).
-puestos.post("/:id/enlace", bodyLimit({ maxSize: MAXIMO_POR_TANDA * 4, onError: (c) => c.body(null, 413) }), async (c) => {
-  const lado = await reglas.ladoEnElPuesto(c.req.param("id"), c.get("sesion").id);
-  if (!lado) return c.json({ error: NO_EMPAREJADO }, 404);
-  return c.body(null, reglas.mandarPorLaSala(c.req.param("id"), lado, await c.req.text()));
 });
 
 // Soltar el emparejamiento, desde cualquiera de los dos.

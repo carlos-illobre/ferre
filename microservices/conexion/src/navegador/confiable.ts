@@ -8,6 +8,8 @@ import { escribir, type Confirmacion, type Dato, type Saludo } from "../comun/me
 // - El que recibe entrega en orden: lo adelantado espera, lo repetido se descarta y se vuelve a
 //   confirmar.
 // - Cada vez que se abre un camino, los dos se saludan (`saludar`) y se reenvía lo pendiente.
+// - Al recibir un saludo también se reenvía lo pendiente. Si llega un dato adelantado (se perdió
+//   uno en el medio), el que recibe saluda una vez por ese hueco: el otro reenvía lo que falta.
 // - Cada página tiene su época: si el otro recargó, el saludo le dice desde qué número esperar.
 // - Lo grande viaja en partes (E30), que se arman al llegar.
 // - La demora es la de la última confirmación: no hay latidos para medirla.
@@ -32,6 +34,8 @@ export function crearConfiable({ epoca, enviar, ahora }: OpcionesConfiables) {
   let esperado = 0;
   let adelantados = new Map<number, Dato>();
   let armado = "";
+  // El hueco por el que ya se saludó (el número que se espera), para no saludar por cada dato.
+  let saludoPorElHueco = 0;
 
   const mandarPendiente = (p: Pendiente) => {
     p.enviadoEn = ahora();
@@ -73,7 +77,9 @@ export function crearConfiable({ epoca, enviar, ahora }: OpcionesConfiables) {
       adelantados = new Map();
       armado = "";
     }
-    if (m.re === epoca) confirmar(m.rh);
+    if (m.re !== epoca) return;
+    confirmar(m.rh);
+    pendientes.forEach(mandarPendiente);
   }
 
   function alDato(m: Dato) {
@@ -88,6 +94,10 @@ export function crearConfiable({ epoca, enviar, ahora }: OpcionesConfiables) {
       }
     }
     enviar(escribir({ t: "ok", e: otraEpoca, h: esperado - 1 }));
+    if (adelantados.size > 0 && saludoPorElHueco !== esperado) {
+      saludoPorElHueco = esperado;
+      saludar();
+    }
   }
 
   function alConfirmacion(m: Confirmacion) {

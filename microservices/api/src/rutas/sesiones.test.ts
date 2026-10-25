@@ -41,7 +41,7 @@ describe("entrar a la computadora con el celular", () => {
     expect((await pedir(app, "POST", "/sesiones/vinculaciones/v1/estado", { rol: null, cuerpo: {} })).status).toBe(400);
     const pendiente = await pedir(app, "POST", "/sesiones/vinculaciones/v1/estado", { rol: null, cuerpo: { clave: "la-clave" } });
     expect(await pendiente.json()).toEqual({ estado: "vencida" }); // no existe o venció
-    base.actual.programar(/AS vigente FROM vinculacion/, { rows: [{ vigente: true }] });
+    base.actual.programar(/AS estado\s+FROM vinculacion/, { rows: [{ estado: "pendiente" }] });
     expect(await (await pedir(app, "POST", "/sesiones/vinculaciones/v1/estado", { rol: null, cuerpo: { clave: "la-clave" } })).json()).toEqual({ estado: "pendiente" });
 
     base.actual.programar(/UPDATE vinculacion SET retirada_en/, { rows: [{ aprobada_por: "u-cajero", dispositivo: "computadora · Chrome" }] });

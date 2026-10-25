@@ -1027,7 +1027,7 @@ RNF-13:
     - tests/integration/migraciones.sh
     - microservices/api/src/persistencia/migrar.test.ts
     - microservices/listas/tests/test_health.py
-    - microservices/web/src/negocio/buscar-version.test.ts
+    - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
   defectos:
     - "Sin prueba: la vuelta atrás automática cuando la versión nueva no queda sana"
     - "Sin prueba: que el cliente tome solo la versión nueva y conserve lo guardado en el dispositivo"
@@ -1282,9 +1282,9 @@ RF-95:
   defectos: []
 
 RF-96:
-  estado: "Hecho (009-T008): sin timer; se busca al abrir, al volver a la vista, al volver la conexión y cuando la API contesta otra versión en X-Version; nada en Configuración"
+  estado: "Hecho (009-T008, 025): sin timer ni consultas propias; se busca al abrir y cuando la API contesta otra versión en X-Avisos; nada en Configuración"
   pruebas:
-    - microservices/web/src/negocio/buscar-version.test.ts
+    - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
     - microservices/web/src/pantallas/version-nueva-sin-timer.test.tsx
     - microservices/api/src/salud.test.ts
   defectos: []
@@ -1589,10 +1589,10 @@ RF-137:
     - microservices/conexion/src/navegador/enlace.test.ts
     - microservices/conexion/src/navegador/confiable.test.ts
     - microservices/conexion/src/navegador/servidor.test.ts
-    - microservices/conexion/src/servidor/central.test.ts
+    - microservices/conexion/src/servidor/canales.test.ts
     - tests/e2e/escritorio/20-conexion.spec.ts
     - tests/e2e/celular/20-conexion.spec.ts
-    - microservices/api/src/rutas/puestos.test.ts
+    - microservices/api/src/rutas/canal.test.ts
   defectos:
     - "Un dato recibido y todavía no confirmado antes de que la página recargue puede llegar dos veces (revisión 1.6)"
     - "Si falla un POST al servidor, las señales de la directa, «sin directa» y «probar» que iban en él no se reenvían (revisión 3.5)"
@@ -1643,7 +1643,7 @@ RNF-68:
   pruebas:
     - microservices/conexion/src/comun/avisos.test.ts
     - microservices/conexion/src/comun/mensajes.test.ts
-    - microservices/conexion/src/servidor/central.test.ts
+    - microservices/conexion/src/servidor/canales.test.ts
     - microservices/conexion/src/navegador/enlace.test.ts
     - microservices/web/src/datos/vinculo/conexion-modulo.test.ts
   defectos: []
@@ -1654,36 +1654,64 @@ RNF-69:
 
 
 RF-141:
-  estado: "Nuevo (025): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (025): los dos códigos QR esperan por el canal, sin preguntar; el canal se abre solo mientras el código está en pantalla"
+  pruebas:
+    - tests/e2e/escritorio/20-conexion.spec.ts
+    - tests/e2e/celular/20-conexion.spec.ts
+    - tests/e2e/escritorio/10-escaner.spec.ts
+    - tests/e2e/celular/10-escaner.spec.ts
+    - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
+    - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
+    - microservices/api/src/rutas/canal.test.ts
+    - microservices/conexion/src/navegador/central.test.ts
+    - microservices/conexion/src/navegador/canal.test.ts
   defectos: []
 
 RF-142:
-  estado: "Nuevo (025): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (025): la versión va a cuestas en X-Avisos; la sesión cerrada, por el 401 del próximo pedido o por el canal si está abierto"
+  pruebas:
+    - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
+    - microservices/web/src/datos/sesion/sesion.test.tsx
+    - microservices/api/src/salud.test.ts
+    - microservices/api/src/rutas/canal.test.ts
   defectos: []
 
 RF-143:
-  estado: "Nuevo (025): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (025): los indicadores salen de la central de avisos, sin preguntar"
+  pruebas:
+    - microservices/conexion/src/navegador/indicador.test.ts
+    - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
+    - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
   defectos: []
 
 RF-144:
-  estado: "Nuevo (025): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (025): lo pendiente sale cuando el indicador pasa a «en línea», sin reintento cada 60 s"
+  pruebas:
+    - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
+    - microservices/web/src/datos/almacenamiento/guardado.test.tsx
   defectos: []
 
 RF-145:
-  estado: "Nuevo (025): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (025): un canal por dispositivo; el vínculo lo suelta con la directa armada y lo cierra con la aplicación oculta"
+  pruebas:
+    - tests/e2e/escritorio/20-conexion.spec.ts
+    - tests/e2e/celular/20-conexion.spec.ts
+    - microservices/conexion/src/navegador/enlace.test.ts
+    - microservices/conexion/src/servidor/canales.test.ts
+    - microservices/api/src/rutas/canal.test.ts
   defectos: []
 
 RNF-70:
-  estado: "Nuevo (025): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (025): central, canal, indicador y canales en el módulo de comunicación, con 100 % de cobertura; un caso nuevo se declara"
+  pruebas:
+    - microservices/conexion/src/navegador/central.test.ts
+    - microservices/conexion/src/servidor/canales.test.ts
+    - microservices/conexion/src/servidor/a-cuestas.test.ts
   defectos: []
 
 RNF-71:
-  estado: "Nuevo (025): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (025): ningún temporizador del navegador consulta la red; sin uso, ningún pedido"
+  pruebas:
+    - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
+    - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
   defectos: []

@@ -161,3 +161,11 @@ vuelta de la conexión.
 - La primera respuesta desde que se abrió no dispara nada: al abrir ya se buscó.
 - La versión de la API y la de la aplicación salen del mismo commit, pero no se comparan entre
   sí: solo importa que la del servidor cambió, así no depende de cómo se escribe cada una.
+
+## Enmienda (2026-10-25): sin consultas propias (ADR-030)
+
+La cabecera pasa a ser `X-Avisos` (lo que va a cuestas, ADR-030) y se saca también la búsqueda al
+volver a la aplicación y al volver la red (2 de este ADR): si la aplicación no se usa, no consulta
+nada (decisión 160). Queda la búsqueda del navegador al abrir y la de la cabecera; con un canal
+abierto por otra cosa, la versión nueva llega por ahí en el momento.
+

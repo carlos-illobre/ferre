@@ -4,7 +4,7 @@ import { stack } from "../comun/stack";
 import { cerrarLasOtrasVentanas, otraVentana } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("escritorio");
+const { API, psql } = stack("escritorio");
 
 // Cuando la conexión directa no se puede, el celular y la computadora se hablan por el servidor,
 // solos, y el indicador lo dice (specs/023, historias 2 y 3).
@@ -30,6 +30,8 @@ const RED_QUE_AISLA = () => {
 test.beforeAll(() => {
   const susSesiones = `(SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`;
   psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN ${susSesiones} OR celular_sesion_id IN ${susSesiones})`);
+  // Lo que dejó la entrada con el código (025-E01): la vinculación apunta a las sesiones.
+  psql(`DELETE FROM vinculacion WHERE celular_sesion_id IN ${susSesiones} OR sesion_id IN ${susSesiones}`);
   psql(`DELETE FROM puesto WHERE sesion_id IN ${susSesiones} OR celular_sesion_id IN ${susSesiones}`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -52,10 +54,11 @@ test.beforeAll(() => {
 test.afterEach(cerrarLasOtrasVentanas);
 
 // Abre los dos, cada uno con lo que le falte para la directa, y los deja en Vender.
-async function abrirLosDos(browser: import("@playwright/test").Browser, enCadaUno: () => void): Promise<{ compu: Page; celular: Page }> {
+async function abrirLosDos(browser: import("@playwright/test").Browser, enCadaUno: () => void, antes: (p: Page) => void = () => {}): Promise<{ compu: Page; celular: Page }> {
   const compu = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
   const celular = await otraVentana(browser, CELULAR);
   for (const [pagina, token] of [[compu, TOKEN_COMPU], [celular, TOKEN_CELULAR]] as const) {
+    antes(pagina);
     await pagina.addInitScript((t) => { localStorage.clear(); localStorage.setItem("ferre.sesion.desarrollo", t); }, token);
     await pagina.addInitScript(enCadaUno);
     await pagina.goto("/#/vender");
@@ -97,4 +100,43 @@ test("023-E06 023-E09 023-E22: si la red no deja, a los 5 segundos van por el se
   await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "conectando");
   await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "servidor", { timeout: 9000 });
   await expect(compu.getByTestId("por-que-servidor")).toContainText("Se probó hoy");
+});
+
+// Los canales abiertos de una página con el servidor (specs/025): los que empezó y todavía no terminaron.
+function canalesAbiertos(pagina: Page) {
+  const abiertos = new Set<unknown>();
+  pagina.on("request", (r) => { if (r.method() === "GET" && new URL(r.url()).pathname === "/canal") abiertos.add(r); });
+  pagina.on("requestfailed", (r) => abiertos.delete(r));
+  pagina.on("requestfinished", (r) => abiertos.delete(r));
+  return () => abiertos.size;
+}
+
+test("025-E21: armada la directa, los dos dejan el canal con el servidor y siguen hablándose", async ({ browser }) => {
+  const abiertos: Array<() => number> = [];
+  const { compu, celular } = await abrirLosDos(browser, () => {}, (p) => abiertos.push(canalesAbiertos(p)));
+  for (const p of [compu, celular]) await expect(p.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
+  await expect.poll(() => abiertos.map((n) => n())).toEqual([0, 0]);
+  await mandarCodigo(celular, "7790002223334");
+  await expect(compu.getByTestId("item").filter({ hasText: "TARUGO CONEXION" })).toBeVisible({ timeout: 10000 });
+});
+
+// Va al final: entrar con el código empareja al celular con esta computadora y suelta el vínculo de
+// las pruebas de arriba (decisión 58).
+test("025-E01 025-E03 025-E12: la entrada con el código espera por un solo canal, sin preguntar; al aprobar, entra enseguida", async ({ browser }) => {
+  const compu = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
+  const pedidos: string[] = [];
+  compu.on("request", (r) => { if (r.url().startsWith(API)) pedidos.push(new URL(r.url()).pathname); });
+  await compu.goto("/");
+  await expect(compu.getByTestId("qr-entrar").locator("img")).toBeVisible();
+  await expect(compu.getByTestId("entrar-conexion")).toHaveText("En línea");
+  // Un rato con el código en pantalla: un solo canal y ninguna pregunta (ni el estado del código ni la salud).
+  await compu.waitForTimeout(6000);
+  expect(pedidos.filter((p) => p === "/canal")).toHaveLength(1);
+  expect(pedidos.filter((p) => p.endsWith("/estado") || p === "/health")).toEqual([]);
+  const enlace = await compu.evaluate(() => (window as unknown as { __enlaceParaEntrar: string }).__enlaceParaEntrar);
+  const codigo = new URL(enlace.replace("#/entrar-compu", "")).searchParams.get("codigo")!;
+  const aprobada = await compu.request.post(`${API}/sesiones/vinculaciones/aprobar`, { headers: { Authorization: `Bearer ${TOKEN_CELULAR}` }, data: { codigo } });
+  expect(aprobada.ok()).toBe(true);
+  await expect(compu.getByTestId("usuario")).toContainText("Conexión E2E", { timeout: 3000 });
+  expect(pedidos.filter((p) => p.endsWith("/estado"))).toHaveLength(1);
 });

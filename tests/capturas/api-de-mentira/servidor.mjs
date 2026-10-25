@@ -17,7 +17,7 @@ for (const f of readdirSync(dir).filter((f) => /^rutas-.*\.mjs$/.test(f)).sort()
   }
 }
 http.createServer(async (req, res) => {
-  const cab = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Authorization, Content-Type", "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS" };
+  const cab = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Temas, X-Canal", "Access-Control-Expose-Headers": "X-Avisos", "X-Avisos": JSON.stringify({ version: "mock" }), "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS" };
   if (req.method === "OPTIONS") { res.writeHead(204, cab); return res.end(); }
   const url = new URL(req.url, "http://x");
   let crudo = ""; for await (const c of req) crudo += c;

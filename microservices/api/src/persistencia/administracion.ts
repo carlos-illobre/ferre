@@ -81,4 +81,8 @@ export async function cambiarUsuario(e: Ejecutor, id: string, activo: boolean | 
   return Number(r.numAffectedRows) > 0;
 }
 
-export const cerrarSesionesDe = (e: Ejecutor, usuarioId: string) => sql`UPDATE sesion SET revocada_en = now() WHERE usuario_id = ${usuarioId} AND revocada_en IS NULL`.execute(e);
+// Devuelve cuáles se cerraron, para cerrar sus canales (025-E32).
+export async function cerrarSesionesDe(e: Ejecutor, usuarioId: string): Promise<string[]> {
+  const { rows } = await sql<{ id: string }>`UPDATE sesion SET revocada_en = now() WHERE usuario_id = ${usuarioId} AND revocada_en IS NULL RETURNING id`.execute(e);
+  return rows.map((r) => r.id);
+}

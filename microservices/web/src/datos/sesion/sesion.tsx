@@ -5,7 +5,7 @@ export const EVENTO_SESION_ABIERTA = "ferre:sesion-abierta";
 // medio armar) se borra al enterarse; los datos no saben qué es una venta (ADR-028).
 export const EVENTO_SESION_TERMINADA = "ferre:sesion-terminada";
 const terminar = () => window.dispatchEvent(new Event(EVENTO_SESION_TERMINADA));
-import { api, borrarToken, guardarToken, leerToken } from "../conexion";
+import { api, avisos, borrarToken, guardarToken, leerToken, perderLaSesion } from "../conexion";
 import type { SesionActual, UsuarioDeLaSesion } from "@servidor/sesiones";
 import { deEsteAmbiente } from "../../plataforma/ambiente";
 
@@ -39,20 +39,14 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("sesion-cerrada", alCerrar);
   }, []);
 
-  // La sesión puede cerrarse en el servidor: a distancia, o al desactivar al usuario. Con la
-  // aplicación abierta se pregunta cada 30 segundos, al volver a la ventana y al recuperar la
-  // conexión; si ya no vale, el 401 la cierra y vuelve sola a la entrada (api.ts). En otra
-  // ventana no se pregunta: se pregunta al volver.
-  const conSesion = sesion.estado === "con-sesion";
+  // La sesión puede cerrarse en el servidor: a distancia, o al desactivar al usuario. No se
+  // pregunta (decisión 160): el próximo pedido la rechaza (401) y vuelve sola a la entrada; si el
+  // canal está abierto por otra cosa, el servidor lo avisa por ahí en el momento (RF-142).
+  const sesionId = sesion.estado === "con-sesion" ? sesion.sesionId : null;
   useEffect(() => {
-    if (!conSesion) return;
-    // Si la sesión sigue valiendo se pregunta al volver a la aplicación y al volver la conexión,
-    // sin timer (decisión 158): una cerrada a distancia también la rechaza el primer pedido.
-    const controlar = () => { if (document.visibilityState !== "hidden") api<SesionActual>("/sesiones/actual").catch(() => undefined); };
-    document.addEventListener("visibilitychange", controlar);
-    window.addEventListener("online", controlar);
-    return () => { document.removeEventListener("visibilitychange", controlar); window.removeEventListener("online", controlar); };
-  }, [conSesion]);
+    if (!sesionId) return;
+    return avisos.vigilar({ tema: `sesion:${sesionId}`, alAviso: perderLaSesion, alCerrar: perderLaSesion, alRechazo: (e) => { if (e === 401) perderLaSesion(); } });
+  }, [sesionId]);
 
   const entrar = useCallback((token: string, usuario: Usuario) => {
     guardarToken(token);

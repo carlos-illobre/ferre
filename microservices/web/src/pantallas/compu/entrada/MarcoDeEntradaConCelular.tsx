@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Disponibilidad } from "../../../plataforma/servidor";
+import type { Disponibilidad } from "../../../negocio/conexion";
 import { Icono, Marca } from "../base/ui";
 import { partirEnDos, QUE_HACE, SELLOS, TEXTOS_DE_ENTRADA } from "../../comun/entrada/textos-de-entrada";
 import { irA } from "../base/rutas";

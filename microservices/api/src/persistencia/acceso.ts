@@ -59,7 +59,7 @@ export async function usuarioActivoPorCorreo(email: string): Promise<string | nu
 export const nuevaVinculacion = (id: string, codigo: string, clave: string, dispositivo: string, segundos: number) =>
   sql`INSERT INTO vinculacion (id, codigo_hash, clave_hash, dispositivo, expira_en) VALUES (${id}, ${hashear(codigo)}, ${hashear(clave)}, ${dispositivo}, now() + (${String(segundos)} || ' seconds')::interval)`.execute(base);
 
-export async function aprobarVinculacion(codigo: string, usuarioId: string, celularSesionId: string): Promise<{ dispositivo: string | null } | null> {
+export async function aprobarVinculacion(codigo: string, usuarioId: string, celularSesionId: string): Promise<{ id: string; dispositivo: string | null } | null> {
   const { rows } = await sql<{ id: string; dispositivo: string | null }>`
     UPDATE vinculacion SET aprobada_en = now(), aprobada_por = ${usuarioId}, celular_sesion_id = ${celularSesionId} WHERE codigo_hash = ${hashear(codigo)} AND aprobada_en IS NULL AND expira_en > now() RETURNING id, dispositivo`.execute(base);
   return rows[0] ?? null;
@@ -74,9 +74,13 @@ export async function retirarVinculacion(id: string, clave: string): Promise<Apr
   return rows[0] ?? null;
 }
 export const anotarSesionDeVinculacion = (id: string, sesionId: string) => sql`UPDATE vinculacion SET sesion_id = ${sesionId} WHERE id = ${id}`.execute(base);
-export async function vinculacionVigente(id: string, clave: string): Promise<boolean> {
-  const { rows } = await sql<{ vigente: boolean }>`SELECT expira_en > now() AND retirada_en IS NULL AS vigente FROM vinculacion WHERE id::text = ${id} AND clave_hash = ${hashear(clave)}`.execute(base);
-  return rows[0]?.vigente ?? false;
+// Cómo está un código de entrada para quien tiene su clave: esperando, aprobado y sin retirar, o
+// nada (no existe, venció o ya se retiró).
+export async function estadoDeVinculacion(id: string, clave: string): Promise<"pendiente" | "aprobada" | null> {
+  const { rows } = await sql<{ estado: "pendiente" | "aprobada" | null }>`
+    SELECT CASE WHEN retirada_en IS NOT NULL THEN NULL WHEN aprobada_en IS NOT NULL THEN 'aprobada' WHEN expira_en > now() THEN 'pendiente' END AS estado
+      FROM vinculacion WHERE id::text = ${id} AND clave_hash = ${hashear(clave)}`.execute(base);
+  return rows[0]?.estado ?? null;
 }
 
 export const sesionesAbiertas = (salvo: string) => sql<Abierta>`

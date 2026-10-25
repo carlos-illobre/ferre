@@ -1,4 +1,4 @@
-import type { Disponibilidad } from "../../../plataforma/servidor";
+import type { Disponibilidad } from "../../../negocio/conexion";
 import type { NombreDeIcono } from "../../../ui/iconos";
 
 // Los textos de la entrada, los mismos en el celular y en la computadora: es una sola

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { hayHuella, huellaVinculadaAca, sesionCerradaPorElServidor, urlApi } from "../../../negocio/entrada";
-import { useResponde } from "../../../plataforma/servidor";
+import { hayHuella, huellaVinculadaAca, sesionCerradaPorElServidor } from "../../../negocio/entrada";
+import { useConexion } from "../../../negocio/conexion";
 import { TEXTOS_DE_ENTRADA } from "../../comun/entrada/textos-de-entrada";
 import { Aviso, Icono } from "../base/ui";
 import { BotonGoogle, BotonHuella } from "./BotonesDeEntrada";
@@ -12,8 +12,8 @@ import "../base/estilos/entrar-con-celular.css";
 // Dos formas de entrar, sin contraseñas (ADR-011): el código para el celular, que es la más rápida,
 // o la huella del dispositivo vinculado o la cuenta de Google. Sin servidor no se entra.
 export function Entrar() {
-  const conexion = useResponde(urlApi("/health"));
-  const enLinea = conexion === "en-linea";
+  // Sin preguntar (RF-143): con el código en pantalla, el canal dice en el momento si se cortó.
+  const conexion = useConexion();
   const sinConexion = conexion === "sin-conexion";
   const [cerrada] = useState(sesionCerradaPorElServidor);
   return (
@@ -24,7 +24,7 @@ export function Entrar() {
       </div>
       <p className="entrar-cc-rapido">{TEXTOS_DE_ENTRADA.conTuUsuario}</p>
       {cerrada && <Aviso tipo="alerta" testId="sesion-cerrada"><strong className="entrar-error-titulo">Hay que iniciar sesión</strong>La sesión de este dispositivo se cerró o venció. Entrá de nuevo para seguir.</Aviso>}
-      <CodigoParaEntrar enLinea={enLinea} />
+      <CodigoParaEntrar enLinea={!sinConexion} />
       {sinConexion && <Aviso tipo="alerta" testId="entrar-sin-conexion">{TEXTOS_DE_ENTRADA.sinConexion}</Aviso>}
       <div className="entrar-o" aria-hidden="true"><span>o</span></div>
       <OtrasFormas sinConexion={sinConexion} />

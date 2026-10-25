@@ -9,7 +9,8 @@ export class CanalDePrueba {
   onclose: (() => void) | null = null;
   otro: CanalDePrueba | null = null;
   enviados: string[] = [];
-  send(t: string) { this.enviados.push(t); this.otro?.onmessage?.({ data: t }); }
+  // Como en un canal de verdad, lo mandado llega después, aunque el otro todavía no escuche.
+  send(t: string) { this.enviados.push(t); setTimeout(() => this.otro?.onmessage?.({ data: t }), 0); }
   cerrarDesdeAfuera() { this.onclose?.(); }
 }
 
