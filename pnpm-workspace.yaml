@@ -1,6 +1,7 @@
 # Un solo workspace para el front y el servidor; no hay librerías compartidas entre servicios (ADR-018).
 # Procesos es un módulo aparte que se lleva a otros proyectos: la web importa sus pantallas (ADR-019).
 # La conexión entre dispositivos también: la usan la web y el servidor (ADR-027).
+# El kit de auditoría también: lo usan los servicios que mandan eventos a Auditoría (specs/027).
 # Cada servicio se empaqueta solo con lo suyo (pnpm deploy), ver ADR-010.
 packages:
   - microservices/comercial
@@ -8,4 +9,5 @@ packages:
   - microservices/procesos/servidor
   - microservices/procesos/web
   - microservices/conexion
+  - microservices/auditoria-kit
   - tests/e2e

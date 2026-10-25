@@ -1,0 +1,34 @@
+{
+  "name": "auditoria-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepare": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit && pnpm capas",
+    "capas": "depcruise src --config .dependency-cruiser.cjs",
+    "test:persistencia": "vitest run --coverage"
+  },
+  "dependencies": {
+    "kysely": "0.29.6",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
+    "@vitest/coverage-v8": "2.1.9",
+    "dependency-cruiser": "18.6.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

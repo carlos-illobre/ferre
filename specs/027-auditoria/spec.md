@@ -99,7 +99,7 @@ lo más nuevo primero.
 
 ### Key Entities
 
-- **Evento**: lo que hizo una persona: id, servicio, tipo (`cosa.accion`), fecha, quién (número y nombre en ese momento), dispositivo, título, detalle, importancia (normal, revisar, anulación), referencias a las cosas que toca y contenido libre.
+- **Evento**: lo que hizo una persona: id, servicio, tipo (`cosa.accion`), fecha, quién (número y nombre en ese momento), dispositivo, título, detalle, grupo (para el filtro «qué»: «Ventas», «Procesos»), importancia (normal, revisar, anulación), referencias a las cosas que toca y contenido libre.
 - **Bandeja de salida**: en la base de cada servicio, los eventos que esperan ser entregados o ya entregados hace menos de una semana.
 - **Auditoría**: el servicio y su base, que guarda los eventos de todos y responde los reportes.
 
