@@ -10,7 +10,7 @@ vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof im
 const guardado = vi.hoisted(() => new Map<string, unknown>());
 vi.mock("../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../datos/almacenamiento")>()), guardarMeta: async (clave: string, valor: unknown) => { guardado.set(clave, valor); }, leerMeta: async (clave: string) => guardado.get(clave) ?? null }));
 
-import { Tickets } from "./compu/base/pantallas/Tickets";
+import { Tickets } from "./compu/tickets/Tickets";
 
 const abierto = { id: "t-1", tipo: "error", descripcion: "La pantalla quedó en blanco", dispositivo: "celular · Chrome", version: "abc", creado_en: "2026-10-11T12:00:00Z", estado: "abierto", resuelto_en: null, nota: null, usuario: "Marta", resuelto_por: null, fotos: [] };
 const resuelto = { ...abierto, id: "t-2", descripcion: "No imprimía", estado: "resuelto", resuelto_en: "2026-10-11T13:00:00Z", resuelto_por: "Carlos", nota: "Corregido" };

@@ -4,7 +4,7 @@ import { conPermisos, conTodosLosPermisos, usuarioDePrueba } from "../pruebas/se
 import { puede } from "./permisos";
 import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELU } from "./celular/App";
-import { PantallaDeProcesos, pedirAProcesos } from "./Procesos";
+import { PantallaDeProcesos, pedirAProcesos } from "./comun/procesos/Procesos";
 
 // El módulo se prueba en su paquete; acá solo importa qué le da Ferrebress.
 vi.mock("procesos-web", () => ({

@@ -1,0 +1,49 @@
+/* Mejoras y errores en el celular, como la v2 («El buzón»; decisión 148). Las piezas (.mv-*)
+   están en mas-v2.css; los íconos de tipo (.tkv-tipo), en la hoja de la computadora y acá. */
+:global(.tkvc) { flex: 1; display: flex; flex-direction: column; gap: 12px; width: 100%; padding: calc(40px + env(safe-area-inset-top)) 16px calc(var(--alto-nav, 64px) + 96px); font-size: 16px; line-height: 1.45; }
+:global(.tkvc) > h1 { font-size: 28px; line-height: 34px; font-weight: 800; letter-spacing: -.02em; }
+.escribir { padding: 12px; display: grid; gap: 12px; }
+.eleccion { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.eleccion > button { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--v-borde-fuerte); background: var(--v-superficie); font: inherit; font-weight: 700; font-size: 15px; color: var(--v-texto-2); box-shadow: var(--v-sombra-1); cursor: pointer; }
+.eleccion > button svg { color: var(--v-texto-3); }
+.eleccion > button:global(.elegida) { background: var(--v-logro-suave); border-color: var(--v-logro); color: var(--v-logro-texto); box-shadow: 0 0 0 3px rgba(30, 158, 98, .12); }
+.eleccion > button:global(.elegida) svg { color: var(--v-logro-texto); }
+.caja { height: 100px; resize: none; padding: 10px 14px; border: 1px solid var(--v-borde-fuerte); border-radius: 12px; background: var(--v-superficie); font: inherit; font-size: 16px; line-height: 24px; color: var(--v-tinta); }
+.caja:focus { outline: none; border-color: var(--v-pino); box-shadow: 0 0 0 4px rgba(18, 56, 47, .12); }
+.fotos { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tomar { width: 60px; height: 60px; border-radius: 8px; display: grid; place-items: center; flex: none; border: 0; cursor: pointer; }
+.tomar:global(.cam) { background: var(--v-pino); color: #fff; box-shadow: var(--v-sombra-2); }
+.tomar:global(.gal) { background: var(--v-hundido); color: var(--v-texto-2); }
+.tomar:disabled { opacity: .45; }
+.fotos :global(.cuantas) { margin-left: auto; font-size: 14px; font-weight: 650; color: var(--v-texto-3); }
+.mini { position: relative; width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid var(--v-borde); background: var(--v-hundido); flex: none; box-shadow: var(--v-sombra-1); padding: 0; display: block; }
+.mini img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.mini :global(.quitar) { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 99px; border: 0; background: rgba(26, 29, 27, .72); color: #fff; display: grid; place-items: center; }
+.mini:global(.chica) { width: 44px; height: 44px; }
+.mini:global(.grande) { width: 100px; height: 100px; cursor: pointer; }
+.sec { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.segmentos { display: inline-flex; padding: 3px; border-radius: 12px; background: var(--v-hundido); gap: 2px; }
+.segmentos > button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; font: inherit; font-weight: 700; font-size: 15px; color: var(--v-texto-2); }
+.segmentos > button:global(.elegido) { background: var(--v-superficie); color: var(--v-tinta); box-shadow: var(--v-sombra-1); }
+.lista { display: flex; flex-direction: column; gap: 8px; }
+.tk { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: start; width: 100%; padding: 10px 12px; background: var(--v-superficie); border: 1px solid var(--v-borde); border-radius: 16px; box-shadow: var(--v-sombra-1); font: inherit; color: inherit; text-align: left; }
+.tk:global(.porenviar) { background: var(--v-urgente-suave); border-color: transparent; }
+.tk:global(.porenviar) :global(.tkv-tipo) { background: var(--v-superficie); }
+.tk :global(.tx) { display: flex; flex-direction: column; min-width: 0; }
+.tk :global(.texto) { font-weight: 650; font-size: 15px; line-height: 21px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tk :global(.quien) { font-size: 14px; line-height: 20px; color: var(--v-texto-2); margin-top: 2px; }
+.tk :global(.quien):global(.urgente) { color: var(--v-urgente-texto); font-weight: 650; }
+.tk :global(.nube) { color: var(--v-urgente-texto); margin-top: 2px; }
+.tk :global(.tkv-tipo) { width: 40px; height: 40px; }
+:global(.tkv-tipo) { border-radius: 12px; display: grid; place-items: center; flex: none; width: 40px; height: 40px; }
+:global(.tkv-tipo):global(.mejora) { background: var(--v-pino-suave); color: var(--v-pino-texto); }
+:global(.tkv-tipo):global(.error) { background: var(--v-error-suave); color: var(--v-error-texto); }
+.vacio { padding: 20px 16px; border: 1px dashed var(--v-borde-fuerte); border-radius: 16px; color: var(--v-texto-2); text-align: center; font-size: 15px; }
+.barra { position: fixed; left: 0; right: 0; bottom: calc(var(--alto-nav, 64px) + env(safe-area-inset-bottom)); z-index: 6; display: grid; padding: 12px 16px; background: rgba(255, 255, 255, .92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--v-borde); box-shadow: 0 -8px 24px -12px rgba(26, 29, 27, .15); }
+.hoja { display: flex; flex-direction: column; gap: 12px; }
+.detCab { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; }
+.detCab :global(.texto) { font-weight: 700; font-size: 17px; line-height: 23px; }
+.tira { display: flex; gap: 8px; overflow-x: auto; }
+.resolver { display: grid; gap: 8px; }
+.resolver input { min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--v-borde-fuerte); font: inherit; font-size: 16px; }
+.ancho { width: 100%; }

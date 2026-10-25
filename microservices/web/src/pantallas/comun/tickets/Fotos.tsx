@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useFoto } from "./tickets";
+import { useFoto } from "../../../negocio/tickets";
 import "./tickets.css";
 
 // Las fotos de Mejoras y errores (RF-80), las mismas en el celular y en la computadora: la chica y,

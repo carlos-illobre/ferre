@@ -71,20 +71,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/pantallas/Tickets.tsx",
-    "to": "src/pantallas/compu/base/dispositivo.ts",
-    "unresolvedTo": "../../compu/base/dispositivo",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "el-celular-no-usa-la-computadora"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/Pestanas.tsx",
     "to": "src/pantallas/compu/base/ui.tsx",
     "unresolvedTo": "../compu/base/ui",
@@ -183,34 +169,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/MisCelulares.tsx",
-    "to": "src/datos/credenciales/index.ts",
-    "unresolvedTo": "../../datos/credenciales",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/pantallas/Configuracion.tsx",
-    "to": "src/datos/almacenamiento/index.ts",
-    "unresolvedTo": "../../../datos/almacenamiento",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/pantallas/Login.tsx",
     "to": "src/datos/credenciales/index.ts",
     "unresolvedTo": "../../../datos/credenciales",
@@ -239,20 +197,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/pantallas/Tickets.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/pantallas/VincularCelular.tsx",
     "to": "src/datos/sesion/index.ts",
     "unresolvedTo": "../../../datos/sesion",
@@ -270,20 +214,6 @@
     "from": "src/pantallas/compu/App.tsx",
     "to": "src/datos/sesion/index.ts",
     "unresolvedTo": "../../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Configuracion.tsx",
-    "to": "src/datos/almacenamiento/index.ts",
-    "unresolvedTo": "../../../../datos/almacenamiento",
     "dependencyTypes": [
       "local",
       "import"
@@ -351,34 +281,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Tickets.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Tickets.tsx",
-    "to": "src/datos/sesion/index.ts",
-    "unresolvedTo": "../../../../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/VincularCelular.tsx",
     "to": "src/datos/sesion/index.ts",
     "unresolvedTo": "../../../../datos/sesion",
@@ -421,34 +323,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/configuracion-comun.ts",
-    "to": "src/datos/almacenamiento/index.ts",
-    "unresolvedTo": "../datos/almacenamiento",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/configuracion-comun.ts",
-    "to": "src/datos/credenciales/index.ts",
-    "unresolvedTo": "../datos/credenciales",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/DineroInvertido.tsx",
     "to": "src/datos/conexion/index.ts",
     "unresolvedTo": "../datos/conexion",
@@ -477,34 +351,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/Procesos.tsx",
-    "to": "src/datos/almacenamiento/index.ts",
-    "unresolvedTo": "../datos/almacenamiento",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/Procesos.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/sugeridos.ts",
     "to": "src/datos/almacenamiento/index.ts",
     "unresolvedTo": "../datos/almacenamiento",
@@ -520,34 +366,6 @@
   {
     "type": "dependency",
     "from": "src/pantallas/sugeridos.ts",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/tickets.ts",
-    "to": "src/datos/almacenamiento/index.ts",
-    "unresolvedTo": "../datos/almacenamiento",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/tickets.ts",
     "to": "src/datos/conexion/index.ts",
     "unresolvedTo": "../datos/conexion",
     "dependencyTypes": [
@@ -995,37 +813,9 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Configuracion.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/Entrar.tsx",
     "to": "src/plataforma/servidor/useResponde.ts",
     "unresolvedTo": "../../../../plataforma/servidor/useResponde",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Tickets.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../../../plataforma/teclado/teclas",
     "dependencyTypes": [
       "local",
       "import"
@@ -1054,20 +844,6 @@
     "from": "src/pantallas/compu/base/ui.tsx",
     "to": "src/negocio/precios/vista-previa.ts",
     "unresolvedTo": "../../../negocio/precios/vista-previa",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/Sistema.tsx",
-    "to": "src/negocio/sistema/ajustes.ts",
-    "unresolvedTo": "../negocio/sistema/ajustes",
     "dependencyTypes": [
       "local",
       "import"
@@ -1175,35 +951,5 @@
       "severity": "error",
       "name": "por-la-puerta-de-entrada-desde-afuera"
     }
-  },
-  {
-    "type": "cycle",
-    "from": "src/pantallas/celular/componentes/OfrecerHuella.tsx",
-    "to": "src/pantallas/celular/pantallas/Login.tsx",
-    "unresolvedTo": "../pantallas/Login",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "sin-ciclos"
-    },
-    "cycle": [
-      {
-        "name": "src/pantallas/celular/pantallas/Login.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/pantallas/celular/componentes/OfrecerHuella.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      }
-    ]
   }
 ]

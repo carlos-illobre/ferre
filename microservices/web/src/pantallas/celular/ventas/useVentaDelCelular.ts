@@ -3,7 +3,7 @@ import { useVenta, type MotivoDeCambio } from "../../../negocio/ventas";
 import { usePuede } from "../../permisos";
 import { TEXTOS } from "../../textos";
 import { textoDeNoCobrar } from "../../comun/ventas/textos-de-la-venta";
-import { describirDispositivo } from "../pantallas/Login";
+import { describirDispositivo } from "../../../plataforma/dispositivo";
 
 type Opciones = { cerrarBusqueda: () => void; alFaltarCliente: () => void };
 

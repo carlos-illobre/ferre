@@ -3,7 +3,7 @@ import { marcarLoQueEntro, useVenta, ventaActual, type MotivoDeCambio } from "..
 import { usePuede } from "../../permisos";
 import { TEXTOS } from "../../textos";
 import { textoDeNoCobrar } from "../../comun/ventas/textos-de-la-venta";
-import { describirDispositivo } from "../base/dispositivo";
+import { describirDispositivo } from "../../../plataforma/dispositivo";
 
 type Opciones = { caja: RefObject<HTMLInputElement>; setConsulta: (texto: string) => void; alFaltarCliente: () => void };
 

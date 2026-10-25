@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, reducirImagen } from "../datos/conexion";
-import { useFoto } from "./tickets";
+import { useFoto } from "../negocio/tickets";
 import { PedirFotoAlCelular } from "./PedirFoto";
 import "./foto-de-factura.css";
 import type { FotoDeComprobante } from "@servidor/compras";

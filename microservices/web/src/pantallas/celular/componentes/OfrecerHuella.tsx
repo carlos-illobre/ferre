@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { hayHuella, vincularEsteDispositivo } from "../../../datos/credenciales";
-import { describirDispositivo, esCelular } from "../pantallas/Login";
+import { describirDispositivo, esCelular } from "../../../plataforma/dispositivo";
 import { AvisoError, Hoja, Icono } from "./base";
 
 // Como en las apps del banco: la primera vez que alguien entra con Google desde un

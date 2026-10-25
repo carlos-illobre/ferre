@@ -1,3 +1,4 @@
+import { describirDispositivo, esCelular } from "../../../plataforma/dispositivo";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ConectandoConGoogle } from "../ConectandoConGoogle";
@@ -138,11 +139,4 @@ export function BotonHuella({ detalle, titulo = "Entrar con la huella", enseguid
   );
 }
 
-// Celular = Android o iPhone/iPad. La oferta de huella al primer login es solo para ellos.
-export const esCelular = () => /Android|iPhone|iPad/.test(navigator.userAgent);
-export function describirDispositivo(): string {
-  const ua = navigator.userAgent;
-  const tipo = esCelular() ? "celular" : "computadora";
-  const navegador = /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome" : /Firefox\//.test(ua) ? "Firefox" : /Safari\//.test(ua) ? "Safari" : "navegador";
-  return `${tipo} · ${navegador}`;
-}
+export { describirDispositivo, esCelular };

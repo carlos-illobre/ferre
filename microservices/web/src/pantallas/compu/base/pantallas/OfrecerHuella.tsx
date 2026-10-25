@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { hayHuella, vincularEsteDispositivo } from "../../../../datos/credenciales";
-import { describirDispositivo, esCelular } from "../dispositivo";
+import { describirDispositivo, esCelular } from "../../../../plataforma/dispositivo";
 import { esFallaDeRed } from "../../negocio/negocio-comun";
 import { Aviso, Boton, Hoja, Icono } from "../ui";
 import "../estilos/entrar.css";

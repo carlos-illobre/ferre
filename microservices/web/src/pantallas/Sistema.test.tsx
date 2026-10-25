@@ -6,7 +6,7 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof import("../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { ErrorApi } from "../datos/conexion";
-import { Sistema } from "./Sistema";
+import { Sistema } from "./comun/sistema/Sistema";
 import { Configuracion } from "../pruebas/configuracion";
 import { olvidarAjustesVistos } from "../negocio/sistema/ajustes";
 import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
@@ -30,7 +30,8 @@ describe("Más → Sistema", () => {
     await waitFor(() => expect(elegido("sis-sesion")).toBe("1 min"));
     expect(within(screen.getByTestId("sis-sesion")).getAllByRole("radio").map((b) => b.textContent)).toEqual(["No", "30 s", "1 min", "5 min", "10 min"]);
     expect(screen.queryByTestId("sis-celular")).toBeNull();
-    expect((screen.getByTestId("sis-vinculo") as HTMLInputElement).value).toBe("30");
+    // Los días se escriben en la caja un momento después de llegar: se espera a que estén.
+    await waitFor(() => expect((screen.getByTestId("sis-vinculo") as HTMLInputElement).value).toBe("30"));
     const largo = screen.getByTestId("sistema").textContent!;
     expect(largo).toContain("un cambio hecho directamente en la base tarda hasta este tiempo");
     unmount();

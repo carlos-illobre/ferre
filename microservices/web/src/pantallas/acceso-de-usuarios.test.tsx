@@ -11,8 +11,6 @@ vi.mock("../espejo", async (original) => ({ ...(await original<typeof import("..
 import { conTodosLosPermisos } from "../pruebas/sesion";
 import { Usuarios } from "./compu/negocio/Usuarios";
 import { Configuracion } from "../pruebas/configuracion";
-import { MisCelulares } from "./celular/MisCelulares";
-import { VinculoPropio } from "./Vinculo";
 
 const MARTA = { id: "m1", email: "marta@ferre.test", nombre: "Marta", activo: true, creado_en: "2026-08-01T12:00:00Z", roles: [{ id: "r1", nombre: "Vendedor" }] };
 const NICO = { id: "n1", email: "nico@ferre.test", nombre: "Nicolás", activo: true, creado_en: "2026-08-01T12:00:00Z", roles: [{ id: "r1", nombre: "Vendedor" }] };
@@ -54,12 +52,12 @@ describe("lo propio, en Configuración", () => {
   beforeEach(() => { conTodosLosPermisos(); apiFalsa.mockReset().mockResolvedValue([]); espejo.emparejado = false; });
 
   it("debajo de las preferencias, mis celulares con huella; el vínculo, solo si está vinculado, con «Desvincular» y sin los días", async () => {
-    const { unmount } = render(<Configuracion celular propio={<><MisCelulares /><VinculoPropio /></>} />);
+    const { unmount } = render(<Configuracion celular />);
     expect(await screen.findByText("Motorola del depósito")).toBeTruthy();
     expect(screen.queryByTestId("vinculo")).toBeNull();
     unmount();
     espejo.emparejado = true;
-    render(<Configuracion celular propio={<><MisCelulares /><VinculoPropio /></>} />);
+    render(<Configuracion celular />);
     expect(screen.getByTestId("vinculo-actual").textContent).toContain("Vinculado con tu computadora");
     expect(screen.getByTestId("desvincular-vinculo")).toBeTruthy();
     expect(screen.queryByTestId("dias-vinculo")).toBeNull();

@@ -1,5 +1,5 @@
-// Qué dispositivo es este, en pocas palabras: queda anotado en cada venta y en cada sesión.
-// Celular = Android o iPhone/iPad; la oferta de entrar con la huella es solo para ellos.
+// Qué dispositivo es este, en pocas palabras: queda anotado en cada venta, en cada sesión y en cada
+// ticket. Celular = Android o iPhone/iPad; la oferta de entrar con la huella es solo para ellos.
 export const esCelular = () => /Android|iPhone|iPad/.test(navigator.userAgent);
 export function describirDispositivo(): string {
   const ua = navigator.userAgent;

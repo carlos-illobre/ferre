@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, ErrorApi, leerToken, reducirImagen, urlApi } from "../datos/conexion";
-import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "../datos/almacenamiento";
-import { guardarMeta, leerMeta } from "../datos/almacenamiento";
+import { api, ErrorApi, leerToken, reducirImagen, urlApi } from "../../datos/conexion";
+import { guardaEnElDispositivo, SIN_CONEXION_Y_SIN_GUARDADO } from "../../datos/almacenamiento";
+import { guardarMeta, leerMeta } from "../../datos/almacenamiento";
 import type { Ticket } from "@servidor/tickets";
 
 // Tickets (RF-80): errores y mejoras que reporta quien usa la app. Un ticket se guarda
@@ -39,6 +39,12 @@ function formularioDe(p: Pendiente): FormData {
   return formulario;
 }
 
+// Si hay que seguir: mandado, o rechazado para siempre. Sin red, o con el servidor caído, se frena.
+async function mandarUno(p: Pendiente): Promise<boolean> {
+  try { await api("/tickets", { method: "POST", body: formularioDe(p) }); return true; }
+  catch (e) { const estado = (e as { estado?: number }).estado; return !(!estado || estado >= 500 || estado === 401 || estado === 429); }
+}
+
 let enviando: Promise<void> | null = null;
 // Manda de a uno, en orden. Un corte de red frena y deja el resto para después; un rechazo
 // del servidor (4xx) es un ticket que reintentar no arregla: se descarta.
@@ -47,8 +53,7 @@ export function enviarPendientes(): Promise<void> {
   enviando = (async () => {
     try {
       for (const p of await leerPendientes()) {
-        try { await api("/tickets", { method: "POST", body: formularioDe(p) }); }
-        catch (e) { const estado = (e as { estado?: number }).estado; if (!estado || estado >= 500 || estado === 401 || estado === 429) return; }
+        if (!(await mandarUno(p))) return;
         await guardarMeta(CLAVE, (await leerPendientes()).filter((x) => x.id !== p.id));
         avisar();
       }

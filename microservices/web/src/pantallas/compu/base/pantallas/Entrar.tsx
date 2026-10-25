@@ -4,7 +4,7 @@ import { useSesion } from "../../../../datos/sesion";
 import QRCode from "qrcode";
 import { dispositivoId, guardarPuestoLocal } from "../../../../puesto";
 import { entrarConHuella, hayHuella, huellaVinculadaAca } from "../../../../datos/credenciales";
-import { describirDispositivo, esCelular } from "../dispositivo";
+import { describirDispositivo, esCelular } from "../../../../plataforma/dispositivo";
 import { marcarEntradaConGoogle } from "./OfrecerHuella";
 import { Aviso, Boton, Icono, Marca, Progreso, type NombreDeIcono } from "../ui";
 import "../estilos/entrar.css";
