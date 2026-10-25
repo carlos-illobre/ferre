@@ -55,3 +55,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T044 [ajuste] Celular: el botón del vínculo con la computadora nunca es gris: verde en espejo y blanco con el borde verde desconectado (decisión 143)
 - [x] T045 [ajuste] Cuenta corriente en rojo en toda la aplicación, con su fondo suave (decisión 144)
 - [x] T046 [regla] Toda cantidad va con su unidad, en el celular y en la computadora (decisión 144)
+- [x] T047 [arreglo] La letra de los importes del celular («Archivo Narrow») no cargaba: su hoja la buscaba en una carpeta que no existe (desde el 2026-10-17)
