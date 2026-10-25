@@ -1,0 +1,92 @@
+/* Usuarios como la v2 («Tabla y ficha», decisión 148): cuatro números, el buscador con sus
+   pastillas, una persona por renglón y la ficha fija de la elegida a la derecha. Las medidas son
+   las de la maqueta; los colores, los de paleta.css. */
+:global(.uv) { gap: 12px; padding-top: 16px; }
+:global(.uv) :global(.pagina-cabeza) { display: contents; }
+:global(.uv) :global(.pagina-cabeza) h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+:global(.uv) :global(.pagina-cabeza) :global(.bajada) { position: absolute; }
+
+/* Botones de la v2: común, naranja, suave, peligro y fantasma, con su tecla. */
+.boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font-weight: 700; font-size: 14px; white-space: nowrap; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); cursor: pointer; position: relative; }
+.boton:global(.accion) { background: var(--p-naranja); border-color: var(--p-naranja); color: #fff; box-shadow: 0 4px 12px rgb(216 63 14 / .28); }
+.boton:global(.accion) .kbd { background: rgb(255 255 255 / .16); border-color: rgb(255 255 255 / .35); color: #fff; }
+.boton:global(.suave) { background: var(--p-relleno); border-color: transparent; box-shadow: none; }
+.boton:global(.peligro) { background: var(--rojo-suave); border-color: transparent; box-shadow: none; color: var(--rojo); }
+.boton:global(.fantasma) { background: transparent; border-color: transparent; box-shadow: none; color: var(--p-texto-2); }
+.boton:global(.con-filtros) { border-color: var(--p-verde-texto); color: var(--p-verde-texto); }
+.boton:disabled { opacity: .45; box-shadow: none; cursor: default; }
+.kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--p-borde-fuerte); border-bottom-width: 2px; background: var(--p-superficie); color: var(--p-texto-2); font-size: 14px; line-height: 1; font-weight: 700; }
+.gris { color: var(--p-texto-3); }
+.detalle { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--p-texto-2); }
+.cortar { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crece { flex: 1; }
+
+.pantalla { display: grid; grid-template-columns: minmax(0, 1fr) 344px; gap: 20px; align-items: start; }
+.izq { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+/* Los cuatro números. */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.kpi { display: flex; align-items: center; gap: 8px; padding: 10px 10px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); min-width: 0; }
+.kpiIco { width: 32px; height: 32px; border-radius: 99px; background: var(--p-verde-suave); color: var(--p-verde-texto); display: grid; place-items: center; flex: none; }
+.kpiVa { font-size: 22px; line-height: 26px; font-weight: 800; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+.kpiEt { font-size: 14px; line-height: 18px; font-weight: 650; color: var(--p-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* El buscador y sus pastillas. */
+.barra { display: flex; gap: 8px; align-items: center; }
+.campo { position: relative; flex: 1; display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 8px 0 14px; border-radius: 12px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-texto-2); }
+.campo input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; font: inherit; font-size: 16px; color: var(--p-tinta); }
+.campo input::placeholder { color: var(--p-texto-3); }
+.campo:focus-within { border-color: var(--p-verde-texto); box-shadow: 0 0 0 3px rgb(15 107 82 / .12); }
+.campo :global(.usuarios-borrar) { position: static; transform: none; }
+.chip { display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.chip:global(.elegido) { background: var(--p-verde); border-color: var(--p-verde); color: #fff; }
+:global(.uv) :global(.usuarios-filtros) { align-self: center; }
+:global(.uv) :global(.usuarios-panel) { left: auto; right: 0; }
+
+/* La lista. */
+.tabla { display: flex; flex-direction: column; gap: 6px; }
+.cab, .fila { display: grid; grid-template-columns: 40px minmax(0, 1fr) 236px 104px 16px; gap: 12px; align-items: center; }
+.cab { padding: 0 16px; font-size: 14px; font-weight: 650; color: var(--p-texto-3); }
+.fila { width: 100%; padding: 7px 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 14px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.fila:hover { border-color: var(--p-borde-fuerte); }
+.fila:global(.elegida) { border-color: var(--p-verde); box-shadow: 0 0 0 3px rgb(23 49 43 / .10); }
+.fila:global(.elegida) .chev { color: var(--p-verde); }
+.fila:global(.inactiva) { background: transparent; box-shadow: none; border-style: dashed; }
+.fila:global(.inactiva) .nom, .fila:global(.inactiva) .mail { color: var(--p-texto-3); }
+.quien { display: flex; flex-direction: column; min-width: 0; }
+.nom { display: flex; gap: 6px; align-items: center; font-weight: 700; font-size: 15px; line-height: 20px; color: var(--p-tinta); }
+.mail { font-size: 14px; line-height: 18px; color: var(--p-texto-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.yo { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 99px; background: var(--p-naranja-suave); color: var(--p-naranja-texto); font-size: 14px; font-weight: 750; }
+.roles { display: flex; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.fila .roles { flex-wrap: nowrap; overflow: hidden; }
+.rol { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px 0 8px; border-radius: 999px; background: var(--p-relleno); color: var(--p-texto-2); font-size: 14px; font-weight: 650; white-space: nowrap; }
+.rolesFicha .rol { height: 28px; }
+.rol:global(.admin) { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.rol:global(.mas) { padding: 0 10px; background: transparent; border: 1px solid var(--p-borde); }
+.acc { display: flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 650; color: var(--p-texto-2); }
+.acc > span { display: inline-flex; align-items: center; gap: 4px; }
+.pastilla { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 14px; font-weight: 650; background: var(--p-relleno); color: var(--p-texto-2); white-space: nowrap; }
+.pastilla:global(.contorno) { background: var(--p-superficie); border: 1px solid var(--p-borde); }
+.chev { color: var(--p-texto-3); }
+
+/* La ficha. */
+.ficha { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 12px; padding: 16px 18px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .06), 0 6px 18px rgb(26 29 27 / .06); min-width: 0; overflow: hidden; }
+.ficha h3 { margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 750; color: var(--p-texto-2); }
+.ficha h3 .boton { min-height: 32px; }
+.fichaQuien { display: flex; gap: 14px; align-items: center; }
+.fichaTextos { min-width: 0; }
+.fichaNombre { display: flex; gap: 6px; align-items: center; font-size: 20px; font-weight: 800; letter-spacing: -.01em; line-height: 26px; color: var(--p-tinta); }
+.sep { height: 1px; background: var(--p-borde); }
+.puede { margin-top: 8px; font-size: 14px; line-height: 20px; color: var(--p-texto-2); }
+.disp { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px 10px; border-radius: 12px; background: var(--p-superficie); border: 1px solid var(--p-borde); }
+.disp + .disp { margin-top: 8px; }
+.dispIco { width: 40px; height: 40px; border-radius: 10px; background: var(--p-relleno); color: var(--p-texto-2); display: grid; place-items: center; }
+.dispTexto { min-width: 0; }
+.dispN { font-weight: 700; font-size: 15px; line-height: 20px; color: var(--p-tinta); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pie { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+.ficha :global(.ru-panel) { margin-top: 4px; }
+
+@media (max-width: 1180px) {
+  .pantalla { grid-template-columns: minmax(0, 1fr) 300px; }
+  .cab, .fila { grid-template-columns: 40px minmax(0, 1fr) 180px 80px 16px; }
+}

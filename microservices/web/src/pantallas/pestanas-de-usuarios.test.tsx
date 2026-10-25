@@ -10,9 +10,9 @@ import { conPermisos, conTodosLosPermisos } from "../pruebas/sesion";
 import { PESTANAS_DE_USUARIOS } from "./pestanas-de-usuarios";
 import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
-import { CabezaDeNegocio } from "./celular/Usuarios";
+import { CabezaDeNegocio } from "./celular/negocio/CabezaDeNegocio";
 import { irA } from "../rutas";
-import { Usuarios } from "./compu/base/pantallas/Usuarios";
+import { Usuarios } from "./compu/negocio/Usuarios";
 
 // Más → Usuarios (decisión 88): una sola opción con cuatro pestañas, igual en las dos interfaces.
 describe("Más → Usuarios", () => {
@@ -66,7 +66,7 @@ describe("Más → Usuarios", () => {
   it("007-T037 en la computadora, la pestaña Usuarios tiene la columna «Acceso» con lo de cada persona, y no hay sección de sesiones", async () => {
     render(<Usuarios />);
     expect((await screen.findAllByText("Marta")).length).toBeGreaterThan(0);
-    expect(document.querySelector(".uv-cab")!.textContent).toContain("Acceso");
+    expect(document.querySelector("[data-testid=cabeza-de-usuarios]")!.textContent).toContain("Acceso");
     expect(screen.getByLabelText(/sesi/i)).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "Sesiones abiertas" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Mis celulares con huella" })).toBeNull();

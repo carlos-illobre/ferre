@@ -3,7 +3,7 @@ import { vincularConCodigo, type Vinculado } from "../../../../negocio/vinculo";
 import { useSesion } from "../../../../datos/sesion";
 import { irA } from "../rutas";
 import { BotonGoogle, BotonHuella, MarcoDeEntrada } from "./Entrar";
-import { esFallaDeRed } from "./negocio-comun";
+import { esFallaDeRed } from "../../negocio/negocio-comun";
 import { Aviso, Boton, Icono, Progreso } from "../ui";
 import "../estilos/entrar.css";
 

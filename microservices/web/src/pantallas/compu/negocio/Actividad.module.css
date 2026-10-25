@@ -1,0 +1,89 @@
+/* Quién hizo qué como la v2 («Registro», decisión 148): los filtros en una fila, la tabla de a 10
+   con la acción elegida resaltada, «Qué pasó» y el detalle de la elegida a la derecha, y el
+   paginador. Las medidas son las de la maqueta; los colores, los de paleta.css. */
+:global(.av2) { gap: 12px; padding-top: 16px; }
+:global(.av2) :global(.pagina-cabeza) { display: contents; }
+:global(.av2) :global(.pagina-cabeza) h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+:global(.av2) :global(.pagina-cabeza) :global(.bajada) { position: absolute; }
+.hoy { font-size: 14px; font-weight: 600; color: var(--p-texto-2); white-space: nowrap; }
+.detalle { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--p-texto-2); }
+.detalle b { color: var(--p-tinta); font-weight: 750; }
+.crece { flex: 1; }
+.boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font-weight: 700; font-size: 14px; white-space: nowrap; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); cursor: pointer; }
+.boton:global(.icono) { width: 36px; padding: 0; }
+.boton:global(.suave) { background: var(--p-relleno); border-color: transparent; box-shadow: none; }
+.boton:global(.fantasma) { background: transparent; border-color: transparent; box-shadow: none; color: var(--p-texto-2); }
+.boton:disabled { opacity: .45; box-shadow: none; cursor: default; }
+.kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--p-borde-fuerte); border-bottom-width: 2px; background: var(--p-superficie); color: var(--p-texto-2); font-size: 14px; line-height: 1; font-weight: 700; }
+
+.pantalla { display: grid; grid-template-columns: minmax(0, 1fr) 312px; gap: 20px; align-items: start; }
+.izq { display: flex; flex-direction: column; min-width: 0; }
+
+/* Los filtros. */
+.filtros { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.selector { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); box-shadow: 0 1px 2px rgb(26 29 27 / .05); font-weight: 700; font-size: 15px; white-space: nowrap; color: var(--p-tinta); }
+.selector:global(.puesto) { border-color: var(--p-verde); background: var(--p-verde-suave); color: var(--p-verde); }
+.et { color: var(--p-texto-2); font-weight: 600; }
+.selector select { appearance: none; border: 0; background: none; font: inherit; color: inherit; padding-right: 2px; cursor: pointer; max-width: 160px; field-sizing: content; }
+.selector select:focus { outline: none; }
+.selector:focus-within { box-shadow: 0 0 0 3px rgb(15 107 82 / .16); }
+.segmentos { display: inline-flex; padding: 3px; border-radius: 12px; background: var(--p-relleno); gap: 2px; }
+.segmentos > button { min-height: 38px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; font-weight: 700; font-size: 14px; color: var(--p-texto-2); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer; }
+.segmentos > button:global(.elegido) { background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); }
+.rango { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-top: 10px; padding: 12px; border-radius: 14px; background: var(--p-superficie); border: 1px solid var(--p-borde); }
+.total { display: flex; align-items: baseline; gap: 10px; margin: 14px 0 10px; }
+.total > b { font-size: 20px; font-weight: 800; letter-spacing: -.01em; color: var(--p-tinta); white-space: nowrap; }
+
+/* La tabla. */
+.tabla { display: flex; flex-direction: column; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); overflow: hidden; }
+.fila { display: grid; grid-template-columns: 48px 100px 186px minmax(0, 1fr) 16px; align-items: center; gap: 12px; min-height: 41px; padding: 0 14px; border: 0; border-top: 1px solid var(--p-borde); background: none; font: inherit; font-size: 15px; text-align: left; color: var(--p-tinta); width: 100%; cursor: pointer; }
+.fila:global(.cab) { min-height: 36px; border-top: 0; background: var(--p-relleno); color: var(--p-texto-2); font-size: 14px; font-weight: 650; cursor: default; }
+.fila:not(:global(.cab)):not(:global(.elegida)):hover { background: var(--p-fondo-2); }
+.fila:global(.elegida) { background: var(--p-verde-suave); box-shadow: inset 4px 0 0 var(--p-verde); }
+.hora { font-weight: 700; color: var(--p-texto-2); white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 15px; }
+.fila:has(.hora:not(:empty)) .hora { overflow: hidden; text-overflow: ellipsis; }
+.quien { display: flex; align-items: center; gap: 8px; font-weight: 650; white-space: nowrap; overflow: hidden; }
+.quien :global(.iniciales):global(.s), .kvQuien :global(.iniciales):global(.s) { width: 26px; height: 26px; }
+.que { display: flex; align-items: center; gap: 8px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tipo { width: 26px; height: 26px; border-radius: 8px; display: inline-grid; place-items: center; background: var(--p-relleno); color: var(--p-texto-2); flex: none; }
+.tipo:global(.l) { width: 44px; height: 44px; border-radius: 12px; }
+.tipo:global(.error) { background: var(--rojo-suave); color: var(--rojo); }
+.tipo:global(.urgente) { background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); }
+.det { color: var(--p-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mas { color: var(--p-texto-3); }
+.fila:global(.elegida) .mas { color: var(--p-verde); }
+.pie { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.paginador { display: flex; align-items: center; gap: 8px; }
+.pag { min-width: 36px; height: 36px; border: 0; border-radius: 10px; display: grid; place-items: center; background: none; font-weight: 700; font-size: 14px; color: var(--p-texto-2); cursor: pointer; }
+.pag:global(.actual) { background: var(--p-verde); color: #fff; }
+
+/* A la derecha: «Qué pasó» y la acción elegida. */
+.der { display: flex; flex-direction: column; gap: 12px; min-width: 0; position: sticky; top: 16px; }
+.caja { padding: 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); }
+.caja h3 { margin: 0 0 10px; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 750; color: var(--p-tinta); }
+.caja h3 small { margin-left: auto; font-size: 14px; color: var(--p-texto-2); font-weight: 600; white-space: nowrap; }
+.barras { display: grid; gap: 2px; }
+.b { display: grid; grid-template-columns: 18px minmax(0, 1fr) 56px 24px; align-items: center; gap: 8px; height: 30px; padding: 0 6px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 14px; font-weight: 650; color: var(--p-tinta); text-align: left; cursor: pointer; }
+.b span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b i { height: 8px; border-radius: 9px; background: var(--p-texto-3); justify-self: start; }
+.b b { text-align: right; font-weight: 800; }
+.b:hover { background: var(--p-relleno); }
+.b:global(.error) { color: var(--rojo); } .b:global(.error) i { background: var(--rojo); }
+.b:global(.urgente) i { background: var(--p-amarillo); }
+.b:global(.puesto) { background: var(--p-verde-suave); color: var(--p-verde); }
+.b:global(.puesto) i { background: var(--p-verde); }
+.b:global(.otras) { cursor: default; }
+.b:global(.otras):hover { background: none; }
+.detCab { display: flex; gap: 12px; align-items: center; }
+.detTitulo { font-size: 18px; line-height: 22px; font-weight: 700; color: var(--p-tinta); }
+.kv { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 6px 10px; margin: 14px 0 0; font-size: 14px; }
+.kv dt { color: var(--p-texto-2); font-weight: 600; }
+.kv dd { margin: 0; font-weight: 650; color: var(--p-tinta); overflow-wrap: anywhere; }
+.kvQuien { display: flex; align-items: center; gap: 6px; }
+.cita { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--p-relleno); font-size: 14px; font-weight: 600; color: var(--p-texto-2); }
+.acciones { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+@media (max-width: 1180px) {
+  .pantalla { grid-template-columns: minmax(0, 1fr) 270px; }
+  .fila { grid-template-columns: 48px 90px 160px minmax(0, 1fr) 16px; }
+}

@@ -9,7 +9,7 @@ const espejo = vi.hoisted(() => ({ emparejado: false }));
 vi.mock("../espejo", async (original) => ({ ...(await original<typeof import("../espejo")>()), useEspejo: () => ({ emparejado: espejo.emparejado, lado: "celular", conectado: true, otroPresente: true, pausado: false, enEspejo: true }) }));
 
 import { conTodosLosPermisos } from "../pruebas/sesion";
-import { Usuarios } from "./compu/base/pantallas/Usuarios";
+import { Usuarios } from "./compu/negocio/Usuarios";
 import { Configuracion } from "../pruebas/configuracion";
 import { MisCelulares } from "./celular/MisCelulares";
 import { VinculoPropio } from "./Vinculo";

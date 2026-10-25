@@ -113,34 +113,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
-    "to": "src/datos/sesion/index.ts",
-    "unresolvedTo": "../../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/componentes/EstadoDeConexion.tsx",
     "to": "src/datos/almacenamiento/index.ts",
     "unresolvedTo": "../../../datos/almacenamiento",
@@ -214,20 +186,6 @@
     "from": "src/pantallas/celular/MisCelulares.tsx",
     "to": "src/datos/credenciales/index.ts",
     "unresolvedTo": "../../datos/credenciales",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Negocio.tsx",
-    "to": "src/datos/sesion/index.ts",
-    "unresolvedTo": "../../datos/sesion",
     "dependencyTypes": [
       "local",
       "import"
@@ -407,20 +365,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/negocio-comun.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/OfrecerHuella.tsx",
     "to": "src/datos/credenciales/index.ts",
     "unresolvedTo": "../../../../datos/credenciales",
@@ -435,34 +379,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Resumen.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Resumen.tsx",
-    "to": "src/datos/sesion/index.ts",
-    "unresolvedTo": "../../../../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/Tickets.tsx",
     "to": "src/datos/conexion/index.ts",
     "unresolvedTo": "../../../../datos/conexion",
@@ -478,48 +394,6 @@
   {
     "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/Tickets.tsx",
-    "to": "src/datos/sesion/index.ts",
-    "unresolvedTo": "../../../../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Usuarios.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Usuarios.tsx",
-    "to": "src/datos/credenciales/index.ts",
-    "unresolvedTo": "../../../../datos/credenciales",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Usuarios.tsx",
     "to": "src/datos/sesion/index.ts",
     "unresolvedTo": "../../../../datos/sesion",
     "dependencyTypes": [
@@ -631,20 +505,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/permisos.ts",
-    "to": "src/datos/sesion/index.ts",
-    "unresolvedTo": "../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/Procesos.tsx",
     "to": "src/datos/almacenamiento/index.ts",
     "unresolvedTo": "../datos/almacenamiento",
@@ -660,34 +520,6 @@
   {
     "type": "dependency",
     "from": "src/pantallas/Procesos.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/Roles.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/RolesDeUsuario.tsx",
     "to": "src/datos/conexion/index.ts",
     "unresolvedTo": "../datos/conexion",
     "dependencyTypes": [
@@ -953,20 +785,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/actividad-en-palabras.ts",
-    "to": "src/negocio/ventas/venta.ts",
-    "unresolvedTo": "../negocio/ventas/venta",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/BarrasEan.tsx",
     "to": "src/plataforma/imagenes/ean13.ts",
     "unresolvedTo": "../plataforma/imagenes/ean13",
@@ -1012,62 +830,6 @@
     "from": "src/pantallas/celular/App.tsx",
     "to": "src/plataforma/camara/Escaner.tsx",
     "unresolvedTo": "../../plataforma/camara/Escaner",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
-    "to": "src/negocio/ventas/resumen-del-dia.ts",
-    "unresolvedTo": "../../negocio/ventas/resumen-del-dia",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
-    "to": "src/negocio/ventas/tablero.ts",
-    "unresolvedTo": "../../negocio/ventas/tablero",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
-    "to": "src/negocio/ventas/venta.ts",
-    "unresolvedTo": "../../negocio/ventas/venta",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
-    "to": "src/negocio/ventas/ventas-del-dia.ts",
-    "unresolvedTo": "../../negocio/ventas/ventas-del-dia",
     "dependencyTypes": [
       "local",
       "import"
@@ -1345,62 +1107,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Resumen.tsx",
-    "to": "src/negocio/ventas/resumen-del-dia.ts",
-    "unresolvedTo": "../../../../negocio/ventas/resumen-del-dia",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Resumen.tsx",
-    "to": "src/negocio/ventas/tablero.ts",
-    "unresolvedTo": "../../../../negocio/ventas/tablero",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Resumen.tsx",
-    "to": "src/negocio/ventas/venta.ts",
-    "unresolvedTo": "../../../../negocio/ventas/venta",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Resumen.tsx",
-    "to": "src/negocio/ventas/ventas-del-dia.ts",
-    "unresolvedTo": "../../../../negocio/ventas/ventas-del-dia",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/base/pantallas/Tickets.tsx",
     "to": "src/plataforma/teclado/teclas.ts",
     "unresolvedTo": "../../../../plataforma/teclado/teclas",
@@ -1553,36 +1259,6 @@
       "severity": "error",
       "name": "por-la-puerta-de-entrada-desde-afuera"
     }
-  },
-  {
-    "type": "cycle",
-    "from": "src/pantallas/celular/ComoVaElNegocio.tsx",
-    "to": "src/pantallas/celular/Usuarios.tsx",
-    "unresolvedTo": "./Usuarios",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "sin-ciclos"
-    },
-    "cycle": [
-      {
-        "name": "src/pantallas/celular/Usuarios.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/pantallas/celular/ComoVaElNegocio.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      }
-    ]
   },
   {
     "type": "cycle",

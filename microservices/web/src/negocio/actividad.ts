@@ -13,3 +13,17 @@ export function useActividad(f: FiltrosDeActividad) {
 }
 
 export const paginasDe = (d: PaginaDeEventos | null): number => (d ? Math.max(1, Math.ceil(d.total / d.por_pagina)) : 1);
+
+// Los filtros del registro, iguales en el celular y la computadora: quién, qué, el período
+// (hoy, ayer, esta semana o un rango de días) y la página.
+export type Periodo = "hoy" | "ayer" | "semana" | "rango";
+export type FiltrosDelRegistro = { usuario: string; tipo: string; periodo: Periodo; desde: string; hasta: string };
+export const AL_ABRIR_EL_REGISTRO: FiltrosDelRegistro = { usuario: "", tipo: "", periodo: "hoy", desde: "", hasta: "" };
+
+// Qué acciones se cuentan en «de la N a la M de T».
+export function rangoDeLaPagina(d: PaginaDeEventos | null) {
+  return { desde: d && d.total ? (d.pagina - 1) * d.por_pagina + 1 : 0, hasta: d ? Math.min(d.total, d.pagina * d.por_pagina) : 0 };
+}
+
+// El primer nombre de quien lo hizo, o «El sistema».
+export const primerNombre = (n: string | null) => (n ? n.split(/\s+/)[0]! : "El sistema");

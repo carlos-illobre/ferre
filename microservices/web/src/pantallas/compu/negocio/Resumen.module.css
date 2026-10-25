@@ -1,0 +1,120 @@
+/* Cómo va el negocio como la v2 («Tablero por secciones», decisión 148): las secciones y el período
+   en segmentos, cuatro números con su comparación, lo vendido por hora, cómo pagaron y, abajo, lo
+   más vendido, lo que no llevaron y el cierre de caja. Las medidas son las de la maqueta; los
+   colores, los de paleta.css («Mostrador»). */
+:global(.rv) { gap: 12px; padding-top: 16px; }
+:global(.rv) :global(.pagina-cabeza) { display: contents; }
+:global(.rv) :global(.pagina-cabeza) :global(.bajada) { position: absolute; }
+:global(.rv) :global(.pagina-cabeza) h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Al lado de las pestañas: «Actualizado 19:12» y «Actualizar F5». */
+.actualizado { font-size: 14px; font-weight: 600; color: var(--p-texto-2); white-space: nowrap; }
+.boton { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--p-borde-fuerte); background: var(--p-superficie); color: var(--p-tinta); font-weight: 700; font-size: 14px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); white-space: nowrap; cursor: pointer; }
+.boton:disabled { opacity: .45; box-shadow: none; cursor: default; }
+.kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--p-borde-fuerte); border-bottom-width: 2px; background: var(--p-superficie); color: var(--p-texto-2); font-size: 14px; line-height: 1; font-weight: 700; }
+
+/* Las secciones y el período. */
+.barra { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.segmentos { display: inline-flex; padding: 3px; border-radius: 12px; background: var(--p-relleno); gap: 2px; }
+.segmentos > button { min-height: 38px; padding: 0 14px; border: 0; border-radius: 9px; background: transparent; font-weight: 700; font-size: 15px; color: var(--p-texto-2); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; cursor: pointer; }
+.segmentos > button:global(.elegido) { background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); }
+.segmentos > button:disabled { cursor: default; }
+.segmentos > button:disabled:not(:global(.elegido)) { opacity: .55; }
+.segKbd { font-size: 14px; color: var(--p-texto-3); font-weight: 700; margin-left: 2px; }
+.periodo { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.compara { font-size: 14px; color: var(--p-texto-2); font-weight: 600; text-align: right; line-height: 18px; }
+.compara b { color: var(--p-tinta); font-weight: 750; }
+
+/* Los números de arriba. */
+.kpis { display: grid; grid-template-columns: 1.25fr 1.25fr 1fr 1fr; gap: 12px; }
+.kpi { position: relative; display: grid; gap: 2px; padding: 12px 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); min-width: 0; }
+.kpi:global(.principal) { border-color: var(--p-verde-suave); }
+.kpiCab { display: flex; align-items: center; gap: 8px; }
+.kpiIco { width: 28px; height: 28px; border-radius: 99px; background: var(--p-verde-suave); color: var(--p-verde-texto); display: grid; place-items: center; flex: none; }
+.etiqueta { font-size: 14px; line-height: 18px; font-weight: 650; color: var(--p-texto-2); }
+.va { display: block; font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -.02em; margin-top: 2px; color: var(--p-tinta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.explica { display: block; padding: 0; border: 0; background: none; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.explicaI { position: absolute; top: 14px; right: 14px; color: var(--p-texto-3); display: inline-flex; }
+.explica:hover .explicaI, .explica:focus-visible .explicaI { color: var(--p-verde-texto); }
+.pesos { white-space: nowrap; }
+.va .peso, .cajaVa .peso { font-size: .62em; font-weight: 700; vertical-align: .32em; margin-right: .08em; }
+.sinDato { color: var(--p-texto-3); }
+.comp { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 14px; color: var(--p-texto-2); font-weight: 600; }
+.compTexto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.delta { flex: none; display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 99px; font-size: 14px; font-weight: 750; white-space: nowrap; background: var(--p-relleno); color: var(--p-texto-2); }
+.delta:global(.sube) { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.delta:global(.baja) { background: var(--rojo-suave); color: var(--rojo); }
+
+/* Las tarjetas de abajo. */
+.filaC { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; }
+.filaD { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 12px; }
+.card { min-width: 0; padding: 16px; background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); display: flex; flex-direction: column; }
+.card > :global(.aviso) { margin-bottom: 8px; }
+.cardCab { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; min-height: 26px; }
+.cardCab h2 { font-size: 18px; line-height: 24px; font-weight: 750; letter-spacing: -.01em; color: var(--p-tinta); white-space: nowrap; }
+.der { margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 14px; color: var(--p-texto-2); font-weight: 600; white-space: nowrap; }
+.enlace { padding: 0; border: 0; background: none; color: var(--p-verde-texto); font-weight: 750; font-size: 14px; cursor: pointer; }
+.enlace:hover { text-decoration: underline; }
+.verVentas { display: inline-flex; align-items: center; gap: 2px; align-self: flex-end; margin-top: auto; padding-top: 8px; }
+.pastilla { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 14px; font-weight: 650; background: var(--p-relleno); color: var(--p-texto-2); white-space: nowrap; }
+.pastilla:global(.urgente) { background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); }
+.vacioChico { font-size: 14px; line-height: 20px; color: var(--p-texto-2); font-weight: 500; }
+.vacioChico b { font-size: 22px; font-weight: 800; color: var(--p-texto-3); margin-right: 6px; vertical-align: -2px; }
+
+/* Vendido por hora. */
+.leyendas { display: flex; align-items: center; gap: 12px; margin-left: 16px; font-size: 14px; color: var(--p-texto-2); font-weight: 600; }
+.ley { display: inline-flex; align-items: center; gap: 6px; }
+.ley i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.leyHoy { background: var(--p-verde); }
+.leyAntes { border: 1.5px dashed var(--p-borde-fuerte); }
+.grafico { position: relative; height: 158px; display: grid; grid-template-columns: 56px 1fr; }
+.eje { display: flex; flex-direction: column; justify-content: space-between; padding: 0 8px 26px 0; text-align: right; font-size: 14px; color: var(--p-texto-3); font-weight: 600; white-space: nowrap; }
+.eje span { line-height: 0; }
+.area { position: relative; }
+.lineas { position: absolute; inset: 0 0 26px 0; display: flex; flex-direction: column; justify-content: space-between; }
+.lineas span { border-top: 1px dashed var(--p-borde); }
+.barras { position: absolute; inset: 0; display: grid; align-items: end; padding-bottom: 26px; }
+.col { position: relative; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.antes { position: absolute; bottom: 0; width: 28px; border-radius: 6px 6px 0 0; border: 1.5px dashed var(--p-borde-fuerte); border-bottom: 0; }
+.hoy { position: relative; width: 20px; border-radius: 6px 6px 0 0; background: var(--p-verde); }
+.col:global(.ahora) .hoy { background: repeating-linear-gradient(135deg, var(--p-verde) 0 6px, var(--p-verde-2) 6px 12px); opacity: .55; }
+.h { position: absolute; bottom: -26px; font-size: 14px; color: var(--p-texto-3); font-weight: 600; }
+.globo { position: absolute; top: -34px; left: 50%; transform: translateX(-50%); background: var(--p-tinta); color: #fff; font-size: 14px; font-weight: 750; padding: 3px 8px; border-radius: 8px; white-space: nowrap; }
+
+/* Cómo pagaron. */
+.stack { display: flex; height: 14px; border-radius: 99px; overflow: hidden; gap: 2px; margin: 2px 0 10px; }
+.stack b { display: block; background: var(--medio); }
+.stack .stackVacio { flex: 1; background: var(--p-relleno); }
+.medios { display: grid; gap: 2px; }
+.medios li { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 10px; height: 36px; white-space: nowrap; }
+.medios .medioIcono:global(.medio-icono):global(.con-fondo) { width: 32px; height: 32px; }
+.medioNombre { font-weight: 700; font-size: 15px; color: var(--p-tinta); overflow: hidden; text-overflow: ellipsis; }
+.medioCuantas { font-size: 14px; color: var(--p-texto-3); font-weight: 600; }
+.medioImporte { font-weight: 800; font-size: 16px; min-width: 88px; text-align: right; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+
+/* No llevaron, los gastos y el cierre de caja. */
+.listaSimple { display: grid; gap: 8px; }
+.listaSimple li { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 650; color: var(--p-tinta); white-space: nowrap; min-width: 0; }
+.listaSimple li:global(.ultima) { color: var(--p-texto-2); }
+.listaSimple svg { flex: none; }
+.listaNombre { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.listaSimple .pastilla { margin-left: auto; }
+.renglones { display: grid; }
+.renglones li { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--p-borde-suave); }
+.renglones li:first-child { border-top: 0; }
+.renglonIco { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--p-relleno); color: var(--p-texto-2); }
+.renglonNombre { display: flex; flex-direction: column; min-width: 0; font-weight: 700; font-size: 15px; line-height: 20px; color: var(--p-tinta); }
+.renglonNombre small { font-weight: 500; font-size: 14px; color: var(--p-texto-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.renglonImporte { font-weight: 800; font-size: 15px; text-align: right; color: var(--p-tinta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.consultas { max-height: 320px; overflow-y: auto; }
+.cajaVa { font-size: 28px; font-weight: 800; letter-spacing: -.02em; color: var(--p-texto-3); line-height: 36px; }
+
+/* Compras e Inventario: lo que ya tenían, dentro de las mismas tarjetas. */
+.otra > :global(.tarjeta), .otra :global(.negocio-bloque), .otra :global(.tabla-marco) { border-color: var(--p-borde); border-radius: 16px; }
+.otra :global(.negocio-bloque-cabeza) h2 { font-size: 18px; line-height: 24px; font-weight: 750; }
+
+@media (max-width: 1180px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filaC, .filaD { grid-template-columns: minmax(0, 1fr); }
+  .periodo { margin-left: 0; }
+}

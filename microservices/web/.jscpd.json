@@ -15,5 +15,5 @@
   ],
   "silent": true,
   "gitignore": true,
-  "threshold": 1.1
+  "threshold": 1
 }

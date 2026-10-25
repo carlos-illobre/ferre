@@ -297,7 +297,7 @@ RF-23:
     - tests/e2e/celular/04-vender.spec.ts
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
     - microservices/web/src/pantallas/celular/ventas/VentasDelDia.test.tsx
-    - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
   defectos:
     - "No se puede corregir una venta: solo anularla y cargarla de nuevo"
     - "No se pueden ver las ventas de días anteriores: el servidor acepta la fecha, pero ninguna interfaz la pide"
@@ -538,7 +538,7 @@ RF-58:
 RF-60:
   estado: "Pendiente (#39)"
   pruebas:
-    - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - tests/e2e/celular/04-vender.spec.ts
   defectos:
     - "Del tablero solo existe, en el celular, lo vendido en el día con la cantidad de ventas y el total por medio de pago; no hay semana ni mes"
@@ -580,7 +580,7 @@ RF-65:
     - tests/e2e/celular/05-compras.spec.ts
     - tests/e2e/escritorio/05-compras.spec.ts
     - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
-    - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
   defectos:
     - "Que una compra anulada no sume al gasto no tiene prueba"
     - "Que una compra con fecha fuera de la semana no sume no tiene prueba, y la consulta de la API no tiene ninguna prueba propia"
@@ -629,7 +629,7 @@ RF-71:
   estado: "Hecho en parte (#41): consulta paginada. Faltan los filtros en pantalla (#58)"
   pruebas:
     - microservices/api/src/rutas/auditoria.test.ts
-    - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - tests/integration/autenticacion.sh
     - microservices/api/src/rutas/credenciales.test.ts
     - tests/e2e/celular/01-login.spec.ts
@@ -642,7 +642,7 @@ RF-72:
   pruebas:
     - microservices/api/src/rutas/roles.test.ts
     - microservices/api/src/rutas/usuarios.test.ts
-    - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
     - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
     - microservices/web/src/pantallas/celular/ventas/Vender.test.tsx
@@ -723,7 +723,7 @@ RF-75:
   estado: "Hecho (#59): pantalla Roles, la misma en el celular y en la computadora"
   pruebas:
     - microservices/api/src/rutas/roles.test.ts
-    - microservices/web/src/pantallas/Roles.test.tsx
+    - microservices/web/src/pantallas/comun/negocio/Roles.test.tsx
     - tests/e2e/celular/13-roles.spec.ts
     - tests/e2e/escritorio/13-roles.spec.ts
   defectos:
@@ -733,7 +733,7 @@ RF-73:
   estado: "Hecho (#41), fuera de esta etapa: reemplazado por RF-72"
   pruebas:
     - microservices/api/src/rutas/usuarios.test.ts
-    - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - tests/integration/autenticacion.sh
   defectos:
     - "Reemplazado: los roles dueño, admin y mostrador ya no existen (RF-72, decisión 50)"
@@ -744,7 +744,7 @@ RF-74:
     - tests/e2e/celular/12-cerrar-sesion.spec.ts
     - tests/e2e/escritorio/12-cerrar-sesion.spec.ts
     - tests/integration/autenticacion.sh
-    - microservices/web/src/pantallas/celular/Negocio.test.tsx
+    - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - microservices/web/src/pantallas/acceso-de-usuarios.test.tsx
     - microservices/api/src/rutas/sesiones.test.ts
     - microservices/api/src/rutas/usuarios.test.ts
@@ -1504,7 +1504,7 @@ RF-135:
   estado: "A validar (020): programado; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
     - microservices/web/src/pantallas/Sistema.test.tsx
-    - microservices/web/src/pantallas/compu/base/pantallas/Actividad.test.tsx
+    - microservices/web/src/pantallas/compu/negocio/Actividad.test.tsx
     - microservices/api/src/rutas/sistema.test.ts
     - microservices/api/src/rutas/roles.test.ts
   defectos:

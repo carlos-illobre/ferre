@@ -1,5 +1,5 @@
 import type { Consulta } from "@servidor/ventas";
-import { comparar, resumenDelDia, totalHasta, type Comparacion } from "./resumen-del-dia";
+import { comparar, porHora, resumenDelDia, totalHasta, type Comparacion } from "./resumen-del-dia";
 import { confirmadas, type VentaDelDia, type VentasDelDia } from "./ventas-del-dia";
 import { MEDIOS, NOMBRE_DE_MEDIO } from "./venta";
 import { pesos } from "../../formato";
@@ -48,4 +48,45 @@ export function pasosDeLoVendido(d: VentasDelDia): string[] {
   if (anuladas) pasos.push(`${anuladas} ${anuladas === 1 ? "venta anulada" : "ventas anuladas"}: no ${anuladas === 1 ? "suma" : "suman"}`);
   if (!pasos.length) pasos.push("Todavía no se registraron ventas en el día");
   return [...pasos, `Vendido hoy: ${pesos(d.total)}`];
+}
+
+// Lo vendido por hora para el gráfico: siempre de 8 a 19, y más si hubo ventas antes o después;
+// cuánto se vendió hoy y ayer en cada hora, la hora más alta de hoy y el escalón del eje (redondo,
+// de modo que tres escalones cubran el máximo: 60 mil para 63.000).
+export function graficoPorHora(hoy: VentaDelDia[] | null, ayer: VentaDelDia[] | null, ahora: number) {
+  const hoyH = new Map((hoy ? porHora(hoy, ahora) : []).map((b) => [b.hora, b.total]));
+  const ayerH = new Map((ayer ? porHora(ayer) : []).map((b) => [b.hora, b.total]));
+  const de = (m: Map<number, number>, h: number) => m.get(h) ?? 0;
+  const conVentas = [...hoyH.keys(), ...ayerH.keys()].filter((h) => de(hoyH, h) > 0 || de(ayerH, h) > 0);
+  const desde = Math.min(8, ...conVentas), hasta = Math.max(19, ...conVentas);
+  const horas = Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i).map((h) => ({ hora: h, hoy: de(hoyH, h), ayer: de(ayerH, h) }));
+  const max = Math.max(0, ...horas.map((h) => Math.max(h.hoy, h.ayer)));
+  const pico = horas.reduce<{ hora: number; hoy: number } | null>((m, h) => (h.hoy > 0 && (m === null || h.hoy > m.hoy) ? h : m), null)?.hora ?? null;
+  return { horas, paso: escalon(max), pico };
+}
+
+function escalon(max: number): number {
+  if (max <= 0) return 10_000;
+  const crudo = max / 3;
+  const base = 10 ** Math.floor(Math.log10(crudo));
+  return [1, 2, 2.5, 5, 10].map((m) => m * base).find((v) => v * 3 >= max) ?? base * 10;
+}
+
+const esDeHoy = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
+// Cuántas consultas de «No llevó» son de hoy: la pastilla de la tarjeta.
+export const consultasDeHoy = (consultas: Consulta[] | null | undefined) => (consultas ?? []).filter((c) => esDeHoy(c.fecha)).length;
+// Cuándo fue una consulta: la hora si es de hoy, si no la fecha.
+export const cuandoFueLaConsulta = (iso: string, fecha: (dia: string) => string) =>
+  esDeHoy(iso) ? new Date(iso).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }) : fecha(iso);
+
+// Las barras de las horas de hoy en el celular: de 8 (o antes, si se vendió antes) hasta las 19 o la
+// hora actual; cada barra con su alto (de 3 a 40 px), si quedó vacía y si es la hora actual.
+export function barrasDeHoy(hoy: VentaDelDia[] | null, hora: number) {
+  const horas = hoy ? porHora(hoy, hora) : [];
+  const porH = new Map(horas.map((b) => [b.hora, b.total]));
+  const desde = Math.min(8, ...horas.filter((b) => b.total > 0).map((b) => b.hora)), hasta = Math.max(19, hora);
+  const columnas = Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i);
+  const max = Math.max(1, ...columnas.map((h) => porH.get(h) ?? 0));
+  const barras = columnas.map((h) => ({ hora: h, vacia: (porH.get(h) ?? 0) === 0, ahora: h === hora, alto: Math.max(3, ((porH.get(h) ?? 0) / max) * 40) }));
+  return { barras, desde, medio: Math.round((desde + hasta) / 2), hasta };
 }

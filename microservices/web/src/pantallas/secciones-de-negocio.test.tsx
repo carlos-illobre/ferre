@@ -11,8 +11,8 @@ import { consultas } from "../datos/conexion";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "./pestanas-de-negocio";
 import { DE_MAS as DE_MAS_COMPU, Mas } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
-import { ComoVaElNegocio } from "./celular/ComoVaElNegocio";
-import { ResumenCompras, ResumenInventario, ResumenVentas } from "./compu/base/pantallas/Resumen";
+import { ComoVaElNegocio } from "./celular/negocio/ComoVaElNegocio";
+import { ResumenCompras, ResumenInventario, ResumenVentas } from "./compu/negocio/Resumen";
 import { DineroInvertido } from "./DineroInvertido";
 import { ComprasRecientes } from "./compu/compras/ComprasRecientes";
 

@@ -7,7 +7,7 @@ vi.mock("../datos/conexion", async (original) => ({ ...(await original<typeof im
 vi.mock("../datos/credenciales", async (original) => ({ ...(await original<typeof import("../datos/credenciales")>()), ...(({ hayHuella: () => false, listarCredenciales: async () => [], quitarCredencial: vi.fn(), vincularEsteDispositivo: vi.fn(), EVENTO_CREDENCIALES: "x" })) }));
 
 import { conTodosLosPermisos } from "../pruebas/sesion";
-import { Usuarios } from "./compu/base/pantallas/Usuarios";
+import { Usuarios } from "./compu/negocio/Usuarios";
 
 const VENDEDOR = { id: "r1", nombre: "Vendedor" }, RECEPCION = { id: "r2", nombre: "Recepción" };
 const GENTE = [
@@ -22,7 +22,7 @@ describe("buscar y filtrar usuarios en la computadora", () => {
     conTodosLosPermisos();
     apiFalsa.mockReset().mockImplementation(async (ruta: string) => (ruta === "/usuarios" ? GENTE : ruta === "/roles" ? [VENDEDOR, RECEPCION] : []));
   });
-  const filas = () => screen.getAllByTestId("usuario-fila").map((f) => f.querySelector(".uv-nom")!.firstChild!.textContent);
+  const filas = () => screen.getAllByTestId("usuario-fila").map((f) => f.querySelector("[data-testid=nombre-de-usuario]")!.firstChild!.textContent);
   const buscador = () => screen.getByTestId("buscar-usuario") as HTMLInputElement;
 
   it("al escribir sugiere; con las flechas y Enter se elige una y quedan solo esa persona", async () => {

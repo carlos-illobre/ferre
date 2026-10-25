@@ -1,0 +1,74 @@
+/* Cómo va el negocio en el celular, como la v2 («Tablero», decisión 148): las secciones como cuatro
+   botones con ícono, el período con el día que compara, «Vendido hoy» grande con las horas en
+   barras, cuatro números en grilla y cómo pagaron. Las medidas son las de la maqueta; los colores,
+   los de paleta.css. */
+:global(.rc) { gap: 12px; }
+.tarjeta { background: var(--p-superficie); border: 1px solid var(--p-borde); border-radius: 16px; box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); }
+.etiqueta { font-size: 14px; line-height: 18px; font-weight: 650; color: var(--p-texto-2); }
+.renglon { font-size: 16px; line-height: 22px; font-weight: 700; color: var(--p-tinta); }
+.detalle { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--p-texto-2); }
+.gris { color: var(--p-texto-3); }
+.peso { font-size: .62em; font-weight: 700; vertical-align: .32em; margin-right: .08em; }
+
+/* Las secciones. */
+.secciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.sec { display: grid; justify-items: center; gap: 2px; padding: 8px 0 6px; min-height: 60px; border-radius: 14px; border: 1px solid transparent; background: none; color: var(--p-texto-2); font-size: 14px; font-weight: 700; }
+.sec:global(.elegida) { background: var(--p-superficie); color: var(--p-verde); border-color: var(--p-borde); box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); font-weight: 800; }
+.sec:disabled { opacity: .55; }
+
+/* El período. */
+.periodo { display: flex; align-items: center; gap: 10px; }
+.segmentos { flex: none; display: inline-flex; padding: 3px; border-radius: 12px; background: var(--p-relleno); gap: 2px; }
+.segmentos > button { min-height: 36px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; font-weight: 700; font-size: 15px; color: var(--p-texto-2); }
+.segmentos > button:global(.elegido) { background: var(--p-superficie); color: var(--p-tinta); box-shadow: 0 1px 2px rgb(26 29 27 / .05), 0 1px 1px rgb(26 29 27 / .03); }
+.segmentos > button:disabled:not(:global(.elegido)) { opacity: .55; }
+.fecha { font-size: 14px; line-height: 18px; color: var(--p-texto-2); font-weight: 600; }
+.fecha b { color: var(--p-tinta); font-weight: 750; }
+
+/* Vendido hoy. */
+.heroe { padding: 14px 16px; }
+.et { display: flex; align-items: center; gap: 8px; }
+.info { margin-left: auto; width: 44px; height: 44px; margin: -12px -12px -12px auto; display: grid; place-items: center; border: 0; background: none; color: var(--p-texto-3); }
+.total { margin-top: 2px; font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: -.03em; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+.comp { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; font-size: 14px; font-weight: 600; color: var(--p-texto-2); }
+.delta { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 8px; border-radius: 99px; font-size: 14px; font-weight: 800; background: var(--p-relleno); color: var(--p-texto-2); white-space: nowrap; }
+.delta:global(.sube) { background: var(--p-verde-suave); color: var(--p-verde-texto); }
+.delta:global(.baja) { background: var(--p-medio-cuenta-suave); color: var(--p-medio-cuenta); }
+.horas { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; align-items: end; height: 40px; margin-top: 12px; }
+.horas span { display: block; border-radius: 4px 4px 2px 2px; background: var(--p-verde); }
+.horas span:global(.c) { background: var(--p-relleno-fuerte); height: 3px !important; }
+.horas span:global(.ahora) { opacity: .45; }
+.horasLb { display: flex; justify-content: space-between; margin-top: 4px; font-size: 14px; color: var(--p-texto-3); font-weight: 600; }
+
+/* Los cuatro números. */
+.grilla { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.chico { padding: 12px 14px; display: grid; gap: 0; align-content: start; min-width: 0; }
+.va { font-size: 24px; line-height: 30px; font-weight: 800; letter-spacing: -.02em; color: var(--p-tinta); font-variant-numeric: tabular-nums; }
+.va.gris { color: var(--p-texto-3); }
+.d { display: flex; align-items: center; gap: 2px; font-size: 14px; font-weight: 750; color: var(--p-verde-texto); }
+.d:global(.baja) { color: var(--p-medio-cuenta); }
+.d:global(.gris) { color: var(--p-texto-3); font-weight: 600; }
+
+/* Cómo pagaron, lo más vendido y lo que no llevaron. */
+.medios, .noLlevaron { padding: 14px; }
+.mediosCab { display: flex; align-items: center; gap: 8px; }
+.mediosCab > :nth-child(2) { margin-left: auto; }
+.stack { display: flex; height: 12px; border-radius: 99px; overflow: hidden; gap: 2px; margin: 8px 0 10px; }
+.stack b { display: block; background: var(--medio); }
+.stack b:global(.vacio) { flex: 1; background: var(--p-relleno); }
+.ml { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 14px; font-weight: 650; color: var(--p-tinta); }
+.ml span { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ml i { width: 10px; height: 10px; border-radius: 99px; display: inline-block; background: var(--medio); flex: none; }
+.ml b { margin-left: auto; font-weight: 800; font-variant-numeric: tabular-nums; }
+.fila { padding: 14px; display: flex; align-items: center; gap: 10px; }
+.der { margin-left: auto; text-align: right; }
+.pastilla { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 14px; font-weight: 650; background: var(--p-relleno); color: var(--p-texto-2); white-space: nowrap; }
+.pastilla:global(.urgente) { background: var(--p-amarillo-suave); color: var(--p-amarillo-texto); }
+.enlace { min-height: 44px; margin: -10px -4px -10px 0; padding: 0 4px; border: 0; background: none; color: var(--p-verde-texto); font-weight: 750; font-size: 14px; }
+.noLlevaron { display: flex; flex-direction: column; gap: 8px; }
+.lrow { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 650; color: var(--p-tinta); min-width: 0; }
+.lrow svg { flex: none; }
+.lrowNombre { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lrow:global(.con-detalle) .lrowNombre { display: flex; flex-direction: column; white-space: normal; }
+.lrow small { font-size: 14px; font-weight: 500; color: var(--p-texto-2); }
+.lrow b { font-weight: 800; white-space: nowrap; }
