@@ -1,14 +1,15 @@
 import { irAlPrimerItem } from "../motor/flechas";
 import { porLaMarca } from "./por-la-marca";
+import { BUSQUEDA_PRINCIPAL, GRILLA_DE_MAS, laPestana, MENU, PANTALLA, parteAbierta, pestanaAbierta, PESTANAS, rutaDeLaPestana } from "./marcas";
 
 type Botones = HTMLButtonElement[];
-const pestanaActual = () => document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".cuerpo .pestanas button");
-const primeraDeMas = () => document.querySelector<HTMLButtonElement>(".cuerpo .mas-grilla button");
-const parteDelMenu = () => document.querySelector<HTMLButtonElement>(".lateral nav button[aria-current='page']") ?? document.querySelector<HTMLButtonElement>(".lateral nav button");
+const pestanaActual = pestanaAbierta;
+const primeraDeMas = () => document.querySelector<HTMLButtonElement>(`${GRILLA_DE_MAS} button`);
+const parteDelMenu = parteAbierta;
 
 // Dejar la marca de las flechas en un lugar aunque la pantalla nueva, al abrirse, ponga el foco en
-// su búsqueda: se insiste un momento, salvo que la persona ya haya tocado otra cosa. En Vender el
-// cursor va siempre a la búsqueda, se llegue como se llegue (Carlos, 2026-10-20; decisión 127). Y
+// su búsqueda: se insiste un momento, salvo que la persona ya haya tocado otra cosa. A la búsqueda
+// principal (la de Vender) el cursor va siempre, se llegue como se llegue (decisión 127). Y
 // si se abrió con la marca del teclado, el cursor va a la caja de texto de la pantalla nueva, si
 // tiene (decisión 137).
 function dejarElFocoEn(buscar: () => HTMLElement | null | undefined): void {
@@ -16,8 +17,8 @@ function dejarElFocoEn(buscar: () => HTMLElement | null | undefined): void {
   const cancelar = () => { cancelado = true; };
   window.addEventListener("keydown", cancelar, { once: true, capture: true });
   window.addEventListener("mousedown", cancelar, { once: true, capture: true });
-  const caja = () => porLaMarca.ahora ? document.querySelector<HTMLInputElement>(".cuerpo input[type='search']:not(:disabled), .cuerpo input[type='text']:not(:disabled)") : null;
-  const destino = () => document.querySelector<HTMLInputElement>('[data-testid="vender"] [data-testid="busqueda"]:not(:disabled)') ?? caja() ?? buscar();
+  const caja = () => porLaMarca.ahora ? document.querySelector<HTMLInputElement>(`${PANTALLA} input[type='search']:not(:disabled), ${PANTALLA} input[type='text']:not(:disabled)`) : null;
+  const destino = () => document.querySelector<HTMLInputElement>(`${BUSQUEDA_PRINCIPAL}:not(:disabled)`) ?? caja() ?? buscar();
   for (const espera of [60, 150, 350, 600]) setTimeout(() => { if (!cancelado) destino()?.focus(); }, espera);
 }
 
@@ -69,17 +70,16 @@ function teclasDeLasPestanas(e: KeyboardEvent, pestanas: HTMLElement) {
 // Al abrir una pestaña (con un clic o con Enter), la marca de las flechas queda en ella: la pantalla
 // nueva no se la lleva.
 function alTocarUnaPestana(e: MouseEvent) {
-  const b = (e.target as Element | null)?.closest<HTMLButtonElement>(".cuerpo .pestanas button");
-  const ruta = b?.dataset.testid;
-  if (ruta) dejarElFocoEn(() => document.querySelector<HTMLButtonElement>(`[data-testid="${ruta}"]`));
+  const ruta = rutaDeLaPestana((e.target as Element | null)?.closest<HTMLButtonElement>(`${PESTANAS} button`));
+  if (ruta) dejarElFocoEn(() => laPestana(ruta));
 }
 
 // El menú de la izquierda y las pestañas de la parte se recorren con sus propias teclas.
 export function instalarMenuYPestanas(): void {
   window.addEventListener("keydown", (e) => {
     const donde = e.target instanceof Element ? e.target : null;
-    const menu = donde?.closest<HTMLElement>(".lateral");
-    const pestanas = donde?.closest<HTMLElement>(".cuerpo .pestanas");
+    const menu = donde?.closest<HTMLElement>(MENU);
+    const pestanas = donde?.closest<HTMLElement>(PESTANAS);
     if (menu) teclasDelMenu(e, menu);
     else if (pestanas) teclasDeLasPestanas(e, pestanas);
   });

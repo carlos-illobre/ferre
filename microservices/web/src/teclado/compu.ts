@@ -11,8 +11,9 @@ import { instalarFilasPropias } from "./compu/filas-propias";
 import { TABLA_DE_LA_COMPU, ETIQUETAS_DE_LA_COMPU } from "./tablas/compu";
 import { accionDe, etiquetar } from "../plataforma/comandos";
 import type { Linea } from "./motor/tabla";
+import { botonesDeLasPestanas, GRILLA_DE_MAS, MENU, PANTALLA, PESTANAS } from "./compu/marcas";
 
-const ZONAS = ".lateral, .pestanas";
+const ZONAS = `${MENU}, ${PESTANAS}`;
 // Las letras que la tabla pide con Alt («Alt+B») para una acción que la pantalla ofrece ahora: esas
 // no se reparten entre los botones.
 const letrasConAlt = (tabla: readonly Linea[]) => () =>
@@ -21,11 +22,11 @@ const letrasConAlt = (tabla: readonly Linea[]) => () =>
 // La disposición de la interfaz de la computadora, para las flechas: el menú de la izquierda, las
 // pestañas y las opciones de Más se recorren por su cuenta.
 const DISPOSICION: DisposicionParaFlechas = {
-  pantalla: ".cuerpo",
-  noSonListas: ".lateral, .pestanas, .mas-grilla",
-  noSonCajas: ".pestanas",
+  pantalla: PANTALLA,
+  noSonListas: `${MENU}, ${PESTANAS}, ${GRILLA_DE_MAS}`,
+  noSonCajas: PESTANAS,
   sinCaja: () => document.getElementById("contenido"),
-  arribaDeLaLista: () => document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']"),
+  arribaDeLaLista: () => botonesDeLasPestanas().find((b) => b.getAttribute("aria-current") === "page") ?? null,
 };
 
 // Todo con el teclado (decisión 77). Primero lo que va por la forma de la pantalla: los dos focos
@@ -44,5 +45,5 @@ export function instalarTecladoDeLaCompu(): void {
   instalarFlechas(DISPOSICION, ZONAS);
   // Las flechas por las filas no son una acción de la pantalla: sus etiquetas, para las ayudas.
   etiquetar({ "filas.siguiente": "↓", "filas.anterior": "↑", ...ETIQUETAS_DE_LA_COMPU });
-  instalarAtajos({ alFinal: ".lateral", ocupadas: letrasConAlt(TABLA_DE_LA_COMPU) });
+  instalarAtajos({ alFinal: MENU, ocupadas: letrasConAlt(TABLA_DE_LA_COMPU) });
 }

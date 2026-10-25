@@ -1,5 +1,5 @@
 // Dónde están la pantalla y sus listas, según lo que dice cada aplicación (ver flechas.ts).
-const LISTAS = "ul, ol, table, [role='list'], .lista";
+const LISTAS = "ul, ol, table, [role='list']";
 const NO_SON_NUNCA = "[role='listbox'], [data-sin-flechas], [data-flechas-propias], thead";
 
 // Lo que cada aplicación dice de su propia disposición. Sin configurar, las flechas valen en
@@ -20,7 +20,7 @@ let disposicion: DisposicionParaFlechas = { pantalla: "body" };
 export const fijarDisposicion = (d: DisposicionParaFlechas) => { disposicion = d; };
 export const laDisposicion = () => disposicion;
 const noSon = () => [disposicion.noSonListas, NO_SON_NUNCA].filter(Boolean).join(", ");
-export const ACCIONABLE = "button:not([disabled]), a[href], [role='button'], [data-principal], .elegible";
+export const ACCIONABLE = "button:not([disabled]), a[href], [role='button'], [data-principal]";
 export const visible = (e: HTMLElement) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== "hidden";
 
 // Dónde valen las flechas: la ventana abierta, si hay una; si no, la pantalla.
@@ -30,7 +30,7 @@ export function alcance(): HTMLElement | null {
 }
 
 const filasDe = (lista: HTMLElement) => lista.tagName === "TABLE"
-  ? [...lista.querySelectorAll<HTMLElement>("tbody > tr")].filter((f) => f.closest("table") === lista && !f.classList.contains("hija"))
+  ? [...lista.querySelectorAll<HTMLElement>("tbody > tr")].filter((f) => f.closest("table") === lista)
   : ([...lista.children] as HTMLElement[]);
 
 // Las filas de la lista de la pantalla: las de la primera lista que tenga alguna.

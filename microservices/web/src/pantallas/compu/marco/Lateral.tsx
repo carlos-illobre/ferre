@@ -32,7 +32,7 @@ export function Lateral({ m, plegado, plegar }: Props) {
   // Cuántos renglones lleva la venta, en Vender del menú (015-E24).
   const enLaVenta = useVentaEnCurso().items.length;
   return (
-    <aside className="lateral">
+    <aside className="lateral" data-zona="menu">
       <div className="lateral-marca">
         <span className="marca-larga"><Logotipo sobre="claro" /></span>
         <span className="marca-corta"><Isotipo sobre="claro" lado={34} /></span>

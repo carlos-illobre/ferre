@@ -1,4 +1,5 @@
 import { porLaMarca } from "./por-la-marca";
+import { botonesDeLasPestanas, botonesDelMenu, rutaDeLaPestana } from "./marcas";
 
 // Dos focos independientes (decisiones 82 y 137): con el cursor en una caja de texto, las flechas
 // mueven la marca del teclado por el menú y las pestañas sin sacar el cursor de la caja. ← (con la
@@ -9,8 +10,8 @@ import { porLaMarca } from "./por-la-marca";
 type Marca = { zona: "menu" | "pestanas"; i: number } | null;
 type Estado = { marca: Marca };
 
-const menu = () => [...document.querySelectorAll<HTMLButtonElement>(".lateral nav button")];
-const pestanas = () => [...document.querySelectorAll<HTMLButtonElement>(".cuerpo .pestanas button")];
+const menu = botonesDelMenu;
+const pestanas = botonesDeLasPestanas;
 const actualDe = (bs: HTMLButtonElement[]) => Math.max(0, bs.findIndex((b) => b.getAttribute("aria-current") === "page"));
 const TIPOS_DE_CAJA = ["text", "search", "", "tel", "url", "email", "password", "number"];
 const esCaja = (foco: Element | null) => foco instanceof HTMLTextAreaElement || (foco instanceof HTMLInputElement && TIPOS_DE_CAJA.includes(foco.type));
@@ -29,7 +30,7 @@ function aLasPestanas(s: Estado, ruta: string) {
   let intentos = 0;
   const mirar = () => {
     const ps = pestanas();
-    if (ps.length && !ps.some((b) => b.getAttribute("aria-current") === "page" && b.dataset.testid === `pestana-${ruta}`) && ruta && intentos++ < 10) { setTimeout(mirar, 40); return; }
+    if (ps.length && !ps.some((b) => b.getAttribute("aria-current") === "page" && rutaDeLaPestana(b) === ruta) && ruta && intentos++ < 10) { setTimeout(mirar, 40); return; }
     s.marca = ps.length > 1 ? { zona: "pestanas", i: actualDe(ps) } : null; pintar(s);
   };
   setTimeout(mirar, 40);
@@ -64,7 +65,7 @@ function moverEnLasPestanas(s: Estado, m: NonNullable<Marca>, izquierda: boolean
 
 function abrirLaPestana(s: Estado, b: HTMLButtonElement | undefined) {
   abrirConLaMarca(s, b);
-  aLasPestanas(s, b?.dataset.testid?.replace("pestana-", "") ?? "");
+  aLasPestanas(s, rutaDeLaPestana(b));
 }
 
 function enLasPestanas(s: Estado, m: NonNullable<Marca>, e: KeyboardEvent, usar: () => void) {

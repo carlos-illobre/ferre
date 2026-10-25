@@ -1,6 +1,6 @@
 import { esperarBusqueda } from "../../../negocio/catalogo";
 import { MARGENES } from "../../../negocio/precios";
-import { useComandos, type Acciones } from "../../../plataforma/comandos";
+import { pedir, useComandos, type Acciones } from "../../../plataforma/comandos";
 import { hayUnaVentanaAbierta } from "../base/ui";
 import type { EstadoDeProductos } from "./useProductos";
 
@@ -35,7 +35,7 @@ function abrir(x: EstadoDeProductos) {
 
 // Arriba de la primera fila están las pestañas: el foco vuelve a ellas (decisión 82).
 function anterior(x: EstadoDeProductos) {
-  if (x.elegido === 0) document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']")?.focus();
+  if (x.elegido === 0) pedir("pestanas.enfocar");
   else x.setElegido((i) => Math.max(i - 1, 0));
 }
 

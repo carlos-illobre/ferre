@@ -20,7 +20,7 @@ export const DE_MAS: { ruta: string; nombre: string; detalle: string; icono: Nom
 export function Mas({ accionDe, opciones }: { accionDe: (ruta: string) => string | null; opciones: ((typeof DE_MAS)[number] & { destino?: string })[] }) {
   return (
     <Pagina titulo="Más" testId="mas" bajada="Lo que se usa de vez en cuando.">
-      <ul className="mas-grilla">
+      <ul className="mas-grilla" data-zona="mas">
         {opciones.map((d) => (
           <li key={d.ruta}>
             <button type="button" className="tarjeta mas-tarjeta" onClick={() => irA(d.destino ?? d.ruta)} data-testid={`mas-${d.ruta}`}>

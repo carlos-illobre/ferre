@@ -41,6 +41,6 @@ export function irAlPrimerItem(): boolean {
 // se puede accionar; si no, lo primero accionable que tenga.
 export function abrir(fila: HTMLElement): void {
   const destino = [...fila.querySelectorAll<HTMLElement>("[data-principal]")].find(visible)
-    ?? (fila.matches("button, a[href], [role='button'], [data-principal], .elegible") ? fila : [...fila.querySelectorAll<HTMLElement>("button:not([disabled]), a[href]")].find(visible) ?? fila);
+    ?? (fila.matches("button, a[href], [role='button'], [data-principal]") ? fila : [...fila.querySelectorAll<HTMLElement>("button:not([disabled]), a[href]")].find(visible) ?? fila);
   destino.click();
 }

@@ -16,7 +16,7 @@ export function CabezaDeLaParte({ m, actual }: { m: MenuDeLaPersona; actual: str
     <div className="pestanas-fila">
       {m.titulo && <div className="parte-cabeza"><h1 className="parte-titulo" data-testid="titulo-de-la-parte">{m.titulo}</h1>
         <div className="pestanas-acciones" id={LUGAR_AL_LADO_DE_LAS_PESTANAS} /></div>}
-      {m.pestanas && <nav ref={pestanas} className="pestanas" aria-label={NOMBRES.get(actual)}>
+      {m.pestanas && <nav ref={pestanas} className="pestanas" data-zona="pestanas" aria-label={NOMBRES.get(actual)}>
         {m.pestanas.map((p) => <PestanaDeLaParte key={p.ruta} p={p} m={m} />)}
       </nav>}
       {!m.titulo && <div className="pestanas-acciones" id={LUGAR_AL_LADO_DE_LAS_PESTANAS} />}
@@ -29,7 +29,7 @@ function PestanaDeLaParte({ p, m }: { p: Pestana; m: MenuDeLaPersona }) {
   const accion = SIN_ATAJO.has(p.ruta) ? null : m.accionDe(p.ruta);
   const tecla = useEtiqueta(accion ?? "");
   return (
-    <button type="button" aria-current={aca ? "page" : undefined} aria-keyshortcuts={tecla} data-testid={`pestana-${p.ruta}`}
+    <button type="button" aria-current={aca ? "page" : undefined} aria-keyshortcuts={tecla} data-pestana={p.ruta} data-testid={`pestana-${p.ruta}`}
       onClick={() => irA(m.destinoDe(p.ruta))}>
       <Icono nombre={p.icono} tam={20} grosor={aca ? 2.3 : 2} />{p.nombre}{p.ruta === "para-revisar" && <CuantosParaRevisar n={m.paraRevisar} />}{accion && <Atajo accion={accion} />}
     </button>

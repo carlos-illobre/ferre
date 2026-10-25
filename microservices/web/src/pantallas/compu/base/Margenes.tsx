@@ -21,7 +21,7 @@ function BotonDeMargen({ m, i, elegido, conFoco, alElegir, disabled, accionDe, c
 export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", accionDe, compacto, flechasDeAfuera, sinSigno }: Props) {
   const conFoco = MARGENES.includes(elegido as never) ? elegido : MARGENES[0];
   return (
-    <div className={`margenes ${compacto ? "compacto" : ""}`} role="radiogroup" aria-label={etiqueta} data-flechas-de-afuera={flechasDeAfuera ? "" : undefined}>
+    <div className={`margenes ${compacto ? "compacto" : ""}`} role="radiogroup" aria-label={etiqueta} data-margenes data-flechas-de-afuera={flechasDeAfuera ? "" : undefined}>
       {MARGENES.map((m, i) => <BotonDeMargen key={m} m={m} i={i} elegido={elegido === m} conFoco={m === conFoco} alElegir={alElegir} disabled={disabled} accionDe={accionDe} compacto={compacto} sinSigno={sinSigno} />)}
     </div>
   );

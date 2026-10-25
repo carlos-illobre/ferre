@@ -1,3 +1,4 @@
+import { MARGENES } from "./marcas";
 // Teclado en la ficha: ← → recorren los márgenes sin elegir (Enter elige el que tiene el
 // foco); ↑ ↓ recorren las partes de la ficha (Enter usa la que tiene el foco); ↑ desde la
 // primera vuelve a los márgenes. En una caja de texto, ← → mueven el cursor.
@@ -32,7 +33,7 @@ function teclasDeLaFicha(e: Tecla, ficha: HTMLElement) {
   if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
   const mover = MOVIMIENTOS[e.key];
   if (!mover) return;
-  const margenes = [...ficha.querySelectorAll<HTMLButtonElement>(".margenes button:not([disabled])")];
+  const margenes = [...ficha.querySelectorAll<HTMLButtonElement>(`${MARGENES} button:not([disabled])`)];
   mover(e, margenes, document.activeElement as HTMLElement | null, ficha);
 }
 

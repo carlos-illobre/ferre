@@ -1,3 +1,4 @@
+import { botonesDelMenu, MENU, PESTANAS } from "./marcas";
 const hayVentana = () => Boolean(document.querySelector("dialog[open], [role='dialog'], [aria-modal='true']"));
 const esCampo = (foco: Element | null) => foco instanceof HTMLInputElement || foco instanceof HTMLTextAreaElement || foco instanceof HTMLSelectElement;
 const ROLES_CON_FLECHAS = ["radio", "tab", "slider", "option", "menuitem"];
@@ -11,7 +12,7 @@ function esDelLugar(e: KeyboardEvent): boolean {
   if (e.key !== "ArrowLeft" || e.defaultPrevented || conModificador(e) || hayVentana()) return true;
   const foco = document.activeElement as HTMLElement | null;
   if (!foco) return false;
-  return Boolean(foco.closest(".lateral, .pestanas, [data-flechas-propias]")) || esCampo(foco) || usaLaFlecha(foco);
+  return Boolean(foco.closest(`${MENU}, ${PESTANAS}, [data-flechas-propias]`)) || esCampo(foco) || usaLaFlecha(foco);
 }
 
 // Flechas entre el menú y la pantalla: ← lleva el foco al menú, ↑ ↓ lo recorren, y → (o Enter)
@@ -19,7 +20,7 @@ function esDelLugar(e: KeyboardEvent): boolean {
 export function instalarFlechaAlMenu(): void {
   window.addEventListener("keydown", (e) => {
     if (esDelLugar(e)) return;
-    const botones = [...document.querySelectorAll<HTMLButtonElement>(".lateral nav button")];
+    const botones = botonesDelMenu();
     const destino = botones.find((b) => b.getAttribute("aria-current") === "page") ?? botones[0];
     if (destino) { e.preventDefault(); destino.focus(); }
   });

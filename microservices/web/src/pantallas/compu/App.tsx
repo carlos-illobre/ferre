@@ -74,7 +74,7 @@ function Marco({ usuario, m, actual }: { usuario: UsuarioDeLaSesion; m: MenuDeLa
     <div className={`app ${plegado ? "plegado" : ""}`}>
       <a className="saltar" href="#contenido" onClick={(e) => { e.preventDefault(); document.getElementById("contenido")?.focus(); }}>Ir al contenido</a>
       <Lateral m={m} plegado={plegado} plegar={plegar} />
-      <div className={`cuerpo ${m.pestanas ? "con-pestanas" : ""} ${m.titulo ? "con-titulo" : ""}`}>
+      <div className={`cuerpo ${m.pestanas ? "con-pestanas" : ""} ${m.titulo ? "con-titulo" : ""}`} data-zona="pantalla">
         {(m.pestanas || m.titulo) && <CabezaDeLaParte m={m} actual={actual} />}
         <PantallaActual actual={actual} usuario={usuario} m={m} conPestanas={Boolean(m.pestanas)} />
       </div>

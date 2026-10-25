@@ -34,12 +34,18 @@ menor acoplamiento y fácil de cambiar (decisión 159).
   - El registro también guarda la etiqueta de cada acción («F2»), para mostrarla al lado del botón
     sin que el componente sepa qué tecla es.
 - **`src/teclado/`** (capa propia, al lado de `app/`): todo lo que sabe de teclas.
-  - El motor: un solo oyente de teclas, que traduce la tecla («Alt+C», «F2», «Mayús+1») y le pide
+  - El motor de la tabla: un solo oyente, que traduce la tecla («Alt+C», «F2», «Mayús+1») y le pide
     al registro la acción de la tabla.
   - Lo del teclado que no depende de la pantalla: las flechas por las filas, las letras con Alt, el
-    foco entre el menú y la pantalla. Lo que va por la forma de la pantalla se reconoce por marcas
-    del HTML (`data-filas` y `data-fila` en una lista que se recorre por sus filas, `role="radiogroup"`),
-    no por el nombre de un componente.
+    foco entre el menú y la pantalla. Lo que va por la forma de la pantalla se reconoce solo por
+    marcas del HTML (`data-zona`, `data-pestana`, `data-filas`, `role="radiogroup"`…), nunca por un
+    nombre de clase ni un `data-testid`. Todas están, con lo que significa cada una, en
+    `teclado/compu/marcas.ts`; quien dibuja las pone.
+  - Cada pieza escucha las teclas por su cuenta y se coordinan por el orden en que
+    `teclado/compu.ts` las instala: lo que va por la forma (el menú y las pestañas, la ficha, los
+    grupos de opciones, las filas), después la tabla, después las flechas por la pantalla y al
+    final las letras con Alt. La primera que usa la tecla la consume (`preventDefault`) y las
+    demás la dejan pasar.
   - Las letras con Alt que pide la tabla para una acción a la vista («Alt+S», subir la lista) no se
     reparten entre los botones: así la letra que muestra el botón es siempre la de su tabla.
   - Una tabla por interfaz y por parte (`tablas/compu/vender.ts`): tecla → acción, y si vale con el
