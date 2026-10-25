@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cuantoMasCaro, masBaratoDe, plano, type Lado, type Resumen, type Sugerencia } from "../../../negocio/catalogo";
 import { fecha, pesos, numero } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Icono } from "../base/ui";
+import { Atajo, Icono } from "../base/ui";
 import css from "./Duplicados.module.css";
 
 // La tabla del par: el producto con «Conservar este», la marca, el código, el proveedor, el costo
@@ -27,7 +27,7 @@ export function FilasDelPar({ s, conservar, quieto, alConservar }: Props) {
       {LADOS.map((lado) => (
         <div key={lado} className={`${css.cel} ${css.h} ${lado === conservar ? "elegida" : ""}`}>
           <button type="button" role="radio" aria-checked={lado === conservar} className={`${css.cons} ${lado === conservar ? "si" : ""}`} disabled={quieto} onClick={() => alConservar(lado)} data-testid={`conservar-${lado}`}>
-            <span className={css.radio} aria-hidden="true" />{TEXTOS.duplicados.conservarEste.largo}<kbd className="tecla" aria-hidden="true">{lado === "a" ? "←" : "→"}</kbd>
+            <span className={css.radio} aria-hidden="true" />{TEXTOS.duplicados.conservarEste.largo}<Atajo accion={`duplicados.conservar-${lado}`} />
           </button>
           <span className={css.prod}>
             <span className={`${css.foto} grande`} aria-hidden="true"><Icono nombre="productos" tam={22} /></span>

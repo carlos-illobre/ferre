@@ -17,3 +17,6 @@ export function useDialogo(alCerrar: () => void) {
   }, []);
   return ref;
 }
+
+// Si hay una ventana abierta (un <dialog>): lo de atrás espera a que se cierre.
+export const hayUnaVentanaAbierta = (): boolean => Boolean(document.querySelector("dialog[open]"));

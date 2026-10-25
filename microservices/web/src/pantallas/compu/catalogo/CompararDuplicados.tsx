@@ -1,7 +1,8 @@
 import { masBaratoDe, type Lado, type Sugerencia } from "../../../negocio/catalogo";
 import { pesos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Icono } from "../base/ui";
+import { useEtiqueta } from "../../../plataforma/comandos";
+import { Atajo, Icono } from "../base/ui";
 import { FilasDelPar } from "./FilasDelPar";
 import css from "./Duplicados.module.css";
 
@@ -15,26 +16,35 @@ const t = TEXTOS.duplicados;
 
 export function CompararDuplicados({ s, posicion, total, conservar, quieto, alConservar, alResolver, alMover }: Props) {
   const codigo = s.motivo === "codigo_barras";
+  const [mismo, distintos, siguiente] = [useEtiqueta("duplicados.mismo"), useEtiqueta("duplicados.distintos"), useEtiqueta("duplicados.siguiente")];
   return (
     <section className={css.comparar} aria-labelledby="dv-titulo">
       <header className={css.compCab}>
         <h2 id="dv-titulo">{t.esElMismoArticulo.largo}</h2>
         <span className={`${css.motivo} ${codigo ? "codigo" : ""}`}><Icono nombre={codigo ? "codigo-de-barras" : "texto"} tam={16} />{codigo ? t.mismoCodigo.largo : t.descripcionParecida.largo}</span>
         <span className={css.nav}>
-          <button type="button" className={css.teclaBoton} onClick={() => alMover(1)} aria-label="La siguiente (J)" aria-keyshortcuts="J"><kbd className="tecla">J</kbd></button>
-          <button type="button" className={css.teclaBoton} onClick={() => alMover(-1)} aria-label="La anterior (K)" aria-keyshortcuts="K"><kbd className="tecla">K</kbd></button>
+          <BotonDeMover accion="duplicados.siguiente" nombre="La siguiente" alTocar={() => alMover(1)} />
+          <BotonDeMover accion="duplicados.anterior" nombre="La anterior" alTocar={() => alMover(-1)} />
           {posicion + 1} de {total}
         </span>
       </header>
       <FilasDelPar s={s} conservar={conservar} quieto={quieto} alConservar={alConservar} />
       <QuedaUnSolo s={s} conservar={conservar} />
       <footer className={css.pie}>
-        <button type="button" className={css.mismo} disabled={quieto} onClick={() => alResolver("unir")} aria-keyshortcuts="E" data-testid="unir"><Icono nombre="unir" />{t.esElMismo.largo}<kbd className="tecla" aria-hidden="true">E</kbd></button>
-        <button type="button" className={css.distintos} disabled={quieto} onClick={() => alResolver("rechazar")} aria-keyshortcuts="D" data-testid="rechazar"><Icono nombre="cerrar" />{t.sonDistintos.largo}<kbd className="tecla" aria-hidden="true">D</kbd></button>
-        <button type="button" className={css.saltar} onClick={() => alMover(1)} aria-keyshortcuts="J">{t.saltar.largo}<kbd className="tecla" aria-hidden="true">J</kbd></button>
+        <button type="button" className={css.mismo} disabled={quieto} onClick={() => alResolver("unir")} aria-keyshortcuts={mismo} data-testid="unir"><Icono nombre="unir" />{t.esElMismo.largo}<Atajo accion="duplicados.mismo" /></button>
+        <button type="button" className={css.distintos} disabled={quieto} onClick={() => alResolver("rechazar")} aria-keyshortcuts={distintos} data-testid="rechazar"><Icono nombre="cerrar" />{t.sonDistintos.largo}<Atajo accion="duplicados.distintos" /></button>
+        <button type="button" className={css.saltar} onClick={() => alMover(1)} aria-keyshortcuts={siguiente}>{t.saltar.largo}<Atajo accion="duplicados.siguiente" /></button>
         <span className={css.ayuda}><span className={css.difiere}>ámbar</span>{t.loQueCambia.largo}</span>
       </footer>
     </section>
+  );
+}
+
+// J y K, arriba: pasan a la siguiente y a la anterior. El botón es su tecla.
+function BotonDeMover({ accion, nombre, alTocar }: { accion: string; nombre: string; alTocar: () => void }) {
+  const tecla = useEtiqueta(accion);
+  return (
+    <button type="button" className={css.teclaBoton} onClick={alTocar} aria-label={tecla ? `${nombre} (${tecla})` : nombre} aria-keyshortcuts={tecla}><Atajo accion={accion} kbd /></button>
   );
 }
 

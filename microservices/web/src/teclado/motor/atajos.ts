@@ -8,10 +8,10 @@ const sinAcentos = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toL
 
 // A cada nombre, en orden, su letra: la primera del nombre que esté libre; si no le queda
 // ninguna, la primera libre del abecedario; si no quedan letras, ninguna.
-// `pedidas`: la letra que un botón pide para sí (`data-atajo`, la que muestra su pantalla, como
-// «Alt S»); se le da esa y nadie más la toma.
-export function repartirLetras(nombres: string[], pedidas: (string | null)[] = []): (string | null)[] {
-  const tomadas = new Set([...RESERVADAS, ...pedidas.filter((l): l is string => Boolean(l))]);
+// `ocupadas`: las letras que con Alt ya piden otra cosa (las de la tabla de teclas); no se reparten.
+// `pedidas`: la letra que un botón ya tiene con Alt (la de su tabla, «Alt S»); se le da esa.
+export function repartirLetras(nombres: string[], ocupadas: readonly string[] = [], pedidas: (string | null)[] = []): (string | null)[] {
+  const tomadas = new Set([...RESERVADAS, ...ocupadas, ...pedidas.filter((l): l is string => Boolean(l))]);
   return nombres.map((nombre, i) => {
     const pedida = pedidas[i];
     if (pedida) return pedida;
@@ -23,20 +23,24 @@ export function repartirLetras(nombres: string[], pedidas: (string | null)[] = [
 }
 
 const visible = (e: HTMLElement) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && getComputedStyle(e).visibility !== "hidden"; };
+// La letra de un botón que ya tiene su tecla con Alt, como la muestra la tabla («Alt S»).
+const letraPedida = (b: HTMLElement) => /^Alt ([A-Z])$/i.exec(b.getAttribute("aria-keyshortcuts") ?? "")?.[1]?.toLowerCase() ?? null;
 const nombreDe = (b: HTMLElement) => (b.getAttribute("aria-label") || b.textContent || b.getAttribute("title") || "").trim();
 
 // Dónde están los botones que reciben letra al final (un menú que ya tiene sus propias teclas):
 // lo dice cada aplicación. Si las letras no alcanzan, esos son los que se quedan sin la suya.
 let alFinal: string | null = null;
+let ocupadas: () => readonly string[] = () => [];
 
 // Los botones que reciben letra: los de la ventana abierta, si hay una; si no, los de la pantalla.
 export function botonesALaVista(): HTMLElement[] {
   const ventanas = [...document.querySelectorAll<HTMLElement>("dialog[open], [role='dialog'], [aria-modal='true']")].filter(visible);
   const donde: ParentNode = ventanas.at(-1) ?? document;
-  // Los que ya tienen su tecla (Alt + número, F2, F5 a F8) no llevan letra: así alcanzan para los demás.
+  // Los que ya tienen su tecla (Alt + número, F2, F5 a F8) no llevan otra letra: así alcanzan para
+  // los demás. Los que la tienen con Alt muestran esa.
   const todos = [...donde.querySelectorAll<HTMLElement>("button:not([disabled]), a[href], [role='button']:not([aria-disabled='true'])")]
     // Lo que está oculto para los lectores de pantalla (aria-hidden) no es algo que se use: no lleva letra.
-    .filter((b) => visible(b) && !b.closest(".atajos-capa") && !b.closest("[aria-hidden='true']") && !b.hasAttribute("aria-keyshortcuts") && nombreDe(b) !== "");
+    .filter((b) => visible(b) && !b.closest(".atajos-capa") && !b.closest("[aria-hidden='true']") && (!b.hasAttribute("aria-keyshortcuts") || letraPedida(b) !== null) && nombreDe(b) !== "");
   // Primero los de la pantalla; después los que la aplicación deja para el final.
   return alFinal ? [...todos.filter((b) => !b.closest(alFinal!)), ...todos.filter((b) => b.closest(alFinal!))] : todos;
 }
@@ -57,7 +61,7 @@ function marcaDe(b: HTMLElement, letra: string): HTMLElement {
 // La capa con las letras de los botones a la vista, y qué botón acciona cada letra.
 function capaDeLetras(): { capa: HTMLDivElement; porLetra: Map<string, HTMLElement> } {
   const botones = botonesALaVista();
-  const letras = repartirLetras(botones.map(nombreDe), botones.map((b) => b.dataset.atajo?.toLowerCase() ?? null));
+  const letras = repartirLetras(botones.map(nombreDe), ocupadas(), botones.map(letraPedida));
   const capa = document.createElement("div");
   capa.className = "atajos-capa";
   capa.setAttribute("aria-hidden", "true");
@@ -85,9 +89,10 @@ function crearLetras() {
 }
 
 // Las letras con Alt, para toda la aplicación. `alFinal`: dónde están los botones que reciben
-// letra al final. Devuelve cómo sacarlas.
-export function instalarAtajos(opciones: { alFinal?: string } = {}): () => void {
+// letra al final; `ocupadas`: las letras que ahora la aplicación usa con Alt para otra cosa. Devuelve cómo sacarlas.
+export function instalarAtajos(opciones: { alFinal?: string; ocupadas?: () => readonly string[] } = {}): () => void {
   alFinal = opciones.alFinal ?? null;
+  ocupadas = opciones.ocupadas ?? (() => []);
   const letras = crearLetras();
   const alApretar = (e: KeyboardEvent) => {
     if (e.key === "Alt") { if (!e.repeat) letras.mostrar(); return; }

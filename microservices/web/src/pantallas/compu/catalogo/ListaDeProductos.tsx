@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { stockDe } from "../../../negocio/catalogo";
 import { cuantosProductos, TEXTOS } from "../../textos";
+import { Atajo } from "../base/ui";
 import { FilaProducto } from "./FilaProducto";
 import type { EstadoDeProductos } from "./useProductos";
 import css from "./Productos.module.css";
@@ -24,9 +25,9 @@ export function ListaDeProductos({ x }: { x: EstadoDeProductos }) {
         </ul>
       )}
       <p className={`${css.teclas} detalle`}>
-        {x.puedeVender && <span><kbd className="tecla">+</kbd> {t.teclaAgregar.largo}</span>}
-        {x.fijaMargen && <span><kbd className="tecla">Mayús</kbd><kbd className="tecla">1–5</kbd> margen</span>}
-        <span><kbd className="tecla">Alt F</kbd> {t.filtros.largo.toLowerCase()}</span>
+        {x.puedeVender && <span><Atajo accion="productos.agregar" kbd /> {t.teclaAgregar.largo}</span>}
+        {x.fijaMargen && <span><Atajo accion="productos.margenes" kbd /> margen</span>}
+        <span><Atajo accion="productos.filtros" kbd /> {t.filtros.largo.toLowerCase()}</span>
       </p>
     </>
   );

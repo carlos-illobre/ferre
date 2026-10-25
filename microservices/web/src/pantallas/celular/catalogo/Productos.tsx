@@ -1,5 +1,6 @@
 import { stockDe } from "../../../negocio/catalogo";
 import { Escaner, hayCamara } from "../../../plataforma/camara";
+import { useEtiqueta } from "../../../plataforma/comandos";
 import { AvisoError, Buscador, Icono, Lista, Toast } from "../componentes/base";
 import { TEXTOS } from "../../textos";
 import { AvisosDeProductos, SinResultados } from "./AvisosDeProductos";
@@ -8,20 +9,20 @@ import { FilaProducto } from "./FilaProducto";
 import { HojaDeFiltros } from "./HojaDeFiltros";
 import { MasProductos } from "./MasProductos";
 import { useProductosDelCelular, type ProductosDelCelular } from "./useProductosDelCelular";
-import { useTeclasDeProductos } from "./useTeclasDeProductos";
+import { useAccionesDeProductos } from "./useAccionesDeProductos";
 import "./catalogo.css";
 
 // La búsqueda le pregunta al servidor y trae de a 50 (specs/018); cada producto abre su ficha en una hoja, donde
 // está el margen (botones o tipeado), los proveedores, la foto y la lista de origen.
 export function Productos() {
   const x = useProductosDelCelular();
-  useTeclasDeProductos(x);
+  useAccionesDeProductos(x);
   return (
     <>
       <Buscador chico valor={x.consulta} alCambiar={x.setConsulta} placeholder={TEXTOS.catalogo.buscar.corto} cajaRef={x.caja} alEscanear={hayCamara() ? () => x.setEscaneando(true) : undefined} extra={<BotonDeFiltros x={x} />} />
       <AvisosDeProductos x={x} />
       {x.escaneando && <Escaner alDetectar={x.alEscanear} alCerrar={() => x.setEscaneando(false)} />}
-      <small className="solo-escritorio">Flechas para elegir · Enter abre{x.fijaMargen ? " · Shift+1 a Shift+5 fijan el margen (300, 200, 100, 50, 25 %)" : ""} · Esc limpia</small>
+      <AyudaDelTeclado fijaMargen={x.fijaMargen} />
       <AvisoError texto={x.errorAlaVista} alCerrar={x.cerrarError} />
       <SinResultados x={x} />
       <LosProductos x={x} />
@@ -31,6 +32,13 @@ export function Productos() {
       {x.abierto && <LaFicha x={x} producto={x.abierto} />}
     </>
   );
+}
+
+// Cómo se usa con un teclado conectado, si el teclado lo dice.
+function AyudaDelTeclado({ fijaMargen }: { fijaMargen: boolean }) {
+  const partes = [useEtiqueta("productos.ayuda.elegir"), useEtiqueta("productos.ayuda.margen"), useEtiqueta("productos.ayuda.limpiar")];
+  const ayuda = partes.filter((p, i) => p && (i !== 1 || fijaMargen)).join(" · ");
+  return ayuda ? <small className="solo-escritorio">{ayuda}</small> : null;
 }
 
 function BotonDeFiltros({ x }: { x: ProductosDelCelular }) {

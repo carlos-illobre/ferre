@@ -3,6 +3,9 @@ import { DE_CUALQUIER_PANTALLA } from "../comunes";
 import { DEL_MARCO } from "./marco";
 import { DE_VENDER } from "./vender";
 import { DEL_DIA } from "./hoy";
+import { DE_PRODUCTOS, ETIQUETAS_DE_PRODUCTOS } from "./productos";
+import { DE_DUPLICADOS } from "./duplicados";
+import { DE_LISTAS } from "./listas";
 
 // Las teclas de la computadora: qué tecla pide cada acción que ofrecen las pantallas (ADR-029).
 // Las teclas mismas se rehacen en T147.
@@ -11,6 +14,10 @@ export const TABLA_DE_LA_COMPU: Linea[] = [
   ...DEL_MARCO,
   ...DE_VENDER,
   ...DEL_DIA,
-  // Productos.
-  { tecla: "+", accion: "productos.agregar" },
+  ...DE_PRODUCTOS,
+  ...DE_DUPLICADOS,
+  ...DE_LISTAS,
 ];
+
+// Etiquetas que no son de una sola tecla.
+export const ETIQUETAS_DE_LA_COMPU: Record<string, string> = { ...ETIQUETAS_DE_PRODUCTOS };

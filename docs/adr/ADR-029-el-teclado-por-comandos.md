@@ -37,7 +37,11 @@ menor acoplamiento y fácil de cambiar (decisión 159).
   - El motor: un solo oyente de teclas, que traduce la tecla («Alt+C», «F2», «Mayús+1») y le pide
     al registro la acción de la tabla.
   - Lo del teclado que no depende de la pantalla: las flechas por las filas, las letras con Alt, el
-    foco entre el menú y la pantalla.
+    foco entre el menú y la pantalla. Lo que va por la forma de la pantalla se reconoce por marcas
+    del HTML (`data-flechas-propias` en una tabla que se recorre por filas, `role="radiogroup"`),
+    no por el nombre de un componente.
+  - Las letras con Alt que pide la tabla para una acción a la vista («Alt+S», subir la lista) no se
+    reparten entre los botones: así la letra que muestra el botón es siempre la de su tabla.
   - Una tabla por interfaz y por parte (`tablas/compu/vender.ts`): tecla → acción, y si vale con el
     cursor en un campo de texto.
   - `app/` lo instala en la interfaz que corresponde.

@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cuentaDelPrecio, margenAMano, otroMargen, type Producto } from "../../../negocio/catalogo";
 import { MARGENES } from "../../../negocio/precios";
 import { pesos, pesosCortos } from "../../../negocio/formato";
+import { useAccionesDelLugar, useEtiqueta } from "../../../plataforma/comandos";
 import { TEXTOS } from "../../textos";
 import type { Cambios } from "./useProductosDelCelular";
 import css from "./Ficha.module.css";
+
+// Un margen; lleva de título la tecla que lo fija en la lista, si tiene.
+function BotonDeMargen({ margen, numero, elegido, disabled, alElegir }: { margen: number; numero: number; elegido: boolean; disabled: boolean; alElegir: () => void }) {
+  return <button type="button" aria-pressed={elegido} aria-label={`${margen} %`} className={elegido ? "activo" : ""} title={useEtiqueta(`productos.margen.${numero}`)} disabled={disabled} onClick={alElegir}>{margen}</button>;
+}
 
 // «Así se calcula», desplegado: los márgenes (quien puede fijarlo) y la cuenta (quien ve costos).
 const t = TEXTOS.ficha;
@@ -26,15 +32,16 @@ function SegmentosDeMargen({ producto: p, sinCosto, alCambiar }: { producto: Pro
   const [escribiendo, setEscribiendo] = useState(false);
   const [otro, setOtro] = useState("");
   const guardarOtro = () => { const v = otroMargen(otro); if (v !== null && v !== p.margen_elegido) alCambiar({ margen_elegido: v }); setEscribiendo(false); };
+  const caja = useRef<HTMLInputElement>(null);
+  useAccionesDelLugar(caja, { "campo.listo": guardarOtro, "campo.deshacer": () => setEscribiendo(false) });
   return (
     <div className={css.segmentos} role="group" aria-label="margen" data-testid="segmentos-de-margen">
       {MARGENES.map((m, i) => (
-        <button key={m} type="button" aria-pressed={p.margen_elegido === m} aria-label={`${m} %`} className={p.margen_elegido === m ? "activo" : ""} title={`Shift+${i + 1}`} disabled={sinCosto} onClick={() => alCambiar({ margen_elegido: m })}>{m}</button>
+        <BotonDeMargen key={m} margen={m} numero={i + 1} elegido={p.margen_elegido === m} disabled={sinCosto} alElegir={() => alCambiar({ margen_elegido: m })} />
       ))}
       {escribiendo ? (
-        <label className={css.otroCaja}><input autoFocus inputMode="numeric" placeholder="ej. 120" aria-label={t.otroMargen.corto} value={otro} data-testid="otro-margen"
+        <label className={css.otroCaja}><input ref={caja} autoFocus inputMode="numeric" placeholder="ej. 120" aria-label={t.otroMargen.corto} value={otro} data-testid="otro-margen"
           onChange={(e) => setOtro(e.target.value.replace(/[^\d]/g, "").slice(0, 5))}
-          onKeyDown={(e) => { if (e.key === "Enter") guardarOtro(); else if (e.key === "Escape") { e.stopPropagation(); setEscribiendo(false); } }}
           onBlur={guardarOtro} /><span aria-hidden="true">%</span></label>
       ) : (
         <button type="button" className={manual !== null ? "activo" : ""} aria-pressed={manual !== null} disabled={sinCosto} onClick={() => { setOtro(manual === null ? "" : String(manual)); setEscribiendo(true); }}

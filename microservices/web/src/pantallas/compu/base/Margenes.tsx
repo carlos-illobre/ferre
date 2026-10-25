@@ -1,30 +1,28 @@
 import { MARGENES } from "../../../negocio/precios";
+import { useEtiqueta } from "../../../plataforma/comandos";
 
-type Props = { elegido: number | null; alElegir: (m: number) => void; disabled?: boolean; etiqueta?: string; atajos?: boolean; compacto?: boolean; flechasDeAfuera?: boolean; sinSigno?: boolean };
-
-// Izquierda y derecha pasan al margen de al lado y lo eligen.
-function pasarConLasFlechas(e: React.KeyboardEvent<HTMLDivElement>) {
-  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-  e.preventDefault(); e.stopPropagation();
-  const botones = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>("button"));
-  const i = botones.indexOf(document.activeElement as HTMLButtonElement);
-  const destino = botones[(i + (e.key === "ArrowRight" ? 1 : -1) + botones.length) % botones.length];
-  destino?.focus(); destino?.click();
-}
+// `accionDe`: la acción que fija cada margen desde la pantalla (para mostrar su tecla en el título).
+// `flechasDeAfuera`: el grupo no se recorre solo: lo recorre quien lo contiene (la ficha).
+type Props = { elegido: number | null; alElegir: (m: number) => void; disabled?: boolean; etiqueta?: string; accionDe?: (i: number) => string; compacto?: boolean; flechasDeAfuera?: boolean; sinSigno?: boolean };
 
 const textoDelMargen = (m: number, sinSigno?: boolean, compacto?: boolean) => `${m}${sinSigno ? "" : `${compacto ? "" : " "}%`}`;
 
-// Los cinco márgenes de un toque. Es un grupo de opciones: Tab entra una vez y las flechas
-// izquierda y derecha pasan de un margen a otro y lo eligen.
-// Con `flechasDeAfuera`, las flechas no eligen: las maneja quien lo contiene, y se elige con Enter.
-export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", atajos, compacto, flechasDeAfuera, sinSigno }: Props) {
+type DelBoton = { m: number; i: number; elegido: boolean; conFoco: boolean; alElegir: (m: number) => void } & Pick<Props, "disabled" | "accionDe" | "compacto" | "sinSigno">;
+function BotonDeMargen({ m, i, elegido, conFoco, alElegir, disabled, accionDe, compacto, sinSigno }: DelBoton) {
+  const tecla = useEtiqueta(accionDe?.(i) ?? "");
+  return (
+    <button type="button" role="radio" aria-checked={elegido} tabIndex={conFoco ? 0 : -1} disabled={disabled} title={tecla}
+      onClick={(e) => { e.stopPropagation(); alElegir(m); }} aria-label={sinSigno ? `${m} %` : undefined} data-testid={`margen-${m}`}>{textoDelMargen(m, sinSigno, compacto)}</button>
+  );
+}
+
+// Los cinco márgenes de un toque. Es un grupo de opciones: Tab entra una vez y se recorre de un
+// margen a otro (eligiéndolo) como cualquier grupo de opciones.
+export function Margenes({ elegido, alElegir, disabled, etiqueta = "Margen", accionDe, compacto, flechasDeAfuera, sinSigno }: Props) {
   const conFoco = MARGENES.includes(elegido as never) ? elegido : MARGENES[0];
   return (
-    <div className={`margenes ${compacto ? "compacto" : ""}`} role="radiogroup" aria-label={etiqueta} onKeyDown={flechasDeAfuera ? undefined : pasarConLasFlechas}>
-      {MARGENES.map((m, i) => (
-        <button key={m} type="button" role="radio" aria-checked={elegido === m} tabIndex={m === conFoco ? 0 : -1} disabled={disabled} title={atajos ? `Mayúsculas + ${i + 1}` : undefined}
-          onClick={(e) => { e.stopPropagation(); alElegir(m); }} aria-label={sinSigno ? `${m} %` : undefined} data-testid={`margen-${m}`}>{textoDelMargen(m, sinSigno, compacto)}</button>
-      ))}
+    <div className={`margenes ${compacto ? "compacto" : ""}`} role="radiogroup" aria-label={etiqueta} data-flechas-de-afuera={flechasDeAfuera ? "" : undefined}>
+      {MARGENES.map((m, i) => <BotonDeMargen key={m} m={m} i={i} elegido={elegido === m} conFoco={m === conFoco} alElegir={alElegir} disabled={disabled} accionDe={accionDe} compacto={compacto} sinSigno={sinSigno} />)}
     </div>
   );
 }

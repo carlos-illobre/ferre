@@ -8,7 +8,7 @@ import { ProveedoresDeListas } from "./ProveedoresDeListas";
 import { ResultadoDeLista } from "./ResultadoDeLista";
 import { Revision } from "./Revision";
 import { UltimasCargas } from "./UltimasCargas";
-import { useListasDeLaCompu, useTeclasDeListas, type ListasDeLaCompu } from "./useListasDeLaCompu";
+import { useListasDeLaCompu, useAccionesDeListas, type ListasDeLaCompu } from "./useListasDeLaCompu";
 import { ZonaDeCarga } from "./ZonaDeCarga";
 import css from "./Listas.module.css";
 
@@ -21,7 +21,7 @@ const t = TEXTOS.listas;
 
 export function Listas() {
   const x = useListasDeLaCompu();
-  useTeclasDeListas(x);
+  useAccionesDeListas(x);
   return (
     <Pagina titulo="Listas de precios" testId="listas" className={css.v2} acciones={<CabezaDeListas x={x} />}>
       <Aviso tipo="error" accion={<Boton tam="chico" icono="repetir" onClick={() => void x.recargar()}>Reintentar</Boton>}>{x.error}</Aviso>
@@ -46,7 +46,7 @@ function CabezaDeListas({ x }: { x: ListasDeLaCompu }) {
     <AlLadoDeLasPestanas>
       <div className={`fila ${css.arriba}`}>
         {x.activos.length > 0 && <Boton icono="edificio" onClick={() => x.setAltaAbierta(true)} data-testid="agregar-proveedor">{t.agregarProveedor.largo}</Boton>}
-        <Boton icono="subir" disabled={!x.enLinea} onClick={() => x.elegirArchivo.current()} data-atajo="s" data-testid="subir-lista">{t.subirLista.largo}<kbd className="tecla solo-compu" aria-hidden="true">Alt S</kbd></Boton>
+        <Boton icono="subir" disabled={!x.enLinea} onClick={() => x.elegirArchivo.current()} accion="listas.subir" data-testid="subir-lista">{t.subirLista.largo}</Boton>
       </div>
     </AlLadoDeLasPestanas>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type DragEvent, type FormEvent } from "react";
 import { useCargaDeLista, type Cargada, type Proveedor } from "../../../negocio/catalogo";
 import { TEXTOS } from "../../textos";
-import { Aviso, Boton, Icono, Progreso } from "../base/ui";
+import { Atajo, Aviso, Boton, Icono, Progreso } from "../base/ui";
 import css from "./Listas.module.css";
 
 // Donde se entrega el archivo: la zona punteada de la v2. Se suelta encima o se elige (Alt S). Si
@@ -48,7 +48,7 @@ function ElegirArchivo({ libre, arrastrando, alElegir }: { libre: boolean; arras
       <span className={css.zonaIc} aria-hidden="true"><Icono nombre="subir-archivo" /></span>
       <span className={css.texto}>
         <b>{arrastrando ? "Soltala acá" : t.cargarUnaLista.largo}</b>
-        <span id={idAyuda}>{t.soltaElExcel.largo} <kbd className="tecla" aria-hidden="true">Alt S</kbd></span>
+        <span id={idAyuda}>{t.soltaElExcel.largo} <Atajo accion="listas.subir" /></span>
       </span>
     </button>
   );

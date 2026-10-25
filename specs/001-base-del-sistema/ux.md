@@ -376,6 +376,8 @@ Con una ventana abierta, las flechas valen dentro de ella.
   botones a la vista, a cada uno le toca siempre la misma letra.
 - No se usan la D, la E ni la F: en Windows el navegador las tiene para cosas propias.
 - Los botones que ya tienen su tecla (Alt + número, F2, F5 a F8) no llevan letra.
+- Un botón que ya tiene su letra con Alt (Alt S, «Subir lista»; Alt D, «Descartar») muestra esa,
+  y ningún otro botón a la vista la toma.
 - Las letras se reparten primero entre los botones de la pantalla, de arriba hacia abajo, y
   después entre los del menú de la izquierda. Si hay más botones que letras, los que sobran
   quedan sin atajo y se alcanzan con Tab.

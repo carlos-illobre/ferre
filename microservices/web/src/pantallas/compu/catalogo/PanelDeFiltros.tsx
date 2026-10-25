@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useComandos } from "../../../plataforma/comandos";
 import { SIN_FILTROS, type Disponibilidad, type Filtros } from "../../../negocio/catalogo";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../base/ui";
@@ -46,12 +47,12 @@ function Marcas({ filtros, marcas, alCambiar }: Omit<Props, "alCerrar">) {
 function useCerrarConEscOAfuera(panel: React.RefObject<HTMLDivElement>, alCerrar: () => void) {
   const cerrar = useRef(alCerrar);
   useEffect(() => { cerrar.current = alCerrar; });
+  // Abierto, ofrece cerrarse (con el teclado, Esc).
+  useComandos({ cerrar: () => cerrar.current() }, { encima: true });
   useEffect(() => {
     panel.current?.querySelector<HTMLElement>("[aria-checked='true']")?.focus();
-    const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") { e.stopPropagation(); cerrar.current(); } };
     const afuera = (e: MouseEvent) => { if (panel.current && !panel.current.parentElement?.contains(e.target as Node)) cerrar.current(); };
-    window.addEventListener("keydown", tecla, true);
     document.addEventListener("mousedown", afuera);
-    return () => { window.removeEventListener("keydown", tecla, true); document.removeEventListener("mousedown", afuera); };
+    return () => document.removeEventListener("mousedown", afuera);
   }, [panel]);
 }

@@ -1,19 +1,20 @@
 import { cuentaDelPrecio, type Producto } from "../../../negocio/catalogo";
 import { pesos, pesosCortos } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
-import { Icono } from "../base/ui";
+import { useEtiqueta } from "../../../plataforma/comandos";
+import { Atajo, Icono } from "../base/ui";
 import css from "./FichaAlLado.module.css";
 
 const t = TEXTOS.ficha;
 
 // «Así se calcula» (RF-114), abierto: el costo, más el margen, más el IVA, y lo que se cobra
-// redondeado a $1.000. F1 (o tocar el título) lo pliega. Sin costo o sin margen, qué falta.
+// redondeado a $1.000. Su tecla (o tocar el título) lo pliega. Sin costo o sin margen, qué falta.
 export function BloqueCalculo({ producto: p, abierto, alPlegar }: { producto: Producto; abierto: boolean; alPlegar: () => void }) {
   const c = cuentaDelPrecio(p);
   return (
     <section className={`${css.bloque} ${css.calculo}`} data-testid="asi-se-calcula">
-      <h3><button type="button" className={css.plegar} onClick={alPlegar} aria-expanded={abierto} aria-keyshortcuts="F1" data-ficha-vertical="" data-testid="abrir-calculo">
-        {t.asiSeCalcula.largo}<span className={css.der}><Icono nombre={abierto ? "arriba" : "abajo"} tam={16} /><kbd className="tecla">F1</kbd></span>
+      <h3><button type="button" className={css.plegar} onClick={alPlegar} aria-expanded={abierto} aria-keyshortcuts={useEtiqueta("productos.calculo")} data-ficha-vertical="" data-testid="abrir-calculo">
+        {t.asiSeCalcula.largo}<span className={css.der}><Icono nombre={abierto ? "arriba" : "abajo"} tam={16} /><Atajo accion="productos.calculo" kbd /></span>
       </button></h3>
       {c.falta !== null ? <p className={css.detalle} data-testid="cuenta-del-precio">{c.falta === "costo" ? t.faltaCosto.largo : t.faltaMargen.largo}</p> : (
         <div className={css.cuenta} data-testid="cuenta-del-precio">

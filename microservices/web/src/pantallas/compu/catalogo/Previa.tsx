@@ -1,4 +1,5 @@
-import { useState, type KeyboardEvent } from "react";
+import { useRef, useState } from "react";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
 import { variacion, type Fila } from "../../../negocio/catalogo";
 import { pesos, porcentaje } from "../../../negocio/formato";
 import { TEXTOS } from "../../textos";
@@ -19,35 +20,22 @@ function Cambio({ fila }: { fila: Fila }) {
   );
 }
 
-// A qué fila lleva cada tecla; null si no mueve o se sale de la tabla.
-function destinoDe(tecla: string, i: number, n: number): number | null {
-  const destino = ({ ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: n - 1 } as Record<string, number>)[tecla];
-  return destino === undefined || destino < 0 || destino >= n ? null : destino;
-}
-
-// La tabla de la revisión. Se recorre con ↑ ↓; la fila con foco muestra debajo, en pasos, de
-// dónde sale su costo (Espacio la pliega).
+// La tabla de la revisión. Se recorre por filas; la fila con foco muestra debajo, en pasos, de
+// dónde sale su costo, y la explicación se pliega y se despliega.
 export function Previa({ filas, mas }: { filas: Fila[]; mas: React.ReactNode }) {
   const [activa, setActiva] = useState(0);
   const [explicada, setExplicada] = useState(true);
-  function mover(e: KeyboardEvent<HTMLTableRowElement>, i: number) {
-    if (e.target !== e.currentTarget) return;
-    if (e.key === " ") { e.preventDefault(); setExplicada((x) => !x); return; }
-    const destino = destinoDe(e.key, i, filas.length);
-    if (destino === null) return;
-    e.preventDefault();
-    setActiva(destino);
-    (e.currentTarget.closest("tbody")?.querySelector(`tr[data-fila="${destino}"]`) as HTMLElement | null)?.focus();
-  }
+  const tabla = useRef<HTMLTableElement>(null);
+  useAccionesDelLugar(tabla, { "previa.explicar": () => setExplicada((x) => !x) });
   return (
     <div className={css.tabla}>
-      <table className={css.previa} data-testid="vista-previa" data-flechas-propias>
+      <table ref={tabla} className={css.previa} data-testid="vista-previa" data-flechas-propias>
         <colgroup><col className="c-foto" /><col /><col className="c-antes" /><col className="c-nuevo" /><col className="c-cambio" /><col className="c-estante" /></colgroup>
         <thead><tr><th scope="col"><span className="solo-lectores">Foto</span></th><th scope="col">Producto</th><th scope="col" className="num">Costo antes</th><th scope="col" className="num">Costo nuevo</th><th scope="col" className="num">Cambio</th><th scope="col" className="num">{TEXTOS.listas.precioEnEstanteria.largo}</th></tr></thead>
         <tbody>
           {filas.map((f, i) => (
             <FilaDePrevia key={f.codigo_proveedor} fila={f} i={i} foco={i === activa} explicada={explicada && i === activa}
-              alTeclear={(e) => mover(e, i)} alEnfocar={() => setActiva(i)} />
+              alEnfocar={() => setActiva(i)} />
           ))}
         </tbody>
       </table>
@@ -56,10 +44,10 @@ export function Previa({ filas, mas }: { filas: Fila[]; mas: React.ReactNode }) 
   );
 }
 
-function FilaDePrevia({ fila: f, i, foco, explicada, alTeclear, alEnfocar }: { fila: Fila; i: number; foco: boolean; explicada: boolean; alTeclear: (e: KeyboardEvent<HTMLTableRowElement>) => void; alEnfocar: () => void }) {
+function FilaDePrevia({ fila: f, i, foco, explicada, alEnfocar }: { fila: Fila; i: number; foco: boolean; explicada: boolean; alEnfocar: () => void }) {
   return (
     <>
-      <tr data-fila={i} className={foco ? "foco" : ""} tabIndex={foco ? 0 : -1} onKeyDown={alTeclear} onFocus={alEnfocar} onClick={alEnfocar}>
+      <tr data-fila={i} className={foco ? "foco" : ""} tabIndex={foco ? 0 : -1} onFocus={alEnfocar} onClick={alEnfocar}>
         <td className={css.fotoCelda}><span className={css.foto} aria-hidden="true"><Icono nombre="productos" tam={16} /></span></td>
         <td><span className={css.n}>{f.descripcion}</span><span className={css.d}>{[f.marca, f.codigo_proveedor].filter(Boolean).join(" · ")}</span></td>
         <td className={`num ${css.antes}`}>{f.costo_anterior === null ? "—" : pesos(f.costo_anterior)}</td>

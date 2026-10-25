@@ -9,7 +9,7 @@ import { SinDuplicados } from "./SinDuplicados";
 import { UnidosDeLaCompu } from "./UnidosDeLaCompu";
 import { UnionManual } from "./UnionManual";
 import { useDuplicadosDeLaCompu, type DuplicadosDeLaCompu } from "./useDuplicadosDeLaCompu";
-import { useTeclasDeDuplicados } from "./useTeclasDeDuplicados";
+import { useAccionesDeDuplicados } from "./useAccionesDeDuplicados";
 import css from "./Duplicados.module.css";
 
 // Un mismo artículo en varios proveedores (RF-06): quien administra ve las sugerencias lado
@@ -18,7 +18,7 @@ import css from "./Duplicados.module.css";
 // «La bandeja»): arriba los números, a la izquierda la cola y a la derecha el par en una tabla.
 export function Duplicados() {
   const x = useDuplicadosDeLaCompu();
-  useTeclasDeDuplicados(x);
+  useAccionesDeDuplicados(x);
   const actual = x.elegida.actual;
   return (
     <Pagina titulo="Duplicados" testId="duplicados" className={css.v2} acciones={<AccionesDeDuplicados x={x} />}>
@@ -50,9 +50,9 @@ function AccionesDeDuplicados({ x }: { x: DuplicadosDeLaCompu }) {
   return (
     <AlLadoDeLasPestanas>
       <div className={`fila ${css.arriba}`}>
-        <Boton icono="buscar" disabled={x.quieto} onClick={() => void x.buscar()} data-atajo="b" data-testid="buscar-duplicados">{t.buscarEnTodo.largo}<kbd className="tecla solo-compu" aria-hidden="true">Alt B</kbd></Boton>
-        <Boton icono="unir" onClick={() => x.setPanel("unir")} data-atajo="u" data-testid="unir-a-mano">{t.unirAMano.largo}<kbd className="tecla solo-compu" aria-hidden="true">Alt U</kbd></Boton>
-        <Boton icono="separar" onClick={() => x.setPanel("unidos")} data-atajo="s" data-testid="unidos">{t.unidosYSeparar.largo}<kbd className="tecla solo-compu" aria-hidden="true">Alt S</kbd></Boton>
+        <Boton icono="buscar" disabled={x.quieto} onClick={() => void x.buscar()} accion="duplicados.buscar" data-testid="buscar-duplicados">{t.buscarEnTodo.largo}</Boton>
+        <Boton icono="unir" onClick={() => x.setPanel("unir")} accion="duplicados.unir" data-testid="unir-a-mano">{t.unirAMano.largo}</Boton>
+        <Boton icono="separar" onClick={() => x.setPanel("unidos")} accion="duplicados.unidos" data-testid="unidos">{t.unidosYSeparar.largo}</Boton>
       </div>
     </AlLadoDeLasPestanas>
   );

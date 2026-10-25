@@ -1,14 +1,10 @@
 import type { Linea } from "../../motor/tabla";
+import { enLaBusquedaYFuera } from "../ayudas";
 
 // Vender: F5 a F8 eligen cómo paga, F2 cobra, F1 muestra el panel, F9 elige el cliente y F4 es
 // «No llevó». Con la búsqueda vacía, + y − cambian la cantidad del renglón elegido y Supr lo quita
 // (también con el cursor en la búsqueda). Fuera de la búsqueda, ↑ ↓ siguen eligiendo lo encontrado
 // y Esc vuelve a ella.
-const enLaBusquedaYFuera = (tecla: string, accion: string, etiqueta?: string): Linea[] => [
-  { tecla, accion, lugar: true, enCampos: true, etiqueta },
-  { tecla, accion, etiqueta },
-];
-
 export const DE_VENDER: Linea[] = [
   { tecla: "F5", accion: "vender.medio.efectivo", enCampos: true },
   { tecla: "F6", accion: "vender.medio.mercado_pago", enCampos: true },

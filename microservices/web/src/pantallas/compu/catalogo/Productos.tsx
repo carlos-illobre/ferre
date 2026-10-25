@@ -7,20 +7,20 @@ import { CabezaDeProductos } from "./CabezaDeProductos";
 import { FichaAlLado } from "./FichaAlLado";
 import { ListaDeProductos } from "./ListaDeProductos";
 import { useProductos } from "./useProductos";
-import { useTeclasDeProductos } from "./useTeclasDeProductos";
+import { useAccionesDeProductos } from "./useAccionesDeProductos";
 import css from "./Productos.module.css";
 
 // Productos en la computadora, como la v2 («Lista y ficha lado a lado», decisión 145): la lista a la
 // izquierda y la ficha del elegido siempre abierta a la derecha.
 export function Productos() {
   const x = useProductos();
-  useTeclasDeProductos(x);
+  const acciones = useAccionesDeProductos(x);
   const p = x.delaFicha;
   return (
     <Pagina titulo="Productos" testId="productos" className="productos productos-v2" acciones={<CabezaDeProductos emparejado={Boolean(x.emparejado)} puedeCargarListas={x.puede("catalogo.listas")} />}>
       <div className="pv">
         <div className={css.lista}>
-          <BuscadorDeProductos x={x} />
+          <BuscadorDeProductos x={x} acciones={acciones} />
           <AvisosDeProductos x={x} />
           <ListaDeProductos x={x} />
         </div>

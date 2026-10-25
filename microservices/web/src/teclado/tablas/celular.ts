@@ -1,4 +1,5 @@
 import type { Linea } from "../motor/tabla";
+import { enLaBusquedaYFuera } from "./ayudas";
 import { DE_CUALQUIER_PANTALLA } from "./comunes";
 
 // Las teclas del celular (un teclado conectado, o el de la pantalla en un campo): qué tecla pide
@@ -15,4 +16,20 @@ const DE_VENDER: Linea[] = [
   { tecla: "ArrowUp", accion: "vender.busqueda.anterior" },
 ];
 
-export const TABLA_DEL_CELULAR: Linea[] = [...DE_CUALQUIER_PANTALLA, ...DE_VENDER];
+// Productos: ↑ ↓ eligen, Enter abre, Esc limpia la búsqueda y Mayús + 1 a 5 fijan el margen.
+const DE_PRODUCTOS: Linea[] = [
+  ...enLaBusquedaYFuera("ArrowDown", "productos.siguiente"),
+  ...enLaBusquedaYFuera("ArrowUp", "productos.anterior"),
+  ...enLaBusquedaYFuera("Enter", "productos.abrir"),
+  ...enLaBusquedaYFuera("Escape", "productos.volver"),
+  ...[1, 2, 3, 4, 5].flatMap((n) => enLaBusquedaYFuera(`Mayús+${n}`, `productos.margen.${n}`, `Shift+${n}`)),
+];
+
+export const TABLA_DEL_CELULAR: Linea[] = [...DE_CUALQUIER_PANTALLA, ...DE_VENDER, ...DE_PRODUCTOS];
+
+// Cómo se usan las teclas, dicho en una frase, para quien tiene un teclado conectado.
+export const ETIQUETAS_DEL_CELULAR: Record<string, string> = {
+  "productos.ayuda.elegir": "Flechas para elegir · Enter abre",
+  "productos.ayuda.margen": "Shift+1 a Shift+5 fijan el margen (300, 200, 100, 50, 25 %)",
+  "productos.ayuda.limpiar": "Esc limpia",
+};

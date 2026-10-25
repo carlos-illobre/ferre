@@ -95,7 +95,7 @@ comparar el precio y su explicación con la cuenta a mano.
 
 1. **Given** una mecha con costo $1.500, IVA 21 % y sin margen, **When** el Administrador elige 100 % con un toque o con un solo atajo de teclado, **Then** esa opción queda marcada como la elegida y el precio es $4.000 (1.500 × 2 × 1,21 = 3.630, para arriba al múltiplo de $1.000).
 2. **Given** un producto sin margen elegido, **When** se lo ve en cualquier lado, **Then** dice «sin precio» en vez de un precio, con las opciones de margen a la vista.
-3. **Given** la mecha de costo $1.500, **When** elige otro margen y tipea 20, **Then** el precio es $3.000 (1.500 × 1,2 × 1,21 = 2.178 → 3.000), se ve que el margen es 20 % puesto a mano y ninguna de las cinco opciones queda marcada: lo tipeado es un porcentaje, no un precio.
+3. **Given** la mecha de costo $1.500, **When** elige otro margen y tipea 20, **Then** el precio es $3.000 (1.500 × 1,2 × 1,21 = 2.178 → 3.000), se ve que el margen es 20 % puesto a mano y ninguna de las cinco opciones queda marcada: lo tipeado es un porcentaje, no un precio. Enter (o salir del campo) lo guarda; Esc lo deja como estaba y la ficha sigue abierta (2026-10-25, T019 de 024).
 4. **Given** un taladro de costo $120.000, **When** elige 25 %, **Then** el precio es $182.000 (181.500 para arriba).
 5. **Given** un producto con margen elegido, **When** se lo vuelve a buscar otro día o desde otro dispositivo, **Then** tiene el mismo margen: queda guardado en el producto.
 6. **Given** un producto con margen 100 % cuyo costo sube al aplicar una lista nueva, **When** se lo busca, **Then** el precio de venta ya está recalculado con el margen guardado.

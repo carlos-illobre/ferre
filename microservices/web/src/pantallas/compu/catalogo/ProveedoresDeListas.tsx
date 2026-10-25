@@ -1,28 +1,39 @@
 import { descuentosDe, situacionDelProveedor, type ListaFila, type Proveedor } from "../../../negocio/catalogo";
 import { TEXTOS } from "../../textos";
-import { Boton, Icono, Vacio } from "../base/ui";
+import { useAccionesDelLugar, useEtiqueta } from "../../../plataforma/comandos";
+import { Atajo, Boton, Icono, Vacio } from "../base/ui";
 import type { ListasDeLaCompu } from "./useListasDeLaCompu";
 import css from "./Listas.module.css";
 
-// Los proveedores, con su lista vigente o vieja y cómo se calcula su costo; «/» los busca.
+// Los proveedores, con su lista vigente o vieja y cómo se calcula su costo, y la búsqueda.
 const t = TEXTOS.listas;
 
 export function ProveedoresDeListas({ x }: { x: ListasDeLaCompu }) {
+  // Deshacer la búsqueda (Esc) la cierra.
+  useAccionesDelLugar(x.cajaProveedor, { "campo.deshacer": () => x.setBuscado(null) });
   return (
     <section className={css.prov} aria-labelledby="lv-proveedores">
       <h2 id="lv-proveedores" className={css.cab}>
         <b>{t.proveedores.largo}</b>{x.activos.length > 0 && <span className={css.cuenta}>{x.activos.length}</span>}
-        {x.activos.length > 0 && <button type="button" className={css.mas} onClick={() => x.buscar((b) => (b === null ? "" : null))} aria-keyshortcuts="/" aria-expanded={x.buscado !== null}>{t.buscar.largo} <kbd className="tecla" aria-hidden="true">/</kbd></button>}
+        {x.activos.length > 0 && <BotonDeBuscar x={x} />}
       </h2>
       {x.buscado !== null && (
         <label className={css.buscar}>
           <Icono nombre="buscar" tam={18} />
-          <input ref={x.cajaProveedor} type="search" value={x.buscado} onChange={(e) => x.setBuscado(e.target.value)} onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); x.setBuscado(null); } }}
+          <input ref={x.cajaProveedor} type="search" value={x.buscado} onChange={(e) => x.setBuscado(e.target.value)}
             placeholder={t.buscarProveedor.largo} aria-label={t.buscarProveedor.largo} autoComplete="off" data-testid="buscar-proveedor" />
         </label>
       )}
       <LosProveedores x={x} />
     </section>
+  );
+}
+
+function BotonDeBuscar({ x }: { x: ListasDeLaCompu }) {
+  return (
+    <button type="button" className={css.mas} onClick={() => x.buscar((b) => (b === null ? "" : null))} aria-keyshortcuts={useEtiqueta("listas.buscar-proveedor")} aria-expanded={x.buscado !== null}>
+      {t.buscar.largo} <Atajo accion="listas.buscar-proveedor" />
+    </button>
   );
 }
 

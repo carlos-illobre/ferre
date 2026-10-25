@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { buscarProveedores, mensajeDeLista, pendientes, retomar, situacionDelProveedor, ultimaAplicada, useListas, type Cargada, type ListaFila } from "../../../negocio/catalogo";
 import { useEnLinea } from "../../../plataforma/sin-conexion";
-import { useTeclasGlobales } from "../../../plataforma/teclado";
+import { useComandos } from "../../../plataforma/comandos";
+import { hayUnaVentanaAbierta } from "../base/ui";
 
 // El estado de Listas en la computadora: lo que se acaba de subir o la pendiente elegida (la
 // primera, si no se eligió ninguna), el resultado de aplicar, los avisos y el proveedor buscado.
@@ -42,19 +43,14 @@ function useBuscarProveedor(proveedores: ReturnType<typeof useListas>["proveedor
   return { activos, ultima, buscado, setBuscado, buscar, cajaProveedor, aLaVista: buscado === null ? ordenados : buscarProveedores(ordenados, buscado) };
 }
 
-// Alt S elige el archivo, 1 a 9 abren la pendiente de ese número y «/» busca un proveedor.
-const sinModificador = (e: globalThis.KeyboardEvent) => !e.ctrlKey && !e.altKey && !e.metaKey;
-const numeroDePendiente = (e: globalThis.KeyboardEvent) => (/^Digit[1-9]$/.test(e.code) && sinModificador(e) ? Number(e.code.slice(5)) - 1 : -1);
-
-function teclear(e: globalThis.KeyboardEvent, l: ListasDeLaCompu) {
-  if (e.altKey && e.code === "KeyS") { e.preventDefault(); l.elegirArchivo.current(); return; }
-  if (e.key === "/" && !e.ctrlKey && !e.altKey) { e.preventDefault(); l.buscar((b) => b ?? ""); return; }
-  const pendiente = l.sinAplicar[numeroDePendiente(e)];
-  if (pendiente) { e.preventDefault(); l.abrir(pendiente); }
-}
-
-export function useTeclasDeListas(x: ListasDeLaCompu) {
-  const actual = useRef(x);
-  useEffect(() => { actual.current = x; });
-  useTeclasGlobales(useCallback((e: globalThis.KeyboardEvent) => { if (!document.querySelector("dialog[open]")) teclear(e, actual.current); }, []));
+// Lo que ofrece Listas: elegir el archivo, buscar un proveedor y abrir la pendiente de cada
+// número (1 a 9). Nada con una ventana abierta.
+export function useAccionesDeListas(x: ListasDeLaCompu) {
+  const libre = (hacer: () => void) => () => (hayUnaVentanaAbierta() ? false : hacer());
+  const abrirLa = (n: number) => () => { const pendiente = x.sinAplicar[n - 1]; if (!pendiente || hayUnaVentanaAbierta()) return false; x.abrir(pendiente); };
+  useComandos({
+    "listas.subir": libre(() => x.elegirArchivo.current()),
+    "listas.buscar-proveedor": libre(() => x.buscar((b) => b ?? "")),
+    ...Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => [`listas.pendiente.${n}`, abrirLa(n)])),
+  });
 }

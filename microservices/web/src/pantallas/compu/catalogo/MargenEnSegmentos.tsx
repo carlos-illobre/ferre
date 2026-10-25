@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
 import { otroMargen, margenAMano, type Producto } from "../../../negocio/catalogo";
 import { TEXTOS } from "../../textos";
 import { Margenes } from "../base/ui";
@@ -15,6 +16,8 @@ export function MargenEnSegmentos({ producto: p, alCambiar }: { producto: Produc
   const [texto, setTexto] = useState("");
   useEffect(() => { setEscribiendo(false); }, [p.id]);
   const sinCosto = p.costo_neto === null;
+  const caja = useRef<HTMLInputElement>(null);
+  useAccionesDelLugar(caja, { "campo.listo": () => guardar(), "campo.deshacer": () => setEscribiendo(false) });
   function guardar() {
     const v = otroMargen(texto);
     if (v !== null && v !== p.margen_elegido) alCambiar({ margen_elegido: v });
@@ -22,12 +25,11 @@ export function MargenEnSegmentos({ producto: p, alCambiar }: { producto: Produc
   }
   return (
     <div className={css.margen}>
-      <Margenes flechasDeAfuera sinSigno elegido={p.margen_elegido} disabled={sinCosto} etiqueta="Margen" atajos alElegir={(m) => alCambiar({ margen_elegido: m })} />
+      <Margenes flechasDeAfuera sinSigno elegido={p.margen_elegido} disabled={sinCosto} etiqueta="Margen" accionDe={(i) => `productos.margen.${i + 1}`} alElegir={(m) => alCambiar({ margen_elegido: m })} />
       {escribiendo ? (
         <label className={css.otroCaja}>
-          <input autoFocus inputMode="numeric" placeholder="ej. 120" aria-label={`${t.otroMargen.largo} para ${p.descripcion}, en porcentaje`} value={texto} data-testid="otro-margen"
+          <input ref={caja} autoFocus inputMode="numeric" placeholder="ej. 120" aria-label={`${t.otroMargen.largo} para ${p.descripcion}, en porcentaje`} value={texto} data-testid="otro-margen"
             onChange={(e) => setTexto(e.target.value.replace(/[^\d]/g, "").slice(0, 5))}
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); guardar(); } else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); setEscribiendo(false); } }}
             onBlur={guardar} />
           <span aria-hidden="true">%</span>
         </label>

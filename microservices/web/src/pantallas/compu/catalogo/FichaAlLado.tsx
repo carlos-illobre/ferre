@@ -3,12 +3,11 @@ import { subirFoto, type Producto } from "../../../negocio/catalogo";
 import { useVeCostos } from "../../Costos";
 import { CodigoDeBarras } from "../../CodigoDeBarras";
 import { TEXTOS } from "../../textos";
-import { Boton, Toast } from "../base/ui";
+import { Atajo, Boton, Toast } from "../base/ui";
 import { BloqueArchivo } from "./BloqueArchivo";
 import { BloqueCalculo } from "./BloqueCalculo";
 import { BloqueProveedores } from "./BloqueProveedores";
 import { CabezaDeLaFicha } from "./CabezaDeLaFicha";
-import { teclasDeLaFicha } from "./teclas-de-la-ficha";
 import type { Cambios } from "./tipos";
 import "./ficha.css";
 import css from "./FichaAlLado.module.css";
@@ -30,7 +29,7 @@ export const FichaAlLado = forwardRef<HTMLElement, Props>(function FichaAlLado(f
   const [mensaje, setMensaje] = useState<string | null>(null);
   useEffect(() => { setMensaje(null); }, [p.id]);
   return (
-    <article className="fal" ref={ref} aria-label={`Ficha de ${p.descripcion}`} data-testid="ficha-producto" onKeyDown={teclasDeLaFicha}>
+    <article className="fal" ref={ref} aria-label={`Ficha de ${p.descripcion}`} data-testid="ficha-producto" data-ficha-con-flechas="">
       <div className={css.cuerpo}>
         <Toast texto={mensaje} alCerrar={() => setMensaje(null)} testId="mensaje-ficha" />
         <CabezaDeLaFicha producto={p} alCambiar={alCambiar} alSubirFoto={async (archivo) => alCambiar({ foto_url: await subirFoto(p.id, archivo) })} alError={setMensaje} />
@@ -45,8 +44,8 @@ export const FichaAlLado = forwardRef<HTMLElement, Props>(function FichaAlLado(f
       </div>
       <div className={css.pie}>
         <span className={css.teclas}>
-          <span><kbd className="tecla">Esc</kbd> {t.vuelveABuscar.largo}</span>
-          <span><kbd className="tecla">↑</kbd><kbd className="tecla">↓</kbd> {t.otroProducto.largo}</span>
+          <span><Atajo accion="productos.volver" kbd /> {t.vuelveABuscar.largo}</span>
+          <span><Atajo accion="productos.anterior" kbd /><Atajo accion="productos.siguiente" kbd /> {t.otroProducto.largo}</span>
         </span>
         <Boton className={css.listo} onClick={f.alListo} data-ficha-vertical="" data-testid="ficha-listo">{t.listo.largo}</Boton>
         {f.alAgregar && <Boton variante="principal" icono="carrito" accion="productos.agregar" onClick={f.alAgregar} data-ficha-vertical="" data-testid="ficha-agregar">{TEXTOS.catalogo.agregarALaVenta.largo}</Boton>}
