@@ -1,5 +1,5 @@
 import { base } from "../persistencia/conexion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import * as datos from "../persistencia/tickets.js";
 import type { Ticket } from "../contratos/tickets.js";
 import type { Enviable } from "../enviable.js";

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { asignarRoles, insertarUsuario, rolesPorNombre } from "./persistencia/administracion.js";
 import { base, cerrar } from "./persistencia/conexion.js";
-import { anotarEvento } from "./persistencia/eventos.js";
+import { anotarEvento } from "./eventos/anotar.js";
 
 // Alta de la primera persona, desde el contenedor:
 //   docker compose exec comercial node dist/crear-usuario.js correo@gmail.com "Nombre"

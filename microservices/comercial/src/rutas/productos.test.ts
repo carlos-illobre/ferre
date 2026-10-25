@@ -250,9 +250,9 @@ describe("PATCH /productos/:id", () => {
     expect((await pedir(app, "PATCH", "/productos/nadie", { cuerpo: { margen_elegido: 50 } })).status).toBe(404);
     base.actual.programar(/UPDATE producto SET/, { rowCount: 1 });
     await pedir(app, "PATCH", "/productos/p1", { rol: "mostrador", cuerpo: { margen_elegido: 50 } });
-    const evento = base.actual.sqlDe(/insert into "evento"/).at(-1)!;
-    expect(evento.params[1]).toBe("producto.precio_elegido");
-    expect(evento.params[4]).toBe("u-mostrador");
+    const evento = base.actual.eventos().at(-1)!;
+    expect(evento.tipo).toBe("producto.precio_elegido");
+    expect(evento.quien?.id).toBe("u-mostrador");
   });
 });
 

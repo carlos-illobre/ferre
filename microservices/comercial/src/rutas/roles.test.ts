@@ -38,7 +38,7 @@ describe("roles", () => {
     expect(r.status).toBe(201);
     expect(base.actual.sqlDe(/INSERT INTO rol \(/)[0]!.params[1]).toBe("Encargado");
     expect(base.actual.sqlDe(/INSERT INTO rol_permiso/)[0]!.params[1]).toEqual(["ventas.registrar", "deposito.ingresos"]);
-    expect(base.actual.sqlDe(/insert into "evento"/)[0]!.params[1]).toBe("rol.creado");
+    expect(base.actual.eventos()[0]!.tipo).toBe("rol.creado");
   });
 
   it("sin nombre, sin permisos o con un permiso que no existe, no se guarda; un nombre repetido, 409", async () => {
@@ -101,7 +101,7 @@ describe("permisos por operación", () => {
     ["GET", "/equivalencias", "Unir duplicados"],
     ["PUT", "/pedidos/x", "Encargar compras"], ["POST", "/compras", "Registrar ingresos"], ["GET", "/compras", "Ver las compras"], ["GET", "/compras/semana", "Ver los gastos"],
     ["POST", "/stock/p1/ajustes", "Contar y corregir stock"], ["GET", "/sectores", "Contar y corregir stock"],
-    ["GET", "/auditoria", "Ver quién hizo qué"], ["GET", "/anomalias", "Ver las anomalías"], ["GET", "/consultas", "Ver las ventas del negocio"],
+    ["GET", "/anomalias", "Ver las anomalías"], ["GET", "/consultas", "Ver las ventas del negocio"],
     ["GET", "/usuarios", "Administrar usuarios"], ["GET", "/sesiones", "Administrar usuarios"], ["GET", "/roles", "Administrar roles"],
     ["PATCH", "/productos/p1", "Fijar márgenes"],
     ["GET", "/sistema/ajustes", "Administrar el sistema"], ["PUT", "/sistema/ajustes", "Administrar el sistema"], ["PUT", "/puestos/configuracion", "Administrar el sistema"],
@@ -130,9 +130,10 @@ describe("permisos por operación", () => {
   });
   it("todos los permisos de la lista se usan en alguna ruta de esta prueba o de las de roles", () => {
     // «Anular ventas de cualquier día» se prueba con las ventas; «Ver costos» no lo exige ninguna
-    // ruta: decide qué muestran las pantallas. Los de Procesos, con su ruta (procesos.test.ts);
-    // «Ver el dinero invertido», con el stock (secciones-de-negocio.test.ts).
-    const usados = new Set([...PROHIBIDO_AL_QUE_SOLO_VENDE.map(([, , nombre]) => nombre), "Vender", "Anular ventas de cualquier día", "Ver costos", "Ver procesos", "Dibujar procesos", "Ver el dinero invertido"]);
+    // ruta: decide qué muestran las pantallas. Los de Procesos y «Ver quién hizo qué» los exigen
+    // Procesos y Auditoría, que los leen de X-Permisos (specs/026 y 027); «Ver el dinero
+    // invertido», con el stock (secciones-de-negocio.test.ts).
+    const usados = new Set([...PROHIBIDO_AL_QUE_SOLO_VENDE.map(([, , nombre]) => nombre), "Vender", "Anular ventas de cualquier día", "Ver costos", "Ver procesos", "Dibujar procesos", "Ver quién hizo qué", "Ver el dinero invertido"]);
     expect(PERMISOS.filter((p) => !usados.has(p.nombre)).map((p) => p.nombre)).toEqual([]);
   });
 });

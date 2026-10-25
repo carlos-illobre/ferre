@@ -1,6 +1,6 @@
 import { base } from "../persistencia/conexion.js";
 import { Deshacer, enTransaccion } from "../persistencia/transaccion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import * as datos from "../persistencia/pedidos.js";
 import type { z } from "zod";
 import type { borradorDePedido } from "./esquemas.js";

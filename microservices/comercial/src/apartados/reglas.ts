@@ -1,7 +1,7 @@
 import { config } from "../config.js";
 import { base } from "../persistencia/conexion.js";
 import { enTransaccion } from "../persistencia/transaccion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import { hashear, usuarioConPermisos, type SesionActiva } from "../acceso/sesiones.js";
 import type { Usuario } from "../acceso/sesiones.js";
 import type { CambioParaApartar, CambiosApartados, CambiosParaRevisar } from "../contratos/apartados.js";

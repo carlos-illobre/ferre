@@ -1,5 +1,5 @@
 import { base } from "../persistencia/conexion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import * as datos from "../persistencia/deposito.js";
 import type { FilaDeStock } from "../persistencia/deposito.js";
 import * as copia from "../productos/copia.js";

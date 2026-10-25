@@ -43,7 +43,7 @@ describe("entrar con Google", () => {
     // Mayúsculas y minúsculas no distinguen un correo de otro.
     expect(base.actual.sqlDe(/FROM usuario WHERE email/)[0]!.params).toEqual(["carlos@ferre.test"]);
     expect(base.actual.sqlDe(/INSERT INTO sesion/)).toHaveLength(1);
-    expect(JSON.parse(String(base.actual.sqlDe(/insert into "evento"/)[0]!.params.at(-1)))).toMatchObject({ medio: "google" });
+    expect(base.actual.eventos()[0]!.contenido).toMatchObject({ medio: "google" });
   });
 
   it("A5: un correo que nadie autorizó no entra, y el error dice cuál es", async () => {

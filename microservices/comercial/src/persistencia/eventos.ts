@@ -1,22 +1,18 @@
-import { randomUUID } from "node:crypto";
-import { sql } from "kysely";
+import { bandejaDeAuditoria, type EventoDeAuditoria } from "auditoria-kit";
+import { config } from "../config.js";
+import { base } from "./conexion.js";
 import type { Ejecutor } from "./transaccion.js";
 
-// Registro de eventos de dominio (ADR-003). Es también la auditoría: quién, cuándo, desde dónde y
-// qué. Toda escritura de negocio pasa por acá. La hora es la de la base: los eventos de una misma
-// transacción comparten la hora de la transacción.
-export type Evento = {
-  tipo: string;
-  contenido: Record<string, unknown>;
-  usuarioId: string | null;
-  dispositivoId?: string | null;
-  version?: number;
-};
+// La bandeja de auditoría de Comercial (specs/027, decisión 167): cada acción deja su evento en la
+// propia base, en la transacción de la acción, y el kit lo entrega a Auditoría. Sin AUDITORIA_URL
+// no anota ni manda.
+export const bandeja = bandejaDeAuditoria({ base, conexion: config.databaseUrl, servicio: "comercial", auditoria: config.auditoriaUrl, token: config.tokenServicio });
 
-export async function anotarEvento(e: Ejecutor, evento: Evento): Promise<string> {
-  const id = randomUUID();
-  await e.insertInto("evento").values({
-    id, tipo: evento.tipo, version: evento.version ?? 1, fecha: sql`now()`, dispositivo_id: evento.dispositivoId ?? null, usuario_id: evento.usuarioId, contenido: JSON.stringify(evento.contenido),
-  }).execute();
-  return id;
+export const anotar = (e: Ejecutor, evento: EventoDeAuditoria) => bandeja.anotar(e, evento);
+
+// Cómo se llama cada persona en este momento: el evento guarda el nombre de entonces.
+export async function nombres(e: Ejecutor, ids: string[]): Promise<Map<string, string>> {
+  if (ids.length === 0) return new Map();
+  const filas = await e.selectFrom("usuario").select(["id", "nombre"]).where("id", "in", ids).execute();
+  return new Map(filas.map((f) => [f.id, f.nombre]));
 }

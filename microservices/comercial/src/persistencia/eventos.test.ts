@@ -1,30 +1,27 @@
-import { describe, expect, it } from "vitest";
+import { sql } from "kysely";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { base } from "./conexion.js";
-import { anotarEvento } from "./eventos.js";
-import { enTransaccion } from "./transaccion.js";
+import { anotar, bandeja, nombres } from "./eventos.js";
+import { Deshacer, enTransaccion } from "./transaccion.js";
 import { usuario } from "./pruebas/datos.js";
 
-// Cada acción queda con quién la hizo (constitución, principio V).
-describe("los eventos", () => {
-  it("anota el tipo, quién, desde dónde, la versión y el contenido", async () => {
-    const quien = await usuario();
-    const id = await anotarEvento(base, { tipo: "prueba.hecha", usuarioId: quien, dispositivoId: "celular-1", version: 2, contenido: { a: 1 } });
-    const fila = await base.selectFrom("evento").selectAll().where("id", "=", id).executeTakeFirstOrThrow();
-    expect(fila).toMatchObject({ tipo: "prueba.hecha", usuario_id: quien, dispositivo_id: "celular-1", version: 2, contenido: { a: 1 } });
+const evento = { tipo: "prueba.hecha", titulo: "Prueba", grupo: "Pruebas", importancia: "normal" as const };
+const enLaBandeja = () => sql<{ evento: { tipo: string; servicio: string } }>`SELECT evento FROM auditoria_bandeja WHERE evento->>'tipo' LIKE 'prueba.%'`.execute(base).then((r) => r.rows.map((f) => f.evento));
+
+// Cada acción deja su evento en la bandeja, en su transacción (specs/027, 027-E05).
+describe("los eventos de Comercial", () => {
+  beforeAll(() => bandeja.iniciar());
+  afterAll(() => bandeja.parar());
+
+  it("027-E05: el evento queda en la bandeja con la acción, y se va si la acción se deshace", async () => {
+    await enTransaccion(async (trx) => { await anotar(trx, { ...evento, tipo: "prueba.deshecha" }); throw new Deshacer(null); });
+    await anotar(base, evento);
+    expect(await enLaBandeja()).toEqual([expect.objectContaining({ tipo: "prueba.hecha", servicio: "comercial" })]);
   });
 
-  it("sin dispositivo ni versión, va sin dispositivo y en la versión 1", async () => {
-    const id = await anotarEvento(base, { tipo: "prueba.sola", usuarioId: null, contenido: {} });
-    expect(await base.selectFrom("evento").select(["dispositivo_id", "version"]).where("id", "=", id).executeTakeFirstOrThrow()).toEqual({ dispositivo_id: null, version: 1 });
-  });
-
-  it("la hora es la de la base: los eventos de una transacción comparten la hora de la transacción", async () => {
-    const ids = await enTransaccion(async (trx) => {
-      const primero = await anotarEvento(trx, { tipo: "prueba.uno", usuarioId: null, contenido: {} });
-      await new Promise((listo) => setTimeout(listo, 20));
-      return [primero, await anotarEvento(trx, { tipo: "prueba.dos", usuarioId: null, contenido: {} })];
-    });
-    const fechas = await base.selectFrom("evento").select("fecha").where("id", "in", ids).execute();
-    expect(new Set(fechas.map((f) => f.fecha.getTime())).size).toBe(1);
+  it("el nombre de cada persona, en este momento", async () => {
+    const ana = await usuario({ nombre: "Ana" });
+    expect(await nombres(base, [ana, crypto.randomUUID()])).toEqual(new Map([[ana, "Ana"]]));
+    expect(await nombres(base, [])).toEqual(new Map());
   });
 });

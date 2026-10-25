@@ -76,17 +76,17 @@ export const unidos = () => sql<{ absorbido_id: string; absorbido: string; conse
 export const reemplazoDe = (e: Ejecutor, id: string) =>
   sql<{ reemplazado_por: string | null }>`SELECT reemplazado_por FROM producto WHERE id = ${id} FOR UPDATE`.execute(e).then((r) => r.rows[0]?.reemplazado_por ?? null);
 
-// El registro de la última unión de un producto (el evento `producto.unido`).
+// El registro de la última unión de un producto: con quién y qué se movió.
 export const ultimaUnion = (e: Ejecutor, absorbido: string) =>
-  sql<{ contenido: Movidos & { conservar: string } }>`SELECT contenido FROM evento WHERE tipo = 'producto.unido' AND contenido->>'absorber' = ${absorbido} ORDER BY fecha DESC LIMIT 1`
-    .execute(e).then((r) => r.rows[0]?.contenido);
+  sql<{ conservar: string; registro: Movidos }>`SELECT conservar, registro FROM union_de_productos WHERE absorbido = ${absorbido} ORDER BY hecha_en DESC LIMIT 1`
+    .execute(e).then((r) => r.rows[0] && { ...r.rows[0].registro, conservar: r.rows[0].conservar });
 
 // Unir: `conservar` sigue existiendo; `absorber` queda inactivo y todo lo suyo (precios,
 // ventas, compras, stock, conteos, consultas) pasa a `conservar`. El proveedor preferido
 // pasa a ser el más barato con lista reciente, salvo que ya estuviera fijado a mano.
 //
-// Devuelve exactamente qué se movió, y eso va al evento `producto.unido`: con ese registro
-// la unión se puede deshacer (`separarProductos`) sin adivinar qué era de quién.
+// Anota exactamente qué se movió en `union_de_productos`: con ese registro la unión se puede
+// deshacer (`separarProductos`) sin adivinar qué era de quién.
 const TABLAS_MOVIBLES = ["precio_proveedor", "item_venta", "item_compra", "movimiento_stock", "consulta", "renglon_conteo"] as const;
 type AntesDelConservado = { codigo_barras: string | null; codigo_leido_en: string | null; marca: string | null; sector_id: string | null; margen_elegido: number | null; proveedor_preferido_id: string | null };
 export type Movidos = {
@@ -118,7 +118,9 @@ export async function unirProductos(e: Ejecutor, conservar: string, absorber: st
   await sql`UPDATE producto SET activo = false, reemplazado_por = ${conservar} WHERE id = ${absorber}`.execute(e);
   await sql`UPDATE equivalencia_sugerida SET estado = 'rechazada', resuelto_en = now() WHERE estado = 'pendiente' AND (producto_a = ${absorber} OR producto_b = ${absorber})`.execute(e);
   await elegirPreferidoMasBarato(e, conservar);
-  return { movidos, renglones_borrados: borrados.rows, conservado_antes, absorbido_antes: { proveedor_preferido_id: absorbido.proveedor_preferido_id } };
+  const registro: Movidos = { movidos, renglones_borrados: borrados.rows, conservado_antes, absorbido_antes: { proveedor_preferido_id: absorbido.proveedor_preferido_id } };
+  await sql`INSERT INTO union_de_productos (id, conservar, absorbido, registro) VALUES (${randomUUID()}, ${conservar}, ${absorber}, ${JSON.stringify(registro)})`.execute(e);
+  return registro;
 }
 
 // Deshacer una unión: cada precio, venta, compra, movimiento, consulta y renglón vuelve al

@@ -29,7 +29,7 @@ describe("usuarios", () => {
     expect(r.status).toBe(201);
     expect(base.actual.sqlDe(/INSERT INTO usuario \(/)[0]!.params.slice(1)).toEqual(["nueva@gmail.com", "Nueva"]);
     expect(base.actual.sqlDe(/INSERT INTO usuario_rol/)[0]!.params[1]).toEqual([VENDEDOR, ADMINISTRADOR]);
-    expect(base.actual.sqlDe(/insert into "evento"/)[0]!.params[1]).toBe("usuario.creado");
+    expect(base.actual.eventos()[0]!.tipo).toBe("usuario.creado");
   });
 
   it("sin correo válido, sin nombre, sin ningún rol o con un rol que no existe, no se guarda", async () => {

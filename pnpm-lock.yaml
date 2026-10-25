@@ -94,6 +94,9 @@ importers:
       '@simplewebauthn/server':
         specifier: ^13.3.3
         version: 13.3.3
+      auditoria-kit:
+        specifier: workspace:*
+        version: link:../auditoria-kit
       conexion-entre-dispositivos:
         specifier: workspace:*
         version: link:../conexion

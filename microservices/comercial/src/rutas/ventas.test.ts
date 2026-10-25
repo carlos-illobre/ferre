@@ -51,7 +51,7 @@ describe("POST /ventas", () => {
     const anomalia = base.actual.sqlDe(/insert into "anomalia"/)[0]!;
     expect(anomalia.params.slice(1, 5)).toEqual(["p1", "u-mostrador", venta.id, 3]);
     expect(String(anomalia.params[5])).toContain("faltaban 3 un.");
-    expect(JSON.stringify(base.actual.sqlDe(/insert into "evento"/)[0]?.params ?? "")).toContain("anomalias");
+    expect(base.actual.eventos()[0]!.contenido).toHaveProperty("anomalias");
   });
 
   it("si alcanza solo en parte, descuenta lo que hay y anota lo que faltó; un stock ya negativo no baja más", async () => {

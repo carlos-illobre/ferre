@@ -9,7 +9,7 @@ const { leerTiempos, ponerParaPrueba, segundosDeSesion } = await import("../sist
 // Más → Sistema (specs/020): lo que vale para todos, que fija quien administra el sistema.
 type Ajustes = { sesion_segundos: number; vinculo_dias: number; tramos: { sesion_segundos: number[] } };
 const guardados = () => base.actual.sqlDe(/INSERT INTO configuracion/).map((c) => c.params);
-const eventos = () => base.actual.sqlDe(/insert into "evento"/);
+const eventos = () => base.actual.eventos();
 
 describe("los ajustes del sistema", () => {
   beforeEach(() => {
@@ -40,8 +40,9 @@ describe("los ajustes del sistema", () => {
     expect(guardados()).toEqual([["sesion.recordar_segundos", "300"]]);
     expect(segundosDeSesion()).toBe(300);
     const [evento] = eventos();
-    expect(evento!.params).toContain("sistema.ajustes_cambiados");
-    expect(JSON.parse(String(evento!.params.find((p) => String(p).includes("despues"))))).toEqual({ antes: { sesion_segundos: 60 }, despues: { sesion_segundos: 300 } });
+    expect(evento!.tipo).toBe("sistema.ajustes_cambiados");
+    expect(evento!.contenido).toEqual({ antes: { sesion_segundos: 60 }, despues: { sesion_segundos: 300 } });
+    expect(evento!.detalle).toBe("Sesión recordada: de 1 min a 5 min");
   });
 
   it("020-E14: los días del vínculo se guardan en el mismo lugar que antes", async () => {

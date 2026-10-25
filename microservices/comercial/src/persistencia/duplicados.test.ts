@@ -2,7 +2,6 @@ import { sql } from "kysely";
 import { describe, expect, it } from "vitest";
 import { base } from "./conexion.js";
 import * as datos from "./duplicados.js";
-import { anotarEvento } from "./eventos.js";
 import { conteo, movimiento, precio, producto, proveedor, renglon, sector, usuario, venta } from "./pruebas/datos.js";
 import { enTransaccion } from "./transaccion.js";
 
@@ -64,6 +63,7 @@ describe("los duplicados", () => {
     ]).execute();
     await base.insertInto("equivalencia_sugerida").values({ id: crypto.randomUUID(), producto_a: absorber < conservar ? absorber : conservar, producto_b: absorber < conservar ? conservar : absorber, motivo: "descripcion" }).execute();
 
+    expect(await datos.ultimaUnion(base, absorber)).toBeUndefined();
     const registro = await enTransaccion((trx) => datos.unirProductos(trx, conservar, absorber));
     expect(registro.movidos).toMatchObject({ precio_proveedor: [barato], item_venta: [item], movimiento_stock: [mov], item_compra: [], consulta: [] });
     expect(registro.renglones_borrados).toHaveLength(1);
@@ -77,9 +77,9 @@ describe("los duplicados", () => {
     expect((await datos.unidos()).find((u) => u.absorbido_id === absorber)).toMatchObject({ conservado: "Conservado" });
     expect((await datos.pendientes()).some((x) => x.producto_a === absorber || x.producto_b === absorber)).toBe(false);
 
-    expect(await datos.ultimaUnion(base, absorber)).toBeUndefined();
-    await anotarEvento(base, { tipo: "producto.unido", usuarioId: ana, contenido: { conservar, absorber, ...registro } });
+    // La unión queda en su tabla, con lo que se movió: con eso se separa.
     const guardado = (await datos.ultimaUnion(base, absorber))!;
+    expect(guardado).toEqual(JSON.parse(JSON.stringify({ ...registro, conservar })));
     await enTransaccion((trx) => datos.separarProductos(trx, conservar, absorber, guardado));
     expect(await datos.reemplazoDe(base, absorber)).toBeNull();
     expect((await base.selectFrom("precio_proveedor").select("producto_id").where("id", "=", barato).executeTakeFirstOrThrow()).producto_id).toBe(absorber);

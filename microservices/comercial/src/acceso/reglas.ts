@@ -5,7 +5,7 @@ import {
 } from "@simplewebauthn/server";
 import { config } from "../config.js";
 import { base } from "../persistencia/conexion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import * as datos from "../persistencia/acceso.js";
 import { guardar } from "../persistencia/sistema.js";
 import { crearSesion, generarToken, revocarSesion, usuarioConPermisos, type SesionActiva } from "./sesiones.js";

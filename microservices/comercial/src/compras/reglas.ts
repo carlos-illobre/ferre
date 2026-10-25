@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { base } from "../persistencia/conexion.js";
 import { Deshacer, enTransaccion } from "../persistencia/transaccion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import * as datos from "../persistencia/compras.js";
 import type { z } from "zod";
 import type { CompraRegistrada, CompraReciente, CompraRepetida, FotoDeComprobante, GastosDeLaSemana, RenglonDeCompra } from "../contratos/compras.js";

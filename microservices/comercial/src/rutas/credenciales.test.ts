@@ -35,7 +35,7 @@ describe("passkeys", () => {
     expect(verificar.registro.mock.calls[0]![0]).toMatchObject({ expectedOrigin: "http://web.prueba", expectedRPID: "web.prueba", requireUserVerification: true });
     const insert = base.actual.sqlDe(/INSERT INTO credencial/)[0]!;
     expect(insert.params).toEqual(["cred-1", "u-mostrador", clave, 0, ["internal"], "Celular de Carlos"]);
-    expect(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params[1]).toBe("credencial.vinculada");
+    expect(base.actual.eventos().at(-1)!.tipo).toBe("credencial.vinculada");
     // el mismo desafío no sirve dos veces, ni sin sesión
     expect((await pedir(app, "POST", "/credenciales/registro", { rol: "mostrador", cuerpo: { desafioId, respuesta: { id: "cred-1" } } })).status).toBe(400);
     expect((await pedir(app, "POST", "/credenciales/registro/opciones", { rol: null, cuerpo: {} })).status).toBe(401);
@@ -63,7 +63,7 @@ describe("passkeys", () => {
     expect(verificar.login.mock.calls[0]![0]).toMatchObject({ credential: { id: "cred-1", counter: 3 }, requireUserVerification: true });
     expect(base.actual.sqlDe(/UPDATE credencial SET contador/)[0]!.params).toEqual([4, "cred-1"]);
     expect(base.actual.sqlDe(/INSERT INTO sesion/)).toHaveLength(1);
-    expect(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params[1]).toBe("sesion.iniciada");
+    expect(base.actual.eventos().at(-1)!.tipo).toBe("sesion.iniciada");
     // desconocido
     const { desafioId: d2 } = (await (await pedir(app, "POST", "/credenciales/login/opciones", { rol: null, cuerpo: {} })).json()) as { desafioId: string };
     const r2 = await pedir(app, "POST", "/credenciales/login", { rol: null, cuerpo: { desafioId: d2, respuesta: { id: "otra" } } });

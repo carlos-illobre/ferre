@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { base } from "../persistencia/conexion.js";
 import { Deshacer, enTransaccion, type Ejecutor } from "../persistencia/transaccion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import type { z } from "zod";
 import type { cambiosDeRol, cambiosDeUsuario, rolNuevo, usuarioNuevo } from "./esquemas.js";
 import * as datos from "../persistencia/administracion.js";

@@ -39,7 +39,7 @@ describe("tickets", () => {
     expect(base.actual.sqlDe(/insert into "ticket_foto"/)).toHaveLength(2);
     expect(escritos).toHaveLength(2);
     expect(escritos[0]).toMatch(/tickets\/[0-9a-f-]{36}\.png\.nuevo$/); // se escribe al lado y se renombra
-    expect(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params[1]).toBe("ticket.creado");
+    expect(base.actual.eventos().at(-1)!.tipo).toBe("ticket.creado");
   });
 
   it("un reenvío del mismo ticket no lo duplica ni vuelve a guardar las fotos", async () => {

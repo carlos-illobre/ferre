@@ -3,7 +3,7 @@ import path from "node:path";
 import { config } from "../config.js";
 import * as archivos from "../persistencia/archivos.js";
 import { base } from "../persistencia/conexion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import { sugerirEquivalencias } from "../persistencia/duplicados.js";
 import * as datos from "../persistencia/listas.js";
 import type { EstadoDeLista, FilasDeLista, ListaAplicandose, ListaCargada, ListaEnHistorial, OrigenDeLista } from "../contratos/listas.js";

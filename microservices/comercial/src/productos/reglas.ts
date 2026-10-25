@@ -1,6 +1,6 @@
 import { base } from "../persistencia/conexion.js";
 import { productosConStock, stockDeProductos } from "../persistencia/deposito.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import { preciosDeUnProducto, VERSION_DE_PRECIOS } from "../precios.js";
 import * as copia from "./copia.js";
 import * as datos from "../persistencia/productos.js";

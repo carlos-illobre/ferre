@@ -35,7 +35,7 @@ describe("POST /ventas/:id/cambio", () => {
     const movs = base.actual.sqlDe(/insert into "movimiento_stock"/).map((c) => c.params);
     expect(movs).toEqual(expect.arrayContaining([expect.arrayContaining(["pinza", "cambio", 1]), expect.arrayContaining(["pinza-punta", "cambio", -1])]));
     expect(base.actual.sqlDe(/insert into "movimiento_dinero"/)[0]!.params).toEqual(expect.arrayContaining(["cobro_diferencia", "mercado_pago", "4000.00"]));
-    expect(base.actual.sqlDe(/insert into "evento"/)[0]!.params).toEqual(expect.arrayContaining(["venta.cambio"]));
+    expect(base.actual.eventos()[0]!.tipo).toBe("venta.cambio");
     // La venta original no cambia.
     expect(base.actual.sqlDe(/update "venta"/)).toHaveLength(0);
   });

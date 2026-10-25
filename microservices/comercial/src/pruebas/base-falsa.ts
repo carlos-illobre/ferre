@@ -9,6 +9,7 @@ import { PERMISOS } from "../permisos.js";
 // contesta con lo que la prueba programó (por expresión regular sobre el SQL). Lo que no
 // se programó devuelve cero filas. La sesión del que llama se contesta acá también.
 export type Consulta = { sql: string; params: unknown[] };
+export type EventoAnotado = { tipo: string; titulo: string; detalle: string | null; grupo: string; importancia: string; quien: { id: string; nombre: string } | null; dispositivo: string | null; contenido: Record<string, unknown> };
 export type Respuesta = { rows?: Record<string, unknown>[]; rowCount?: number } | ((params: unknown[]) => { rows?: Record<string, unknown>[]; rowCount?: number });
 
 // Usuarios de prueba. «dueño» y «admin» pueden todo; «mostrador» todo menos administrar; y
@@ -66,6 +67,8 @@ export function baseFalsa() {
     programar: (patron: RegExp, respuesta: Respuesta) => { programadas.unshift({ patron, respuesta }); },
     fijarSesion: (fila: Record<string, unknown> | null) => { sesionFija = fila; },
     sqlDe: (patron: RegExp) => consultas.filter((c) => patron.test(c.sql)),
+    // Los eventos que quedaron en la bandeja de auditoría (specs/027), como se van a mandar.
+    eventos: () => consultas.filter((c) => /INSERT INTO auditoria_bandeja/.test(c.sql)).map((c) => JSON.parse(String(c.params[1])) as EventoAnotado),
     limpiar: () => { consultas.length = 0; programadas.length = 0; },
   };
 }

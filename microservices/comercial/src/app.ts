@@ -6,7 +6,6 @@ import { baseResponde } from "./persistencia/conexion.js";
 import { iniciada as copiaIniciada, ponerAlDia } from "./productos/copia.js";
 import { sesiones } from "./rutas/sesiones.js";
 import { usuarios } from "./rutas/usuarios.js";
-import { auditoria } from "./rutas/auditoria.js";
 import { proveedores } from "./rutas/proveedores.js";
 import { listas } from "./rutas/listas.js";
 import { fotos, productos } from "./rutas/productos.js";
@@ -60,7 +59,6 @@ app.use("/*", async (c, next) => {
 
 app.route("/sesiones", sesiones);
 app.route("/usuarios", usuarios);
-app.route("/auditoria", auditoria);
 app.route("/proveedores", proveedores);
 app.route("/listas", listas);
 app.route("/productos", productos);

@@ -1,6 +1,6 @@
 import type { z } from "zod";
 import { base } from "../persistencia/conexion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import { diasDeVinculo } from "../acceso/vinculo.js";
 import { olvidarSesiones } from "../acceso/sesiones.js";
 import { guardar } from "../persistencia/sistema.js";

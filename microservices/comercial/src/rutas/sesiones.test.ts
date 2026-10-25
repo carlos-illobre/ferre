@@ -77,9 +77,9 @@ describe("entrar a la computadora con el celular", () => {
     expect(retiro.sql).toMatch(/clave_hash = \$2 AND aprobada_en IS NOT NULL AND retirada_en IS NULL/);
     expect(retiro.params).toEqual(["v1", hashear("la-clave")]);
     expect(base.actual.sqlDe(/INSERT INTO sesion/).at(-1)!.params[1]).toBe("u-cajero");
-    const evento = base.actual.sqlDe(/insert into "evento"/).at(-1)!.params;
-    expect(JSON.stringify(evento)).toContain("sesion.iniciada");
-    expect(JSON.stringify(evento)).toContain("celular");
+    const evento = base.actual.eventos().at(-1)!;
+    expect(evento.tipo).toBe("sesion.iniciada");
+    expect(evento.contenido.medio).toBe("celular");
   });
 
   it("el celular que la dejó entrar queda emparejado con la computadora, y el anterior de cualquiera de los dos se suelta (decisión 58)", async () => {

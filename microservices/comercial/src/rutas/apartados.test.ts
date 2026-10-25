@@ -102,11 +102,11 @@ describe("Para revisar: listar, aceptar y descartar", () => {
     const venta = base.actual.sqlDe(/insert into "venta"/)[0]!;
     expect(venta.params).toEqual(expect.arrayContaining([VENTA.id, VENTA.fecha]));
     // La venta queda a nombre de Ana: el evento de la venta es suyo.
-    const eventos = base.actual.sqlDe(/insert into "evento"/);
-    expect(eventos.some((e) => e.params.includes(ANA) && String(e.params.find((p) => typeof p === "string" && p.startsWith("venta"))).startsWith("venta"))).toBe(true);
+    const eventos = base.actual.eventos();
+    expect(eventos.some((e) => e.quien?.id === ANA && e.tipo.startsWith("venta"))).toBe(true);
     // Y la decisión, a nombre de quien aceptó.
     expect(base.actual.sqlDe(/update "cambio_apartado" set "decision"/)[0]!.params).toEqual(expect.arrayContaining(["aceptado", "u-admin"]));
-    expect(eventos.some((e) => e.params.includes("apartado.aceptado") && e.params.includes("u-admin"))).toBe(true);
+    expect(eventos.some((e) => e.tipo === "apartado.aceptado" && e.quien?.id === "u-admin")).toBe(true);
     // El cambio se bloquea mientras se decide.
     expect(base.actual.sqlDe(/from "cambio_apartado" as "a" left join "usuario" as "d"/)[0]!.sql).toMatch(/for update of "a"/);
   });
@@ -117,7 +117,7 @@ describe("Para revisar: listar, aceptar y descartar", () => {
     expect(r.status).toBe(200);
     expect(base.actual.sqlDe(/insert into "venta"/)).toHaveLength(0);
     expect(base.actual.sqlDe(/update "cambio_apartado" set "decision"/)[0]!.params).toEqual(expect.arrayContaining(["descartado", "u-admin"]));
-    expect(base.actual.sqlDe(/insert into "evento"/).some((e) => e.params.includes("apartado.descartado"))).toBe(true);
+    expect(base.actual.eventos().some((e) => e.tipo === "apartado.descartado")).toBe(true);
   });
 
   it("014-E01: la sesión cerrada sirve para subir hasta 30 días después de cerrada", async () => {

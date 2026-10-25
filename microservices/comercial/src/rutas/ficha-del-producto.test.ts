@@ -17,7 +17,7 @@ describe("la última lectura del código (RF-112)", () => {
     const update = base.actual.sqlDe(/UPDATE producto SET/).at(-1)!;
     expect(update.sql).toMatch(/codigo_barras = \$1, codigo_leido_en = \$2/);
     expect(update.params).toEqual(["7791234000004", "2026-10-13T13:24:00.000Z", "p1"]);
-    expect(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params.join(" ")).toContain("2026-10-13T13:24:00.000Z");
+    expect(JSON.stringify(base.actual.eventos().at(-1)!.contenido)).toContain("2026-10-13T13:24:00.000Z");
   });
 
   it("016-E09: sin hora, o con una en el futuro o anterior al sistema, vale la del servidor", () => {

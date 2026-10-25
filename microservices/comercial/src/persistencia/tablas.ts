@@ -216,17 +216,6 @@ export interface EquivalenciaSugerida {
   resuelto_por: string | null;
 }
 
-export interface Evento {
-  contenido: Json;
-  creado_en: Generated<Timestamp>;
-  dispositivo_id: string | null;
-  fecha: Timestamp;
-  id: string;
-  tipo: string;
-  usuario_id: string | null;
-  version: Generated<number>;
-}
-
 export interface FotoComprobante {
   archivo: string;
   compra_id: string | null;
@@ -450,6 +439,14 @@ export interface TicketFoto {
   ticket_id: string;
 }
 
+export interface UnionDeProductos {
+  absorbido: string;
+  conservar: string;
+  hecha_en: Generated<Timestamp>;
+  id: string;
+  registro: Json;
+}
+
 export interface Usuario {
   activo: Generated<boolean>;
   creado_en: Generated<Timestamp>;
@@ -507,7 +504,6 @@ export interface DB {
   correccion_venta: CorreccionVenta;
   credencial: Credencial;
   equivalencia_sugerida: EquivalenciaSugerida;
-  evento: Evento;
   foto_comprobante: FotoComprobante;
   item_compra: ItemCompra;
   item_pedido: ItemPedido;
@@ -527,6 +523,7 @@ export interface DB {
   sesion: Sesion;
   ticket: Ticket;
   ticket_foto: TicketFoto;
+  union_de_productos: UnionDeProductos;
   usuario: Usuario;
   usuario_rol: UsuarioRol;
   venta: Venta;

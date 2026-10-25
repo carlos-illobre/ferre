@@ -72,7 +72,7 @@ describe("emparejamiento", () => {
     base.actual.programar(/UPDATE puesto SET expira_en = now\(\) WHERE id = \$1/, { rowCount: 1 });
     expect((await pedir(app, "DELETE", "/puestos/p1", { rol: "mostrador" })).status).toBe(204);
     expect(base.actual.sqlDe(/UPDATE puesto SET expira_en = now\(\) WHERE id = \$1/)[0]!.params).toEqual(["p1", "sesion-mostrador", "sesion-mostrador"]);
-    expect(JSON.stringify(base.actual.sqlDe(/insert into "evento"/).at(-1)!.params)).toContain("puesto.desvinculado");
+    expect(base.actual.eventos().at(-1)!.tipo).toBe("puesto.desvinculado");
   });
 
   // Decisión 60: el espejo.

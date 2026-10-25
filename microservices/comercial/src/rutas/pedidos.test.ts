@@ -10,7 +10,7 @@ const PROVEEDOR = "0b0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c11";
 const MECHA = "1c0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c21";
 const DISCO = "2d0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c31";
 const borrador = (cambios: Record<string, unknown> = {}) => ({ proveedor_id: PROVEEDOR, items: [{ producto_id: MECHA, cantidad: 24 }, { producto_id: DISCO, cantidad: 7.5 }], ...cambios });
-const tipos = () => base.actual.sqlDe(/insert into "?evento/i).map((c) => c.params.find((p) => typeof p === "string" && p.startsWith("pedido."))).filter(Boolean);
+const tipos = () => base.actual.eventos().map((e) => e.tipo).filter((t) => t.startsWith("pedido."));
 
 // Pedidos a proveedores (RF-55, decisión 52).
 describe("pedidos a proveedores", () => {

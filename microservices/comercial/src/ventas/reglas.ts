@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { base } from "../persistencia/conexion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import { subtotalDeRenglon } from "../precios.js";
 import type { VentaDelDia, VentasDelDia } from "../contratos/ventas.js";
 import * as datos from "../persistencia/ventas.js";

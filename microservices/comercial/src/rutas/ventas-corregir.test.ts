@@ -40,7 +40,7 @@ describe("POST /ventas/:id/corregir", () => {
     const plata = base.actual.sqlDe(/insert into "movimiento_dinero"/)[0]!.params;
     expect(plata).toEqual(expect.arrayContaining(["devolucion", "efectivo", "-3000.00"]));
     expect(base.actual.sqlDe(/update "venta" set "total" = \$1/)[0]!.params[0]).toBe("17000.00");
-    expect(base.actual.sqlDe(/insert into "evento"/)[0]!.params).toEqual(expect.arrayContaining(["venta.corregida"]));
+    expect(base.actual.eventos()[0]!.tipo).toBe("venta.corregida");
   });
 
   it("019-E02 019-E03 019-E29: un precio a mano más alto se cobra tal cual con el medio elegido", async () => {

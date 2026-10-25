@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { base } from "../persistencia/conexion.js";
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import * as datos from "../persistencia/catalogo.js";
 import type { z } from "zod";
 import type { Proveedor } from "../contratos/proveedores.js";

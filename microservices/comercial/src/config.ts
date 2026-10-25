@@ -23,4 +23,7 @@ export const config = {
   carpetaListas: obligatoria("CARPETA_LISTAS"),
   // Qué versión corre (la imagen); la salud la dice. No cambia el comportamiento.
   version: obligatoria("VERSION"),
+  // Dónde está Auditoría (specs/027). Es la única que puede faltar, a propósito: sin ella, Comercial
+  // funciona igual y no manda sus eventos (decisión 167).
+  auditoriaUrl: process.env.AUDITORIA_URL || undefined,
 };

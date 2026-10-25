@@ -1,4 +1,4 @@
-import { anotarEvento } from "../persistencia/eventos.js";
+import { anotarEvento } from "../eventos/anotar.js";
 import { Deshacer, enTransaccion } from "../persistencia/transaccion.js";
 import { base } from "../persistencia/conexion.js";
 import * as datos from "../persistencia/duplicados.js";
@@ -31,9 +31,9 @@ export function resolver(id: string, accion: "unir" | "rechazar", lado: "a" | "b
     if (accion === "unir") {
       const conservar = lado === "b" ? sugerencia.producto_b : sugerencia.producto_a;
       const absorber = conservar === sugerencia.producto_a ? sugerencia.producto_b : sugerencia.producto_a;
-      const registro = await datos.unirProductos(trx, conservar, absorber);
+      await datos.unirProductos(trx, conservar, absorber);
       await datos.resolverSugerencia(trx, id, "unida", usuarioId);
-      await anotarEvento(trx, { tipo: "producto.unido", usuarioId, contenido: { conservar, absorber, sugerencia: id, ...registro } });
+      await anotarEvento(trx, { tipo: "producto.unido", usuarioId, contenido: { conservar, absorber, sugerencia: id } });
     } else {
       await datos.resolverSugerencia(trx, id, "rechazada", usuarioId);
       await anotarEvento(trx, { tipo: "equivalencia.rechazada", usuarioId, contenido: { sugerencia: id } });
@@ -47,8 +47,8 @@ export function resolver(id: string, accion: "unir" | "rechazar", lado: "a" | "b
 export function unirAMano(conservar: string, absorber: string, usuarioId: string): Promise<Resultado> {
   return enTransaccion(async (trx) => {
     if ((await datos.activos(trx, conservar, absorber)) !== 2) throw new Deshacer(mal(404, "Alguno de los productos no existe o ya fue unido"));
-    const registro = await datos.unirProductos(trx, conservar, absorber);
-    await anotarEvento(trx, { tipo: "producto.unido", usuarioId, contenido: { conservar, absorber, manual: true, ...registro } });
+    await datos.unirProductos(trx, conservar, absorber);
+    await anotarEvento(trx, { tipo: "producto.unido", usuarioId, contenido: { conservar, absorber, manual: true } });
     return { ok: true } as Resultado;
   });
 }
@@ -56,13 +56,13 @@ export function unirAMano(conservar: string, absorber: string, usuarioId: string
 // Las uniones hechas, mientras el absorbido siga dentro del conservado: se pueden separar.
 export const unidos = (): Promise<Enviable<Union>[]> => datos.unidos();
 
-// Deshacer una unión a partir del registro de lo que se movió (evento producto.unido).
+// Deshacer una unión a partir del registro de lo que se movió (su tabla, union_de_productos).
 export function separar(absorbido: string, usuarioId: string): Promise<Resultado> {
   return enTransaccion(async (trx) => {
     const conservar = await datos.reemplazoDe(trx, absorbido);
     if (!conservar) throw new Deshacer(mal(409, "Ese producto no está unido a otro"));
     const registro = await datos.ultimaUnion(trx, absorbido);
-    if (!registro || registro.conservar !== conservar || !registro.movidos) throw new Deshacer(mal(409, "No hay registro de esa unión: no se puede separar sola"));
+    if (!registro || registro.conservar !== conservar) throw new Deshacer(mal(409, "No hay registro de esa unión: no se puede separar sola"));
     await datos.separarProductos(trx, conservar, absorbido, registro);
     await anotarEvento(trx, { tipo: "producto.separado", usuarioId, contenido: { conservar, absorbido } });
     return { ok: true } as Resultado;
