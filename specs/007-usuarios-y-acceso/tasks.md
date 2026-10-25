@@ -61,3 +61,4 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T050 [ajuste] Entrada de la computadora: «La forma más rápida» a la derecha del título
 - [x] T051 [ajuste] Entrada de la computadora: «Una vez dentro, resiste cortes de internet» y «Busca productos por código de barras», con el ícono arriba para que entren
 - [x] T052 [ajuste] Entrada de la computadora: «La forma más rápida» va contra el borde derecho de la tarjeta, separada del título
+- [x] T053 [regla] El dispositivo al que le cierran la sesión a distancia o desactivan a su usuario ya no pregunta cada 30 segundos: vuelve a la entrada en cuanto se lo usa, se vuelve a la aplicación o recupera la conexión (decisión 158; RF-74, pedido de Carlos del 2026-10-25)

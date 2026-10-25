@@ -6,7 +6,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 // contesta 401 y la aplicación borra la sesión y vuelve sola a la entrada. Se simula el servidor
 // (fetch); la sesión y el cliente son los de verdad. Casos D4 a D6 de docs/pruebas-manuales/entrar.md.
 vi.unmock("./index"); // la preparación reemplaza la sesión por su index
-const { ProveedorDeSesion, useSesion, CONTROL_DE_SESION_MS } = await import("./sesion");
+const { ProveedorDeSesion, useSesion } = await import("./sesion");
 const { api } = await import("../conexion");
 const { agregarALaVenta, ventaActual } = await import("../../negocio/ventas/venta-en-curso");
 
@@ -48,19 +48,20 @@ describe("el servidor da por terminada la sesión", () => {
     expect(localStorage.getItem("ferre.sesion.prueba")).toBeNull();
   });
 
-  // Decisión 97 (historia 5, escenarios 4 y 4b): no hace falta que el dispositivo pida algo.
-  it("escenario 4: con la aplicación abierta y sin tocar nada, en menos de 30 segundos vuelve a la entrada", async () => {
+  // Decisión 158 (historia 5, escenario 4): sin timer; nadie pregunta mientras nadie la toca.
+  it("escenario 4: con la aplicación abierta y sin tocar nada, no pregunta: no hay timer", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {
-      servidor = async () => respuesta(200, { id: "s-1", usuario: CARLOS });
+      let preguntas = 0;
+      servidor = async () => { preguntas++; return respuesta(200, { id: "s-1", usuario: CARLOS }); };
       render(<ProveedorDeSesion><Estado /></ProveedorDeSesion>);
       await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("adentro"));
-      // La desactivaron (o le cerraron la sesión a distancia).
-      servidor = async () => respuesta(401, { error: "Hay que iniciar sesión" });
-      await act(async () => { await vi.advanceTimersByTimeAsync(CONTROL_DE_SESION_MS); });
-      await waitFor(() => expect(screen.getByTestId("estado").textContent).toBe("sin-sesion"));
-      expect(CONTROL_DE_SESION_MS).toBeLessThanOrEqual(30_000);
-      expect(localStorage.getItem("ferre.sesion.prueba")).toBeNull();
+      const alAbrir = preguntas;
+      servidor = async () => { preguntas++; return respuesta(401, { error: "Hay que iniciar sesión" }); };
+      await act(async () => { await vi.advanceTimersByTimeAsync(24 * 3_600_000); });
+      expect(preguntas).toBe(alAbrir);
+      expect(screen.getByTestId("estado").textContent).toBe("adentro");
+      expect(vi.getTimerCount()).toBe(0);
     } finally { vi.useRealTimers(); }
   });
 

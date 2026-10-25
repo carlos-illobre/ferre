@@ -739,7 +739,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
       para quien tiene «Ver las compras», aunque sumándolas se saquen los gastos de la semana.
 
 97. **Al desactivar a alguien o cerrarle una sesión a distancia, el dispositivo sale solo**
-    (2026-10-17). Carlos pidió que el usuario desactivado salga automáticamente:
+    (2026-10-17; los 30 segundos los sacó la decisión 158). Carlos pidió que el usuario desactivado salga automáticamente:
     - Con la aplicación abierta y conexión, el dispositivo vuelve a la entrada en menos de 30
       segundos, sin que nadie toque nada; si estaba en otra ventana, apenas vuelve. Sin conexión,
       al recuperarla. Antes salía recién en su próximo pedido al servidor.
@@ -1325,3 +1325,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      primer pedido que haga. Reemplaza a las decisiones 91 y 92; lo de la decisión 54 (recién
      abierta se actualiza sola; si no, el aviso) sigue igual. El control de la sesión cada 30
      segundos (RF-74) no es de esto y queda como está.
+
+158. **Sin timer para enterarse de una sesión cerrada** (2026-10-25). Carlos eligió sacar la
+     pregunta cada 30 segundos de la decisión 97. La sesión cerrada a distancia, o la de alguien
+     desactivado, sigue sin servir en el momento: el servidor rechaza cualquier pedido con ella.
+     El dispositivo vuelve a la entrada en su primer pedido, al volver a la aplicación o al
+     recuperar la conexión. Una pantalla abierta que nadie toca sigue mostrando lo que tenía
+     hasta que se la usa. Precisa la decisión 97; lo demás de ella (lo hecho sin conexión queda
+     apartado) sigue igual.

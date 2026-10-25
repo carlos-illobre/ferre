@@ -1,6 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-// Con la aplicación abierta se pregunta cada tanto si la sesión sigue valiendo (decisión 97).
-export const CONTROL_DE_SESION_MS = 30_000;
 // Quien dependa de la sesión para conectarse (el espejo con el celular) se entera al entrar.
 export const EVENTO_SESION_ABIERTA = "ferre:sesion-abierta";
 // Avisa que la persona ya no está: salió o se le cerró la sesión. Lo que es de ella (la venta a
@@ -48,11 +46,12 @@ export function ProveedorDeSesion({ children }: { children: ReactNode }) {
   const conSesion = sesion.estado === "con-sesion";
   useEffect(() => {
     if (!conSesion) return;
+    // Si la sesión sigue valiendo se pregunta al volver a la aplicación y al volver la conexión,
+    // sin timer (decisión 158): una cerrada a distancia también la rechaza el primer pedido.
     const controlar = () => { if (document.visibilityState !== "hidden") api<SesionActual>("/sesiones/actual").catch(() => undefined); };
-    const cada = setInterval(controlar, CONTROL_DE_SESION_MS);
     document.addEventListener("visibilitychange", controlar);
     window.addEventListener("online", controlar);
-    return () => { clearInterval(cada); document.removeEventListener("visibilitychange", controlar); window.removeEventListener("online", controlar); };
+    return () => { document.removeEventListener("visibilitychange", controlar); window.removeEventListener("online", controlar); };
   }, [conSesion]);
 
   const entrar = useCallback((token: string, usuario: Usuario) => {
