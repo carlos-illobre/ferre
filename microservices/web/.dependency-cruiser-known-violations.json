@@ -197,20 +197,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/pantallas/Anomalias.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/pantallas/Configuracion.tsx",
     "to": "src/datos/almacenamiento/index.ts",
     "unresolvedTo": "../../../datos/almacenamiento",
@@ -284,20 +270,6 @@
     "from": "src/pantallas/compu/App.tsx",
     "to": "src/datos/sesion/index.ts",
     "unresolvedTo": "../../datos/sesion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Anomalias.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../../datos/conexion",
     "dependencyTypes": [
       "local",
       "import"
@@ -757,20 +729,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/negocio/apartados.ts",
-    "to": "src/negocio/ventas/venta.ts",
-    "unresolvedTo": "./ventas/venta",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/negocio/compras.ts",
     "to": "src/negocio/deposito/inventario.ts",
     "unresolvedTo": "./deposito/inventario",
@@ -886,20 +844,6 @@
     "from": "src/pantallas/celular/Lector.tsx",
     "to": "src/plataforma/camara/Escaner.tsx",
     "unresolvedTo": "../../plataforma/camara/Escaner",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/pantallas/Anomalias.tsx",
-    "to": "src/negocio/ventas/venta.ts",
-    "unresolvedTo": "../../../negocio/ventas/venta",
     "dependencyTypes": [
       "local",
       "import"
@@ -1040,34 +984,6 @@
     "from": "src/pantallas/compu/App.tsx",
     "to": "src/plataforma/teclado/teclas.ts",
     "unresolvedTo": "../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Anomalias.tsx",
-    "to": "src/negocio/ventas/venta.ts",
-    "unresolvedTo": "../../../../negocio/ventas/venta",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/compu/base/pantallas/Anomalias.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../../../plataforma/teclado/teclas",
     "dependencyTypes": [
       "local",
       "import"

@@ -11,8 +11,8 @@ import { consultas } from "../datos/conexion";
 import { PESTANAS_DE_ANOMALIAS, PIDE_LAS_ANOMALIAS } from "./pestanas-de-anomalias";
 import { DE_MAS as DE_MAS_COMPU } from "./compu/Mas";
 import { DE_MAS as DE_MAS_CELULAR } from "./celular/App";
-import { CabezaDeAnomalias } from "./celular/CabezaDeAnomalias";
-import { ParaRevisar } from "./compu/base/pantallas/Anomalias";
+import { CabezaDeAnomalias } from "./celular/anomalias/CabezaDeAnomalias";
+import { ParaRevisar } from "./compu/anomalias/ParaRevisar";
 import { describir } from "../negocio/apartados";
 
 // Más → Anomalías → Para revisar (specs/014-cambios-apartados).

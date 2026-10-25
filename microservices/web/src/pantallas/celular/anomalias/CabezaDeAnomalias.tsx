@@ -1,9 +1,9 @@
-import { irA } from "../../rutas";
-import { useParaRevisar } from "../../negocio/apartados";
-import { usePuede } from "../permisos";
-import { PESTANAS_DE_ANOMALIAS, type PestanaDeAnomalias } from "../pestanas-de-anomalias";
-import { NOMBRES } from "../textos";
-import { Pestanas } from "./Pestanas";
+import { irA } from "../../../rutas";
+import { useParaRevisar } from "../../../negocio/apartados";
+import { usePuede } from "../../permisos";
+import { PESTANAS_DE_ANOMALIAS, type PestanaDeAnomalias } from "../../pestanas-de-anomalias";
+import { NOMBRES } from "../../textos";
+import { Pestanas } from "../Pestanas";
 
 // El encabezado de Más → Anomalías (014): el título y las pestañas que la persona puede ver,
 // primero «Para revisar» con la cantidad pendiente a la derecha. Cada pestaña dibuja su
