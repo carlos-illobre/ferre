@@ -3,9 +3,14 @@
 Una sola máquina (Ampere ARM, 2 núcleos, 12 GB) corre los dos ambientes, **pruebas** y
 **producción**, cada uno con su base en un contenedor de la máquina (ADR-026). El cliente web vive en GitHub Pages.
 Nadie entra a la máquina para desplegar: GitHub publica un aviso y la máquina, que lo
-escucha, verifica contra el repositorio y se actualiza sola (ADR-013). Todo lo de ferre
-corre como el usuario **`ferre`**, sin privilegios y con Docker rootless: sin root, sin
-sudo, sin grupo `docker`.
+escucha, verifica contra el repositorio y se actualiza sola (ADR-013). **Cada ambiente
+corre con su propio usuario**, sin privilegios y con su propio Docker rootless:
+**`ferre-produccion`** y **`ferre-pruebas`** (decisión 161). Así un error en pruebas (un
+`docker compose down -v` o un `prune` en la carpeta equivocada) no puede tocar producción: son
+dos Docker distintos, con sus imágenes, volúmenes y redes. Sin root, sin sudo, sin grupo
+`docker`.
+
+Los pasos 1 a 3, 6, 7, 9 y 10 se hacen **una vez con cada usuario**, cada uno con su ambiente.
 
 El reverse proxy de la máquina **no es parte de este proyecto**: lo administra la
 máquina para todas sus aplicaciones. Ferre solo cumple un contrato con él (ver "El
@@ -16,16 +21,18 @@ que verse si salió bien.
 
 ## Antes de empezar
 
-- El usuario `ferre`, sin sudo, con **Docker rootless** instalado y
-  `docker context use rootless`, y **linger** habilitado por un administrador, para que
-  sus servicios sigan corriendo sin sesión abierta: `sudo loginctl enable-linger ferre`.
-  Es lo único que necesita root, una vez.
+- Los usuarios `ferre-produccion` y `ferre-pruebas`, sin sudo, cada uno con **Docker
+  rootless** instalado (`dockerd-rootless-setuptool.sh install` y `docker context use
+  rootless`, con sus rangos en `/etc/subuid` y `/etc/subgid`), y **linger** habilitado por
+  un administrador, para que sus servicios sigan corriendo sin sesión abierta:
+  `sudo loginctl enable-linger ferre-produccion ferre-pruebas`. Crear los usuarios y el
+  linger es lo único que necesita root, una vez.
 - No hace falta abrir puertos ni cargar claves en GitHub: ferre solo escucha en la
   interfaz local y el despliegue no entra a la máquina.
 
 ## 1. Clonar el repositorio
 
-Como `ferre`:
+Con cada usuario:
 
 ```bash
 git clone https://github.com/carlos-illobre/ferre.git ~/ferre-repo
@@ -36,7 +43,8 @@ Es solo para los scripts de instalación; el despliegue no usa esta copia.
 ## 2. Verificar sin tocar nada
 
 ```bash
-bash ~/ferre-repo/deployment/oracle-single/preflight.sh
+bash ~/ferre-repo/deployment/oracle-single/preflight.sh pruebas      # como ferre-pruebas
+bash ~/ferre-repo/deployment/oracle-single/preflight.sh produccion   # como ferre-produccion
 ```
 
 Dice qué falta y cómo resolverlo. Repetilo después de cada paso hasta que quede en verde.
@@ -44,11 +52,12 @@ Dice qué falta y cómo resolverlo. Repetilo después de cada paso hasta que que
 ## 3. Instalar el servicio de despliegue
 
 ```bash
-bash ~/ferre-repo/deployment/oracle-single/maquina/instalar.sh
+bash ~/ferre-repo/deployment/oracle-single/maquina/instalar.sh pruebas      # como ferre-pruebas
+bash ~/ferre-repo/deployment/oracle-single/maquina/instalar.sh produccion   # como ferre-produccion
 ```
 
-Sin sudo. Crea `~/ferre/bin/` con los scripts, `~/ferre/produccion` y `~/ferre/pruebas`
-con sus `.env` a partir de las plantillas, `~/ferre/despliegue.env`, y el servicio de
+Sin sudo. En el usuario que lo corre, crea `~/ferre/bin/` con los scripts, la carpeta de su
+ambiente (`~/ferre/pruebas` o `~/ferre/produccion`) con su `.env` a partir de la plantilla, `~/ferre/despliegue.env`, y el servicio de
 usuario `ferre-despliegue` en systemd (registrado, todavía apagado). Se puede volver a
 correr: no pisa lo que ya está completado.
 
@@ -79,13 +88,13 @@ cada una, distintas en pruebas y en producción.
 
 ## 6. Completar la configuración
 
-Tres archivos, reemplazando todos los marcadores `<...>`:
+Dos archivos en cada usuario, reemplazando todos los marcadores `<...>`:
 
 | Archivo | Qué va |
 |---|---|
-| `~/ferre/produccion/.env` | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), las tres claves de la base (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`), un token de servicio |
-| `~/ferre/pruebas/.env` | lo mismo para pruebas, con **otras** claves y **otro** token |
-| `~/ferre/despliegue.env` | el canal de avisos (paso 7) |
+| `~/ferre/produccion/.env` (de `ferre-produccion`) | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), las tres claves de la base (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`), un token de servicio |
+| `~/ferre/pruebas/.env` (de `ferre-pruebas`) | lo mismo para pruebas, con **otras** claves y **otro** token |
+| `~/ferre/despliegue.env` (en los dos) | el canal de avisos (paso 7), el mismo en los dos: cada uno despliega solo su ambiente |
 
 Token de servicio, uno por ambiente: `openssl rand -hex 32`. `IMAGEN_TAG` se deja como
 está: lo escribe el despliegue.
@@ -120,7 +129,8 @@ las aplicaciones. Ferre necesita de él exactamente esto:
 | `ferre-api.duckdns.org` | `http://127.0.0.1:8081` |
 | `ferre-api-pruebas.duckdns.org` | `http://127.0.0.1:8082` |
 
-No hace falta que el proxy y ferre compartan usuario, Docker ni red.
+No hace falta que el proxy y ferre compartan usuario, Docker ni red; tampoco los dos
+ambientes entre sí.
 
 ## 9. Arrancar el servicio de despliegue
 
@@ -129,10 +139,11 @@ systemctl --user start ferre-despliegue
 journalctl --user -u ferre-despliegue -f
 ```
 
-Al arrancar hace una verificación: consulta las ramas, baja las imágenes de pruebas y de
-producción, levanta cada ambiente y comprueba que quede sano. Después queda escuchando.
+Con cada usuario. Al arrancar hace una verificación: consulta la rama de su ambiente, baja
+sus imágenes, lo levanta y comprueba que quede sano; el ambiente que no tiene `.env` en ese
+usuario lo saltea. Después queda escuchando.
 
-**Bien:** el journal termina en `pruebas corriendo <sha>`, `produccion corriendo <sha>` y
+**Bien:** el journal termina en `pruebas corriendo <sha>` (o `produccion corriendo <sha>`) y
 `escuchando ...`. Con el reverse proxy configurado,
 `curl https://ferre-api-pruebas.duckdns.org/health` devuelve `{"ok":true,...}`. Si un
 ambiente no queda sano, el journal muestra sus logs y vuelve a la versión anterior si
@@ -140,11 +151,11 @@ la había.
 
 ## 10. El primer usuario
 
-Una vez por ambiente:
+Una vez por ambiente, con su usuario:
 
 ```bash
-cd ~/ferre/produccion && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre"
-cd ~/ferre/pruebas && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre"
+cd ~/ferre/produccion && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre"   # ferre-produccion
+cd ~/ferre/pruebas && docker compose exec gestion-del-local node dist/crear-usuario.js tu@gmail.com "Tu nombre"      # ferre-pruebas
 ```
 
 Después se entra con Google y se da de alta al empleado desde la app (roles: `dueño`, `admin`, `mostrador`):
@@ -163,7 +174,7 @@ CI construye, publica y avisa; la máquina despliega producción sola. La rama
 
 ## 12. Volver atrás
 
-En la máquina, con el SHA que el journal mostró como "antes":
+En la máquina, como `ferre-produccion`, con el SHA que el journal mostró como "antes":
 
 ```bash
 ~/ferre/bin/desplegar.sh produccion <sha-anterior>
@@ -176,14 +187,17 @@ una versión migró el esquema, volver la imagen no vuelve la base.
 ## 13. Actualizar los scripts de la máquina
 
 Los scripts de `~/ferre/bin` y la unidad de systemd se copian al instalar; el despliegue
-por aviso no los actualiza. Cuando cambien en el repositorio:
+por aviso no los actualiza. Cuando cambien en el repositorio, con cada usuario y su ambiente:
 
 ```bash
-cd ~/ferre-repo && git pull && bash deployment/oracle-single/maquina/instalar.sh
+cd ~/ferre-repo && git pull && bash deployment/oracle-single/maquina/instalar.sh <ambiente>
 systemctl --user restart ferre-despliegue
 ```
 
 ## 14. Operación de todos los días
+
+Cada comando, con el usuario del ambiente que se mira (`sudo -iu ferre-produccion` o
+`sudo -iu ferre-pruebas` desde una cuenta con sudo). Los ejemplos son de producción.
 
 ```bash
 # qué corre y con qué versión (IMAGEN_TAG es el SHA)
@@ -203,7 +217,7 @@ cd ~/ferre/produccion && docker compose logs -f --tail 100 gestion-del-local
 docker stats --no-stream
 df -h / && docker system df
 
-# apagar pruebas cuando no se use (producción sigue)
+# apagar pruebas cuando no se use (producción sigue), como ferre-pruebas
 cd ~/ferre/pruebas && docker compose down
 ```
 

@@ -105,3 +105,14 @@ reverse proxy deja de ser una red externa y pasa a ser **puertos de la interfaz 
 cada API se publica en `127.0.0.1:PUERTO_API` (8081 producción, 8082 pruebas) y el proxy,
 que es un servicio de la máquina fuera de Docker, apunta ahí. Ferre no necesita red
 `caddy-gateway` ni alias por ambiente; desaparecen `AMBIENTE` y `RED_GATEWAY`.
+
+---
+
+## Enmienda 3 (2026-10-25): un usuario por ambiente
+
+Lo que la enmienda 2 preveía para cada aplicación de la máquina vale también entre los dos
+ambientes de ferre (decisión 161): producción corre con el usuario `ferre-produccion` y pruebas
+con `ferre-pruebas`, cada uno con su Docker rootless y su servicio de despliegue. Los dos
+escuchan el mismo canal de avisos y cada uno despliega solo el ambiente que tiene configurado.
+Un error en pruebas (borrar volúmenes, limpiar imágenes) no puede tocar producción. Los
+puertos locales y el contrato con el reverse proxy no cambian.

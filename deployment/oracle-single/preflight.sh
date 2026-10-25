@@ -3,12 +3,17 @@
 # Verificación previa de la máquina de Oracle. NO MODIFICA NADA: solo informa. Se corre
 # como el usuario sin privilegios que va a correr ferre (Docker rootless), en la máquina:
 #
-#   bash deployment/oracle-single/preflight.sh
+#   bash deployment/oracle-single/preflight.sh pruebas|produccion
+#
+# Cada ambiente corre con su propio usuario (ferre-produccion, ferre-pruebas; decisión 161):
+# se mira solo el ambiente pedido.
 set -uo pipefail
+AMBIENTE=${1:-}
+case "$AMBIENTE" in produccion) PUERTO=8081 ;; pruebas) PUERTO=8082 ;; *) echo "uso: preflight.sh pruebas|produccion"; exit 1 ;; esac
 
 # La API de cada ambiente se publica solo en 127.0.0.1 (8081 producción, 8082 pruebas);
 # el reverse proxy de la máquina la alcanza ahí.
-MEMORIA_NECESARIA_MB=2048     # dos ambientes: 2 APIs Node + 2 lectores Python, con margen
+MEMORIA_NECESARIA_MB=1024     # un ambiente: la API, Procesos, el lector de listas y su base, con margen
 
 VERDE='\033[0;32m'; ROJO='\033[0;31m'; AMARILLO='\033[0;33m'; NC='\033[0m'
 fallos=0
@@ -54,7 +59,7 @@ fi
 [ "$(loginctl show-user "$(id -un)" -p Linger --value 2>/dev/null)" = yes ] && ok "linger activo: los servicios de usuario siguen sin sesión" || aviso "sin linger: un administrador debe correr  sudo loginctl enable-linger $(id -un)"
 
 titulo "Los puertos locales de la API"
-for puerto in 8081 8082; do
+for puerto in $PUERTO; do
     if ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE "^127\.0\.0\.1:${puerto}$"; then
         ok "127.0.0.1:$puerto en uso (si ferre ya corre, es esperable)"
     elif ss -ltn 2>/dev/null | awk '{print $4}' | grep -qE "[:.]${puerto}$"; then
@@ -65,7 +70,8 @@ for puerto in 8081 8082; do
 done
 
 titulo "Las carpetas de los ambientes y el servicio de despliegue"
-for a in produccion pruebas; do
+[ "$(id -un)" = "ferre-$AMBIENTE" ] && ok "usuario ferre-$AMBIENTE" || aviso "$AMBIENTE corre con el usuario ferre-$AMBIENTE, y este es $(id -un)"
+for a in $AMBIENTE; do
     if [ -f "$HOME/ferre/$a/.env" ]; then
         grep -q '<' "$HOME/ferre/$a/.env" && aviso "~/ferre/$a/.env todavía tiene marcadores <...> sin reemplazar" || ok "~/ferre/$a/.env existe"
     else

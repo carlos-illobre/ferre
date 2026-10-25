@@ -272,14 +272,15 @@ Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con 
 `specs/` cuando se empieza; la última cumple todas las restricciones.
 
 - [x] T139 [agente] [alta] Etapa 1: PostgreSQL en un contenedor de la máquina de Oracle, una base por servicio (mostrador y Procesos), mudanza desde Supabase, capa de datos aparte con 100 % de cobertura y todo lo que cambia entre ambientes en el .env (specs/022-base-de-datos-propia)
-- [ ] T140 [agente] Etapa 2: copia cifrada por noche de la base y los archivos fuera de Oracle, guía de restauración probada, y Tickets en su propio servicio con su base (depende de T139)
+- [ ] T140 [agente] Etapa 2: copia cifrada por noche de la base y los archivos de producción (pruebas no se copia, decisión 161) fuera de Oracle, guía de restauración probada, y Tickets en su propio servicio con su base (depende de T139)
 - [ ] T141 [agente] Etapa 3: el dispositivo guarda todos los cambios del mostrador, con tope por espacio y sin borrar lo no confirmado; pide al navegador no borrar los datos; sin almacenamiento local no trabaja sin conexión (depende de T139)
 - [ ] T142 [agente] Etapa 4: copia continua de la base (perder como mucho un minuto), avisos del monitor externo, prueba mensual de restauración, archivos en un almacenamiento de objetos y las listas de proveedores con su base (depende de T140)
 - [ ] T143 [agente] Etapa 5: usuarios de la base con lo mínimo, los históricos no se pueden modificar desde la base, unir duplicados sin reescribir filas, copia semanal inmutable en un segundo proveedor (depende de T142)
 - [ ] T144 [agente] Usuarios y acceso en su propio servicio con su base, cuando un tercer servicio necesite iniciar sesión (depende de T143)
 - [ ] T145 [agente] Etapa 6: réplica en caliente en una segunda máquina y archivos para análisis (Parquet con DuckDB) (depende de T143)
 - [ ] T146 [carlos] Crear las cuentas gratuitas de Cloudflare R2, Backblaze B2 y Healthchecks.io (antes de T140)
-- [ ] T150 [carlos] [alta] Terminar de pasar a la base propia (022). Pruebas ya está, desde el 2026-10-25: claves en su .env, scripts reinstalados y primer usuario creado. Los secretos de Supabase en GitHub ya no están. Falta producción: antes de promover, agregar al .env AMBIENTE=produccion, las tres CLAVE_BASE_* (distintas de las de pruebas) y PUERTO_BASE=5433, quitar DATABASE_URL y, después de promover, crear el primer usuario (docs/operacion/DEPLOYMENT.md) (depende de T139)
+- [ ] T150 [carlos] [alta] Terminar de pasar a la base propia (022). Pruebas ya está, desde el 2026-10-25: claves en su .env, scripts reinstalados y primer usuario creado. Los secretos de Supabase en GitHub ya no están. Falta producción, que se arma ya con su usuario ferre-produccion (T153): antes de promover, agregar a su .env AMBIENTE=produccion, las tres CLAVE_BASE_* (distintas de las de pruebas) y PUERTO_BASE=5433, quitar DATABASE_URL y, después de promover, crear el primer usuario (docs/operacion/DEPLOYMENT.md) (depende de T139)
+- [ ] T153 [carlos] [alta] Un usuario de Linux por ambiente en la máquina (decisión 161, 001-T049): crear ferre-pruebas y ferre-produccion con su Docker rootless, pasar pruebas a ferre-pruebas (su base arranca vacía de nuevo) y dejar ferre-produccion listo para cuando se promueva; el usuario ferre queda solo con la producción vieja hasta entonces
 
 ## Sin etapa
 
