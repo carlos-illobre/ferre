@@ -1,4 +1,5 @@
-import type { KeyboardEvent } from "react";
+import { useRef } from "react";
+import { useAccionesDelLugar, useEtiqueta } from "../../../plataforma/comandos";
 import { conUnidad } from "../../../negocio/catalogo";
 import type { CompraFila } from "../../../negocio/compras";
 import { fecha, pesos, pesosCortos } from "../../../negocio/formato";
@@ -13,25 +14,35 @@ import css from "./Compras.module.css";
 // renglones y «Anular esta compra».
 const t = TEXTOS.compras;
 const nombreComprobante = (c: CompraFila) => (c.comprobante_tipo === "sin_comprobante" ? "Sin comprobante" : `${c.comprobante_tipo === "factura" ? "Factura" : "Remito"}${c.comprobante_numero ? ` ${c.comprobante_numero}` : ""}`);
-type Props = { c: CompraFila; abierta: boolean; anula: boolean; alAlternar: () => void; alTeclear: (e: KeyboardEvent<HTMLButtonElement>) => void; alAnular: () => void };
+type Props = { c: CompraFila; abierta: boolean; anula: boolean; alAlternar: () => void; alAnular: () => void };
 
 export { nombreComprobante };
 
-export function CompraReciente({ c, abierta, anula, alAlternar, alTeclear, alAnular }: Props) {
+export function CompraReciente({ c, abierta, anula, alAlternar, alAnular }: Props) {
   const anulada = c.estado === "anulada";
   return (
     <li className={`${css.compra} ${anulada ? "anulada" : ""} ${abierta ? "abierta" : ""}`} data-testid="compra-reciente">
       <div className={css.fila}>
         <span className={css.mini}>{c.foto ? <VerComprobante ruta={c.foto} /> : <Icono nombre="notebook-pen" />}</span>
-        <button type="button" className={css.abrir} data-abre-compra onClick={alAlternar} onKeyDown={alTeclear} aria-expanded={abierta}
-          aria-label={`${abierta ? "Plegar" : "Ver"} los renglones de la compra a ${c.proveedor} del ${fecha(c.fecha)}`} aria-keyshortcuts={anulada ? undefined : "Delete"}>
-          <span className={css.texto}><b>{c.proveedor}</b><span>{fecha(c.fecha)} · {nombreComprobante(c)} · {plural(Number(c.renglones), "renglón", "renglones")}</span></span>
-          <ImporteYEstado c={c} anulada={anulada} />
-          <Icono nombre="chevron-right" className={css.flecha} />
-        </button>
+        <BotonDeLaCompra c={c} abierta={abierta} anulada={anulada} alAlternar={alAlternar} alAnular={anula ? alAnular : null} />
       </div>
       {abierta && <RenglonesDeLaCompra c={c} puedeAnular={!anulada && anula} alAnular={alAnular} />}
     </li>
+  );
+}
+
+// El botón que abre la compra; con el foco en él, ofrece anularla (si se puede).
+function BotonDeLaCompra({ c, abierta, anulada, alAlternar, alAnular }: { c: CompraFila; abierta: boolean; anulada: boolean; alAlternar: () => void; alAnular: (() => void) | null }) {
+  const boton = useRef<HTMLButtonElement>(null);
+  useAccionesDelLugar(boton, { "compras.anular": anulada ? null : alAnular });
+  const tecla = useEtiqueta("compras.anular");
+  return (
+    <button type="button" ref={boton} className={css.abrir} data-abre-compra data-fila onClick={alAlternar} aria-expanded={abierta}
+      aria-label={`${abierta ? "Plegar" : "Ver"} los renglones de la compra a ${c.proveedor} del ${fecha(c.fecha)}`} aria-keyshortcuts={anulada ? undefined : tecla}>
+      <span className={css.texto}><b>{c.proveedor}</b><span>{fecha(c.fecha)} · {nombreComprobante(c)} · {plural(Number(c.renglones), "renglón", "renglones")}</span></span>
+      <ImporteYEstado c={c} anulada={anulada} />
+      <Icono nombre="chevron-right" className={css.flecha} />
+    </button>
   );
 }
 

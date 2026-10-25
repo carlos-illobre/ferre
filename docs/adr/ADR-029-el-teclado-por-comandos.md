@@ -38,7 +38,7 @@ menor acoplamiento y fácil de cambiar (decisión 159).
     al registro la acción de la tabla.
   - Lo del teclado que no depende de la pantalla: las flechas por las filas, las letras con Alt, el
     foco entre el menú y la pantalla. Lo que va por la forma de la pantalla se reconoce por marcas
-    del HTML (`data-flechas-propias` en una tabla que se recorre por filas, `role="radiogroup"`),
+    del HTML (`data-filas` y `data-fila` en una lista que se recorre por sus filas, `role="radiogroup"`),
     no por el nombre de un componente.
   - Las letras con Alt que pide la tabla para una acción a la vista («Alt+S», subir la lista) no se
     reparten entre los botones: así la letra que muestra el botón es siempre la de su tabla.

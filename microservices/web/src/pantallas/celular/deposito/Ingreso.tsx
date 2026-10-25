@@ -20,7 +20,7 @@ export function Ingreso() {
       <div className="lateral">
         <div className="columna al-costado"><DatosDelIngreso x={x} /></div>
         <div className="columna">
-          <Buscador chico valor={i.consulta} alCambiar={i.setConsulta} placeholder={"Producto que llegó"} onKeyDown={x.teclas} cajaRef={x.caja} alEscanear={hayCamara() ? () => x.setEscaneando(true) : undefined} />
+          <Buscador chico valor={i.consulta} alCambiar={i.setConsulta} placeholder={"Producto que llegó"} acciones={x.enLaCaja} cajaRef={x.caja} alEscanear={hayCamara() ? () => x.setEscaneando(true) : undefined} />
           {x.escaneando && <Escaner alDetectar={x.alDetectar} alCerrar={() => x.setEscaneando(false)} />}
           {i.consulta.trim() && <SugerenciasDelIngreso x={x} />}
           {i.renglones.map((r) => <RenglonDelIngreso key={r.clave} x={x} r={r} />)}

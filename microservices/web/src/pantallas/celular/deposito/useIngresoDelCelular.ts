@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { Acciones } from "../../../plataforma/comandos";
 import { busquedaAlDia, esperarBusqueda } from "../../../negocio/catalogo";
 import { detalleDelRegistro, useIngreso } from "../../../negocio/deposito";
 import { irA } from "../../../rutas";
@@ -30,11 +31,13 @@ export function useIngresoDelCelular() {
     if (!busquedaAlDia(texto, proveedor)) { void esperarBusqueda(texto, 16, proveedor).then((r) => (r[0] ? agregar(r[0]) : agregar(null, texto))); return; }
     if (resultados[elegido]) agregar(resultados[elegido]); else if (texto) agregar(null, texto);
   }
-  function teclas(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); setElegido((i) => (e.key === "ArrowDown" ? Math.min(i + 1, resultados.length - 1) : Math.max(i - 1, 0))); }
-    else if (e.key === "Enter") { e.preventDefault(); enter(); }
-    else if (e.key === "Escape") ingreso.setConsulta("");
-  }
+  // Lo de la búsqueda: marcar el de al lado, agregar el marcado y limpiarla.
+  const enLaCaja: Acciones = {
+    "lista.siguiente": () => setElegido((i) => Math.min(i + 1, resultados.length - 1)),
+    "lista.anterior": () => setElegido((i) => Math.max(i - 1, 0)),
+    "lista.elegir": enter,
+    "lista.salir": () => ingreso.setConsulta(""),
+  };
   async function confirmar() {
     if (ingreso.ocupado) return;
     if (ingreso.falta) { setAviso(AVISOS[ingreso.falta]); if (ingreso.falta === "proveedor") setHoja("proveedores"); return; }
@@ -44,6 +47,6 @@ export function useIngresoDelCelular() {
     if (registro.dePedido) irA("deposito/ingreso");
   }
   const setError = (texto: string | null) => { setAviso(texto); if (texto === null) ingreso.setError(null); };
-  return { pedido, errorPedido, ingreso, elegido, error: aviso ?? ingreso.error, setError, hoja, setHoja, escaneando, setEscaneando, exito, setExito, caja, alDetectar, teclas, confirmar };
+  return { pedido, errorPedido, ingreso, elegido, error: aviso ?? ingreso.error, setError, hoja, setHoja, escaneando, setEscaneando, exito, setExito, caja, alDetectar, enLaCaja, confirmar };
 }
 export type IngresoDelCelular = ReturnType<typeof useIngresoDelCelular>;

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
 import { abreviarUnidad, conUnidad, enteras, unidadDe, type Producto } from "../../../negocio/catalogo";
 import { useCorregirStock, useFormularioDeCorreccion } from "../../../negocio/deposito";
 import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../../textos";
@@ -29,13 +30,15 @@ export function CorregirEnLaHoja({ producto: p, cantidad, alAjustar }: Props) {
     try { const { hay, encolado } = await corregir(f.real, f.motivo); alAjustar(mensajeDelAjuste(p, cantidad, hay, encolado)); }
     catch (e) { setError((e as Error).message); }
   }
+  const caja = useRef<HTMLInputElement>(null);
+  useAccionesDelLugar(caja, { "campo.listo": () => void guardar() });
   return (
     <div className={css.corregir} data-testid="correccion">
       <div className={css.filaC}>
         <span className={css.etC}>¿Cuántas hay?</span>
         <span className={css.cantidad}>
           <button type="button" onClick={() => { f.sumar(-1); setError(null); }} aria-label="Una menos"><Icono nombre="minus" /></button>
-          <input inputMode={enteras(unidadDe(p)) ? "numeric" : "decimal"} value={f.real} onFocus={(e) => e.target.select()} onChange={(e) => { f.setReal(e.target.value); setError(null); }} onKeyDown={(e) => { if (e.key === "Enter") void guardar(); }} aria-label="Cuántas hay" data-testid="cantidad-real" />
+          <input ref={caja} inputMode={enteras(unidadDe(p)) ? "numeric" : "decimal"} value={f.real} onFocus={(e) => e.target.select()} onChange={(e) => { f.setReal(e.target.value); setError(null); }} aria-label="Cuántas hay" data-testid="cantidad-real" />
           <button type="button" onClick={() => { f.sumar(1); setError(null); }} aria-label="Una más"><Icono nombre="plus" /></button>
         </span>
       </div>

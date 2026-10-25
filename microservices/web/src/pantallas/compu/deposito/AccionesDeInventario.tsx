@@ -13,7 +13,7 @@ export function AccionesDeInventario({ pidePedidos }: { pidePedidos: boolean }) 
     <AlLadoDeLasPestanas>
       <div className={css.acciones}>
         <Boton tam="chico" disabled title={t.todaviaNo.largo} data-testid="exportar-excel"><Icono nombre="file-spreadsheet" tam={16} />{t.exportar.largo}</Boton>
-        <Boton tam="chico" disabled title={t.todaviaNo.largo} data-testid="etiquetas"><Icono nombre="printer" tam={16} />{t.etiquetas.largo} <kbd className="tecla">Alt E</kbd></Boton>
+        <Boton tam="chico" disabled title={t.todaviaNo.largo} accion="inventario.etiquetas" kbd data-testid="etiquetas"><Icono nombre="printer" tam={16} />{t.etiquetas.largo} </Boton>
         {pidePedidos && <Boton tam="chico" variante="principal" className={css.quePedir} onClick={() => irA("pedidos")} data-testid="que-pedir"><Icono nombre="truck" tam={16} />{t.quePedir.largo} · — </Boton>}
       </div>
     </AlLadoDeLasPestanas>

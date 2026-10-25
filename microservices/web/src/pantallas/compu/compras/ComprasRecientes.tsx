@@ -1,9 +1,9 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useComprasRecientes, useGastosDeLaSemana, usePedidosPorLlegar } from "../../../negocio/compras";
-import { useTeclasGlobales } from "../../../plataforma/teclado";
+import { useComandos } from "../../../plataforma/comandos";
 import { useEnLinea } from "../../../plataforma/sin-conexion";
 import { usePuede } from "../../permisos";
-import { Aviso } from "../base/ui";
+import { Aviso, hayUnaVentanaAbierta } from "../base/ui";
 import { irA } from "../base/rutas";
 import { AccionesDeCompras } from "./AccionesDeCompras";
 import { CostadoDeCompras } from "./CostadoDeCompras";
@@ -17,8 +17,7 @@ import css from "./Compras.module.css";
 // la semana con sus barras por día (con «Ver los gastos»), los pedidos por llegar y lo que se les
 // debe; debajo las compras recientes (con «Ver las compras»), que se abren para ver sus renglones
 // y se anulan con «Registrar ingresos»; a la derecha la foto de la factura, lo que está por llegar
-// y lo que vence primero. Teclas: flechas recorren las compras, Enter abre, Supr anula; Alt N
-// registra una compra y Alt P arma un pedido.
+// y lo que vence primero. Ofrece registrar una compra y armar un pedido.
 export function ComprasRecientes() {
   const puede = usePuede();
   const registra = puede("deposito.ingresos");
@@ -28,11 +27,8 @@ export function ComprasRecientes() {
   const compras = useComprasRecientes(puede("deposito.compras"));
   const { porLlegar } = usePedidosPorLlegar(encarga || registra);
   const [mensaje, setMensaje] = useState<string | null>(null);
-  useTeclasGlobales(useCallback((e: globalThis.KeyboardEvent) => {
-    if (document.querySelector("dialog[open]") || !e.altKey) return;
-    if (e.code === "KeyN" && registra) { e.preventDefault(); irA("ingreso"); }
-    else if (e.code === "KeyP" && encarga) { e.preventDefault(); irA("pedidos"); }
-  }, [registra, encarga]));
+  const libre = (puede: boolean, hacer: () => void) => () => (!puede || hayUnaVentanaAbierta() ? false : hacer());
+  useComandos({ "compras.registrar": libre(registra, () => irA("ingreso")), "compras.pedido": libre(encarga, () => irA("pedidos")) });
   return (
     <div className="cv">
       <AccionesDeCompras encarga={encarga} registra={registra} />

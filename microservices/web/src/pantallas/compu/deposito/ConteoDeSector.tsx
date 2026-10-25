@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useRef } from "react";
 import type { Conteo } from "../../../negocio/deposito";
-import { useTeclasGlobales } from "../../../plataforma/teclado";
+import { useComandos } from "../../../plataforma/comandos";
 import { AlLadoDeLasPestanas } from "../../AlLadoDeLasPestanas";
 import { TEXTOS } from "../../textos";
-import { Aviso, Boton, Toast } from "../base/ui";
+import { Aviso, Boton, hayUnaVentanaAbierta, Toast } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import { BuscarParaContar } from "./BuscarParaContar";
 import { CabezaDelConteo } from "./CabezaDelConteo";
@@ -14,15 +13,15 @@ import { ResultadoDelConteo } from "./ResultadoDelConteo";
 import { useConteoDeSector, type ConteoDeSector as Estado } from "./useConteoDeSector";
 import css from "./Contar.module.css";
 
-// El conteo abierto del sector elegido, a la derecha de la lista. Alt C cierra el sector y Alt E
-// le pide el lector al celular vinculado.
+// El conteo abierto del sector elegido, a la derecha de la lista: cerrar el sector y pedirle el
+// lector al celular vinculado.
 const t = TEXTOS.contar;
 const SIN_CONEXION = "Sin conexión: seguí contando. Lo contado queda guardado en este dispositivo y se manda solo al volver internet; cerrar el sector necesita conexión.";
 type Props = { conteo: Conteo; alActualizar: (c: Conteo) => void; alCerrado: () => void; alOtro: () => void };
 
 export function ConteoDeSector({ conteo, alActualizar, alCerrado, alOtro }: Props) {
   const x = useConteoDeSector(conteo, alActualizar);
-  useTeclasDelConteo(x);
+  useAccionesDelConteo(x);
   if (x.resultado) return <ResultadoDelConteo sector={conteo.sector} resultado={x.resultado} id={x.id} alOtro={alOtro} />;
   return (
     <div className={css.conteo} data-testid="conteo">
@@ -48,20 +47,18 @@ function AccionesDelConteo({ x }: { x: Estado }) {
   return (
     <AlLadoDeLasPestanas>
       <div className={css.acciones}>
-        {x.emparejado && <Boton tam="chico" onClick={x.pedirLector} data-testid="pedir-lector"><Icono nombre="scan-barcode" tam={16} />{t.escanearConElCelular.largo} <kbd className="tecla">Alt E</kbd></Boton>}
-        <Boton tam="chico" variante="principal" className={css.cerrar} disabled={x.conteo.renglones.length === 0} onClick={() => x.setCerrando(true)} data-testid="cerrar"><Icono nombre="square-check-big" tam={16} />{t.cerrarElSector.largo} <kbd className="tecla">Alt C</kbd></Boton>
+        {x.emparejado && <Boton tam="chico" onClick={x.pedirLector} accion="conteo.lector" kbd data-testid="pedir-lector"><Icono nombre="scan-barcode" tam={16} />{t.escanearConElCelular.largo} </Boton>}
+        <Boton tam="chico" variante="principal" className={css.cerrar} disabled={x.conteo.renglones.length === 0} onClick={() => x.setCerrando(true)} accion="conteo.cerrar" kbd data-testid="cerrar"><Icono nombre="square-check-big" tam={16} />{t.cerrarElSector.largo} </Boton>
       </div>
     </AlLadoDeLasPestanas>
   );
 }
 
-function useTeclasDelConteo(x: Estado) {
-  const actual = useRef(x);
-  useEffect(() => { actual.current = x; });
-  useTeclasGlobales(useCallback((e: globalThis.KeyboardEvent) => {
-    const x = actual.current;
-    if (document.querySelector("dialog[open]") || !e.altKey || x.resultado) return;
-    if (e.code === "KeyC" && x.conteo.renglones.length > 0) { e.preventDefault(); x.setCerrando(true); }
-    else if (e.code === "KeyE" && x.emparejado) { e.preventDefault(); x.pedirLector(); }
-  }, []));
+// Lo que ofrece el conteo, salvo con una ventana abierta o ya cerrado.
+function useAccionesDelConteo(x: Estado) {
+  const libre = (puede: boolean, hacer: () => void) => () => (!puede || hayUnaVentanaAbierta() || x.resultado ? false : hacer());
+  useComandos({
+    "conteo.cerrar": libre(x.conteo.renglones.length > 0, () => x.setCerrando(true)),
+    "conteo.lector": libre(Boolean(x.emparejado), x.pedirLector),
+  });
 }

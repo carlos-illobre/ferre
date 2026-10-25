@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
 import { abreviarUnidad } from "../../../negocio/catalogo";
 import css from "./Pedidos.module.css";
 
@@ -8,6 +9,9 @@ const granel = (unidad: string) => unidad !== "unidad";
 export function CantidadDelPedido({ valor, unidad, nombre, alCambiar }: { valor: number; unidad: string; nombre: string; alCambiar: (c: number) => void }) {
   const paso = granel(unidad) ? 0.5 : 1;
   const [texto, setTexto] = useState(String(valor).replace(".", ","));
+  const caja = useRef<HTMLInputElement>(null);
+  // Terminar el campo lo fija (al salir de él).
+  useAccionesDelLugar(caja, { "campo.listo": () => caja.current?.blur() });
   useEffect(() => { setTexto(String(valor).replace(".", ",")); }, [valor]);
   const fijar = (crudo: string) => {
     const n = Number(crudo.replace(",", "."));
@@ -17,7 +21,7 @@ export function CantidadDelPedido({ valor, unidad, nombre, alCambiar }: { valor:
   return (
     <span className={css.cantidad}>
       <button type="button" onClick={() => alCambiar(Math.max(paso, Math.round((valor - paso) * 10) / 10))} aria-label={`Una menos de ${nombre}`}>−</button>
-      <input inputMode="decimal" value={texto} onChange={(e) => setTexto(e.target.value)} onBlur={(e) => fijar(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+      <input inputMode="decimal" value={texto} onChange={(e) => setTexto(e.target.value)} onBlur={(e) => fijar(e.target.value)} ref={caja}
         aria-label={`Cantidad de ${nombre}${granel(unidad) ? `, en ${unidad}` : ""}`} data-testid="cantidad-pedido" />
       <span className={css.unidad}>{abreviarUnidad(unidad)}</span>
       <button type="button" onClick={() => alCambiar(Math.round((valor + paso) * 10) / 10)} aria-label={`Una más de ${nombre}`}>+</button>

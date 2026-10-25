@@ -1,4 +1,5 @@
-import type { KeyboardEvent } from "react";
+import { useRef } from "react";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
 import { pesosCortos } from "../../../negocio/formato";
 import { incompleto, type Renglon } from "../../../negocio/deposito";
 import { Boton, Vacio } from "../base/ui";
@@ -25,21 +26,26 @@ export function RenglonesDelIngreso({ x }: { x: IngresoDeLaCompu }) {
   );
 }
 
-// Enter termina el renglón: de la descripción a la cantidad, de la cantidad al costo si falta, y
-// si no de vuelta al buscador.
+// Terminar un campo del renglón pasa al siguiente: de la descripción a la cantidad, de la cantidad
+// al costo si falta, y si no de vuelta al buscador.
 const DESPUES: Record<string, (r: Renglon) => string | null> = { "descripcion-nueva": () => "cantidad", cantidad: (r) => (r.costo === null ? "costo" : null), costo: () => null };
-function teclasDeRenglon(e: KeyboardEvent<HTMLElement>, r: Renglon, caja: HTMLInputElement | null) {
-  const despues = DESPUES[(e.target as HTMLElement).dataset.testid ?? ""];
-  if (e.key !== "Enter" || !despues) return;
-  e.preventDefault();
+const campoCon = (fila: HTMLElement | null) => {
+  const foco = document.activeElement;
+  return foco instanceof HTMLElement && fila?.contains(foco) ? foco.dataset.testid ?? "" : "";
+};
+function terminarElCampo(fila: HTMLElement | null, r: Renglon, caja: HTMLInputElement | null) {
+  const despues = DESPUES[campoCon(fila)];
+  if (!despues) return false;
   const siguiente = despues(r);
-  if (siguiente) e.currentTarget.querySelector<HTMLInputElement>(`[data-testid='${siguiente}']`)?.focus();
+  if (siguiente) fila?.querySelector<HTMLInputElement>(`[data-testid='${siguiente}']`)?.focus();
   else caja?.focus();
 }
 
 function RenglonDelIngreso({ x, r }: { x: IngresoDeLaCompu; r: Renglon }) {
+  const fila = useRef<HTMLTableRowElement>(null);
+  useAccionesDelLugar(fila, { "campo.listo": () => terminarElCampo(fila.current, r, x.caja.current) });
   return (
-    <tr className={incompleto(r) ? "incompleto" : ""} data-clave={r.clave} data-testid="renglon" onKeyDown={(e) => teclasDeRenglon(e, r, x.caja.current)}>
+    <tr ref={fila} className={incompleto(r) ? "incompleto" : ""} data-clave={r.clave} data-testid="renglon">
       <td><NombreDelRenglon x={x} r={r} /></td>
       <td className="angosta"><CantidadDelRenglon x={x} r={r} /></td>
       <td className="angosta"><CostoDelRenglon x={x} r={r} />{r.costo === null && <span className="falta-texto compras-bajo-nombre">Falta el costo</span>}</td>

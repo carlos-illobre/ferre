@@ -9,7 +9,7 @@ const detalleDe = (p: Producto) => [p.marca, p.proveedor].filter(Boolean).join("
 export function BuscarParaContar({ x }: { x: ConteoDelCelular }) {
   return (
     <>
-      <Buscador valor={x.consulta} alCambiar={x.setConsulta} placeholder={"Buscá o escaneá el producto"} onKeyDown={x.teclasBusqueda} alEscanear={hayCamara() ? () => x.setEscaneando(true) : undefined} />
+      <Buscador valor={x.consulta} alCambiar={x.setConsulta} placeholder={"Buscá o escaneá el producto"} acciones={x.enLaCaja} alEscanear={hayCamara() ? () => x.setEscaneando(true) : undefined} />
       {x.escaneando && <Escaner alDetectar={x.alDetectar} alCerrar={() => x.setEscaneando(false)} />}
       {x.resultados.length > 0 && (
         <Lista data-testid="sugerencias">

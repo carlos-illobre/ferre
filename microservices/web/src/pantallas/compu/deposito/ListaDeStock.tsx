@@ -1,5 +1,6 @@
 import { TEXTOS } from "../../textos";
-import { Aviso, Boton, Buscador, Vacio } from "../base/ui";
+import type { Acciones } from "../../../plataforma/comandos";
+import { Atajo, Aviso, Boton, Buscador, Vacio } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import { FiltrosDeStock } from "./FiltrosDeStock";
 import { FilasDeStock } from "./FilasDeStock";
@@ -9,12 +10,12 @@ import css from "./Inventario.module.css";
 // A la izquierda: la búsqueda (con el lector del celular vinculado), los filtros y los productos.
 const t = TEXTOS.stock;
 
-export function ListaDeStock({ x }: { x: Inventario }) {
+export function ListaDeStock({ x, enLaCaja }: { x: Inventario; enLaCaja: Acciones }) {
   return (
     <div className={css.izq}>
-      <Buscador valor={x.consulta} alCambiar={x.setConsulta} placeholder={t.buscar.largo} etiqueta="Buscar un producto" cajaRef={x.caja} autoFoco
+      <Buscador valor={x.consulta} alCambiar={x.setConsulta} placeholder={t.buscar.largo} etiqueta="Buscar un producto" cajaRef={x.caja} autoFoco acciones={enLaCaja}
         extra={<>
-          {!x.consulta && <kbd className={`tecla ${css.barra}`}>/</kbd>}
+          {!x.consulta && <Atajo accion="inventario.buscar" className={`tecla ${css.barra}`} kbd />}
           {x.emparejado && <Boton variante="marino" className={css.celular} onClick={x.pedirLector} data-testid="pedir-lector"><Icono nombre="scan-barcode" />{t.conElCelular.largo}</Boton>}
         </>} />
       <LectorPedido pedido={x.lectorPedido} />

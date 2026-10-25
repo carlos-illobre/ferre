@@ -1,10 +1,10 @@
-import { useEffect, useId, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, useState, type ReactNode, type RefObject } from "react";
 import { busquedaAlDia, esperarBusqueda } from "../../../negocio/catalogo";
 import { Buscador } from "../base/ui";
 import { detalleDe, type Producto } from "./deposito-comun";
 import css from "./Deposito.module.css";
 
-// Busca mientras se escribe. Flechas recorren, Enter elige, Escape limpia. Los resultados flotan
+// Busca mientras se escribe. Con el foco en la caja se marca el de al lado, se elige el marcado y se limpia. Los resultados flotan
 // debajo de la caja; si no hay, se ofrece agregarlo como producto nuevo (Ingreso).
 type Props = {
   consulta: string; alCambiar: (v: string) => void; resultados: Producto[]; alElegir: (p: Producto) => void;
@@ -18,7 +18,7 @@ export function BuscadorDeProducto(props: Props) {
   const b = useBuscadorDeProducto(props);
   return (
     <div className={css.buscador}>
-      <Buscador valor={consulta} alCambiar={alCambiar} placeholder={placeholder} disabled={disabled} onKeyDown={b.teclas} cajaRef={cajaRef} alEscanear={alEscanear} autoFoco={autoFoco}
+      <Buscador valor={consulta} alCambiar={alCambiar} placeholder={placeholder} disabled={disabled} acciones={b.acciones} cajaRef={cajaRef} alEscanear={alEscanear} autoFoco={autoFoco}
         controla={b.conLista ? b.id : undefined} activo={b.conLista ? `${b.id}-${b.marcado}` : undefined} />
       {b.conLista && <Sugerencias props={props} id={b.id} marcado={b.marcado} ofreceCrear={b.ofreceCrear} />}
       {b.abierta && b.total === 0 && <p className={css.nada} role="status">Nada con «{b.texto}». Probá con otra palabra o con el código.</p>}
@@ -40,14 +40,15 @@ function useBuscadorDeProducto({ consulta, alCambiar, resultados, alElegir, alCr
     const p = resultados[marcado];
     if (p) alElegir(p); else if (ofreceCrear) alCrear?.(texto);
   }
-  // Sin resultados a la vista, ↑ ↓ recorren la pantalla (flechas.ts).
-  function teclas(e: KeyboardEvent<HTMLInputElement>) {
-    const flecha = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0;
-    if (flecha && total > 0) { e.preventDefault(); setMarcado((i) => Math.min(Math.max(i + flecha, 0), total - 1)); }
-    else if (e.key === "Enter") { e.preventDefault(); enter(); }
-    else if (e.key === "Escape" && consulta) { e.preventDefault(); alCambiar(""); }
-  }
-  return { id, marcado, texto, abierta, ofreceCrear, total, conLista: abierta && total > 0, teclas };
+  // Sin resultados a la vista, marcar no aplica y se recorre la pantalla.
+  const marcar = (paso: number) => () => (total > 0 ? setMarcado((i) => Math.min(Math.max(i + paso, 0), total - 1)) : false);
+  const acciones = {
+    "lista.siguiente": marcar(1),
+    "lista.anterior": marcar(-1),
+    "lista.elegir": enter,
+    "lista.salir": () => (consulta ? alCambiar("") : false),
+  };
+  return { id, marcado, texto, abierta, ofreceCrear, total, conLista: abierta && total > 0, acciones };
 }
 
 function Sugerencias({ props: { resultados, alElegir, alCrear, aLaDerecha, consulta }, id, marcado, ofreceCrear }: { props: Props; id: string; marcado: number; ofreceCrear: boolean }) {

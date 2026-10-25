@@ -8,7 +8,7 @@ import { instalarGrillaDeMas } from "./compu/grilla-de-mas";
 import { instalarMenuYPestanas } from "./compu/menu-y-pestanas";
 import { instalarFicha } from "./compu/ficha";
 import { instalarGruposDeOpciones } from "./compu/grupos-de-opciones";
-import { instalarFilasDeUnaTabla } from "./compu/filas-de-una-tabla";
+import { instalarFilasPropias } from "./compu/filas-propias";
 import { TABLA_DE_LA_COMPU, ETIQUETAS_DE_LA_COMPU } from "./tablas/compu";
 import { accionDe, etiquetar } from "../plataforma/comandos";
 import type { Linea } from "./motor/tabla";
@@ -38,7 +38,7 @@ export function instalarTecladoDeLaCompu(): void {
   instalarGrillaDeMas();
   instalarFicha();
   instalarGruposDeOpciones();
-  instalarFilasDeUnaTabla();
+  instalarFilasPropias();
   zonasConTeclasPropias(ZONAS);
   // La tabla antes que «← al menú»: una pantalla que usa ← (Duplicados) se queda con la tecla.
   instalarTabla(TABLA_DE_LA_COMPU, ZONAS);

@@ -29,7 +29,7 @@ export function Previa({ filas, mas }: { filas: Fila[]; mas: React.ReactNode }) 
   useAccionesDelLugar(tabla, { "previa.explicar": () => setExplicada((x) => !x) });
   return (
     <div className={css.tabla}>
-      <table ref={tabla} className={css.previa} data-testid="vista-previa" data-flechas-propias>
+      <table ref={tabla} className={css.previa} data-testid="vista-previa" data-flechas-propias data-filas>
         <colgroup><col className="c-foto" /><col /><col className="c-antes" /><col className="c-nuevo" /><col className="c-cambio" /><col className="c-estante" /></colgroup>
         <thead><tr><th scope="col"><span className="solo-lectores">Foto</span></th><th scope="col">Producto</th><th scope="col" className="num">Costo antes</th><th scope="col" className="num">Costo nuevo</th><th scope="col" className="num">Cambio</th><th scope="col" className="num">{TEXTOS.listas.precioEnEstanteria.largo}</th></tr></thead>
         <tbody>

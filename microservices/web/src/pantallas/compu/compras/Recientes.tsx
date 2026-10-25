@@ -1,4 +1,4 @@
-import { useMemo, useState, type KeyboardEvent } from "react";
+import { useMemo, useState } from "react";
 import { pesosCortos } from "../../../negocio/formato";
 import { esDeLaSemana, type CompraFila, type Gastos, type useComprasRecientes } from "../../../negocio/compras";
 import { TEXTOS } from "../../textos";
@@ -12,7 +12,7 @@ import css from "./Compras.module.css";
 
 // Las últimas compras, con la miniatura de su comprobante. Cada una se abre para ver sus renglones
 // y se puede anular; anular no se deshace, por eso pide confirmación con el motivo ahí mismo.
-// Flechas recorren las compras; Supr anula la que tiene el foco.
+// Las compras se recorren por filas (data-filas); la que tiene el foco ofrece anularla.
 type Filtro = "semana" | "anuladas" | null;
 const t = TEXTOS.compras;
 type Props = { compras: ReturnType<typeof useComprasRecientes>; gastos: Gastos | null; enLinea: boolean; alAnular: (mensaje: string) => void };
@@ -24,10 +24,6 @@ export function Recientes({ compras, gastos, enLinea, alAnular }: Props) {
   const f = useFiltroDeCompras(filas, gastos);
   const { abiertas, alternar } = useAbiertas();
   const [anulando, setAnulando] = useState<CompraFila | null>(null);
-  function teclas(e: KeyboardEvent<HTMLButtonElement>, c: CompraFila) {
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") moverEntreCompras(e);
-    else if (e.key === "Delete" && c.estado !== "anulada" && anula) { e.preventDefault(); setAnulando(c); }
-  }
   const anulada = () => { const c = anulando!; setAnulando(null); alAnular(`Compra a ${c.proveedor} por ${pesosCortos(c.total)} anulada: el stock que había sumado se descontó.`); };
   return (
     <section className={css.recientes} aria-labelledby="cv-recientes" data-testid="compras-recientes">
@@ -38,8 +34,8 @@ export function Recientes({ compras, gastos, enLinea, alAnular }: Props) {
       <Aviso tipo="alerta" accion={<Boton tam="chico" icono="repetir" onClick={compras.recargar}>Reintentar</Boton>}>{error}</Aviso>
       <SinCompras filas={filas} error={error} visibles={f.visibles.length} />
       {f.visibles.length > 0 && (
-        <ul className={css.lista}>
-          {f.visibles.map((c) => <CompraReciente key={c.id} c={c} abierta={abiertas.has(c.id)} anula={anula} alAlternar={() => alternar(c.id)} alTeclear={(e) => teclas(e, c)} alAnular={() => setAnulando(c)} />)}
+        <ul className={css.lista} data-filas>
+          {f.visibles.map((c) => <CompraReciente key={c.id} c={c} abierta={abiertas.has(c.id)} anula={anula} alAlternar={() => alternar(c.id)} alAnular={() => setAnulando(c)} />)}
         </ul>
       )}
       {anulando && <AnularCompra compra={anulando} enLinea={enLinea} alCerrar={() => setAnulando(null)} alAnular={anulada} />}
@@ -71,10 +67,4 @@ function SinCompras({ filas, error, visibles }: { filas: CompraFila[] | null; er
   if (filas === null) return error ? null : <div className="compras-cargando" aria-busy="true"><span className="solo-lectores">Trayendo las compras…</span><div className="esqueleto" /><div className="esqueleto" /><div className="esqueleto" /></div>;
   if (filas.length === 0) return <p className="detalle">No hay compras registradas. La primera aparece acá cuando registres un ingreso de mercadería.</p>;
   return visibles === 0 ? <p className="detalle">Ninguna compra con este filtro.</p> : null;
-}
-
-function moverEntreCompras(e: KeyboardEvent<HTMLButtonElement>) {
-  const todos = [...(e.currentTarget.closest("ul")?.querySelectorAll<HTMLButtonElement>("[data-abre-compra]") ?? [])];
-  const destino = todos[todos.indexOf(e.currentTarget) + (e.key === "ArrowDown" ? 1 : -1)];
-  if (destino) { e.preventDefault(); destino.focus(); }
 }

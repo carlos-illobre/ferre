@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Acciones } from "../../../plataforma/comandos";
 import { busquedaAlDia, esperarBusqueda, traerPorCodigo, useCatalogo, type Producto } from "../../../negocio/catalogo";
 import { cantidadContada, useConteo, type Conteo } from "../../../negocio/deposito";
 
@@ -31,7 +32,7 @@ export function useConteoDelCelular(conteo: Conteo, alActualizar: (c: Conteo) =>
   const alDetectar = useCallback((codigo: string) => {
     void traerPorCodigo(codigo).then((p) => { if (p) { setEscaneando(false); elegirProducto(p); } else setError(`El código ${codigo} no está en el catálogo: buscalo por nombre.`); }).catch((e: Error) => setError(e.message));
   }, [catalogo]); // eslint-disable-line react-hooks/exhaustive-deps
-  const teclasBusqueda = (e: KeyboardEvent<HTMLInputElement>) => teclasDeLaBusqueda(e, { consulta, resultados, elegido, setElegido, setConsulta, elegirProducto });
+  const enLaCaja = accionesDeLaBusqueda({ consulta, resultados, elegido, setElegido, setConsulta, elegirProducto });
   async function guardar() {
     if (!producto) return;
     const n = cantidadContada(cantidad, producto);
@@ -43,19 +44,23 @@ export function useConteoDelCelular(conteo: Conteo, alActualizar: (c: Conteo) =>
   }
   return {
     conteo, contadoPorId: c.contadoPorId, consulta, setConsulta, elegido, resultados, producto, setProducto, cantidad, setCantidad, cerrando, setCerrando, escaneando, setEscaneando,
-    resultado, error, setError, cajaCantidad, elegirProducto, alDetectar, teclasBusqueda, guardar, cerrar,
+    resultado, error, setError, cajaCantidad, elegirProducto, alDetectar, enLaCaja, guardar, cerrar,
   };
 }
 export type ConteoDelCelular = ReturnType<typeof useConteoDelCelular>;
 
-// ↑ ↓ eligen, Enter elige (si la lista no alcanzó a lo escrito, espera la respuesta), Esc limpia.
+// Lo de la búsqueda: marcar el de al lado, elegir el marcado (si la lista no alcanzó a lo escrito,
+// espera la respuesta) y limpiarla.
 type Busqueda = { consulta: string; resultados: Producto[]; elegido: number; setElegido: (f: (i: number) => number) => void; setConsulta: (c: string) => void; elegirProducto: (p: Producto) => void };
-function teclasDeLaBusqueda(e: KeyboardEvent<HTMLInputElement>, b: Busqueda) {
-  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); b.setElegido((i) => (e.key === "ArrowDown" ? Math.min(i + 1, b.resultados.length - 1) : Math.max(i - 1, 0))); }
-  else if (e.key === "Enter") enterEnLaBusqueda(e, b);
-  else if (e.key === "Escape") b.setConsulta("");
-}
-function enterEnLaBusqueda(e: KeyboardEvent<HTMLInputElement>, b: Busqueda) {
-  if (!busquedaAlDia(b.consulta)) { e.preventDefault(); void esperarBusqueda(b.consulta).then((r) => { if (r[0]) b.elegirProducto(r[0]); }); }
-  else if (b.resultados[b.elegido]) { e.preventDefault(); b.elegirProducto(b.resultados[b.elegido]!); }
+const accionesDeLaBusqueda = (b: Busqueda): Acciones => ({
+  "lista.siguiente": () => b.setElegido((i) => Math.min(i + 1, b.resultados.length - 1)),
+  "lista.anterior": () => b.setElegido((i) => Math.max(i - 1, 0)),
+  "lista.elegir": () => elegirElMarcado(b),
+  "lista.salir": () => b.setConsulta(""),
+});
+function elegirElMarcado(b: Busqueda) {
+  if (!busquedaAlDia(b.consulta)) { void esperarBusqueda(b.consulta).then((r) => { if (r[0]) b.elegirProducto(r[0]); }); return; }
+  const marcado = b.resultados[b.elegido];
+  if (!marcado) return false;
+  b.elegirProducto(marcado);
 }

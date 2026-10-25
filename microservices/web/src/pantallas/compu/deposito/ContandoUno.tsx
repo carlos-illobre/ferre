@@ -1,19 +1,23 @@
 import { conUnidad, enteras, unidadDe } from "../../../negocio/catalogo";
 import type { Contado } from "../../../negocio/deposito";
-import { Boton } from "../base/ui";
+import { useRef } from "react";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
+import { Atajo, Boton } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import { FotoChica } from "./FotoChica";
 import { nombreUnidad, type Producto } from "./deposito-comun";
 import type { ConteoDeSector } from "./useConteoDeSector";
 import css from "./Contar.module.css";
 
-// El producto que se está contando: «¿Cuántas hay?», Enter y el siguiente; Esc cancela. Si ya se
+// El producto que se está contando: «¿Cuántas hay?» y el siguiente, o cancelar. Si ya se
 // había contado, lo nuevo lo reemplaza, y se puede quitar de lo contado.
 export function ContandoUno({ x, producto }: { x: ConteoDeSector; producto: Producto }) {
+  const formulario = useRef<HTMLFormElement>(null);
+  useAccionesDelLugar(formulario, { "campo.deshacer": () => x.setProducto(null) });
   const previo = x.contadoPorId.get(producto.id);
   const unidad = unidadDe(producto);
   return (
-    <form className={css.contando} onSubmit={(e) => { e.preventDefault(); void x.guardar(); }} noValidate data-testid="contando" onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); x.setProducto(null); } }}>
+    <form className={css.contando} onSubmit={(e) => { e.preventDefault(); void x.guardar(); }} noValidate data-testid="contando" ref={formulario}>
       <FotoChica id={producto.id} grande />
       <QueSeCuenta producto={producto} previo={previo} />
       <label className={css.cuantas} htmlFor={`${x.id}-cantidad`}>
@@ -23,7 +27,7 @@ export function ContandoUno({ x, producto }: { x: ConteoDeSector; producto: Prod
           aria-invalid={Boolean(x.errorCantidad)} aria-describedby={x.errorCantidad ? `${x.id}-falta` : undefined} data-testid="cantidad" />
         <small>{nombreUnidad(unidad)}</small>
       </label>
-      <Boton type="submit" variante="marino" className={css.siguiente} disabled={x.guardando} data-testid="siguiente">{x.guardando ? "Guardando…" : "Siguiente"} <kbd className="tecla">Enter</kbd></Boton>
+      <Boton type="submit" variante="marino" className={css.siguiente} disabled={x.guardando} data-testid="siguiente">{x.guardando ? "Guardando…" : "Siguiente"} <Atajo accion="campo.listo" kbd /></Boton>
       <PieDelContando x={x} unidad={unidad} conPrevio={Boolean(previo)} />
     </form>
   );
@@ -44,7 +48,7 @@ function PieDelContando({ x, unidad, conPrevio }: { x: ConteoDeSector; unidad: R
     <div className={css.contandoPie}>
       {x.errorCantidad && <p className={css.falta} id={`${x.id}-falta`} role="alert">{x.errorCantidad}</p>}
       {!enteras(unidad) && <span className="detalle">En {nombreUnidad(unidad)}, con un decimal.</span>}
-      <Boton tam="chico" onClick={() => x.setProducto(null)} disabled={x.guardando}>Cancelar <kbd className="tecla">Esc</kbd></Boton>
+      <Boton tam="chico" onClick={() => x.setProducto(null)} disabled={x.guardando}>Cancelar <Atajo accion="campo.deshacer" kbd /></Boton>
       {conPrevio && <Boton variante="peligro" tam="chico" icono="basura" onClick={() => void x.quitar()} disabled={x.guardando} data-testid="quitar-contado">Quitar de lo contado</Boton>}
     </div>
   );

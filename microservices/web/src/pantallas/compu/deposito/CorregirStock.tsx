@@ -1,9 +1,10 @@
-import { useId, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 import { numero } from "../../../negocio/formato";
 import { enteras, unidadDe } from "../../../negocio/catalogo";
 import { useCorregirStock, useFormularioDeCorreccion } from "../../../negocio/deposito";
 import { MOTIVOS_DE_AJUSTE, TEXTOS } from "../../textos";
-import { Aviso, Boton } from "../base/ui";
+import { useAccionesDelLugar } from "../../../plataforma/comandos";
+import { Atajo, Aviso, Boton } from "../base/ui";
 import { Icono } from "../../../ui/iconos";
 import type { Producto } from "./deposito-comun";
 import css from "./Inventario.module.css";
@@ -34,16 +35,18 @@ export function CorregirStock({ producto: p, cantidad, alCorregir, alTerminar }:
     } catch (err) { setError(`No se guardó la corrección: ${(err as Error).message}`); }
   }
   const cancelar = () => { f.limpiar(); setFalta({}); alTerminar(); };
+  const formulario = useRef<HTMLFormElement>(null);
+  useAccionesDelLugar(formulario, { "campo.deshacer": cancelar });
   return (
-    <form className={css.corregir} onSubmit={guardar} onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); cancelar(); } }} noValidate data-testid="correccion">
+    <form className={css.corregir} onSubmit={guardar} noValidate data-testid="correccion" ref={formulario}>
       <CuantasHay id={id} producto={p} cantidad={cantidad} f={f} falta={falta.real} alCambiar={() => setFalta((x) => ({ ...x, real: undefined }))} />
       {falta.real && <p className="stock-falta" id={`${id}-falta-real`} role="alert">{falta.real}</p>}
       <Motivo id={id} f={f} falta={falta.motivo} alCambiar={() => setFalta((x) => ({ ...x, motivo: undefined }))} />
       {falta.motivo && <p className="stock-falta" id={`${id}-falta-motivo`} role="alert">{falta.motivo}</p>}
       <Aviso tipo="error">{error}</Aviso>
       <div className={css.filaC}>
-        <Boton type="submit" variante="marino" className={css.guardar} disabled={guardando} data-testid="guardar-ajuste">{guardando ? "Guardando…" : "Guardar corrección"} <kbd className="tecla">Enter</kbd></Boton>
-        <Boton className={css.cancelar} onClick={cancelar} disabled={guardando}>Cancelar <kbd className="tecla">Esc</kbd></Boton>
+        <Boton type="submit" variante="marino" className={css.guardar} disabled={guardando} data-testid="guardar-ajuste">{guardando ? "Guardando…" : "Guardar corrección"} <Atajo accion="campo.listo" kbd /></Boton>
+        <Boton className={css.cancelar} onClick={cancelar} disabled={guardando}>Cancelar <Atajo accion="campo.deshacer" kbd /></Boton>
       </div>
     </form>
   );
