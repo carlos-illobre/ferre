@@ -343,3 +343,25 @@ pasan. Hay comportamientos técnicos que no pide ninguna regla escrita:
 ## 5. Pantallas
 
 La funcionalidad no lleva maquetas («No lleva pantallas»). No hay nada que comparar.
+
+## Después de la revisión (2026-10-25)
+
+Lo que frenaba el cierre, resuelto:
+
+1. **Código copiado (E03, SC-01):** T023 y decisión 166. La lógica repetida entre las dos
+   interfaces quedó una sola vez; `pnpm limites` falla con cualquier repetición que no sea el
+   dibujo del celular parecido al de la computadora (hoy, 0 prohibidas).
+2. **Lo guardado y el servidor fuera de `datos/` (E01):** T021. Una regla de `pnpm limites`
+   prohíbe `localStorage`, `sessionStorage`, `indexedDB` y `fetch` fuera de `datos/`,
+   `plataforma/` y `app/`.
+3. **Quién puede anular (E04, Seguridad):** T022. `puede`, `usePuede` y `usePuedeAnular` en
+   `negocio/usuarios/`; quién ve cada parte de Vender, en `negocio/permisos/`.
+
+De los defectos del teclado: T024 hizo que reconozca la pantalla solo por marcas del HTML
+(`teclado/compu/marcas.ts`) y ADR-029 documenta las marcas y el orden de las piezas. Las teclas
+escritas a mano del manual y de cuatro ayudas quedaron en T147. La documentación atrasada
+(RNF-69, ADR-028, ADR-015, `CLAUDE.md`, el plan) está al día.
+
+Quedan como defectos, sin frenar: los archivos sueltos en la raíz de `pantallas/` y de `negocio/`,
+los estilos globales y la paleta en `pantallas/`, y lógica de pantalla en hooks de cada interfaz
+que no es igual entre las dos.

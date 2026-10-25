@@ -22,7 +22,7 @@ Cada etapa se sube con todas las pruebas en verde y sin cambiar nada a la vista 
 - [x] T019 Catálogo sin código de teclas (depende de T017)
 - [x] T020 Depósito, compras, negocio, anomalías, mejoras y errores, configuración, sistema y el manual sin código de teclas (depende de T017)
 - [x] T013 Cierre: la lista de excepciones vacía, ADR-018 y `001/ux.md` al día con las carpetas, y la documentación de `tests/capturas/` (depende de T012)
-- [ ] T014 Revisión independiente (paso 7) (depende de T013)
+- [x] T014 Revisión independiente (paso 7) (depende de T013)
 - [x] T021 Lo guardado en el dispositivo y los pedidos al servidor solo en `datos/` (y `plataforma/`): sin `localStorage`, `sessionStorage` ni `fetch` en `negocio/` ni en `pantallas/`, con una regla de `pnpm limites` que lo controle (revision.md, punto 2)
 - [x] T022 Quién puede qué, una sola vez en el negocio: `puede`, `usePuede` y quién anula una venta (`usePuedeAnular`) en `negocio/usuarios/`, y quién ve cada parte de Vender en `negocio/permisos/` (revision.md, punto 3)
 - [x] T023 Sin código copiado (decisión 166): la lógica repetida entre interfaces, una sola vez (agregar a la venta desde el catálogo, la foto de un producto en una lista, subir una foto, el subtotal de un renglón corregido, las teclas de cobrar), la parte con pestañas del celular, una sola pieza; `pnpm limites` falla con cualquier repetición que no sea dibujo del celular parecido al de la computadora (revision.md, punto 1)
