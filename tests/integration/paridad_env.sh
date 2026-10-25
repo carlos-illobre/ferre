@@ -53,4 +53,13 @@ if [[ -n "$escrito" ]]; then
   estado=1
 fi
 
+# Decisión 161: los logs de cada contenedor no pasan de 10 MB (dos archivos de 5 MB que rotan).
+sin_tope=$(docker compose --profile gateway config --format json 2>/dev/null | node -e '
+  const s = JSON.parse(require("fs").readFileSync(0, "utf8")).services;
+  for (const [n, v] of Object.entries(s)) { const o = v.logging?.options ?? {}; if (o["max-size"] !== "5m" || o["max-file"] !== "2") console.log(n); }' | tr "\n" " ")
+if [[ -n "$sin_tope" ]]; then
+  echo "Servicios sin tope de logs (decisión 161): $sin_tope"
+  estado=1
+fi
+
 exit $estado

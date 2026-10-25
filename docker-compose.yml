@@ -10,11 +10,20 @@
 # La base corre en todos los ambientes (ADR-026): una instancia por proyecto de compose, con
 # una base y un usuario por servicio. Cada clave está una vez en el .env; acá se arma la cadena.
 
+# Los logs de cada contenedor no pasan de 10 MB: dos archivos de 5 MB que rotan. Los dos
+# ambientes comparten el disco de la máquina (decisión 161).
+x-logs: &logs
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "2"
+
 services:
   reverse-proxy:
     image: caddy:2-alpine
     profiles: ["gateway"]
     restart: unless-stopped
+    logging: *logs
     ports:
       - "80:80"
       - "443:443"
@@ -36,6 +45,7 @@ services:
       context: .
       dockerfile: microservices/api/Dockerfile
     restart: unless-stopped
+    logging: *logs
     depends_on:
       db:
         condition: service_healthy
@@ -69,6 +79,7 @@ services:
     image: ${REGISTRO:?falta REGISTRO en el .env}/listas-de-proveedores:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
     build: ./microservices/listas
     restart: unless-stopped
+    logging: *logs
     environment:
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
       PORT: "8000"
@@ -87,6 +98,7 @@ services:
       context: .
       dockerfile: microservices/procesos/servidor/Dockerfile
     restart: unless-stopped
+    logging: *logs
     depends_on:
       db:
         condition: service_healthy
@@ -106,6 +118,7 @@ services:
     image: ${REGISTRO:?falta REGISTRO en el .env}/base-de-datos:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
     build: ./microservices/base-de-datos
     restart: unless-stopped
+    logging: *logs
     environment:
       POSTGRES_PASSWORD: ${CLAVE_BASE_ADMIN:?falta CLAVE_BASE_ADMIN en el .env}
       CLAVE_BASE_MOSTRADOR: ${CLAVE_BASE_MOSTRADOR:?falta CLAVE_BASE_MOSTRADOR en el .env}

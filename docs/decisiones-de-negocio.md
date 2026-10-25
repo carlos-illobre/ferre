@@ -1353,3 +1353,11 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      la directa o de respaldo, por el mismo canal. Los temporizadores que no usan la red (la
      cuenta regresiva del código) se quedan. Todo en el módulo de comunicación de 023, como
      una pieza que se extiende declarando casos nuevos.
+161. **Pruebas y producción conviven en la misma máquina, cada uno con lo suyo** (2026-10-25,
+     specs/001 y 022). Carlos: los logs de cada contenedor no pasan de 10 MB, porque el disco es
+     uno solo para los dos ambientes. No se les ponen topes de memoria ni de procesador:
+     producción se usa de 9 a 17 y pruebas fuera de ese horario, así que no compiten. Vigilar
+     el disco de la máquina hace falta, pero no es parte del proyecto: es de este ambiente,
+     que más adelante se cambia por uno pago. Cada ambiente corre con su propio usuario de
+     Linux y su propio Docker, para que un error en uno no pueda tocar el otro. Las copias de la
+     etapa 2 son solo de producción: lo de pruebas se puede perder.

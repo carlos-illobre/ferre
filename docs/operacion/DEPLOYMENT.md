@@ -45,6 +45,9 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   conectarse. Para cambiar una clave, o reponerlas todas, ver «Si se pierde el `.env`».
 - Desde afuera del contenedor, la base pide clave siempre; adentro, por el socket, el
   administrador entra sin clave (lo usa el control de salud del contenedor).
+- **Logs:** los de cada contenedor no pasan de 10 MB (dos archivos de 5 MB que rotan), porque el
+  disco es uno solo para los dos ambientes. Pruebas y producción no tienen topes de memoria ni
+  de procesador: se usan en horarios distintos (decisión 161).
 - Imágenes publicadas por CI en GHCR, etiquetadas por SHA corto
   ([ADR-007](../adr/ADR-007-imagenes-en-ci-y-ghcr.md)).
 - Configuración de la aplicación en la máquina: `~/ferre/produccion/.env` y

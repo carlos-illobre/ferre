@@ -56,3 +56,5 @@ tareas»). Las funcionalidades nuevas tienen su propia carpeta.
 - [x] T045 [ajuste] Cuenta corriente en rojo en toda la aplicación, con su fondo suave (decisión 144)
 - [x] T046 [regla] Toda cantidad va con su unidad, en el celular y en la computadora (decisión 144)
 - [x] T047 [arreglo] La letra de los importes del celular («Archivo Narrow») no cargaba: su hoja la buscaba en una carpeta que no existe (desde el 2026-10-17)
+- [x] T048 [ajuste] Los logs de cada contenedor no pasan de 10 MB: dos archivos de 5 MB que rotan (decisión 161)
+- [ ] T049 [ajuste] Un usuario de Linux por ambiente en la máquina, cada uno con su Docker: la instalación es por ambiente y la guía lo explica (decisión 161)
