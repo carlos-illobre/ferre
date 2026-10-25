@@ -280,7 +280,7 @@ Rediseño por etapas (decisión 150). Cada etapa es una funcionalidad nueva con 
 - [ ] T145 [agente] Etapa 6: réplica en caliente en una segunda máquina y archivos para análisis (Parquet con DuckDB) (depende de T143)
 - [ ] T146 [carlos] Crear las cuentas gratuitas de Cloudflare R2, Backblaze B2 y Healthchecks.io (antes de T140)
 - [ ] T150 [carlos] [alta] Terminar de pasar a la base propia (022). Pruebas ya está, desde el 2026-10-25: claves en su .env, scripts reinstalados y primer usuario creado. Los secretos de Supabase en GitHub ya no están. Falta producción, que se arma ya con su usuario ferre-produccion (T153): antes de promover, agregar a su .env AMBIENTE=produccion, las tres CLAVE_BASE_* (distintas de las de pruebas) y PUERTO_BASE=5433, quitar DATABASE_URL y, después de promover, crear el primer usuario (docs/operacion/DEPLOYMENT.md) (depende de T139)
-- [ ] T153 [carlos] [alta] Un usuario de Linux por ambiente en la máquina (decisión 161, 001-T049): crear ferre-pruebas y ferre-produccion con su Docker rootless, pasar pruebas a ferre-pruebas (su base arranca vacía de nuevo) y dejar ferre-produccion listo para cuando se promueva; el usuario ferre queda solo con la producción vieja hasta entonces
+- [ ] T153 [carlos] [alta] Un usuario de Linux por ambiente en la máquina (decisión 161, 001-T049). Hecho el 2026-10-25: ferre-pruebas corre pruebas con su Docker rootless, su servicio de despliegue y su base; ferre-produccion tiene Docker rootless y el repo, sin servicios. Falta, al promover: instalar producción en ferre-produccion (con T150), bajar la producción vieja del usuario ferre siguiendo ORACLE.md («Pasar un ambiente que ya corre de un usuario a otro») y dar de baja el usuario ferre
 
 ## Sin etapa
 
