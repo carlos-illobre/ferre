@@ -40,7 +40,8 @@
 	}
 
 	# Procesos (ADR-019) no sabe de sesiones: la puerta pregunta quién es y qué puede.
-	handle /procesos* {
+	@procesos path /procesos /procesos/*
+	handle @procesos {
 		forward_auth comercial:8080 {
 			uri /sesiones/quien
 			header_up X-Token-Servicio {$TOKEN_SERVICIO}
@@ -54,12 +55,19 @@
 		}
 	}
 
-	# Un servicio que no responde: se dice con palabras, como cualquier otro error (026-E08).
+	# Un servicio que no responde (026-E08). Si es Procesos, se dice con palabras, como cualquier
+	# otro error. Si es Comercial, se corta la conexión: la aplicación lo toma como sin conexión y
+	# sigue con lo que tiene en el dispositivo, igual que antes de la puerta.
 	handle_errors 502 503 504 {
-		header Access-Control-Allow-Origin {$ORIGEN_WEB}
-		header Access-Control-Expose-Headers X-Avisos
-		header Content-Type application/json
-		respond `{"error":"Esa parte del sistema no responde ahora. Probá de nuevo en un rato"}` {err.status_code}
+		handle @procesos {
+			header Access-Control-Allow-Origin {$ORIGEN_WEB}
+			header Access-Control-Expose-Headers X-Avisos
+			header Content-Type application/json
+			respond `{"error":"Procesos no responde ahora. Probá de nuevo en un rato"}` {err.status_code}
+		}
+		handle {
+			abort
+		}
 	}
 
 	# Lo demás es de Comercial, que sabe de sesiones. Lo que queda abierto (el canal de avisos)

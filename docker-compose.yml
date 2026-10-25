@@ -152,7 +152,8 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      # Sana cuando responde y ya están la base y el usuario de cada servicio (specs/027).
+      test: ["CMD-SHELL", "asegurar.sh"]
       interval: 5s
       timeout: 3s
       retries: 10

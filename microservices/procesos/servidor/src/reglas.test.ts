@@ -255,4 +255,15 @@ describe("lo que se anota", () => {
     await r.guardarBorrador(p.id, { bpmn: conPasos(2), revision: p.revision }, dibuja);
     expect(tipos(almacen)).toEqual(["proceso.creado", "proceso.borrador_cambiado"]);
   });
+
+  it("026-E11: si la base falla al guardar el borrador, la media hora no empieza a contar", async () => {
+    const { almacen, r } = conAlmacen();
+    const p = await r.crear({ nombre: "Venta" }, dibuja);
+    const guardarDeVerdad = almacen.guardarBorrador.bind(almacen);
+    almacen.guardarBorrador = async () => { throw new Error("la base no responde"); };
+    await expect(r.guardarBorrador(p.id, { bpmn: conPasos(2), revision: p.revision }, dibuja)).rejects.toThrow("la base no responde");
+    almacen.guardarBorrador = guardarDeVerdad;
+    await r.guardarBorrador(p.id, { bpmn: conPasos(2), revision: p.revision }, dibuja);
+    expect(tipos(almacen)).toEqual(["proceso.creado", "proceso.borrador_cambiado"]);
+  });
 });

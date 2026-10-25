@@ -1,4 +1,4 @@
 # La base de datos (ADR-026): una instancia por ambiente, con una base y un usuario por servicio.
-# El script de inicio corre una sola vez, cuando el volumen de datos está vacío.
+# El control de salud corre asegurar.sh: la base de cada servicio y su usuario aparecen solos.
 FROM postgres:17-alpine
-COPY iniciar.sh /docker-entrypoint-initdb.d/
+COPY asegurar.sh /usr/local/bin/asegurar.sh

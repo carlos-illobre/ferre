@@ -145,9 +145,10 @@ export function crearReglas(almacen: Almacen) {
       const { pasos } = await bpmnValido(datos.bpmn);
       await existente(id);
       const anotada = anotacionDelBorrador(id, quien);
-      const nueva = await almacen.guardarBorrador(id, revision, { bpmn: datos.bpmn as string, pasos, autor: quien }, anotada);
-      // Si otro guardó antes, no se anotó nada: la media hora no empieza a contar.
-      if (nueva === null && anotada) borradorAnotado.delete(`${quien.id}/${id}`);
+      // Si otro guardó antes o la base falló, no se anotó nada: la media hora no empieza a contar.
+      const noSeAnoto = () => { if (anotada) borradorAnotado.delete(`${quien.id}/${id}`); };
+      const nueva = await almacen.guardarBorrador(id, revision, { bpmn: datos.bpmn as string, pasos, autor: quien }, anotada).catch((e: unknown) => { noSeAnoto(); throw e; });
+      if (nueva === null) noSeAnoto();
       return siSigueIgual(id, quien, nueva);
     },
 

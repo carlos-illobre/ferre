@@ -77,9 +77,20 @@ verificar "025-E09: la respuesta lleva X-Avisos" 1 "$(printf '%s\n' "$respuesta"
 
 # 026-E08: Procesos sin responder: la puerta lo dice con palabras y lo demás sigue andando.
 docker compose stop procesos >/dev/null 2>&1
-verificar "026-E08: Procesos caído, 502 con el aviso" '{"error":"Esa parte del sistema no responde ahora. Probá de nuevo en un rato"}' "$(curl -s -H "Authorization: Bearer $DUENA" $API/procesos)"
+verificar "026-E08: Procesos caído, 502 con el aviso" '{"error":"Procesos no responde ahora. Probá de nuevo en un rato"}' "$(curl -s -H "Authorization: Bearer $DUENA" $API/procesos)"
 verificar "026-E08: Comercial sigue andando" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sesiones/actual)"
 docker compose start procesos >/dev/null 2>&1
+docker compose up -d --wait >/dev/null 2>&1
+
+# Comercial sin responder: la puerta corta la conexión, como si no hubiera red (la aplicación sigue
+# con lo que tiene en el dispositivo), en vez de contestar un error.
+docker compose stop comercial >/dev/null 2>&1
+curl -s -o /dev/null "http://127.0.0.1:$(valor PUERTO_API)/sesiones/actual"; corte=$?
+verificar "026: Comercial caído, la puerta corta la conexión (sin respuesta)" si "$([[ $corte -eq 52 || $corte -eq 56 ]] && echo si || echo "no ($corte)")"
+# El proxy de adelante (el de la máquina, o el de desarrollo) contesta 502 sin CORS: para el
+# navegador es una falla de red.
+verificar "026: Comercial caído, lo que llega al navegador no lleva CORS" 0 "$(curl -s -o /dev/null -D - -H "Origin: $ORIGEN" $API/sesiones/actual | grep -ic '^access-control-allow-origin:')"
+docker compose start comercial >/dev/null 2>&1
 docker compose up -d --wait >/dev/null 2>&1
 
 [[ $fallos -eq 0 ]] || { echo "$fallos verificación(es) de la puerta fallaron"; exit 1; }

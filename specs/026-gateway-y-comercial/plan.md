@@ -44,8 +44,16 @@
   respuesta el navegador los rechaza.
 - **Procesos lee los permisos con sus nombres configurados:** en vez de `X-Puede` con sus
   palabras, recibe `X-Permisos` (la lista de permisos de la persona) y su `.env` dice qué
-  permiso es «ver» y cuál «dibujar» (`PERMISO_VER`, `PERMISO_DIBUJAR`). Sigue sin saber nada de
+  permiso es «ver» y cuál «dibujar» (`PERMISO_VER`, `PERMISO_DIBUJAR`; como no cambian entre
+  ambientes, van escritas en el compose y no en el `.env`). Sigue sin saber nada de
   Ferrebress (RNF-61) y la puerta no traduce nada.
+- **La salud de la puerta** está en `/puerta/salud`, para el control del contenedor.
+- **Quién llama de verdad:** la puerta confía en el `X-Forwarded-For` que pone el reverse proxy de
+  la máquina (`trusted_proxies private_ranges`), así Comercial sigue viendo la dirección de quien
+  llama para limitar los intentos de entrar.
+- **Un servicio caído:** si es Procesos, la puerta lo dice con palabras; si es Comercial, corta la
+  conexión, y la aplicación lo toma como sin conexión (sigue con lo que tiene en el dispositivo).
+- **Versión fija de Caddy** (`2.11.7`): el orden en que aplica las directivas no puede cambiar solo.
 - **Los servicios atienden solo a la puerta:** Comercial exige el token entre servicios en
   todo menos `/health` (que usa el control de salud del contenedor), como ya hace Procesos.
   Ninguno publica puertos; la puerta se publica en `127.0.0.1:PUERTO_API`.

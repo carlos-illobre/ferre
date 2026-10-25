@@ -1,4 +1,4 @@
-// El kit se lleva a cualquier servicio (specs/027, decisión 166): no importa nada de Ferrebress,
+// El kit se lleva a cualquier servicio (specs/027, decisión 167): no importa nada de Ferrebress,
 // solo su base (kysely, pg) y lo que trae Node.
 module.exports = {
   forbidden: [

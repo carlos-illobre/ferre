@@ -24,6 +24,13 @@ for base in postgres template1; do
   como procesos "$(valor CLAVE_BASE_PROCESOS)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Procesos abrió la base $base"
 done
 
+# 027: un servicio nuevo con base aparece solo en un ambiente que ya existe: asegurar.sh crea su
+# base y su usuario a partir de su CLAVE_BASE_<SERVICIO>, sin tocar las demás.
+docker compose exec -T -e CLAVE_BASE_SERVICIONUEVO=clave-nueva db sh -c 'rm -f /tmp/bases-aseguradas && asegurar.sh' || falla "asegurar.sh falló con un servicio nuevo"
+como servicionuevo clave-nueva servicionuevo "SELECT 1" >/dev/null 2>&1 || falla "el servicio nuevo no abre su base"
+como servicionuevo clave-nueva mostrador "SELECT 1" >/dev/null 2>&1 && falla "el servicio nuevo abrió la base del mostrador"
+docker compose exec -T db psql -U postgres -qc "DROP DATABASE servicionuevo" -c "DROP ROLE servicionuevo" >/dev/null
+
 # 022-E08: las tablas de Procesos están en su base, no en la del mostrador.
 [[ "$(como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'procesos'")" == "0" ]] || falla "la base del mostrador tiene tablas de Procesos"
 

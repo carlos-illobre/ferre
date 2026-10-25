@@ -54,7 +54,7 @@ describe("los procesos en Postgres", () => {
 
   it("026-E10 026-E12: cada cambio anota su evento en la misma transacción, con el proceso; sin anotación o si no cambió, nada", async () => {
     const anota = (tipo: string) => ({ tipo, autor });
-    const eventos = async (id: string) => (await base.selectFrom("procesos.evento").select(["tipo", "usuario_id", "usuario_nombre", "contenido"]).where(sql`contenido->>'id'`, "=", id).orderBy("fecha").execute());
+    const eventos = async (id: string) => (await base.withSchema("procesos").selectFrom("evento").select(["tipo", "usuario_id", "usuario_nombre", "contenido"]).where(sql`contenido->>'id'`, "=", id).orderBy("fecha").execute());
     const id = await almacen.crear("Cobro", version(1), anota("proceso.creado"));
     expect(await almacen.renombrar(id, "Cobro en caja", anota("proceso.renombrado"))).toBe(true);
     expect(await almacen.guardarBorrador(id, 1, version(2), anota("proceso.borrador_cambiado"))).toBe(2);

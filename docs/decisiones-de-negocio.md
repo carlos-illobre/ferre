@@ -1420,7 +1420,7 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      46), aunque se parezca. El control de código repetido deja pasar solo eso: una pieza visual
      (`.tsx` o `.css`) del celular parecida a una de la computadora; cualquier otra repetición falla.
 
-166. **Auditoría con un contrato estándar, y opcional para cada servicio** (2026-10-25). Carlos:
+167. **Auditoría con un contrato estándar, y opcional para cada servicio** (2026-10-25). Carlos:
      sumar un servicio en el futuro no puede obligar a cambiar Auditoría (precisa la 165). Cada
      servicio le manda sus eventos con un formato único y versionado, que trae el texto para
      personas armado por el servicio, así que ni Auditoría ni la web necesitan conocer sus

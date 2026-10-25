@@ -1,6 +1,6 @@
 # Contrato de auditoría, versión 1
 
-Cómo un servicio le manda a Auditoría lo que hizo cada persona (specs/027, decisión 166). Lo
+Cómo un servicio le manda a Auditoría lo que hizo cada persona (specs/027, decisión 167). Lo
 cumple cualquier servicio, en cualquier lenguaje: Auditoría no necesita conocerlo. En Node, el
 kit `microservices/auditoria-kit` lo hace por el servicio.
 

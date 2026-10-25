@@ -78,3 +78,14 @@ cada aplicación.
 Procesos deja de usar la base de Ferrebress: tiene su base `procesos` en la misma instancia, con
 su usuario (ADR-026). Sus tablas siguen en el esquema `procesos` dentro de ella, y sus migraciones
 las aplica el migrador de Kysely (ADR-025). Para llevarlo a otro proyecto se copia su base entera.
+
+---
+
+## Enmienda (2026-10-25, specs/026): la puerta en vez de la aplicación
+
+Ferrebress ya no le reenvía los pedidos a Procesos desde su servidor: lo hace la puerta del
+servidor (ADR-031), que le pregunta a la aplicación quién es la persona y le pasa
+`X-Usuario-Id`, `X-Usuario-Nombre` y `X-Permisos`. Procesos recibe los permisos con los nombres
+de la aplicación y su configuración (`PERMISO_VER`, `PERMISO_DIBUJAR`) le dice cuáles son los
+suyos. Lo que se hace en Procesos lo anota Procesos en su base, en la transacción del cambio.
+Sigue sin usar nada de Ferrebress.

@@ -1,6 +1,6 @@
 # Tareas: Auditoría
 
-- [x] T001 Especificación (paso 1), con las respuestas de Carlos del 2026-10-25 (decisiones 164 a 166); aprobada el 2026-10-25
+- [x] T001 Especificación (paso 1), con las respuestas de Carlos del 2026-10-25 (decisiones 164, 165 y 167); aprobada el 2026-10-25
 - [x] T002 Plan con «Seguridad» (paso 3) (depende de T001)
 - [ ] T003 Las bases nuevas aparecen solas: `asegurar.sh` repetible, en el arranque y en el control de salud; `CLAVE_BASE_AUDITORIA` (depende de T002)
 - [x] T004 El contrato v1 escrito (`docs/auditoria/contrato-v1.md`) (E15) (depende de T002)

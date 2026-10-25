@@ -9,7 +9,7 @@
 **Maquetas**: No lleva pantallas
 
 **Input**: Carlos, el 2026-10-25, al dividir la aplicación en servicios por funcionalidad
-(decisiones 164 a 166). Es la etapa 2 del plan (`proyecto/tasks.md`, T154). Hoy el servidor
+(decisiones 164, 165 y 167). Es la etapa 2 del plan (`proyecto/tasks.md`, T154). Hoy el servidor
 del mostrador hace dos trabajos: el suyo y el de puerta para Procesos (le reenvía los pedidos,
 valida la sesión y anota en «Quién hizo qué» lo que se hace en Procesos). Con más servicios en
 camino (Auditoría, Tickets, Acceso), esa puerta va a un servicio propio, y el servidor del

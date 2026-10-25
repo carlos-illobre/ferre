@@ -3,7 +3,7 @@ import { sql, type Kysely } from "kysely";
 import pg from "pg";
 import { MAXIMO_POR_LOTE, problemaDelEvento, type EventoDeAuditoria, type EventoMandado } from "./contrato.js";
 
-// La bandeja de auditoría de un servicio (specs/027, decisión 166). El servicio anota cada evento
+// La bandeja de auditoría de un servicio (specs/027, decisión 167). El servicio anota cada evento
 // en su propia base, en la transacción de la acción: si la acción se deshace, el evento no queda.
 // Un mandador los entrega a Auditoría después, sin perder ninguno: si Auditoría no responde,
 // esperan y se reintentan. Sin la dirección de Auditoría, el kit está apagado: no anota ni manda.

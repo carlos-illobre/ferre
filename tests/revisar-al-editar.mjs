@@ -16,6 +16,9 @@ const RAIZ = fileURLToPath(new URL('..', import.meta.url));
 const PAQUETES = [
   { carpeta: 'microservices/comercial', tsconfig: 'tsconfig.pruebas.json', eslint: false },
   { carpeta: 'microservices/web', tsconfig: 'tsconfig.json', eslint: false },
+  { carpeta: 'microservices/procesos/servidor', tsconfig: 'tsconfig.pruebas.json', eslint: false },
+  { carpeta: 'microservices/auditoria', tsconfig: 'tsconfig.pruebas.json', eslint: false },
+  { carpeta: 'microservices/auditoria-kit', tsconfig: 'tsconfig.json', eslint: false },
 ];
 const EXTENSIONES = /\.(ts|tsx|mts|cts|js|jsx|mjs)$/;
 const MAXIMO = 40;

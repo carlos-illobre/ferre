@@ -8,7 +8,7 @@
 
 **Maquetas**: No lleva pantallas («Quién hizo qué» se ve igual)
 
-**Input**: Carlos, el 2026-10-25 (decisiones 164, 165 y 166). Es la etapa 3 del plan
+**Input**: Carlos, el 2026-10-25 (decisiones 164, 165 y 167). Es la etapa 3 del plan
 (`proyecto/tasks.md`, T157). Con los servicios separados, lo que hizo cada persona queda en la
 base de cada servicio. Un servicio de Auditoría lo junta y arma los reportes. Carlos pidió que
 un servicio nuevo, en el futuro, se pueda sumar sin cambiar Auditoría ni la web, y que ningún
@@ -18,12 +18,12 @@ servicio dependa de Auditoría para funcionar: mandarle eventos es una opción d
 
 ### Session 2026-10-25
 
-- Q: ¿Cómo llegan los eventos a Auditoría? → A: Cada servicio se los manda con un formato único y versionado. No se pierde ninguno: el servicio los anota en su propia base, dentro de su transacción, y después los entrega (decisión 166).
-- Q: ¿Auditoría tiene que conocer a los servicios? → A: No: acepta cualquier servicio que mande eventos con el formato, con el token entre servicios. Cada evento trae su texto para personas armado por el servicio que lo conoce (decisión 166).
-- Q: ¿Un servicio puede andar sin Auditoría? → A: Sí, es opcional: si su archivo de variables de entorno no dice dónde está Auditoría, no anota ni manda nada. Encendido, tampoco depende de ella: si está caída, los eventos esperan (decisión 166).
+- Q: ¿Cómo llegan los eventos a Auditoría? → A: Cada servicio se los manda con un formato único y versionado. No se pierde ninguno: el servicio los anota en su propia base, dentro de su transacción, y después los entrega (decisión 167).
+- Q: ¿Auditoría tiene que conocer a los servicios? → A: No: acepta cualquier servicio que mande eventos con el formato, con el token entre servicios. Cada evento trae su texto para personas armado por el servicio que lo conoce (decisión 167).
+- Q: ¿Un servicio puede andar sin Auditoría? → A: Sí, es opcional: si su archivo de variables de entorno no dice dónde está Auditoría, no anota ni manda nada. Encendido, tampoco depende de ella: si está caída, los eventos esperan (decisión 167).
 - Q: ¿Qué pasa con los eventos que ya hay? → A: Auditoría arranca vacía en los dos ambientes; no se mudan (Carlos, 2026-10-25: no hay datos reales).
 - Q: ¿Quién ve los reportes? → A: Quien tiene hoy el permiso de ver «Quién hizo qué» (Carlos, 2026-10-25).
-- Q: ¿Cuánto tiempo queda un evento en la base del servicio que lo anotó? → A: Hasta una semana después de que Auditoría confirma que lo guardó (decisión 166).
+- Q: ¿Cuánto tiempo queda un evento en la base del servicio que lo anotó? → A: Hasta una semana después de que Auditoría confirma que lo guardó (decisión 167).
 
 ## User Scenarios & Testing *(mandatory)*
 

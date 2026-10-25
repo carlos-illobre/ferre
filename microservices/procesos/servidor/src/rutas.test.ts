@@ -4,7 +4,8 @@ import { crearReglas } from "./reglas.js";
 import { almacenEnMemoria } from "./memoria.js";
 
 const TOKEN = "token-de-prueba";
-const PERMISOS = { ver: "procesos.ver", dibujar: "procesos.dibujar" };
+// Otros nombres que los de Ferrebress: Procesos usa los que le dice su configuración.
+const PERMISOS = { ver: "mirar-diagramas", dibujar: "editar-diagramas" };
 const app = () => crearApp({ reglas: crearReglas(almacenEnMemoria()), token: TOKEN, permisos: PERMISOS });
 // «ver», «dibujar» o los dos, con los nombres de la aplicación que lo usa.
 const permisos = (puede: string) => puede.split(",").filter(Boolean).map((p) => PERMISOS[p.trim() as keyof typeof PERMISOS] ?? p).join(",");
@@ -18,7 +19,7 @@ describe("quién llama", () => {
     const a = app();
     expect((await a.request("/procesos")).status).toBe(401);
     expect((await a.request("/procesos", { headers: { ...cabeceras("dibujar"), "X-Token-Servicio": "otro" } })).status).toBe(401);
-    expect((await a.request("/procesos", { headers: { "X-Token-Servicio": TOKEN, "X-Permisos": "procesos.dibujar" } })).status).toBe(401);
+    expect((await a.request("/procesos", { headers: { "X-Token-Servicio": TOKEN, "X-Permisos": "editar-diagramas" } })).status).toBe(401);
   });
 
   it("011-E37 011-E39 sin ver ni dibujar no se puede ni leer la lista", async () => {
