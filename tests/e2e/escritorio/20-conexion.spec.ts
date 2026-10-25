@@ -34,7 +34,6 @@ test.beforeAll(() => {
   psql(`DELETE FROM vinculacion WHERE celular_sesion_id IN ${susSesiones} OR sesion_id IN ${susSesiones}`);
   psql(`DELETE FROM puesto WHERE sesion_id IN ${susSesiones} OR celular_sesion_id IN ${susSesiones}`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL}', 'Conexión E2E')`);
   psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);

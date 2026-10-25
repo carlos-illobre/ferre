@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("celular");
+const { psql, psqlAuditoria } = stack("celular");
 
 const CELULAR = true;
 
@@ -29,7 +29,6 @@ test.beforeAll(() => {
   psql(`DELETE FROM producto WHERE id IN ('${ID_MECHA}', '${ID_DISCO}')`);
   psql(`DELETE FROM proveedor WHERE id = '${ID_PROV}'`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL}', 'Compradora E2E')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
@@ -108,5 +107,5 @@ test("armar un pedido, mandarlo, recibirlo en parte desde el ingreso y cerrarlo 
   await expect(page.getByTestId("mensaje-pedidos")).toContainText("cerrado incompleto");
   await expect(page.getByTestId("cerrados").getByTestId("pedido").filter({ hasText: PROVEEDOR })).toContainText("Cerrado incompleto");
   await expect.poll(() => psql(`SELECT estado FROM pedido WHERE proveedor_id = '${ID_PROV}'`)).toBe("cerrado_incompleto");
-  await expect.poll(() => psql(`SELECT string_agg(tipo, ',' ORDER BY creado_en) FROM evento WHERE tipo LIKE 'pedido.%' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("pedido.enviado,pedido.recibido,pedido.cerrado");
+  await expect.poll(() => psqlAuditoria(`SELECT string_agg(tipo, ',' ORDER BY fecha) FROM auditoria.evento WHERE tipo LIKE 'pedido.%' AND quien_id = '${psql(`SELECT id FROM usuario WHERE email = '${EMAIL}'`)}'`)).toBe("pedido.enviado,pedido.recibido,pedido.cerrado");
 });

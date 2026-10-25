@@ -16,7 +16,6 @@ test.beforeAll(() => {
   psqlProcesos("DELETE FROM procesos.proceso WHERE nombre LIKE 'Venta celular E2E%'");
   const id = `(SELECT id FROM usuario WHERE email = '${EMAIL}')`;
   psql(`DELETE FROM sesion WHERE usuario_id IN ${id}`);
-  psql(`DELETE FROM evento WHERE usuario_id IN ${id}`);
   psql(`DELETE FROM usuario_rol WHERE usuario_id IN ${id}`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Procesos celular E2E', 'mostrador')`);

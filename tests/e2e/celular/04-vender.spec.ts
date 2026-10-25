@@ -4,7 +4,7 @@ import { stack } from "../comun/stack";
 import { deslizarParaCobrar, buscarEnVender } from "../comun/cobrar";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql } = stack("celular");
+const { API, psql, psqlAuditoria } = stack("celular");
 
 // Happy path "buscar un producto y registrar una venta" (issue #15): el empleado busca,
 // agrega con Enter, cambia la cantidad, elige cómo paga y cobra. La venta queda con el
@@ -23,7 +23,6 @@ test.beforeAll(() => {
   // La prueba del atajo abre «Vincular el celular», que deja un código pedido por esa sesión: se borra antes que ella.
   psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Mostrador vender E2E', 'mostrador')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
@@ -125,7 +124,7 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día y anularla", as
   await page.getByTestId("comentario-anular").fill("cambió de idea");
   await page.getByTestId("confirmar-anular").click();
   await expect(deHoy).toContainText(/anulada/i);
-  await expect.poll(() => psql(`SELECT contenido->>'motivo' FROM evento WHERE tipo = 'venta.anulada' ORDER BY fecha DESC LIMIT 1`)).toBe("Se arrepintió: cambió de idea");
+  await expect.poll(() => psqlAuditoria(`SELECT contenido->>'motivo' FROM auditoria.evento WHERE tipo = 'venta.anulada' ORDER BY fecha DESC LIMIT 1`)).toBe("Se arrepintió: cambió de idea");
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("10.000");
   // La anomalía se ve en Más > Anomalías.
   await page.getByRole("button", { name: "Más", exact: true }).click();

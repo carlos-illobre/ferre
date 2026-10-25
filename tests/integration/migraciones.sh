@@ -12,7 +12,7 @@ if [[ "$aplicadas" != "$esperadas" ]]; then
   exit 1
 fi
 
-for tabla in proveedor lista_importada producto precio_proveedor cliente venta item_venta consulta compra item_compra movimiento_stock evento; do
+for tabla in proveedor lista_importada producto precio_proveedor cliente venta item_venta consulta compra item_compra movimiento_stock union_de_productos; do
   docker compose exec -T db psql -U mostrador -d mostrador -tAc "SELECT 1 FROM $tabla LIMIT 0" >/dev/null 2>&1 \
     || { echo "falta la tabla $tabla"; exit 1; }
 done

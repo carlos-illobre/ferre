@@ -11,6 +11,9 @@ valor() { grep -E "^$1=" .env | cut -d= -f2-; }
 ORIGEN=$(valor ORIGEN_WEB)
 psql() { docker compose exec -T db psql -U mostrador -d mostrador -tAc "$1"; }
 psqlProcesos() { docker compose exec -T db psql -U procesos -d procesos -tAc "$1"; }
+psqlAuditoria() { docker compose exec -T db psql -U auditoria -d auditoria -tAc "$1"; }
+# Lo que le llega a Auditoría tarda un momento: se espera hasta 15 s a que la consulta dé lo esperado.
+hasta() { local r; for _ in $(seq 30); do r=$(psqlAuditoria "$2"); [[ "$r" == "$1" ]] && break; sleep 0.5; done; echo "$r"; }
 codigo() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 fallos=0
 verificar() { # descripción esperado real
@@ -19,7 +22,6 @@ verificar() { # descripción esperado real
 
 # Una persona con todos los permisos y otra que solo vende, con sesiones conocidas.
 psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'puerta-%@ferre.test')" >/dev/null
-psql "DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'puerta-%@ferre.test')" >/dev/null
 psql "DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'puerta-%@ferre.test')" >/dev/null
 psql "DELETE FROM usuario WHERE email LIKE 'puerta-%@ferre.test'" >/dev/null
 docker compose exec -T comercial node dist/crear-usuario.js puerta-duena@ferre.test "Dueña Núñez" >/dev/null || { echo "no se pudo crear la persona"; exit 1; }
@@ -36,7 +38,7 @@ verificar "026-E01: /sesiones/actual llega a Comercial" 200 "$(codigo -H "Author
 # 026-E02: Procesos recibe quién es y qué puede, y anota el cambio con el nombre de la persona.
 nombre="Puerta $RANDOM"
 verificar "026-E02: con sesión y permiso, Procesos crea" 201 "$(codigo -H "Authorization: Bearer $DUENA" -H 'Content-Type: application/json' -d "{\"nombre\":\"$nombre\"}" $API/procesos)"
-verificar "026-E02 026-E10: Procesos anota quién lo hizo" "Dueña Núñez" "$(psqlProcesos "SELECT usuario_nombre FROM procesos.evento WHERE tipo = 'proceso.creado' AND contenido->>'nombre' = '$nombre'")"
+verificar "026-E02 026-E10: Procesos anota quién lo hizo" "Dueña Núñez" "$(hasta "Dueña Núñez" "SELECT quien_nombre FROM auditoria.evento WHERE tipo = 'proceso.creado' AND contenido->>'nombre' = '$nombre'")"
 verificar "026-E02: sin el permiso de Procesos, Procesos dice que falta" 403 "$(codigo -H "Authorization: Bearer $VENDE" $API/procesos)"
 
 # 026-E03: sin sesión, la puerta no pasa el pedido y devuelve el aviso de siempre.

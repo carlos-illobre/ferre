@@ -22,7 +22,6 @@ test.beforeAll(() => {
   // La prueba del atajo abre «Vincular el celular», que deja un código pedido por esa sesión: se borra antes que ella.
   psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   // La corrección de la corrida anterior (019): su plata, la marca en los renglones quitados y ella.
   const suyas = `SELECT id FROM correccion_venta WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`;
   psql(`DELETE FROM movimiento_dinero WHERE correccion_id IN (${suyas}) OR usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
@@ -144,6 +143,14 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día, corregirla y a
   // Anomalías abre en «Para revisar» (014): las anotadas están en la otra pestaña.
   await page.getByTestId("pestana-anomalias").click();
   await expect(page.getByTestId("anomalia").filter({ hasText: "TORNILLO VENDER" }).first()).toContainText("Venta sin stock");
+
+  // 027-E01: lo hecho se ve en «Quién hizo qué», que arma Auditoría: con la persona y el grupo elegidos.
+  await page.goto("/#/actividad");
+  await page.getByTestId("filtro-usuario").selectOption({ label: "Mostrador vender E2E" });
+  await expect(page.getByTestId("filtro-tipo").locator("option", { hasText: "Ventas" })).toHaveCount(1);
+  await page.getByTestId("filtro-tipo").selectOption("Ventas");
+  await expect(page.getByTestId("evento").filter({ hasText: "Venta anulada" })).toContainText("Motivo: Se arrepintió: cambió de idea");
+  await expect(page.getByTestId("evento").filter({ hasText: "Venta corregida" })).toHaveCount(1);
 
   // "No llevó": la consulta queda registrada.
   await page.getByTestId("menu-vender").click();

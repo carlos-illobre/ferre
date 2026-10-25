@@ -13,7 +13,6 @@ const EMAIL = "e2e-cerrar-sesion@ferre.test";
 
 test.beforeEach(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Dueño cerrar E2E', 'dueño')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).

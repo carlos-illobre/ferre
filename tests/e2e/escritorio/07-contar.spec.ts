@@ -19,7 +19,6 @@ const ID_B = "00000000-0000-0000-0000-00000000e2ee";
 
 test.beforeAll(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`UPDATE conteo SET abierto_por = NULL, cerrado_por = NULL WHERE abierto_por IN (SELECT id FROM usuario WHERE email = '${EMAIL}') OR cerrado_por IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`UPDATE renglon_conteo SET contado_por = NULL WHERE contado_por IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);

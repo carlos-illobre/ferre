@@ -19,7 +19,6 @@ const MUESTRA = path.resolve("../../microservices/listas/tests/muestras/LISTA GE
 test.beforeAll(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`UPDATE lista_importada SET cargada_por = NULL, aplicada_por = NULL WHERE cargada_por IN (SELECT id FROM usuario WHERE email = '${EMAIL}') OR aplicada_por IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Dueño listas E2E', 'dueño')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).

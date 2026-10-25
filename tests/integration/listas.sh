@@ -9,6 +9,9 @@ cd "$(dirname "$0")/../.."
 API=http://localhost
 MUESTRAS=microservices/listas/tests/muestras
 psql() { docker compose exec -T db psql -U mostrador -d mostrador -tAc "$1"; }
+psqlAuditoria() { docker compose exec -T db psql -U auditoria -d auditoria -tAc "$1"; }
+# Lo que le llega a Auditoría tarda un momento: se espera hasta 15 s a que la consulta dé lo esperado.
+hasta() { local r; for _ in $(seq 30); do r=$(psqlAuditoria "$2"); [[ "$r" == "$1" ]] && break; sleep 0.5; done; echo "$r"; }
 json() { python3 -c "import json,sys; d=json.load(sys.stdin); print(eval('d$1'))"; }
 
 # Dueño de prueba con sesión sembrada (como en autenticacion.sh).
@@ -94,5 +97,5 @@ if [[ -f "privado/lista_precios_ixnova_14-8-2026.xlsx" ]]; then
   echo "  (Ixnova completa aplicada en $(( $(date +%s) - inicio )) s)"
 fi
 
-verificar "la auditoría registró la aplicación" sí "$([[ $(psql "SELECT count(*) FROM evento WHERE tipo = 'lista.aplicada'") -ge 1 ]] && echo sí || echo no)"
+verificar "la auditoría registró la aplicación" sí "$(hasta sí "SELECT CASE WHEN count(*) >= 1 THEN 'sí' ELSE 'no' END FROM auditoria.evento WHERE tipo = 'lista.aplicada'")"
 exit $(( fallos > 0 ))

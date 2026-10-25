@@ -17,7 +17,6 @@ test.beforeAll(() => {
   psql(`DELETE FROM ticket_foto WHERE ticket_id IN (SELECT id FROM ticket WHERE usuario_id IN ${delUsuario})`);
   psql(`DELETE FROM ticket WHERE usuario_id IN ${delUsuario}`);
   psql(`DELETE FROM sesion WHERE usuario_id IN ${delUsuario}`);
-  psql(`DELETE FROM evento WHERE usuario_id IN ${delUsuario}`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Tickets E2E', 'mostrador')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).

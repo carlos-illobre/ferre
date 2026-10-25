@@ -15,7 +15,6 @@ const ID_PROD = "00000000-0000-0000-0000-00000000e2eb";
 
 test.beforeAll(() => {
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Mostrador stock E2E', 'mostrador')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).

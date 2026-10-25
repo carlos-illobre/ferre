@@ -598,5 +598,16 @@ fecha o rango de fechas y por tipo de acción, solos o combinados; quitar los fi
   nueva primero» y una tarjeta por acción con el ícono del tipo, qué fue con su importe, quién y
   el detalle, y la hora; una venta anulada lleva el borde rojo. Al tocarla sube la hoja con todo.
   Abajo, «Nuevas» y «Anteriores» con la página en el medio.
+
+**Con Auditoría (027, 2026-10-25).** El registro lo arma Auditoría con lo que manda cada servicio:
+
+- Cada acción se ve con el título y el detalle que mandó el servicio que la hizo, el ícono de su
+  grupo y el color de su importancia (rojo lo anulado, ámbar lo que se revisa).
+- «Qué» lista los grupos que hay (Ventas, Compras, Productos, Procesos…): un servicio nuevo suma
+  los suyos solo. Tocar una barra de «Qué pasó» filtra por ese tipo, como antes, y «Qué» lo
+  muestra elegido.
+- Quién va con el nombre que tenía la persona cuando lo hizo; el detalle completo dice desde qué
+  dispositivo, y ya no el correo.
+- Si Auditoría no responde, dice que «Quién hizo qué» no está disponible ahora.
 - El ícono de cada tipo es gris, salvo lo que el dueño revisa: una venta anulada en rojo, un
   cambio de margen o un ajuste de stock en ámbar.

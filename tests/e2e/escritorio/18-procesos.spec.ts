@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql, psqlProcesos } = stack("escritorio");
+const { API, psql, psqlProcesos, psqlAuditoria } = stack("escritorio");
 
 const VENTA = readFileSync("../../microservices/procesos/web/src/modelo/ejemplos/venta.bpmn", "utf8");
 
@@ -19,7 +19,6 @@ const ROL_LECTOR = "00000000-0000-4000-9000-0000000000e1";
 function crearUsuario(email: string, token: string, roles: string) {
   const id = `(SELECT id FROM usuario WHERE email = '${email}')`;
   psql(`DELETE FROM sesion WHERE usuario_id IN ${id}`);
-  psql(`DELETE FROM evento WHERE usuario_id IN ${id}`);
   psql(`DELETE FROM usuario_rol WHERE usuario_id IN ${id}`);
   psql(`DELETE FROM usuario WHERE email = '${email}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${email}', 'Procesos E2E', 'mostrador')`);
@@ -31,7 +30,6 @@ function crearUsuario(email: string, token: string, roles: string) {
 test.beforeAll(() => {
   // El esquema lo crea el servicio de Procesos al arrancar.
   psqlProcesos("DELETE FROM procesos.proceso");
-  psqlProcesos("DELETE FROM procesos.evento");
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
   crearUsuario(EMAIL, TOKEN, "r.id::text LIKE '00000000-0000-4000-8000-%'");
   psql(`DELETE FROM rol_permiso WHERE rol_id = '${ROL_LECTOR}'`);
@@ -130,7 +128,7 @@ test("011-E02 011-E04 011-E05 011-E09 011-E10 011-E13 011-E14 011-E15 011-E22 di
   await expect(page.getByTestId("procesos-estado")).toHaveText("Vigente");
   // Lo anota Procesos en su base, con quién lo hizo (026-E10).
   const quien = psql(`SELECT id FROM usuario WHERE email = '${EMAIL}'`);
-  await expect.poll(() => psqlProcesos(`SELECT count(*) FROM procesos.evento WHERE usuario_id = '${quien}' AND tipo = 'proceso.vigente'`)).toBe("1");
+  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE quien_id = '${quien}' AND tipo = 'proceso.vigente'`)).toBe("1");
 });
 
 // Crea un proceso por la API de Ferrebress (como lo haría la pantalla) y lo deja vigente.

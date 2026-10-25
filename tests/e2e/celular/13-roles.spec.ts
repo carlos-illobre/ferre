@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql } = stack("celular");
+const { API, psql, psqlAuditoria } = stack("celular");
 
 const CELULAR = true;
 
@@ -24,7 +24,6 @@ const RUTAS = CELULAR
 test.beforeAll(() => {
   for (const e of [EMAIL_ADMIN, EMAIL_VENDEDOR]) {
     psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
-    psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
     psql(`DELETE FROM usuario WHERE email = '${e}'`);
   }
   psql(`DELETE FROM usuario_rol WHERE rol_id IN (SELECT id FROM rol WHERE nombre = '${ROL_NUEVO}')`);
@@ -113,7 +112,7 @@ test("se arma un rol, se lo asigna y la persona gana ese acceso", async ({ page 
   await expect(page.getByRole("heading", { name: "Negocio", exact: true })).toBeVisible();
   await expect(page.locator("[data-testid^='seccion-']")).toHaveCount(0);
   await expect(page.getByTestId("sin-permiso")).toHaveCount(0);
-  await expect.poll(() => psql(`SELECT count(*) FROM evento WHERE tipo = 'rol.creado' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
+  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'rol.creado' AND quien_id = '${psql(`SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}'`)}'`)).toBe("1");
 });
 
 test("nadie se quita a sí mismo la administración, y un rol en uso no se borra", async ({ page }) => {
@@ -148,7 +147,6 @@ test("013: las secciones de Cómo va el negocio siguen los permisos de cada rol"
 
   // 013-E19: un rol con «Ver los gastos» y «Ver el dinero invertido», y nada de ventas.
   psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL_GASTOS}')`);
-  psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL_GASTOS}')`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL_GASTOS}'`);
   psql(`DELETE FROM usuario_rol WHERE rol_id IN (SELECT id FROM rol WHERE nombre = '${ROL_GASTOS}')`);
   psql(`DELETE FROM rol WHERE nombre = '${ROL_GASTOS}'`);

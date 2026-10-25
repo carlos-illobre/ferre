@@ -8,12 +8,14 @@ cd "$(dirname "$0")/../.."
 
 API=http://localhost
 psql() { docker compose exec -T db psql -U mostrador -d mostrador -tAc "$1"; }
+psqlAuditoria() { docker compose exec -T db psql -U auditoria -d auditoria -tAc "$1"; }
+# Lo que le llega a Auditoría tarda un momento: se espera hasta 15 s a que la consulta dé lo esperado.
+hasta() { local r; for _ in $(seq 30); do r=$(psqlAuditoria "$2"); [[ "$r" == "$1" ]] && break; sleep 0.5; done; echo "$r"; }
 codigo() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 
 # Limpieza de corridas anteriores (en orden de dependencias).
 psql "DELETE FROM vinculacion WHERE aprobada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test') OR sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test'))" >/dev/null
 psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
-psql "DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
 psql "UPDATE lista_importada SET cargada_por = NULL, aplicada_por = NULL WHERE cargada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test') OR aplicada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
 psql "DELETE FROM usuario WHERE email LIKE 'prueba-%@ferre.test'" >/dev/null
 
@@ -41,7 +43,7 @@ verificar "empleado no puede ver auditoría (403)"    403 "$(codigo -H "Authoriz
 verificar "dueño lista usuarios"                     200 "$(codigo -H "Authorization: Bearer $TOKEN_DUENO" $API/usuarios)"
 verificar "dueño autoriza un usuario nuevo"          201 "$(codigo -H "Authorization: Bearer $TOKEN_DUENO" -H 'Content-Type: application/json' -d '{"email":"prueba-nuevo@ferre.test","nombre":"Nuevo","roles":["00000000-0000-4000-8000-0000000000a1"]}' $API/usuarios)"
 verificar "correo repetido da 409"                   409 "$(codigo -H "Authorization: Bearer $TOKEN_DUENO" -H 'Content-Type: application/json' -d '{"email":"prueba-nuevo@ferre.test","nombre":"Nuevo","roles":["00000000-0000-4000-8000-0000000000a1"]}' $API/usuarios)"
-verificar "la auditoría registra el alta"            1   "$(psql "SELECT count(*) FROM evento e JOIN usuario u ON u.id = e.usuario_id WHERE e.tipo = 'usuario.creado' AND u.email = 'prueba-dueno@ferre.test'")"
+verificar "la auditoría registra el alta"            1   "$(hasta 1 "SELECT count(*) FROM (SELECT 1 FROM auditoria.evento WHERE tipo = 'usuario.creado' AND contenido->>'email' = 'prueba-dueno@ferre.test' ORDER BY fecha DESC LIMIT 1) x")"
 verificar "login con Google sin credencial da 400"   400 "$(codigo -H 'Content-Type: application/json' -d '{}' $API/sesiones/google)"
 verificar "credencial de Google inválida da 401"     401 "$(codigo -H 'Content-Type: application/json' -d '{"credencial":"basura"}' $API/sesiones/google)"
 

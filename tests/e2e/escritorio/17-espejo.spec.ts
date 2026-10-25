@@ -27,7 +27,6 @@ test.beforeAll(() => {
   psql(`DELETE FROM pedido WHERE proveedor_id = '${ID_PROV}'`);
   for (const e of [EMAIL, EMAIL_OTRA]) {
     psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
-    psql(`DELETE FROM evento WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
     psql(`DELETE FROM usuario WHERE email = '${e}'`);
   }
   psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL}', 'Espejo E2E'), (gen_random_uuid(), '${EMAIL_OTRA}', 'Otra persona E2E')`);

@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql } = stack("celular");
+const { API, psql, psqlAuditoria } = stack("celular");
 
 const CELULAR = true;
 
@@ -39,7 +39,6 @@ test.beforeAll(() => {
   psql(`INSERT INTO producto (id, descripcion, marca, margen_elegido) VALUES ('${CANDADO}', 'CANDADO APARTADO (E2E)', 'MARCA E2E', 100)`);
   psql(`INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, fecha, nota) VALUES (gen_random_uuid(), '${CANDADO}', 'ajuste', 10, 'conteo', now(), 'stock inicial e2e')`);
   psql(`DELETE FROM sesion WHERE usuario_id IN ${deEllos}`);
-  psql(`DELETE FROM evento WHERE usuario_id IN ${deEllos}`);
   psql(`DELETE FROM usuario_rol WHERE usuario_id IN ${deEllos}`);
   psql(`DELETE FROM usuario WHERE email IN ('${EMAIL_ADMIN}', '${EMAIL_ANA}')`);
   psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL_ADMIN}', 'Admin apartados E2E'), (gen_random_uuid(), '${EMAIL_ANA}', 'Ana apartados E2E')`);
@@ -100,7 +99,7 @@ test("014-E01 014-E06 014-E14 una venta sin mandar de Ana, desactivada, sube apa
 
   // Quedó registrada a nombre de Ana, con la fecha en que la cobró, y se anotó quién la aceptó.
   await expect.poll(() => psql(`SELECT to_char(fecha AT TIME ZONE 'UTC', 'YYYY-MM-DD HH24:MI') FROM venta WHERE id = '${VENTA}'`)).toBe("2026-10-01 13:47");
-  expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'venta.registrada' AND usuario_id = '${ana}' AND contenido->>'id' = '${VENTA}'`)).toBe("1");
+  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'venta.registrada' AND quien_id = '${ana}' AND contenido->>'id' = '${VENTA}'`)).toBe("1");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${CANDADO}'`)).toBe("8.000");
-  expect(psql(`SELECT count(*) FROM evento WHERE tipo = 'apartado.aceptado' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
+  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'apartado.aceptado' AND quien_id = '${psql(`SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}'`)}'`)).toBe("1");
 });

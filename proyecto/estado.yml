@@ -628,7 +628,7 @@ RF-70b:
 RF-71:
   estado: "Hecho en parte (#41): consulta paginada. Faltan los filtros en pantalla (#58)"
   pruebas:
-    - microservices/comercial/src/rutas/auditoria.test.ts
+    - microservices/auditoria/src/rutas.test.ts
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - tests/integration/autenticacion.sh
     - microservices/comercial/src/rutas/credenciales.test.ts
@@ -1720,8 +1720,16 @@ RNF-71:
   defectos: []
 
 RF-146:
-  estado: "Nuevo (027): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (027): «Quién hizo qué» lo arma Auditoría con los eventos de Comercial y Procesos; cada acción con su título, detalle e importancia, y el filtro «qué» con los grupos"
+  pruebas:
+    - microservices/auditoria/src/rutas.test.ts
+    - microservices/auditoria/src/persistencia/eventos.test.ts
+    - microservices/comercial/src/eventos/en-palabras.test.ts
+    - microservices/comercial/src/eventos/anotar.test.ts
+    - microservices/web/src/pantallas/compu/negocio/Actividad.test.tsx
+    - microservices/web/src/pantallas/celular/negocio/Actividad.test.tsx
+    - tests/integration/auditoria.sh
+    - tests/e2e/escritorio/04-vender.spec.ts
   defectos: []
 
 RNF-72:
@@ -1742,8 +1750,14 @@ RNF-73:
   defectos: []
 
 RNF-74:
-  estado: "Nuevo (027): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (027): el contrato v1 y el kit con la bandeja en la base de cada servicio; sin AUDITORIA_URL el servicio funciona igual; Auditoría caída no frena nada y lo pendiente se entrega al volver"
+  pruebas:
+    - microservices/auditoria-kit/src/contrato.test.ts
+    - microservices/auditoria-kit/src/bandeja.test.ts
+    - microservices/comercial/src/persistencia/eventos.test.ts
+    - microservices/procesos/servidor/src/persistencia/procesos.test.ts
+    - tests/integration/auditoria.sh
+    - tests/integration/base-propia.sh
   defectos: []
 
 RNF-75:

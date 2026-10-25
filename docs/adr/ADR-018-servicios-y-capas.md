@@ -60,7 +60,7 @@ las imágenes y de los paquetes no cambian con las carpetas: el despliegue los u
 
 Cada tema tiene su carpeta en `microservices/comercial/src/` (ventas, clientes, compras, pedidos,
 conteos, deposito, catalogo, productos, listas, duplicados, administracion, acceso, tickets,
-anomalias, actividad):
+anomalias):
 
 - **La ruta** (`src/rutas/<tema>.ts`) solo traduce: lee el pedido, llama a la regla y elige el
   código de respuesta. No tiene SQL ni reglas.
@@ -79,7 +79,8 @@ anomalias, actividad):
   se escribe a mano, con el tipo de lo que devuelve y los valores como parámetros: con la
   plantilla `sql` de Kysely o con el cliente de Postgres. Las transacciones se abren con
   `enTransaccion` (Kysely) o `enTransaccionPg`; para devolver una respuesta deshaciendo lo
-  hecho se tira `Deshacer`. `anotarEvento` es el registro de eventos con Kysely.
+  hecho se tira `Deshacer`. `anotarEvento` (`src/eventos/anotar.ts`) arma las palabras del evento
+  y lo deja en la bandeja de auditoría, en la transacción de la acción (specs/027).
 - **Control automático:** `pnpm capas` en el servidor (parte de `typecheck`, corre en cada
   subida) no deja que una ruta importe la base ni una capa de datos, ni que los datos dependan
   de las reglas o de las rutas.

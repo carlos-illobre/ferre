@@ -76,3 +76,14 @@ siguen igual. Se agrega una regla de nombres: los servicios se nombran por la pa
 negocio que resuelven.
 
 → [ADR-010](ADR-010-servicios-clientes-y-librerias.md)
+
+---
+
+## Enmienda (specs/027, decisión 167)
+
+La tabla de eventos de Comercial se fue. Cada servicio anota lo que hizo cada persona en una
+bandeja de salida de su propia base, en la misma transacción de la acción, y el kit de auditoría
+(`microservices/auditoria-kit`) lo entrega a Auditoría con el contrato v1
+([docs/auditoria/contrato-v1.md](../auditoria/contrato-v1.md)). La auditoría vive en Auditoría;
+el registro de una unión de productos, que Comercial necesita para separarlos, quedó en su propia
+tabla.
