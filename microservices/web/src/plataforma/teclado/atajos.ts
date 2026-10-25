@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import "./atajos.css";
 
 // Atajos de los botones en la computadora (decisión 80): con Alt apretado, cada botón a la
@@ -85,24 +84,23 @@ function crearLetras() {
   return { ocultar, mostrar, botonDe };
 }
 
-export function useAtajos(activos: boolean, opciones?: { alFinal?: string }): void {
-  if (opciones) alFinal = opciones.alFinal ?? null;
-  useEffect(() => {
-    if (!activos) return;
-    const letras = crearLetras();
-    const alApretar = (e: KeyboardEvent) => {
-      if (e.key === "Alt") { if (!e.repeat) letras.mostrar(); return; }
-      const boton = letras.botonDe(letraConAlt(e));
-      if (!boton) return;
-      e.preventDefault(); e.stopPropagation();
-      letras.ocultar();
-      boton.focus();
-      boton.click();
-    };
-    const alSoltar = (e: KeyboardEvent) => { if (e.key === "Alt") { e.preventDefault(); letras.ocultar(); } };
-    window.addEventListener("keydown", alApretar, true);
-    window.addEventListener("keyup", alSoltar, true);
-    window.addEventListener("blur", letras.ocultar);
-    return () => { letras.ocultar(); window.removeEventListener("keydown", alApretar, true); window.removeEventListener("keyup", alSoltar, true); window.removeEventListener("blur", letras.ocultar); };
-  }, [activos]);
+// Las letras con Alt, para toda la aplicación. `alFinal`: dónde están los botones que reciben
+// letra al final. Devuelve cómo sacarlas.
+export function instalarAtajos(opciones: { alFinal?: string } = {}): () => void {
+  alFinal = opciones.alFinal ?? null;
+  const letras = crearLetras();
+  const alApretar = (e: KeyboardEvent) => {
+    if (e.key === "Alt") { if (!e.repeat) letras.mostrar(); return; }
+    const boton = letras.botonDe(letraConAlt(e));
+    if (!boton) return;
+    e.preventDefault(); e.stopPropagation();
+    letras.ocultar();
+    boton.focus();
+    boton.click();
+  };
+  const alSoltar = (e: KeyboardEvent) => { if (e.key === "Alt") { e.preventDefault(); letras.ocultar(); } };
+  window.addEventListener("keydown", alApretar, true);
+  window.addEventListener("keyup", alSoltar, true);
+  window.addEventListener("blur", letras.ocultar);
+  return () => { letras.ocultar(); window.removeEventListener("keydown", alApretar, true); window.removeEventListener("keyup", alSoltar, true); window.removeEventListener("blur", letras.ocultar); };
 }

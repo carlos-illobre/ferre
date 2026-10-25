@@ -18,10 +18,12 @@ void respetarElGuardado();
 
 async function cargarInterfaz() {
   if (vistaPara(window.innerWidth) === "escritorio") {
-    const { App } = await import("../pantallas/compu/App");
+    const [{ App }, { instalarTecladoDeLaCompu }] = await Promise.all([import("../pantallas/compu/App"), import("../teclado")]);
+    instalarTecladoDeLaCompu();
     return App;
   }
-  const { App } = await import("../pantallas/celular/App");
+  const [{ App }, { instalarTecladoDelCelular }] = await Promise.all([import("../pantallas/celular/App"), import("../teclado")]);
+  instalarTecladoDelCelular();
   return App;
 }
 void cargarInterfaz().then((App) => {

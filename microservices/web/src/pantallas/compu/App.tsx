@@ -5,7 +5,6 @@ import "../medios.css";
 import { useEffect, useRef } from "react";
 import { useVentaEnEspejo } from "../../negocio/ventas";
 import type { UsuarioDeLaSesion } from "../../negocio/usuarios";
-import { useAtajos, useFlechas, zonasConTeclasPropias, type DisposicionParaFlechas } from "../../plataforma/teclado";
 import { FotoParaLaCompu } from "../FotoParaLaCompu";
 import { ProveedorDeSesion, useSesion } from "../../negocio/entrada";
 import { ConRutas, useRuta } from "./base/rutas";
@@ -29,17 +28,6 @@ import "./base/estilos/menu.css";
 import { CabezaDeLaParte } from "./marco/CabezaDeLaParte";
 import { Lateral } from "./marco/Lateral";
 
-zonasConTeclasPropias(".lateral, .pestanas");
-// La disposición de esta interfaz, para la tecnología de teclado (que no la conoce): el menú de la
-// izquierda, las pestañas y las opciones de Más se recorren por su cuenta.
-const DISPOSICION: DisposicionParaFlechas = {
-  pantalla: ".cuerpo",
-  noSonListas: ".lateral, .pestanas, .mas-grilla",
-  noSonCajas: ".pestanas",
-  sinCaja: () => document.getElementById("contenido"),
-  arribaDeLaLista: () => document.querySelector<HTMLElement>(".cuerpo .pestanas button[aria-current='page']"),
-};
-
 // La interfaz de computadora (menú lateral, tablas, todo con teclado), con la paleta de la v5 y el
 // menú reducido a lo de todos los días: lo que se usa poco va en «Más». Alt + número abre cada pantalla.
 export function App() {
@@ -61,9 +49,6 @@ function Pantallas() {
   const codigo = ruta.parametros.get("codigo");
   const conSesion = sesion.estado === "con-sesion";
   const { m, actual } = useMarco(conSesion ? sesion.usuario : null, ruta);
-  // Todo con el teclado: las flechas recorren lo que hay en pantalla (ver flechas.ts).
-  useFlechas(true, DISPOSICION);
-  useAtajos(true, { alFinal: ".lateral" });
   if (sesion.estado === "con-sesion" && !aparte(ruta.nombre, codigo)) return <Marco usuario={sesion.usuario} m={m} actual={actual} />;
   return <FueraDelMarco nombre={ruta.nombre} codigo={codigo} />;
 }

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { usarTeclasPorDefecto } from "./teclas";
 import { filasDeLaPantalla, fijarDisposicion, laDisposicion, type DisposicionParaFlechas } from "./disposicion";
 import { abrir, filaMarcada, marcar } from "./marca";
@@ -73,15 +72,13 @@ function manejar(e: KeyboardEvent): void {
   if (e.key === "Enter") enter(e, foco); else mover(e, foco);
 }
 
-export function useFlechas(activas: boolean, deLaAplicacion?: DisposicionParaFlechas): void {
-  if (deLaAplicacion) fijarDisposicion(deLaAplicacion);
-  useEffect(() => {
-    if (!activas) return;
-    usarTeclasPorDefecto(manejar);
-    // Al cambiar de pantalla o al usar el mouse, la marca de las flechas se va.
-    const quitar = () => marcar(null);
-    window.addEventListener("hashchange", quitar);
-    window.addEventListener("mousedown", quitar);
-    return () => { usarTeclasPorDefecto(null); window.removeEventListener("hashchange", quitar); window.removeEventListener("mousedown", quitar); quitar(); };
-  }, [activas]);
+// Las flechas por la lista de la pantalla, para toda la aplicación. Devuelve cómo sacarlas.
+export function instalarFlechas(deLaAplicacion: DisposicionParaFlechas): () => void {
+  fijarDisposicion(deLaAplicacion);
+  usarTeclasPorDefecto(manejar);
+  // Al cambiar de pantalla o al usar el mouse, la marca de las flechas se va.
+  const quitar = () => marcar(null);
+  window.addEventListener("hashchange", quitar);
+  window.addEventListener("mousedown", quitar);
+  return () => { usarTeclasPorDefecto(null); window.removeEventListener("hashchange", quitar); window.removeEventListener("mousedown", quitar); quitar(); };
 }

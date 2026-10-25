@@ -70,6 +70,20 @@ module.exports = {
       to: { path: "^src/pantallas/celular/" },
     },
     {
+      name: "nadie-usa-el-teclado",
+      comment: "Las pantallas, las piezas y el negocio no saben de teclas (ADR-029): ofrecen acciones con nombre (plataforma/comandos) y src/teclado dice qué tecla pide cada una. Solo el arranque lo instala.",
+      severity: "error",
+      from: { path: "^src/", pathNot: "^src/(teclado|app)/" },
+      to: { path: "^src/teclado/" },
+    },
+    {
+      name: "el-teclado-solo-usa-la-plataforma",
+      comment: "src/teclado pide acciones por su nombre: no importa pantallas, piezas, negocio ni datos.",
+      severity: "error",
+      from: { path: "^src/teclado/", pathNot: FUERA_DE_LAS_PRUEBAS },
+      to: { path: "^src/", pathNot: "^src/(teclado|plataforma)/" },
+    },
+    {
       name: "solo-el-arranque-usa-el-arranque",
       severity: "error",
       from: { path: "^src/", pathNot: "^src/app/" },
