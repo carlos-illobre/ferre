@@ -1,0 +1,2 @@
+.caja { display: inline-flex; align-items: center; gap: 4px; height: 44px; padding: 0 10px; border-radius: 12px; background: #fff; border: 1.5px solid var(--m-urgente); font-weight: 700; }
+.caja input { width: 84px; font-size: 17px; font-weight: 700; }

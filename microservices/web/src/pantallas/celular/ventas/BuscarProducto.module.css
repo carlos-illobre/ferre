@@ -1,0 +1,20 @@
+/* La búsqueda en su hoja, como la v2 (decisión 140). */
+:global(.hoja).hoja { min-height: 92dvh; background: #F4F2EC; display: flex; flex-direction: column; gap: 10px; }
+.cab { display: flex; align-items: center; gap: 8px; }
+.cab :global(.buscador) { flex: 1; min-width: 0; }
+/* La caja, como la de la pantalla (y con el foco, el borde de siempre). */
+:global(.contenido) .cab :global(.buscador-caja) { background: var(--m-superficie); border: 1px solid var(--m-borde-fuerte); box-shadow: var(--m-sombra-1); border-radius: 14px; }
+.cancelar { height: 44px; padding: 0 6px; font-weight: 700; font-size: 16px; color: #545955; }
+.rotulo { margin: 2px 2px 0; font-size: 14px; font-weight: 650; color: #545955; }
+.lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; overflow: auto; }
+.r { width: 100%; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid #E6E2D8; background: #fff; box-shadow: 0 1px 2px rgba(26, 29, 27, .05); text-align: left; color: #1A1D1B; }
+.r.elegida { border-color: #12382F; box-shadow: 0 0 0 3px rgba(18, 56, 47, .10); }
+.r :global(.miniatura) { width: 56px; height: 56px; border-radius: 12px; background: #ECE9E1; display: grid; place-items: center; overflow: hidden; color: #545955; }
+.r :global(.miniatura) img { width: 100%; height: 100%; object-fit: cover; }
+.texto { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.texto b { font-size: 16px; font-weight: 750; line-height: 21px; }
+.texto small { font-size: 14px; color: #545955; }
+.texto .hay { color: #11764A; font-weight: 700; }
+.texto .noHay { color: #845400; font-weight: 700; }
+.r strong { font-size: 17px; font-weight: 800; white-space: nowrap; }
+.r strong.sin { font-size: 14px; color: #845400; }

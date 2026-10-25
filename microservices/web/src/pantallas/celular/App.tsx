@@ -37,7 +37,7 @@ import { NOMBRES, TEXTOS } from "../textos";
 import { AnotadasCelu, ParaRevisarCelu } from "./pantallas/Anomalias";
 import { CabezaDeAnomalias } from "./CabezaDeAnomalias";
 import { PESTANAS_DE_ANOMALIAS, PIDE_LAS_ANOMALIAS } from "../pestanas-de-anomalias";
-import { ParteVender } from "./Vender";
+import { ParteVender } from "./ventas/ParteVender";
 import "./estilos.css";
 import "./tema.css";
 

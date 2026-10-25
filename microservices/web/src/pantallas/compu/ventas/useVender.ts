@@ -6,7 +6,8 @@ import { useEntrada } from "./useEntrada";
 import { usePanel } from "./usePanel";
 import { useQuitarConAnimacion } from "./useQuitarConAnimacion";
 import { useRenglonElegido } from "./useRenglonElegido";
-import { flechasDeLaBusqueda, teclasDeLaCaja, useFlechasFueraDeLaCaja, useTeclasDeVender } from "./useTeclasDeVender";
+import { flechasDeLaBusqueda } from "../../comun/ventas/teclas-de-la-busqueda";
+import { teclasDeLaCaja, useFlechasFueraDeLaCaja, useTeclasDeVender } from "./useTeclasDeVender";
 import { useVentaDeLaCompu } from "./useVentaDeLaCompu";
 
 // Todo lo que usa Vender en la computadora, armado con las piezas del negocio.

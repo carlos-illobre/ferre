@@ -1,0 +1,8 @@
+.cobro { position: sticky; bottom: 12px; z-index: 5; margin: auto -16px 0; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; background: rgba(255, 255, 255, .94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--m-borde); box-shadow: 0 -8px 24px -12px rgba(26, 29, 27, .15); }
+.falta { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--m-urgente-texto); }
+.pago { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+/* Los avisos, abajo, sobre el cobro (como la v2). */
+.tostada { position: absolute; left: 16px; right: 16px; bottom: calc(100% + 8px); pointer-events: none; }
+.tostada :global(.toast) { pointer-events: auto; box-shadow: 0 12px 28px -8px rgba(0, 0, 0, .35); }
+/* El cobro apoyado en el menú de abajo, sin franja en el medio, como la v2. */
+@media (max-width: 899px) { .cobro { bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom)); } }

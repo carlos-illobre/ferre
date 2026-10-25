@@ -1,0 +1,16 @@
+.unidad { order: 2; position: relative; display: inline-flex; align-items: center; height: 38px; padding: 0 2px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); text-decoration: underline dotted; text-underline-offset: 3px; }
+.unidad select { position: absolute; inset: 0; width: 100%; opacity: 0; font-size: 16px; }
+
+/* La lista de la unidad, con el estilo de la pantalla, como en la computadora (los navegadores que no
+   lo admiten muestran el de siempre, con la unidad escrita encima). */
+@supports (appearance: base-select) {
+  .unidad > span { display: none; }
+  .unidad select, .unidad select::picker(select) { appearance: base-select; }
+  .unidad select { position: static; opacity: 1; display: flex; align-items: center; height: 38px; padding: 0 2px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; color: #545955; text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer; }
+  .unidad select::picker-icon { display: none; }
+  .unidad select::picker(select) { margin-top: 6px; padding: 6px; min-width: 88px; border: 1px solid #E6E2D8; border-radius: 12px; background: #fff; box-shadow: 0 12px 32px rgb(26 29 27 / .16), 0 2px 6px rgb(26 29 27 / .08); }
+  .unidad option { display: flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 8px; color: #1A1D1B; font-size: 16px; font-weight: 600; background: none; }
+  .unidad option::checkmark { display: none; }
+  .unidad option:hover, .unidad option:focus-visible { background: #ECE9E1; outline: 0; }
+  .unidad option:checked { background: #E3EEE8; color: #12382F; font-weight: 800; }
+}

@@ -1,0 +1,26 @@
+/* Cada renglón. */
+.renglon { background: var(--m-superficie); border: 1px solid var(--m-borde); border-radius: 16px; box-shadow: var(--m-sombra-1); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.renglon.falta { border-color: #F3C766; background: linear-gradient(180deg, var(--m-urgente-suave), #fff 70%); }
+.renglon.recien { border: 2px solid var(--m-logro); padding: 11px; }
+.arriba { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.arriba :global(.foto-chica), .arriba :global(.miniatura) { width: 56px; height: 56px; border-radius: 12px; }
+.libre { display: grid; place-items: center; background: var(--m-hundido); color: var(--m-texto-2); }
+.nombre { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; color: var(--m-tinta); }
+.nombre b { font-weight: 750; font-size: 16px; line-height: 21px; }
+.nombre small { font-size: 14px; line-height: 19px; color: var(--m-texto-2); }
+.precio { display: flex; flex-direction: column; align-items: center; padding: 4px 10px; border-radius: 10px; background: var(--m-logro-suave); color: var(--m-tinta); }
+.precio b { font-size: 17px; font-weight: 800; color: var(--m-logro-texto); }
+.precio small { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: var(--m-texto-2); }
+.precio.falta { background: #fff; box-shadow: inset 0 0 0 1.5px var(--m-urgente); }
+.precio.falta b { color: var(--m-urgente-texto); font-size: 15px; }
+.margenes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.margenes button { height: 44px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--m-urgente); color: var(--m-urgente-texto); font-weight: 750; font-size: 15px; }
+.abajo { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.tacho { width: 40px; height: 40px; display: grid; place-items: center; color: var(--m-texto-3); border-radius: 10px; flex: none; margin: 0 -4px 0 -4px; }
+:global(.contenido) .abajo :global(.contador) { display: inline-flex; height: 40px; background: #fff; border: 1px solid var(--m-borde-fuerte); border-radius: 12px; overflow: hidden; flex: none; }
+:global(.contenido) .abajo :global(.contador) button { width: 32px; height: 38px; color: var(--m-texto-2); border-radius: 0; }
+:global(.contenido) .abajo :global(.contador) input { width: 30px; text-align: right; padding-right: 3px; font-size: 16px; font-weight: 800; color: var(--m-tinta); }
+:global(.contenido) .abajo :global(.contador) > button:last-of-type { order: 3; }
+.margen { display: inline-flex; align-items: center; gap: 2px; height: 40px; padding: 0 8px; flex: none; border-radius: 12px; background: var(--m-hundido); font-weight: 750; font-size: 14px; white-space: nowrap; color: var(--m-tinta); }
+.subtotal { margin-left: auto; font-weight: 800; font-size: 18px; white-space: nowrap; }
+.stock { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; background: var(--m-urgente-suave); color: var(--m-urgente-texto); font-size: 14px; font-weight: 700; }

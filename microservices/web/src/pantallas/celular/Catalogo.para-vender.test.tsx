@@ -12,7 +12,7 @@ vi.mock("../../negocio/catalogo", async (original) => ({ ...(await original<type
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>(async () => []));
 vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { Catalogo } from "./Catalogo";
-import { ParteVender } from "./Vender";
+import { ParteVender } from "./ventas/ParteVender";
 import { App } from "./App";
 import { agregarALaVenta, vaciarVenta, ventaActual } from "../../negocio/ventas/venta-en-curso";
 import { TEXTOS } from "../textos";

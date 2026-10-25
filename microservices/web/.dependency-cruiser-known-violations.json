@@ -523,34 +523,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/Vender.tsx",
-    "to": "src/datos/almacenamiento/index.ts",
-    "unresolvedTo": "../../datos/almacenamiento",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Vender.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/App.tsx",
     "to": "src/datos/sesion/index.ts",
     "unresolvedTo": "../../datos/sesion",
@@ -2007,76 +1979,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/Vender.tsx",
-    "to": "src/negocio/catalogo/precio.ts",
-    "unresolvedTo": "../../negocio/catalogo/precio",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Vender.tsx",
-    "to": "src/negocio/precios/vista-previa.ts",
-    "unresolvedTo": "../../negocio/precios/vista-previa",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Vender.tsx",
-    "to": "src/negocio/ventas/venta.ts",
-    "unresolvedTo": "../../negocio/ventas/venta",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Vender.tsx",
-    "to": "src/plataforma/camara/Escaner.tsx",
-    "unresolvedTo": "../../plataforma/camara/Escaner",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Vender.tsx",
-    "to": "src/plataforma/teclado/teclas.ts",
-    "unresolvedTo": "../../plataforma/teclado/teclas",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/CodigoDeBarras.tsx",
     "to": "src/negocio/catalogo/ficha.ts",
     "unresolvedTo": "../negocio/catalogo/ficha",
@@ -2997,43 +2899,6 @@
       },
       {
         "name": "src/pantallas/celular/componentes/OfrecerHuella.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
-    "from": "src/pantallas/celular/pantallas/CorregirYCambio.tsx",
-    "to": "src/pantallas/celular/Vender.tsx",
-    "unresolvedTo": "../Vender",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "sin-ciclos"
-    },
-    "cycle": [
-      {
-        "name": "src/pantallas/celular/Vender.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/pantallas/celular/pantallas/VentasDeHoy.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/pantallas/celular/pantallas/CorregirYCambio.tsx",
         "dependencyTypes": [
           "local",
           "import"

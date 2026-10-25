@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { EVENTO_EMPAREJAMIENTO, puestoLocal } from "../../puesto";
+import { EVENTO_EMPAREJAMIENTO, puestoLocal, puestoRemoto } from "../../puesto";
 import { escucharPuesto } from "../../codigos-del-celular";
 
 // Los códigos que lee el celular vinculado a este puesto entran a la venta. El emparejamiento
@@ -23,4 +23,16 @@ export function useCelularQueEscanea(alCodigo: (codigo: string) => unknown) {
     return () => { window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar); soltar(); };
   }, [alVincular, soltar]);
   return { vinculado, alVincular };
+}
+
+// El celular emparejado con una computadora (decisión 58): Vender es su propia venta; para leerle
+// códigos a la computadora está el lector, que es un modo aparte (decisión 59).
+export function useEmparejadoConLaCompu(): boolean {
+  const [emparejado, setEmparejado] = useState(() => Boolean(puestoRemoto()));
+  useEffect(() => {
+    const mirar = () => setEmparejado(Boolean(puestoRemoto()));
+    window.addEventListener(EVENTO_EMPAREJAMIENTO, mirar);
+    return () => window.removeEventListener(EVENTO_EMPAREJAMIENTO, mirar);
+  }, []);
+  return emparejado;
 }

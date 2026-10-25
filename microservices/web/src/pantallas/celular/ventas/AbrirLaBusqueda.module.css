@@ -1,0 +1,5 @@
+/* La búsqueda y la cámara, del mismo alto de arranque. */
+:global(.contenido) .buscador :global(.buscador-caja) { background: var(--m-superficie); border: 1px solid var(--m-borde-fuerte); box-shadow: var(--m-sombra-1); border-radius: 14px; }
+:global(.contenido) .buscador :global(.escanear) { background: var(--m-pino); border-radius: 14px; }
+.abrir { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; color: #6B706B; font-size: 16px; cursor: text; }
+.abrir span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

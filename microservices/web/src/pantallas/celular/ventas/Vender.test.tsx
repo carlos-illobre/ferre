@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { conPermisos } from "../../pruebas/sesion";
+import { conPermisos } from "../../../pruebas/sesion";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { catalogoFalso, producto } from "../../pruebas/catalogo-falso";
+import { catalogoFalso, producto } from "../../../pruebas/catalogo-falso";
 
 const catalogo = vi.hoisted(() => ({ actual: null as unknown as { useCatalogoFalso: () => unknown; traerPorCodigo: (c: string) => Promise<unknown> } }));
-vi.mock("../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../negocio/catalogo")>()), ...((await import("../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
-vi.mock("../../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
-vi.mock("./componentes/VincularCelular", () => ({ VincularCelular: () => null }));
-vi.mock("../../puesto", async (original) => ({ ...(await original<typeof import("../../puesto")>()), puestoRemoto: () => null, puestoLocal: () => null, guardarPuestoLocal: vi.fn() }));
-vi.mock("../../codigos-del-celular", () => ({ enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), pedirLector: vi.fn() }));
+vi.mock("../../../negocio/catalogo", async (original) => ({ ...(await original<typeof import("../../../negocio/catalogo")>()), ...((await import("../../../pruebas/catalogo-falso")).moduloDeCatalogo(() => catalogo.actual)) }));
+vi.mock("../../../plataforma/camara/Escaner", () => ({ Escaner: () => null, hayCamara: () => false }));
+vi.mock("../componentes/VincularCelular", () => ({ VincularCelular: () => null }));
+vi.mock("../../../puesto", async (original) => ({ ...(await original<typeof import("../../../puesto")>()), puestoRemoto: () => null, puestoLocal: () => null, guardarPuestoLocal: vi.fn() }));
+vi.mock("../../../codigos-del-celular", () => ({ enviarCodigoAlPuesto: vi.fn(), escucharPuesto: vi.fn(() => () => undefined), pedirLector: vi.fn() }));
 const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 const enviarOEncolar = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<{ encolado: boolean }>>(async () => ({ encolado: false })));
-vi.mock("../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
-vi.mock("../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../datos/almacenamiento")>()), ...(({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: vi.fn(async () => 0), pendientes: vi.fn(async () => []), alCambiarLaCola: () => () => undefined })) }));
+vi.mock("../../../datos/conexion", async (original) => ({ ...(await original<typeof import("../../../datos/conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
+vi.mock("../../../datos/almacenamiento", async (original) => ({ ...(await original<typeof import("../../../datos/almacenamiento")>()), ...(({ enviarOEncolar: (...a: unknown[]) => enviarOEncolar(...a), enviarPendientes: vi.fn(async () => 0), pendientes: vi.fn(async () => []), alCambiarLaCola: () => () => undefined })) }));
 
-import { ParteVender } from "./Vender";
+import { ParteVender } from "./ParteVender";
 
 const ventasVacias = { ventas: [], totales: {}, total: 0 };
 function armar(ventas: unknown = ventasVacias, sub: string | null = null) {

@@ -3,7 +3,9 @@ import { Hoja, Icono, AvisoError } from "../componentes/base";
 import { Icono as IconoC } from "../../compu/base/ui";
 import { IconoDeMedio } from "../../IconoDeMedio";
 import { TEXTOS } from "../../textos";
-import { ElegirCliente } from "../Vender";
+import { ElegirCliente } from "../ventas/ElegirCliente";
+import { BotonDeCliente } from "../ventas/BotonDeCliente";
+import { MediosDePago } from "../ventas/MediosDePago";
 import { MEDIOS, NOMBRE_DE_MEDIO, type Medio } from "../../../negocio/ventas/venta";
 import { fueSinConexion, type VentaDelDia } from "../../../negocio/ventas/ventas-del-dia";
 import { aEntrada, conCantidad, conPrecio, diferenciaDe, porQueNoSeGuarda, quitar, resolucionDe, subtotalCorregido, totalCorregido, useCorregirVenta, type Correccion, type RenglonCorregido } from "../../../negocio/ventas/correccion";
@@ -25,23 +27,9 @@ const fechaCorta = (iso: string) => new Date(iso).toLocaleDateString("es-AR", { 
 const numero = (n: number) => n.toLocaleString("es-AR", { maximumFractionDigits: 3 });
 const COBROS = ["efectivo", "mercado_pago", "tarjeta"] as const;
 type Cobro = (typeof COBROS)[number];
-const NOMBRE_CORTO: Record<Medio, string> = { efectivo: "Efectivo", mercado_pago: "M. Pago", tarjeta: "Tarjeta", cuenta_corriente: "Cta. cte." };
 
 function Foto({ url }: { url: string | null }) {
   return <span className="cc-foto">{urlDeFoto(url) ? <img src={urlDeFoto(url)!} alt="" /> : <Icono nombre="imagen" tam={18} />}</span>;
-}
-
-// La fila de pastillas de los medios, como en Vender (decisión 142).
-function Medios<M extends Medio>({ medios, elegido, alElegir, etiqueta, prefijo }: { medios: readonly M[]; elegido: M; alElegir: (m: M) => void; etiqueta: string; prefijo: string }) {
-  return (
-    <div className="vm-medios-fila" role="radiogroup" aria-label={etiqueta}>
-      {medios.map((m) => (
-        <button key={m} type="button" role="radio" aria-checked={elegido === m} aria-label={NOMBRE_DE_MEDIO[m]} className={`vm-mp medio-${m} ${elegido === m ? "elegido" : ""}`} onClick={() => alElegir(m)} data-testid={`${prefijo}-${m}`}>
-          <IconoDeMedio medio={m} tam={18} />{elegido === m && <span>{NOMBRE_CORTO[m]}</span>}
-        </button>
-      ))}
-    </div>
-  );
 }
 
 // Un producto del catálogo para sumar (al corregir o en lo que se lleva), buscado como en Vender.
@@ -135,12 +123,12 @@ export function CorregirEnLaHoja({ venta: v, c, alCambiar, alGuardar, alDescarta
       {sumando ? <SumarProducto etiqueta={t.agregarProducto.corto} alSumar={(p) => { alCambiar({ ...c, renglones: [...c.renglones, { ...p, devuelto: 0, antes: null }] }); setSumando(false); }} />
         : <button type="button" className="vhc-agregar" onClick={() => setSumando(true)} data-testid="agregar-producto"><IconoC nombre="mas" tam={16} />{t.agregarProducto.corto}</button>}
       <div className="cc-fila">
-        <Medios medios={MEDIOS} elegido={c.medio} etiqueta="Medio de pago" prefijo="medio-ed" alElegir={(m) => { alCambiar({ ...c, medio: m }); if (m === "cuenta_corriente" && !c.clienteId) setEligiendoCliente(true); }} />
-        {c.medio === "cuenta_corriente" && <button type="button" className={`vm-cliente ${cliente ? "elegido" : "falta"}`} onClick={() => setEligiendoCliente(true)} aria-label={cliente ? `Cliente: ${cliente.nombre}` : t.eligeCliente.corto} data-testid="cliente-ed"><Icono nombre="persona" tam={20} /></button>}
+        <MediosDePago medios={MEDIOS} elegido={c.medio} etiqueta="Medio de pago" prefijo="medio-ed" alElegir={(m) => { alCambiar({ ...c, medio: m }); if (m === "cuenta_corriente" && !c.clienteId) setEligiendoCliente(true); }} />
+        {c.medio === "cuenta_corriente" && <BotonDeCliente elegido={Boolean(cliente)} falta alTocar={() => setEligiendoCliente(true)} etiqueta={cliente ? `Cliente: ${cliente.nombre}` : t.eligeCliente.corto} testId="cliente-ed"><Icono nombre="persona" tam={20} /></BotonDeCliente>}
       </div>
       <div className="cc-total"><span>{t.columnaTotal.corto}</span><span>{diferencia !== 0 && <s className="cc-viejo">{pesosCortos(v.total)}</s>}<b className="importe" data-testid="total-corregido">{pesosCortos(total)}</b></span></div>
       <div className="cc-resuelve" data-testid="como-se-resuelve">
-        {resuelta === "cobrada" ? <><span>{t.seCobraCon.corto}</span><Medios medios={COBROS} elegido={medioDif} alElegir={setMedioDif} etiqueta="Con qué se cobra la diferencia" prefijo="dif" /></>
+        {resuelta === "cobrada" ? <><span>{t.seCobraCon.corto}</span><MediosDePago medios={COBROS} elegido={medioDif} alElegir={setMedioDif} etiqueta="Con qué se cobra la diferencia" prefijo="dif" /></>
           : resuelta === "devuelta" ? <span>{t.seDevuelve.corto}: <b>{pesosCortos(-diferencia)}</b></span>
             : resuelta === "cuenta_corriente" && diferencia !== 0 ? <span>{diferencia > 0 ? t.subeLaDeuda.corto : t.bajaLaDeuda.corto}{cliente ? ` ${cliente.nombre}` : ""}: <b>{pesosCortos(Math.abs(diferencia))}</b></span>
               : <span>{t.sinDiferencia.corto}</span>}
@@ -259,7 +247,7 @@ export function HojaDeCambio({ venta, alCerrar, alListo }: { venta: VentaDelDia 
         <div className="cc-difer" data-testid="diferencia-cambio">
           <div><small>{diferencia >= 0 ? t.aCobrar.corto : t.aDevolver.corto}</small><b className="importe">{vuelve.length ? pesosCortos(Math.abs(diferencia)) : "—"}</b>
             {resuelto === "cuenta_corriente" && diferencia !== 0 && <small>{diferencia > 0 ? t.subeLaDeuda.corto : t.bajaLaDeuda.corto}</small>}</div>
-          {resuelto === "cobrado" && <Medios medios={COBROS} elegido={medioDif} alElegir={setMedioDif} etiqueta="Con qué se cobra la diferencia" prefijo="dif" />}
+          {resuelto === "cobrado" && <MediosDePago medios={COBROS} elegido={medioDif} alElegir={setMedioDif} etiqueta="Con qué se cobra la diferencia" prefijo="dif" />}
         </div>
         <p className="hoy-hoja-detalle cc-valores">Vuelve {pesosCortos(valorQueVuelve(vuelve))}{lleva.length ? ` · se lleva ${pesosCortos(lleva.reduce((s, l) => s + valorDe(l), 0))}` : ""}</p>
         <AvisoError texto={error} />

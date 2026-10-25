@@ -1,0 +1,9 @@
+.fila { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.medio { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 5px; border-radius: 99px; border: 1px solid var(--m-borde-fuerte); background: #fff; font-weight: 700; font-size: 15px; color: var(--m-tinta); white-space: nowrap; transition: background-color 160ms, border-color 160ms; }
+.medio :global(.medio-icono) { width: 32px; height: 32px; border-radius: 99px; background: var(--medio-suave); color: var(--medio); display: grid; place-items: center; transition: background-color 160ms, color 160ms; }
+.medio.elegido { padding: 0 14px 0 5px; border: 2px solid var(--medio); background: var(--medio-suave); }
+.medio.elegido :global(.medio-icono) { background: var(--medio); color: #fff; }
+.medio.elegido span { animation-duration: 160ms; }
+/* El ícono trae su color con más clases: el elegido lo pisa. */
+.medio.elegido > :global(.medio-icono.medio-icono.medio-icono) { color: #fff; }
+@media (prefers-reduced-motion: reduce) { .medio, .medio :global(.medio-icono) { transition: none; } }

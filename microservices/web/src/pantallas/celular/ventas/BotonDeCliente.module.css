@@ -1,0 +1,8 @@
+.cliente { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--m-borde-fuerte); background: #fff; color: var(--m-texto-2); font-weight: 650; font-size: 15px; }
+.cliente span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cliente svg { flex: none; }
+.cliente.elegido { color: var(--m-tinta); font-weight: 750; border-color: var(--m-tinta); }
+.cliente.falta { border: 2px solid var(--m-urgente); color: var(--m-urgente-texto); background: var(--m-urgente-suave); }
+/* En Vender, redondo al final de la fila de los medios. */
+.cliente.redondo { flex: none; width: 44px; padding: 0; justify-content: center; border-radius: 99px; }
+.redondo b { font-size: 15px; font-weight: 800; }

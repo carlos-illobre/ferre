@@ -29,12 +29,6 @@ export function useTeclasDeVender(t: DeVender) {
   }, t.activas);
 }
 
-// ↑ ↓ eligen un producto del desplegable; sin resultados a la vista no son para eso: recorren la
-// pantalla (flechas.ts).
-export function flechasDeLaBusqueda(hayResultados: boolean, mover: (paso: 1 | -1) => void): TablaDeTeclas {
-  return { ArrowDown: () => (hayResultados ? mover(1) : false), ArrowUp: () => (hayResultados ? mover(-1) : false) };
-}
-
 // En la caja: las flechas, Enter (agrega o cobra) y Esc (borra lo escrito).
 export const teclasDeLaCaja = (flechas: TablaDeTeclas, alEnter: () => void, consulta: string, limpiar: () => void) =>
   (e: KeyboardEvent<HTMLInputElement>) => teclearCon({ ...flechas, Enter: alEnter, Escape: () => (consulta ? limpiar() : false) }, e);

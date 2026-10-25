@@ -35,7 +35,6 @@
  "src/pantallas/celular/Stock.tsx",
  "src/pantallas/celular/TarjetaDeUsuario.tsx",
  "src/pantallas/celular/Usuarios.tsx",
- "src/pantallas/celular/Vender.tsx",
  "src/pantallas/celular/componentes/EstadoDeConexion.tsx",
  "src/pantallas/celular/componentes/Foto.tsx",
  "src/pantallas/celular/pantallas/Anomalias.tsx",

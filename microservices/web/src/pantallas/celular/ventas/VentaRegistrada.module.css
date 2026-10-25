@@ -1,0 +1,12 @@
+:global(.hoja-fondo).fondo { justify-content: center; align-items: center; padding: 20px; z-index: 50; }
+.listo { width: 100%; max-width: 380px; padding: 28px 20px 20px; border-radius: 24px; background: #fff; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 24px 60px -12px rgba(0, 0, 0, .4); animation: abre 0.25s cubic-bezier(.2, .9, .3, 1); }
+.tilde { width: 72px; height: 72px; border-radius: 99px; background: var(--m-logro); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 8px var(--m-logro-suave); margin-bottom: 8px; }
+.tilde.pendiente { background: var(--m-urgente); box-shadow: 0 0 0 8px var(--m-urgente-suave); }
+.listo h2 { margin: 0; font-size: 20px; font-weight: 800; }
+.total { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; }
+.sinRed { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: var(--m-urgente-suave); color: var(--m-urgente-texto); font-size: 14px; font-weight: 700; text-align: left; }
+.sinRed svg { flex: none; margin-top: 1px; }
+.detalle { margin: 0; display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 4px; font-size: 15px; color: var(--m-texto-2); }
+.botones { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.botones :global(.boton) { width: 100%; justify-content: center; }
+@keyframes abre { from { opacity: 0; transform: scale(.94) translateY(6px); } }

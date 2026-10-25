@@ -1,0 +1,14 @@
+.titulo { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.espejo { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 99px; border: 1.5px solid var(--m-logro); background: var(--m-logro-suave); color: var(--m-logro-texto); font-weight: 700; font-size: 15px; }
+
+/* La cámara arriba: empuja la venta hacia abajo, que se sigue viendo (decisión 119). */
+:global(.escaner).camara { position: relative; inset: auto; z-index: 1; height: 236px; margin: 0 -16px; border-radius: 0; overflow: hidden; background: #120f0d; animation: baja 0.32s cubic-bezier(.2, .9, .3, 1); }
+:global(.escaner).camara video { position: absolute; inset: 0; height: 100%; }
+:global(.escaner).camara :global(.guia) { left: 22%; right: 22%; top: 18%; height: 46%; border-color: rgba(255, 255, 255, .85); border-width: 3px; }
+:global(.escaner).camara :global(.escaner-abajo) { position: absolute; left: 0; right: 0; bottom: 0; background: none; padding: 10px 12px; border-radius: 0; gap: 6px; }
+:global(.escaner).camara :global(.escaner-abajo) :global(.error) { color: #fff; font-size: 14px; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
+:global(.escaner).camara :global(.escaner-leido) { background: rgba(255, 255, 255, .96); color: var(--m-tinta); font-size: 15px; box-shadow: 0 10px 28px rgba(0, 0, 0, .4); }
+:global(.escaner).camara :global(.escaner-leido)::before { content: "✓"; display: inline-grid; place-items: center; width: 24px; height: 24px; margin-right: 8px; border-radius: 99px; background: var(--m-logro); color: #fff; font-size: 14px; }
+:global(.escaner).camara form input { height: 44px; border-radius: 12px; background: rgba(255, 255, 255, .92); padding: 0 12px; font-size: 16px; }
+:global(.escaner).camara form button { height: 44px; padding: 0 14px; border-radius: 12px; background: rgba(0, 0, 0, .55); color: #fff; font-weight: 700; }
+@keyframes baja { from { height: 0; } }

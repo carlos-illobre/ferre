@@ -1,0 +1,24 @@
+/* Vender en el celular (decisión 119): el lenguaje «Mostrador» (docs/lenguaje-mostrador/), con sus
+   colores con nombre, solo dentro de esta pantalla. El marco (la barra de abajo, el estado de la
+   conexión) es el de toda la aplicación. */
+/* El fondo de «Mostrador» (papel cálido, gris) en Vender y Ventas de hoy, como la v2. */
+:global(body):has(.pantalla) { background: #F4F2EC; }
+.vender {
+  --m-fondo: #F4F2EC; --m-hundido: #ECE9E1; --m-superficie: #fff; --m-borde: #E6E2D8; --m-borde-fuerte: #CEC8BA;
+  --m-tinta: #1A1D1B; --m-texto-2: #545955; --m-texto-3: #6B706B;
+  --m-pino: #12382F; --m-pino-suave: #E3EEE8; --m-pino-texto: #17614E;
+  --m-accion: #E8541C; --m-accion-fuerte: #C8450F;
+  --m-urgente: #F0A20F; --m-urgente-suave: #FFF3D8; --m-urgente-texto: #845400;
+  --m-error-texto: #AE281D; --m-error-suave: #FCEAE7;
+  --m-logro: #1E9E62; --m-logro-suave: #E2F4EA; --m-logro-texto: #11764A;
+  --m-sombra-1: 0 1px 2px rgba(26, 29, 27, .05), 0 1px 1px rgba(26, 29, 27, .03);
+  --m-sombra-accion: 0 6px 16px -6px rgba(232, 84, 28, .55);
+  color: var(--m-tinta);
+}
+.vender :global(.titulo) { color: var(--m-tinta); }
+/* El estado de la conexión, debajo del título, como la v2 (decisión 140); el de arriba no se repite. */
+.pantalla :global(.estado-chico) { margin-top: -6px; font-size: 14px; font-weight: 600; color: #545955; }
+.pantalla :global(.estado-chico) i { width: 8px; height: 8px; }
+:global(.app):has(.pantalla) :global(.linea-de-arriba) :global(.estado-chico) { display: none; }
+/* El cobro apoyado en el menú de abajo, sin franja en el medio, como la v2. */
+@media (max-width: 899px) { :global(.contenido).vender { padding-bottom: calc(var(--alto-nav) + env(safe-area-inset-bottom)); } }
