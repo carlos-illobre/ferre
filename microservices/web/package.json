@@ -11,7 +11,7 @@
     "lint": "tsc --noEmit",
     "preview": "vite preview --port 4173 --strictPort",
     "capas": "depcruise src --config .dependency-cruiser.cjs --ignore-known",
-    "limites": "eslint src && jscpd --config .jscpd.json"
+    "limites": "eslint src && node scripts/repetido.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

@@ -40,6 +40,11 @@ export function empezarCorreccion(v: VentaDelDia): Correccion {
 
 export const subtotalCorregido = (r: Pick<RenglonCorregido, "cantidad" | "precio_unitario" | "margen_aplicado">): number =>
   subtotalDeRenglon({ precioUnitario: r.precio_unitario, cantidad: r.cantidad, aMano: r.margen_aplicado === null }).valor;
+// El subtotal de un renglón corregido y, si cambió la cantidad o el precio, el de antes (para tacharlo).
+export function subtotalesDelRenglon(r: RenglonCorregido): { ahora: number; antes: number | null } {
+  const cambio = r.antes && (r.antes.cantidad !== r.cantidad || r.antes.precio_unitario !== r.precio_unitario);
+  return { ahora: subtotalCorregido(r), antes: cambio ? subtotalCorregido({ ...r.antes!, margen_aplicado: r.margen_aplicado }) : null };
+}
 export const totalCorregido = (c: Correccion): number => Math.round(c.renglones.reduce((s, r) => s + subtotalCorregido(r), 0) * 100) / 100;
 export const diferenciaDe = (v: VentaDelDia, c: Correccion): number => Math.round((totalCorregido(c) - Number(v.total)) * 100) / 100;
 

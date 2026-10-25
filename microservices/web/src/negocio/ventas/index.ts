@@ -10,7 +10,7 @@ export * from "./lista-del-dia";
 export * from "./corrigiendo";
 export { buscarVentas, confirmadas, fueSinConexion, hoyLocal, MOTIVOS_DE_ANULACION, plano, SIN_MOTIVO, useConsultas, useVentasDelDia, ventasCambiaron, type Consulta, type VentaDelDia, type VentasDelDia } from "./ventas-del-dia";
 export { diaAnterior, nombreDelDia, resumenDelDia, useResumenDelDia, type Comparacion, type ResumenDelDia } from "./resumen-del-dia";
-export { aEntrada, conCantidad, conPrecio, empezarCorreccion, subtotalCorregido, useCorregirVenta, type Correccion, type RenglonCorregido } from "./correccion";
+export { aEntrada, conCantidad, conPrecio, empezarCorreccion, subtotalCorregido, subtotalesDelRenglon, useCorregirVenta, type Correccion, type RenglonCorregido } from "./correccion";
 export { aEntradaDeCambio, diferenciaDelCambio, paraVolver, paraVolverDeLaBusqueda, resolucionDelCambio, sePuedeCambiar, useRegistrarCambio, useVentasParaCambio, valorQueVuelve, type ParaVolver, type SeLleva, type VentaParaCambio, type Vuelve } from "./cambio";
 export * from "./tablero";
 export { useVentaEnEspejo } from "./venta-en-espejo";

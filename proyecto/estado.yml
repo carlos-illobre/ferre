@@ -1648,8 +1648,10 @@ RNF-68:
     - microservices/web/src/datos/vinculo/conexion-modulo.test.ts
   defectos: []
 RNF-69:
-  estado: "Nuevo (024): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (024): las capas, los límites de tamaño y complejidad, el teclado aparte y el código repetido los controlan pnpm capas y pnpm limites en cada subida, sin excepciones"
+  pruebas:
+    - microservices/web/src/teclado/motor/motor.test.tsx
+    - microservices/web/src/plataforma/comandos/comandos.test.tsx
   defectos: []
 
 

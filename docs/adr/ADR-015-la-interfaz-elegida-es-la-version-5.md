@@ -19,7 +19,7 @@ versión 4 (decisión 27). El 2026-10-11 eligió la versión 5, que junta esas t
 > **la principal**: su código está en `src/pantallas/` y se publica en la raíz. Las versiones
 > 1 a 4 son históricas y se publican bajo `historico/`. Donde este documento dice «versión 5»
 > hay que leer «la principal». Se sumaron tres archivos que comparten las dos interfaces:
-> `src/pantallas/textos.ts` (textos y listas; forma larga para la computadora y corta para
+> `src/pantallas/textos/` (textos y listas; forma larga para la computadora y corta para
 > el celular), `src/pantallas/paleta.css` (todos los colores) y las reglas, que tienen que
 > ser idénticas en las dos.
 >
@@ -63,7 +63,7 @@ Dónde está cada cosa en el código:
 | Lo compartido por los dos árboles | `src/pantallas/*.tsx` y `src/pantallas/*.css` |
 | Pantallas de la versión 1 que usa el celular | `src/pantallas/`, `src/componentes/` |
 | Pantallas de la versión 2 que usa la computadora | `src/v2/` |
-| Textos y listas comunes, y la paleta | `src/pantallas/textos.ts`, `src/pantallas/paleta.css` |
+| Textos y listas comunes, y la paleta | `src/pantallas/textos/`, `src/pantallas/paleta.css` |
 | Las versiones históricas | `historico/v1/`, `historico/v2/`, `historico/v4/` (entradas), `public/historico/` (maquetas 3 y 4 y la lista) |
 | Redirecciones desde las direcciones viejas | `public/v1/` … `public/v5/`, `public/versiones.html` |
 

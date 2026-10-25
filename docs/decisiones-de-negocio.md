@@ -1412,3 +1412,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      hay temporizadores. Va en la etapa 3, después del gateway, para que Tickets y Acceso nazcan
      entregándole sus eventos. El broker de mensajes queda para el final (etapa 11), donde se
      reanaliza si Auditoría pasa a recibirlos por ahí.
+
+166. **Entre el celular y la computadora se repite el dibujo, nunca la lógica** (2026-10-25,
+     specs/024, T023). Carlos eligió, entre unificar todo o solo la lógica, la segunda: los hooks,
+     las reglas y las cuentas que hacen lo mismo en las dos interfaces están una sola vez (en
+     `negocio/` o en `pantallas/comun/`), y el dibujo de cada interfaz queda en su archivo (decisión
+     46), aunque se parezca. El control de código repetido deja pasar solo eso: una pieza visual
+     (`.tsx` o `.css`) del celular parecida a una de la computadora; cualquier otra repetición falla.

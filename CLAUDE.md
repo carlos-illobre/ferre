@@ -127,12 +127,13 @@ Tarda unos segundos por edición. No reemplaza las compuertas de antes de subir.
   por defecto; solo cambia si el director de arte propone algo superador y Carlos lo elige.
 - **Tiene dos juegos de pantallas, celular y computadora, en archivos separados, a
   propósito** (decisión 46). Entre los dos: **las reglas son idénticas, la paleta es una sola
-  (`paleta.css`) y los textos dicen lo mismo** (`textos.ts`: largos en la computadora, que
+  (`paleta.css`) y los textos dicen lo mismo** (`pantallas/textos/`: largos en la computadora, que
   explican; resumidos en el celular). Un cambio de regla o de texto se hace en lo compartido
   o en los dos lados, nunca en uno solo (decisión 47).
 - **Es la interfaz definitiva** (decisión 83). Las versiones anteriores y sus mockups se
-  borraron el 2026-10-13: no hay otra interfaz en el repositorio. Lo común a las dos (la
-  llamada a la API, el catálogo, el envío sin conexión, la sesión) está en `src/`.
+  borraron el 2026-10-13: no hay otra interfaz en el repositorio. Lo común a las dos está en
+  sus capas (ADR-028): `datos/` (la API, lo guardado, la sesión), `negocio/` (las reglas),
+  `ui/` (las piezas), `pantallas/comun/` y `teclado/` (ADR-029).
 - **Capas** ([ADR-018](docs/adr/ADR-018-servicios-y-capas.md)): la regla de cada proceso
   está una sola vez en `src/negocio/` y las pantallas solo muestran; la tecnología que sirve
   para cualquier aplicación está en `src/plataforma/`, que no puede importar nada del negocio.

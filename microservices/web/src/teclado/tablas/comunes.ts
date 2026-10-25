@@ -18,3 +18,13 @@ export const DE_CUALQUIER_PANTALLA: Linea[] = [
   // Cerrar lo que está abierto arriba de todo (una hoja, un menú).
   { tecla: "Escape", accion: "cerrar", enCampos: true },
 ];
+
+// Vender, en las dos interfaces: F5 a F8 eligen cómo paga y F2 cobra, aunque el cursor esté en
+// la búsqueda.
+export const MEDIOS_Y_COBRAR: Linea[] = [
+  { tecla: "F5", accion: "vender.medio.efectivo", enCampos: true },
+  { tecla: "F6", accion: "vender.medio.mercado_pago", enCampos: true },
+  { tecla: "F7", accion: "vender.medio.tarjeta", enCampos: true },
+  { tecla: "F8", accion: "vender.medio.cuenta_corriente", enCampos: true },
+  { tecla: "F2", accion: "vender.cobrar", enCampos: true },
+];

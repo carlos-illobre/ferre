@@ -1,4 +1,4 @@
-import { Pestanas } from "../Pestanas";
+import { ParteConPestanas } from "../marco/ParteConPestanas";
 import { type Permiso } from "../../../negocio/permisos";
 import { usePuede } from "../../../negocio/usuarios";
 import { SinPermiso } from "../../SinPermiso";
@@ -20,12 +20,8 @@ export function Catalogo({ sub }: { sub: string | null }) {
   const permitida = (s: Sub) => !PIDE[s] || puedeEsto(PIDE[s]!);
   if (!permitida(actual)) return <SinPermiso falta={[PIDE[actual]!]} />;
   return (
-    <main className="contenido">
-      <div className="encabezado">
-        <h1 className="titulo">Catálogo</h1>
-        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor }))} actual={actual} alElegir={(v) => irA(v === "productos" ? "catalogo" : `catalogo/${v}`)} />
-      </div>
+    <ParteConPestanas titulo="Catálogo" opciones={SUB.filter((s) => permitida(s.valor))} actual={actual} alElegir={(v) => irA(v === "productos" ? "catalogo" : `catalogo/${v}`)}>
       {actual === "productos" ? <Productos /> : actual === "listas" ? <Listas /> : <Duplicados />}
-    </main>
+    </ParteConPestanas>
   );
 }

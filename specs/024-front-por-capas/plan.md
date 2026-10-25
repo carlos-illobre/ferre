@@ -40,7 +40,7 @@ Cada una deja todo en verde y se sube sola.
 1. **Mediciones y reglas.**
    - ESLint con los límites, `jscpd` y las reglas de capas de ADR-028 en `pnpm capas`.
    - Cada uno arranca con la lista de lo que hoy no cumple.
-   - Corren en el CI con `pnpm test`.
+   - Corren en el CI con `pnpm typecheck` (tipos, `pnpm capas` y `pnpm limites`).
 2. **`app/` y la raíz de `src/`.**
    - El arranque va a `app/`.
    - Cada archivo suelto de la raíz va a su capa:

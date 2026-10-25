@@ -63,8 +63,9 @@ src/
     sesion/           quién entró y su token; avisa cuando la sesión termina
     credenciales/     entrar y vincular con la huella
     vinculo/          el emparejamiento con el otro dispositivo y el enlace por donde se hablan
-  ui/             las piezas de «Mostrador» (botón, hoja, aviso, pestañas, lista, buscador,
-                  un solo juego de íconos, la paleta); no saben qué es una venta
+  ui/             las piezas de «Mostrador» (botón, hoja, aviso, lista, buscador, un solo
+                  juego de íconos); no saben qué es una venta. La paleta y las pestañas de
+                  cada interfaz siguen en pantallas/
   negocio/<capacidad>/   las reglas en funciones puras y los hooks que traen y guardan los
                   datos; sin nada visual
   pantallas/
@@ -119,7 +120,7 @@ Se miden en cada subida:
 | Bloques anidados | 3 | ESLint `max-depth` |
 | Líneas por archivo | unas 150 | ESLint `max-lines` |
 | Líneas por componente | 40 | ESLint `max-lines-per-function` |
-| Código copiado | ninguno | `jscpd` |
+| Código copiado | ninguno, salvo el dibujo del celular parecido al de la computadora (decisión 166) | `jscpd`, filtrado por `scripts/repetido.mjs` |
 
 Las pruebas no cuentan para el tamaño.
 

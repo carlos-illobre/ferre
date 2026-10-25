@@ -1,4 +1,4 @@
-import { conCantidad, conPrecio, subtotalCorregido, type RenglonCorregido as Renglon } from "../../../negocio/ventas";
+import { conCantidad, conPrecio, subtotalesDelRenglon, type RenglonCorregido as Renglon } from "../../../negocio/ventas";
 import { nombreDeProducto, pesosCortos } from "../../../negocio/formato";
 import { Icono } from "../componentes/base";
 import { FotoChica } from "./FotoChica";
@@ -26,11 +26,11 @@ export function RenglonCorregido({ r, alCambiar, alQuitar }: { r: Renglon; alCam
 }
 
 function SubtotalCorregido({ r }: { r: Renglon }) {
-  const cambio = r.antes && (r.antes.cantidad !== r.cantidad || r.antes.precio_unitario !== r.precio_unitario);
+  const st = subtotalesDelRenglon(r);
   return (
     <span className={`${css.sub} importe`}>
-      {cambio && <s className={css.viejo}>{pesosCortos(subtotalCorregido({ cantidad: r.antes!.cantidad, precio_unitario: r.antes!.precio_unitario, margen_aplicado: r.margen_aplicado }))}</s>}
-      {pesosCortos(subtotalCorregido(r))}
+      {st.antes !== null && <s className={css.viejo}>{pesosCortos(st.antes)}</s>}
+      {pesosCortos(st.ahora)}
     </span>
   );
 }

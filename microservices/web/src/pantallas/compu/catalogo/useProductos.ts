@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { cuantosFiltros, SIN_FILTROS, useCatalogo, useListaDeProductos, useMarcas, type Filtros, type Producto } from "../../../negocio/catalogo";
-import { agregarALaVenta, useLoQueLeeElCelular } from "../../../negocio/ventas";
-import { useDebounce, useSeVaSolo } from "../../../plataforma/tiempo";
+import { cuantosFiltros, SIN_FILTROS, useCatalogo, useListaDeProductos, useMarcas, type Filtros } from "../../../negocio/catalogo";
+import { useLoQueLeeElCelular } from "../../../negocio/ventas";
+import { useDebounce } from "../../../plataforma/tiempo";
 import { usePuede } from "../../../negocio/usuarios";
-import { TEXTOS } from "../../textos";
 import type { Cambios } from "./tipos";
+import { useAgregarALaVenta } from "../../comun/catalogo/useAgregarALaVenta";
 
 // El estado de Productos: lo buscado (le pregunta al servidor y trae de a 50, specs/018), los filtros
 // por disponibilidad y marca (RF-109, de esta pantalla, no se guardan), el elegido con su ficha al
@@ -22,7 +22,7 @@ export function useProductos() {
   useEffect(() => { setElegido(0); }, [consultaEstable, filtros]);
   const [cargandoCodigo, setCargandoCodigo] = useState(false);
   const emparejado = useLoQueLeeElCelular(setConsulta, !cargandoCodigo);
-  const { agregado, agregar } = useAgregarALaVenta();
+  const { agregado, agregar } = useAgregarALaVenta(false);
   const [error, setError] = useState<string | null>(null);
   const actualizar = useCallback((id: string, cambios: Cambios) => {
     setError(null);
@@ -39,14 +39,6 @@ export function useProductos() {
   };
 }
 export type EstadoDeProductos = ReturnType<typeof useProductos>;
-
-// Agregar a la venta desde acá: avisa unos segundos qué se agregó.
-function useAgregarALaVenta() {
-  const [agregado, setAgregado] = useState<string | null>(null);
-  useSeVaSolo(agregado, () => setAgregado(null), 3000);
-  const agregar = useCallback((p: Producto) => { agregarALaVenta(p); setAgregado(`${TEXTOS.catalogo.agregado.largo}: ${p.descripcion}`); }, []);
-  return { agregado, agregar };
-}
 
 // «Así se calcula» empieza abierto; F1 lo pliega.
 function usePlegarCalculo() {

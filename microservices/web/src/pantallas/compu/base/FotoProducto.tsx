@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { PedirFotoAlCelular, hayQueUsarElCelular } from "../../PedirFoto";
 import { urlDeFoto } from "../../../negocio/catalogo";
+import { useSubirFoto } from "../../comun/catalogo/useSubirFoto";
 import { Aviso, Boton, Icono, useDialogo } from "../../../ui";
 
 type AlSubir = (archivo: File) => Promise<void>;
@@ -29,26 +30,15 @@ export function FotoProducto({ id, url: urlCruda, descripcion, alSubir }: { id: 
 }
 
 // Subir la foto nueva: desde un archivo o desde el celular, con su error si falla.
-function useSubirFoto(alSubir?: AlSubir) {
-  const [subiendo, setSubiendo] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+function useSubirFotoDeLaCompu(alSubir?: AlSubir) {
+  const s = useSubirFoto(alSubir, (m) => `No se pudo subir la foto: ${m}. Probá de nuevo.`);
   const [pidiendo, setPidiendo] = useState(false);
-  async function recibir(f: File | undefined) {
-    if (!f || !alSubir) return;
-    setPidiendo(false); setSubiendo(true); setError(null);
-    try { await alSubir(f); } catch (err) { setError(`No se pudo subir la foto: ${(err as Error).message}. Probá de nuevo.`); }
-    finally { setSubiendo(false); }
-  }
-  async function elegida(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    e.target.value = "";
-    await recibir(f);
-  }
-  const pedirAlCelular = () => { setError(null); setPidiendo(true); };
-  return { subiendo, error, pidiendo, recibir, elegida, pedirAlCelular, dejarDePedir: () => setPidiendo(false) };
+  const recibir = (f: File | undefined) => { setPidiendo(false); return s.recibir(f); };
+  const pedirAlCelular = () => { s.setError(null); setPidiendo(true); };
+  return { subiendo: s.subiendo, error: s.error, pidiendo, recibir, elegida: s.elegida, pedirAlCelular, dejarDePedir: () => setPidiendo(false) };
 }
 
-type Subida = ReturnType<typeof useSubirFoto>;
+type Subida = ReturnType<typeof useSubirFotoDeLaCompu>;
 
 function textoDelArchivo(subiendo: boolean, url: string | null) {
   if (hayQueUsarElCelular()) return "Elegir un archivo";
@@ -70,7 +60,7 @@ function SacarOtra({ subida, url }: { subida: Subida; url: string | null }) {
 
 function FotoGrande({ url, nombre, descripcion, alSubir, alCerrar }: { url: string | null; nombre: string; descripcion: string; alSubir?: AlSubir; alCerrar: () => void }) {
   const ref = useDialogo(alCerrar);
-  const subida = useSubirFoto(alSubir);
+  const subida = useSubirFotoDeLaCompu(alSubir);
   return (
     <dialog ref={ref} className={`foto-grande${subida.pidiendo ? " pidiendo" : ""}`} aria-label={`Foto de ${descripcion}`} onClick={(e) => { if (e.target === e.currentTarget) alCerrar(); }} data-testid="foto-grande">
       <figure>

@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
+import { useSubirFoto } from "../../comun/catalogo/useSubirFoto";
 import type { Producto } from "../../../negocio/catalogo";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../componentes/base";
@@ -11,15 +12,7 @@ const t = TEXTOS.ficha;
 // neutro con «Sacar foto».
 export function FotoDeLaFicha({ producto: p, alSubir, stock }: { producto: Producto; alSubir: (archivo: File) => Promise<void>; stock: React.ReactNode }) {
   const archivo = useRef<HTMLInputElement>(null);
-  const [subiendo, setSubiendo] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  async function elegida(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    e.target.value = "";
-    if (!f) return;
-    setSubiendo(true); setError(null);
-    try { await alSubir(f); } catch (err) { setError(`${t.noSubio.corto}: ${(err as Error).message}`); } finally { setSubiendo(false); }
-  }
+  const { subiendo, error, elegida } = useSubirFoto(alSubir, (m) => `${t.noSubio.corto}: ${m}`);
   return (
     <div className={`ficha-foto ${css.hero} ${p.foto_url ? "" : "sin"}`}>
       {stock}

@@ -53,6 +53,9 @@ function guardarArchivo(blob: Blob, nombre: string): void {
   setTimeout(() => URL.revokeObjectURL(direccion), 10_000);
 }
 
+// Solo el token de la sesión, para bajar un archivo.
+const soloElToken = (token: string | null) => new Headers(token ? { Authorization: `Bearer ${token}` } : {});
+
 const esDeLectura = (pedido: RequestInit) => !pedido.method || pedido.method === "GET";
 
 export function crearCliente(opciones: OpcionesDeCliente) {
@@ -88,7 +91,7 @@ export function crearCliente(opciones: OpcionesDeCliente) {
   // error (un 409 que dice cómo quedó algo). Sin red, falla como `fetch`.
   async function pedirTalCual(ruta: string, pedido: RequestInit = {}): Promise<Response> {
     const token = leerToken();
-    const respuesta = await fetch(url(ruta), { ...pedido, headers: cabecerasDe(pedido, token) });
+    const respuesta = await llegar(ruta, { ...pedido, headers: cabecerasDe(pedido, token) });
     revisar(respuesta, token);
     return respuesta;
   }
@@ -96,10 +99,7 @@ export function crearCliente(opciones: OpcionesDeCliente) {
   // Bajar un archivo con la sesión puesta. Un enlace común no sirve: el token va en la
   // cabecera, no en una cookie.
   async function bajar(ruta: string): Promise<Blob> {
-    const token = leerToken();
-    const cabeceras = new Headers();
-    if (token) cabeceras.set("Authorization", `Bearer ${token}`);
-    const respuesta = await llegar(ruta, { headers: cabeceras });
+    const respuesta = await llegar(ruta, { headers: soloElToken(leerToken()) });
     opciones.alContestar?.(respuesta);
     if (!respuesta.ok) await fallar(respuesta);
     return respuesta.blob();

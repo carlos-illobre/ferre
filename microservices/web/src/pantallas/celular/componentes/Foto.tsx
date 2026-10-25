@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useComandos } from "../../../plataforma/comandos";
 import { urlDeFoto } from "../../../negocio/catalogo";
+import { useSubirFoto } from "../../comun/catalogo/useSubirFoto";
 import { Icono } from "./base";
 import { useVolverCierra } from "../../../plataforma/navegacion";
 
@@ -21,21 +22,8 @@ function conTransicion(cambio: () => void) {
   else cambio();
 }
 
-function useSubirFoto(alSubir?: AlSubir) {
-  const [subiendo, setSubiendo] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  async function elegida(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    e.target.value = "";
-    if (!f || !alSubir) return;
-    setSubiendo(true); setError(null);
-    try { await alSubir(f); } catch (err) { setError(`No se pudo subir la foto: ${(err as Error).message}`); }
-    finally { setSubiendo(false); }
-  }
-  return { subiendo, error, elegida };
-}
 
-function SacarOtra({ url, subiendo, elegida }: { url: string | null } & Omit<ReturnType<typeof useSubirFoto>, "error">) {
+function SacarOtra({ url, subiendo, elegida }: { url: string | null } & Pick<ReturnType<typeof useSubirFoto>, "subiendo" | "elegida">) {
   const archivo = useRef<HTMLInputElement>(null);
   return (
     <>
@@ -46,7 +34,7 @@ function SacarOtra({ url, subiendo, elegida }: { url: string | null } & Omit<Ret
 }
 
 function FotoGrande({ url, nombre, descripcion, alSubir, alCerrar }: { url: string | null; nombre: string; descripcion: string; alSubir?: AlSubir; alCerrar: () => void }) {
-  const { subiendo, error, elegida } = useSubirFoto(alSubir);
+  const { subiendo, error, elegida } = useSubirFoto(alSubir, (m) => `No se pudo subir la foto: ${m}`);
   return (
     <div className="foto-grande-fondo" onClick={alCerrar} role="dialog" aria-label={descripcion} data-testid="foto-grande">
       <figure className="foto-grande" onClick={(e) => e.stopPropagation()}>

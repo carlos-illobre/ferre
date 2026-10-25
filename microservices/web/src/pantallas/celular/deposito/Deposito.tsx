@@ -4,7 +4,7 @@ import { type Permiso } from "../../../negocio/permisos";
 import { usePuede } from "../../../negocio/usuarios";
 import { SinPermiso } from "../../SinPermiso";
 import { irA } from "../rutas";
-import { Pestanas } from "../Pestanas";
+import { ParteConPestanas } from "../marco/ParteConPestanas";
 import { ComprasRecientes } from "../compras/ComprasRecientes";
 import { Contar } from "./Contar";
 import { Ingreso } from "./Ingreso";
@@ -29,13 +29,9 @@ export function Deposito({ sub }: { sub: string | null }) {
   const pestana = actual === "ingreso" || actual === "pedidos" ? "compras" : actual;
   if (!permitida(actual)) return <SinPermiso falta={PIDE[actual]!} />;
   return (
-    <main className="contenido">
-      <div className="encabezado">
-        <h1 className="titulo">Depósito</h1>
-        <Pestanas opciones={SUB.filter((s) => permitida(s.valor)).map((s) => ({ valor: s.valor, nombre: s.nombre, icono: s.valor }))} actual={pestana} alElegir={(v) => irA(`deposito/${v}`)} />
-      </div>
+    <ParteConPestanas titulo="Depósito" opciones={SUB.filter((s) => permitida(s.valor))} actual={pestana} alElegir={(v) => irA(`deposito/${v}`)}>
       <LaPantalla actual={actual} />
-    </main>
+    </ParteConPestanas>
   );
 }
 
