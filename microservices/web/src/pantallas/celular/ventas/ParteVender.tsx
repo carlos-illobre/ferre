@@ -1,5 +1,5 @@
 import { irA } from "../rutas";
-import { usePuede } from "../../permisos";
+import { usePuede, usePuedeAnular } from "../../../negocio/usuarios";
 import { SinPermiso } from "../../SinPermiso";
 import { EstadoDeConexion } from "../componentes/EstadoDeConexion";
 import { VentasDelDia } from "./VentasDelDia";
@@ -21,6 +21,7 @@ function pestanaActual(sub: string | null, permitidas: typeof SUB[number][]): Su
 
 export function ParteVender({ sub }: { sub: string | null }) {
   const puede = usePuede();
+  const anula = usePuedeAnular();
   const permitidas = SUB.filter((s) => puede(...PIDE[s.valor]));
   const actual = pestanaActual(sub, permitidas);
   // Con una sola pestaña a la vista no se dibujan.
@@ -30,7 +31,7 @@ export function ParteVender({ sub }: { sub: string | null }) {
   return (
     <main className={`contenido ${css.pantalla}`}>
       <div className="encabezado"><h1 className="titulo">Vender</h1><EstadoDeConexion testId="conexion-vender" />{pestanas}</div>
-      <VentasDelDia anulaHoy={puede("ventas.anular", "ventas.anular_cualquiera")} anulaCualquierDia={puede("ventas.anular_cualquiera")} />
+      <VentasDelDia anulaHoy={anula.hoy} anulaCualquierDia={anula.cualquierDia} />
     </main>
   );
 }

@@ -1,6 +1,6 @@
 import { MEDIOS, NOMBRE_DE_MEDIO, type resumenDelDia, type VentasDelDia } from "../../../negocio/ventas";
 import { IconoDeMedio } from "../../IconoDeMedio";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { irA } from "../base/rutas";
 import { Icono } from "../../../ui/iconos";

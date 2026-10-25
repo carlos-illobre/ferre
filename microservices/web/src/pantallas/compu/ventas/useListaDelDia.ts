@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { buscarVentas, empezarCorreccion, pasaElFiltro, useResumenDelDia, type Correccion, type FiltroDeVentas, type VentaDelDia } from "../../../negocio/ventas";
 import { pedirClientes } from "../../../negocio/catalogo";
 import { useSeVaSolo } from "../../../plataforma/tiempo";
-import { usePuede } from "../../permisos";
+import { usePuedeAnular } from "../../../negocio/usuarios";
 
 // El estado de «Ventas del día» en la computadora: el día, el filtro y lo buscado, la venta elegida
 // (si no, la primera no anulada), la que se corrige, la que se anula y las ventanas abiertas.
@@ -12,7 +12,7 @@ export function useListaDelDia() {
   const lista = useFiltroYBusqueda(r.ventas ?? []);
   const [correccion, setCorreccion] = useState<{ ventaId: string; c: Correccion } | null>(null);
   const e = useElegida(lista.visibles, (v) => { if (correccion && correccion.ventaId !== v.id) setCorreccion(null); });
-  const anula = usePuedeAnular(r.esHoy);
+  const anula = usePuedeAnular().delDia(r.esHoy);
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [porAnular, setPorAnular] = useState<VentaDelDia | null>(null);
   const [hojaAbierta, setHojaAbierta] = useState(false);
@@ -31,11 +31,6 @@ export function useListaDelDia() {
 }
 export type ListaDelDia = ReturnType<typeof useListaDelDia>;
 
-// Las de hoy, con «Anular ventas del día»; las de otro día, solo con «de cualquier día». Corregir pide lo mismo (decisión 135).
-function usePuedeAnular(esHoy: boolean): boolean {
-  const puede = usePuede();
-  return esHoy ? puede("ventas.anular", "ventas.anular_cualquiera") : puede("ventas.anular_cualquiera");
-}
 
 function useFiltroYBusqueda(todas: VentaDelDia[]) {
   const [filtro, setFiltro] = useState<FiltroDeVentas>("todas");

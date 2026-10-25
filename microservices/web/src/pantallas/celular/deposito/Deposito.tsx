@@ -1,6 +1,7 @@
 import { pantallaDeCompras } from "../../../negocio/compras";
 import { Pedidos } from "../../comun/deposito/Pedidos";
-import { usePuede, type Permiso } from "../../permisos";
+import { type Permiso } from "../../../negocio/permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { SinPermiso } from "../../SinPermiso";
 import { irA } from "../rutas";
 import { Pestanas } from "../Pestanas";

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { cuantosFiltros, SIN_FILTROS, useCatalogo, useListaDeProductos, useMarcas, type Filtros, type Producto } from "../../../negocio/catalogo";
 import { agregarALaVenta, useLoQueLeeElCelular } from "../../../negocio/ventas";
 import { useDebounce, useSeVaSolo } from "../../../plataforma/tiempo";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import type { Cambios } from "./tipos";
 

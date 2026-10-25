@@ -1,5 +1,5 @@
 import type { NombreDeIcono } from "./compu/base/ui";
-import type { Permiso } from "./permisos";
+import type { Permiso } from "../negocio/permisos";
 import { NOMBRES } from "./textos";
 
 // Más → Anomalías (014): dos pestañas, igual en el celular y en la computadora. Primero «Para

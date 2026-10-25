@@ -1,6 +1,7 @@
 import type { Ruta } from "../rutas";
 import type { UsuarioDeLaSesion } from "../../../negocio/usuarios";
-import { puede, type Permiso } from "../../permisos";
+import { type Permiso } from "../../../negocio/permisos";
+import { puede } from "../../../negocio/usuarios";
 import { PESTANAS_DE_USUARIOS } from "../../pestanas-de-usuarios";
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO } from "../../pestanas-de-negocio";
 import { PESTANAS_DE_ANOMALIAS } from "../../pestanas-de-anomalias";

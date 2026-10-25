@@ -1,5 +1,5 @@
 import type { NombreDeIcono } from "./compu/base/ui";
-import type { Permiso } from "./permisos";
+import type { Permiso } from "../negocio/permisos";
 import { NOMBRES, TEXTOS } from "./textos";
 
 // Más → Cómo va el negocio (decisión 95): tres secciones, cada una con su permiso de lectura,

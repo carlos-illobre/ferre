@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useVenta, type MotivoDeCambio } from "../../../negocio/ventas";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { textoDeNoCobrar } from "../../comun/ventas/textos-de-la-venta";
 import { describirDispositivo } from "../../../plataforma/dispositivo";

@@ -3,7 +3,7 @@ import { conUnidad, useCatalogo } from "../../../negocio/catalogo";
 import { cuentaDelStock, errorDelStock, pasaElFiltro, productosConStock, useStock, type FiltroDeStock } from "../../../negocio/deposito";
 import { useLoQueLeeElCelular, usePedirLector } from "../../../negocio/ventas";
 import { useEnLinea } from "../../../plataforma/sin-conexion";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { conSigno, nombreUnidad, type Producto } from "./deposito-comun";
 
 // El estado de Stock en la computadora: lo buscado (o lo que lee el celular vinculado, decisión 59),

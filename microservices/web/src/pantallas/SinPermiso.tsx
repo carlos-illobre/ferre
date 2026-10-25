@@ -1,4 +1,4 @@
-import { PERMISOS, type Permiso } from "./permisos";
+import { PERMISOS, type Permiso } from "../negocio/permisos";
 import "./sin-permiso.css";
 
 // Lo que ve quien llega a una pantalla que sus roles no le permiten (RF-72). Dice qué permiso

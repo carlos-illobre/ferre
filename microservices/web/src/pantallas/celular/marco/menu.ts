@@ -1,4 +1,4 @@
-import type { Permiso } from "../../permisos";
+import { PIDE_VENDER, PIDE_VENTAS_DEL_DIA, type Permiso } from "../../../negocio/permisos";
 import type { NombreDeIcono } from "../../../ui";
 import type { Parte } from "../negocio/Negocio";
 import { PIDE_USUARIOS } from "../../pestanas-de-usuarios";
@@ -13,7 +13,7 @@ export type RutaDelMenu = "catalogo" | "vender" | "deposito" | "negocio" | "mas"
 // Como la v2 (decisión 148): Vender · Catálogo · Depósito · Negocio · Más. Negocio no tiene dirección
 // propia: sus pantallas siguen en mas/… (las direcciones de siempre) y se ven con Negocio marcado.
 export const PESTANAS: { ruta: RutaDelMenu; nombre: string; pide?: Permiso[] }[] = [
-  { ruta: "vender", nombre: "Vender", pide: ["ventas.registrar", "ventas.ver", "ventas.anular", "ventas.anular_cualquiera"] },
+  { ruta: "vender", nombre: "Vender", pide: [...PIDE_VENDER, ...PIDE_VENTAS_DEL_DIA] },
   { ruta: "catalogo", nombre: "Catálogo" },
   { ruta: "deposito", nombre: "Depósito" },
   { ruta: "negocio", nombre: NOMBRES.negocio, pide: [...PIDE_EL_NEGOCIO, ...PIDE_USUARIOS] },

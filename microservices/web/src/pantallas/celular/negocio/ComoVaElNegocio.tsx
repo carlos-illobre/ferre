@@ -1,5 +1,5 @@
 import { irA } from "../rutas";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../../pestanas-de-negocio";
 import { CabezaDeNegocio } from "./CabezaDeNegocio";
 import { DineroInvertido } from "../../DineroInvertido";

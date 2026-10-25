@@ -3,7 +3,7 @@ import { pesosCortos } from "../../../negocio/formato";
 import { esDeLaSemana, type CompraFila, type Gastos, type useComprasRecientes } from "../../../negocio/compras";
 import { TEXTOS } from "../../textos";
 import { useAbiertas } from "../../comun/compras/useAbiertas";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { Aviso, Boton } from "../base/ui";
 import { mensajeDe } from "../deposito/deposito-comun";
 import { AnularCompra } from "./AnularCompra";

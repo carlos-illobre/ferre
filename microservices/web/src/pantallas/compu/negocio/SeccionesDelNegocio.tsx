@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAccionesDelLugar } from "../../../plataforma/comandos";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../../pestanas-de-negocio";
 import { irA } from "../base/rutas";

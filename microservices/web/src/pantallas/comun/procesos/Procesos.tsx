@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { dondeGuardarProcesos, PANTALLAS_DE_FERREBRESS, pedirAProcesos } from "../../../negocio/procesos";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import "./procesos.css";
 
 // Procesos (RF-90 a RF-95) es un módulo aparte que se lleva a otros proyectos (ADR-019). Acá

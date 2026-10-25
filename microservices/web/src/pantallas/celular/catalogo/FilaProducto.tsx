@@ -1,6 +1,6 @@
 import { faltaParaElPrecio, precioDelProducto, type Producto } from "../../../negocio/catalogo";
 import { esMargenBoton } from "../../../negocio/precios";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { pesosCortos } from "../../../negocio/formato";
 import { Icono } from "../componentes/base";

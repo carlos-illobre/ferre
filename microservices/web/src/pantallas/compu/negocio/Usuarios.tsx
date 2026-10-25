@@ -3,7 +3,7 @@ import { NOMBRES, TEXTOS } from "../../textos";
 import { Aviso, Boton, Hoja, Pagina, Toast } from "../base/ui";
 import { useEnLinea } from "./negocio-comun";
 import { avisoDeAutorizado } from "../../../negocio/usuarios";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { AccionesDeUsuarios } from "./AccionesDeUsuarios";
 import { AltaDeUsuario } from "./AltaDeUsuario";
 import { FichaDeUsuario } from "./FichaDeUsuario";

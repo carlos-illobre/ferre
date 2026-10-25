@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useVeCostos } from "../../Costos";
 import { CodigoDeBarras } from "../../CodigoDeBarras";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { stockDe, subirFoto, useCatalogo, type Producto } from "../../../negocio/catalogo";
 import { agregarALaVenta } from "../../../negocio/ventas";
 import { TEXTOS } from "../../textos";

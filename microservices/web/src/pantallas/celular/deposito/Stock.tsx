@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { mensajeDeStock, productosConStock, cuentaDelStock, pasaElFiltro, useStock, type FiltroDeStock } from "../../../negocio/deposito";
 import { useCatalogo } from "../../../negocio/catalogo";
 import { Escaner, hayCamara } from "../../../plataforma/camara";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { AvisoError, Buscador, Toast } from "../componentes/base";
 import { FiltrosDelStock } from "./FiltrosDelStock";

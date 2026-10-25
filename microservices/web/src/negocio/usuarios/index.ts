@@ -8,3 +8,4 @@ export * from "./cambio-de-roles";
 export * from "./sesion-propia";
 export * from "./acceso";
 export * from "./roles";
+export * from "./puede";

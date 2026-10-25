@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useComprasRecientes, useGastosDeLaSemana, usePedidosPorLlegar } from "../../../negocio/compras";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { Toast } from "../componentes/base";
 import { ComprasDelCelular } from "./ComprasDelCelular";
 import { FotoDeLaFactura } from "./FotoDeLaFactura";

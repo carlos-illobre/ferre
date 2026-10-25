@@ -1,7 +1,7 @@
 import { esMargenBoton } from "../../../negocio/precios";
 import { pesosCortos } from "../../../negocio/formato";
 import { precioDelProducto, urlDeFoto, type Producto } from "../../../negocio/catalogo";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../base/ui";
 import css from "./Productos.module.css";

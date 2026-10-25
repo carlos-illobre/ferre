@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { SeccionDelNegocio } from "./SeccionDelNegocio";
 import "./negocio.css";

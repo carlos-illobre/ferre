@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { cuantosFiltros, SIN_FILTROS, traerPorCodigo, useCatalogo, useListaDeProductos, useMarcas, useResumenDelCatalogo, type Filtros, type Producto } from "../../../negocio/catalogo";
 import { agregarALaVenta } from "../../../negocio/ventas";
 import { useDebounce, useSeVaSolo } from "../../../plataforma/tiempo";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 
 // El estado de Productos en el celular: lo buscado (le pregunta al servidor y trae de a 50,

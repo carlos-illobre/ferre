@@ -1,5 +1,6 @@
 import { Pestanas } from "../Pestanas";
-import { usePuede, type Permiso } from "../../permisos";
+import { type Permiso } from "../../../negocio/permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { SinPermiso } from "../../SinPermiso";
 import { irA } from "../rutas";
 import { Duplicados } from "./Duplicados";

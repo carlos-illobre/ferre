@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useComprasRecientes, useGastosDeLaSemana, usePedidosPorLlegar } from "../../../negocio/compras";
 import { useComandos } from "../../../plataforma/comandos";
 import { useEnLinea } from "../../../plataforma/sin-conexion";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { Aviso, hayUnaVentanaAbierta } from "../base/ui";
 import { irA } from "../base/rutas";
 import { AccionesDeCompras } from "./AccionesDeCompras";

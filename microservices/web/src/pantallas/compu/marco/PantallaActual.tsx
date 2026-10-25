@@ -20,7 +20,7 @@ import { Sistema } from "../../comun/sistema/Sistema";
 import { Actividad } from "../negocio/Actividad";
 import { Vender } from "../ventas/Vender";
 import { Mas } from "./Mas";
-import { puede } from "../../permisos";
+import { puede } from "../../../negocio/usuarios";
 import { SinPermiso } from "../../SinPermiso";
 import { Roles } from "../../comun/negocio/Roles";
 import { Tickets } from "../tickets/Tickets";

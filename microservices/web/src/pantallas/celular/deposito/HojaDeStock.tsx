@@ -1,6 +1,6 @@
 import { abreviarUnidad, type Producto } from "../../../negocio/catalogo";
 import { conSaldo, useMovimientos, type StockFila } from "../../../negocio/deposito";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { pesosEnteros } from "../../comun/deposito/movimientos";
 import { Hoja } from "../componentes/base";
 import { CorregirEnLaHoja } from "./CorregirEnLaHoja";

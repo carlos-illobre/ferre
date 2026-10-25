@@ -1,5 +1,5 @@
 import { AlLadoDeLasPestanas } from "../../AlLadoDeLasPestanas";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { Icono } from "../../../ui/iconos";
 import { irA } from "../base/rutas";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { mensajeDeLista, pendientes, retomar, ultimaAplicada, useListas, type Cargada, type ListaFila } from "../../../negocio/catalogo";
 import { AvisoError, Toast } from "../componentes/base";
 import { AltaDeProveedor } from "./AltaDeProveedor";

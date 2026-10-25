@@ -1,7 +1,7 @@
 import { TEXTOS } from "../../textos";
 import { useEtiqueta } from "../../../plataforma/comandos";
 import { Atajo, Icono } from "../base/ui";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { AlLadoDeLasPestanas } from "../../AlLadoDeLasPestanas";
 import { irA } from "../base/rutas";
 import css from "./Usuarios.module.css";

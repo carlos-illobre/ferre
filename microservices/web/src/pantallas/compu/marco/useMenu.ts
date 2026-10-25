@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { PIDE_EL_NEGOCIO } from "../../pestanas-de-negocio";
-import { puede, type Permiso } from "../../permisos";
+import { type Permiso } from "../../../negocio/permisos";
+import { puede } from "../../../negocio/usuarios";
 import type { UsuarioDeLaSesion } from "../../../negocio/usuarios";
 import { useParaRevisar } from "../../../negocio/apartados";
 import { DE_ANOMALIAS, DE_NEGOCIO, MENU, NOMBRES, PESTANA_DE, RUTAS_DE_ANOMALIAS, RUTAS_DE_NEGOCIO, SIN_ATAJO, TODAS, type Pestana } from "./menu";

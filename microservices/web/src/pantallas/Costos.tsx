@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { usePuede } from "./permisos";
+import { usePuede } from "../negocio/usuarios";
 
 // Los costos (lo que cobra cada proveedor, y las explicaciones que lo dejan ver) se muestran
 // solo a quien tiene el permiso «Ver costos» (RF-72, decisión 53). Igual en las dos interfaces.

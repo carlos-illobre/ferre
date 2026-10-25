@@ -1,5 +1,5 @@
 import type { NombreDeIcono } from "./compu/base/ui";
-import type { Permiso } from "./permisos";
+import type { Permiso } from "../negocio/permisos";
 import { NOMBRES } from "./textos";
 
 // Más → Usuarios (decisiones 88 y 100): una sola opción con tres pestañas, igual en el celular y en

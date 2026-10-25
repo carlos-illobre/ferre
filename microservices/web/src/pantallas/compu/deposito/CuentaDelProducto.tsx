@@ -1,7 +1,7 @@
 import { useId, type RefObject } from "react";
 import { useCatalogo } from "../../../negocio/catalogo";
 import { conSaldo as saldoDe, useMovimientos, type StockFila } from "../../../negocio/deposito";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { TEXTOS } from "../../textos";
 import { Boton } from "../base/ui";
 import { Icono } from "../../../ui/iconos";

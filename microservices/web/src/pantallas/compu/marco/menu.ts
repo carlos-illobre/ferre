@@ -1,6 +1,6 @@
 import { PIDE_EL_NEGOCIO, SECCIONES_DE_NEGOCIO, type SeccionDeNegocio } from "../../pestanas-de-negocio";
 import { PESTANAS_DE_ANOMALIAS } from "../../pestanas-de-anomalias";
-import type { Permiso } from "../../permisos";
+import { PIDE_VENDER, PIDE_VENTAS_DEL_DIA, type Permiso } from "../../../negocio/permisos";
 import type { NombreDeIcono } from "../base/ui";
 import { NOMBRES as NOMBRES_DE_TEXTOS } from "../../textos";
 import { DE_MAS } from "./Mas";
@@ -30,7 +30,7 @@ const DE_LA_PARTE_NEGOCIO: Pestana[] = [
 // Ingreso y los Pedidos, como la v2; Resumen sus secciones; Usuarios los roles).
 export const PESTANA_DE: Record<string, string> = { gastos: "resumen", invertido: "resumen", roles: "usuarios", ingreso: "compras", pedidos: "compras" };
 export const MENU: Parte[] = [
-  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: ["ventas.registrar"] }, { ruta: "hoy", icono: "ventas", nombre: "Ventas del día", pide: ["ventas.ver", "ventas.anular", "ventas.anular_cualquiera"] }] },
+  { clave: "vender", nombre: "Vender", icono: "vender", pestanas: [{ ruta: "vender", icono: "vender", nombre: "Vender", pide: [...PIDE_VENDER] }, { ruta: "hoy", icono: "ventas", nombre: "Ventas del día", pide: [...PIDE_VENTAS_DEL_DIA] }] },
   { clave: "catalogo", nombre: "Catálogo", icono: "menu-catalogo", pestanas: [{ ruta: "productos", icono: "productos", nombre: "Productos" }, { ruta: "listas", icono: "listas", nombre: "Listas", pide: ["catalogo.listas"] }, { ruta: "duplicados", icono: "duplicados", nombre: "Duplicados", pide: ["catalogo.duplicados"] }] },
   // Depósito como la v2 (decisión 148): Stock · Compras · Contar; Compras abre el Ingreso y los Pedidos.
   { clave: "deposito", nombre: "Depósito", icono: "deposito", pestanas: [{ ruta: "stock", icono: "stock", nombre: "Stock" }, { ruta: "compras", icono: "compras", nombre: "Compras", pide: ["negocio.gastos", "deposito.compras", "deposito.ingresos", "deposito.pedidos"] }, { ruta: "contar", icono: "contar", nombre: "Contar", pide: ["deposito.stock"] }] },

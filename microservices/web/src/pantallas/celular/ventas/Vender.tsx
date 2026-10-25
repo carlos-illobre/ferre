@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { irA } from "../rutas";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { BarraDeCobro } from "./BarraDeCobro";
 import { CabezaDeVender } from "./CabezaDeVender";
 import { HojasDeVender } from "./HojasDeVender";

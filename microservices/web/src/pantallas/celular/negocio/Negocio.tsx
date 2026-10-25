@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { NOMBRES } from "../../textos";
 import { Actividad } from "./Actividad";
-import { usePuede } from "../../permisos";
+import { usePuede } from "../../../negocio/usuarios";
 import { UsuariosDelCelular } from "./UsuariosDelCelular";
 
 // Usuarios y quién hizo qué: dos pestañas de Más → Usuarios (decisiones 88 y 100); la tercera,

@@ -1,5 +1,5 @@
 import { Atajo, Icono, Pagina, type NombreDeIcono } from "../base/ui";
-import type { Permiso } from "../../permisos";
+import type { Permiso } from "../../../negocio/permisos";
 import { irA } from "../base/rutas";
 import { TEXTOS } from "../../textos";
 import { PIDE_LAS_ANOMALIAS } from "../../pestanas-de-anomalias";
