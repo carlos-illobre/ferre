@@ -1561,13 +1561,12 @@ RNF-66:
   defectos: []
 
 RNF-67:
-  estado: "Hecho (022-T009): AMBIENTE en el .env y VITE_AMBIENTE al construir la web; sin valores por omisión; lo guardado en el dispositivo lleva el ambiente"
+  estado: "Hecho (022-T009): AMBIENTE en el .env y VITE_AMBIENTE al construir la web en la CI (decisión 162); sin valores por omisión; lo guardado en el dispositivo lleva el ambiente"
   pruebas:
     - microservices/api/src/config.test.ts
     - microservices/web/src/plataforma/ambiente/ambiente.test.ts
     - tests/integration/paridad_env.sh
   defectos:
-    - "VITE_AMBIENTE de pruebas y producción está en la CI, no en el .env, porque la web se construye en GitHub y no en la máquina; el AMBIENTE del .env de la máquina no lo lee ninguna pieza. Lo decide Carlos (revisión de 022, 4)"
     - "E19 solo tiene prueba en el servidor (y de una variable): no la tienen el corte de la web al construir, el de Procesos ni el del compose; vite dev no exige VITE_BASE (revisión de 022, 1.4)"
     - "Las e2e escriben las claves del dispositivo con el ambiente desarrollo fijo: con otro AMBIENTE en el .env fallan las que siembran la sesión (revisión de 022, 3.3)"
 

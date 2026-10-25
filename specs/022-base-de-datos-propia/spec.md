@@ -41,6 +41,7 @@ el 18/11 puede restringir la base (ADR-023).
 - Q: ¿Qué pasa con el tope de consumo del plan gratuito de la base (RNF-62)? → A: Si Supabase no aporta valor, no se usa; sin Supabase ese tope no existe y RNF-62 se retira (decisión 151).
 - Q: ¿Hasta dónde llega el reordenamiento del código? → A: Solo la capa de datos. Las reglas y las rutas cambian únicamente lo necesario para llamarla (de dónde importan); el resto se reordena más adelante, de a poco (decisión 151).
 - Q: ¿Dónde va cada pieza del servidor? → A: Cada servicio del servidor tiene su propia carpeta dentro de la de servicios; la base de datos, que pasa a ser una pieza más, también (decisión 151).
+- Q: La web se publica en GitHub Pages y no se construye en el servidor: ¿dónde va lo que distingue a la de cada ambiente? → A: En la CI de GitHub, que la construye; es la única excepción a «todo en el archivo de variables de entorno» (decisión 162, 2026-10-25).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -149,7 +150,7 @@ de variables, y ver que solo cambia lo que ese archivo dice.
 1. **E19** **Given** una variable que falta en el archivo de variables de entorno, **When** se construye o arranca cualquier pieza (servidor, Procesos, la web, la base), **Then** se corta con un mensaje que nombra la variable; no hay ningún valor por omisión.
 2. **E20** **Given** el ambiente de pruebas, **When** la aplicación decide si mostrar «Ambiente de prueba», **Then** lo decide por la variable que nombra el ambiente, no por la versión ni por la dirección.
 3. **E21** **Given** un dispositivo que abre pruebas y producción, **When** guarda datos para trabajar sin conexión, **Then** cada ambiente guarda en su propio lugar del dispositivo, nombrado según esa variable: la sesión, el catálogo y la cola de uno no se mezclan con los del otro.
-4. **E22** **Given** el código de una pieza, **When** se lo revisa, **Then** no tiene direcciones, puertos, nombres de base ni nombres de ambiente escritos adentro: todo eso sale del archivo de variables de entorno, y la lista de variables es la misma en todos los ambientes (cambian solo los valores).
+4. **E22** **Given** el código de una pieza, **When** se lo revisa, **Then** no tiene direcciones, puertos, nombres de base ni nombres de ambiente escritos adentro: todo eso sale del archivo de variables de entorno (o, para la aplicación web publicada, de la configuración de su construcción), y la lista de variables es la misma en todos los ambientes (cambian solo los valores).
 
 ---
 
@@ -168,7 +169,7 @@ de variables, y ver que solo cambia lo que ese archivo dice.
 - **RNF-64**: Las bases nuevas arrancan vacías y con el esquema al día; no se muda nada de la base anterior, que no tenía datos reales, y deja de usarse. Lo que el servidor o un dispositivo guardaron con una marca de otra base no se usa en la nueva. Retira RNF-62, el tope de consumo del plan gratuito de la base anterior.
 - **RNF-65**: En cada servicio, todo lo que guarda o lee datos (base y archivos) está en una capa propia, separada de las rutas y de las reglas del negocio; cada servicio del servidor, y la base, tienen su carpeta propia dentro de la de servicios; y un control automático en cada subida impide que otra capa use la base o el disco. Dentro de esa capa no hay código repetido: una sola forma de consultar, de abrir una transacción, de migrar y de guardar un archivo, y la forma de las tablas sale de las migraciones, no se escribe dos veces.
 - **RNF-66**: Las pruebas de la capa de datos corren contra PostgreSQL de la misma versión que producción y cubren el 100 % de sus líneas, ramas y funciones; una subida que baja de ese número no pasa. Una línea de esa capa que no se puede cubrir con una prueba no se escribe. Cambia, para esta capa, la regla de las pruebas (RNF-55), que no tenía meta de cobertura.
-- **RNF-67**: Todo lo que cambia entre ambientes está en el archivo de variables de entorno y en ningún otro lado: el código que se prueba es el mismo que corre en producción. Ninguna pieza tiene valores por omisión para esas variables ni deduce el ambiente de otra cosa (la versión, la dirección). Lo que cada ambiente guarda en el dispositivo va aparte, nombrado según el ambiente.
+- **RNF-67**: Todo lo que cambia entre ambientes está en el archivo de variables de entorno y en ningún otro lado: el código que se prueba es el mismo que corre en producción. La única excepción es la aplicación web publicada: se construye en GitHub y no en el servidor, así que lo que distingue a cada ambiente (su carpeta, la dirección de su servidor, el nombre del ambiente y la versión) se fija al construirla, en la configuración de esa construcción (decisión 162). Ninguna pieza tiene valores por omisión para esas variables ni deduce el ambiente de otra cosa (la versión, la dirección). Lo que cada ambiente guarda en el dispositivo va aparte, nombrado según el ambiente.
 
 ### Key Entities
 

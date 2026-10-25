@@ -14,3 +14,4 @@
 - [x] T012 Revisión independiente (`revision.md`) y qué se hizo con cada punto (depende de T010)
 - [x] T013 Actualizar `proyecto/estado.yml`, incorporar lo nuevo a la `spec.md` de 001 y marcar T139 (depende de T012)
 - [x] T014 [ajuste] Qué hacer si se pierde el `.env` de un ambiente: los datos siguen en el volumen y las claves se reponen por el socket del contenedor (DEPLOYMENT)
+- [x] T015 [regla] Lo que distingue a la web de cada ambiente (carpeta, API, ambiente, versión) se fija al construirla en la CI de GitHub Pages, no en el .env (decisión 162)

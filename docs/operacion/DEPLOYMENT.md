@@ -57,8 +57,8 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
 - **Cliente web en GitHub Pages:** un sitio, dos carpetas: la raíz es `produccion` y
   `/pruebas/` es `master`. CI lo construye con las variables de repositorio `API_URL` y
   `API_URL_PRUEBAS`, y el ambiente (`VITE_AMBIENTE`) y la versión de cada build. Es lo único que
-  vive fuera del `.env`, porque la web no se construye en la máquina (falla anotada en
-  `proyecto/estado.yml`, RNF-67: lo decide Carlos). El identificador de Google no va:
+  vive fuera del `.env`: depende de GitHub Pages, que construye la web, y no de la máquina
+  (decisión 162). El identificador de Google no va:
   la aplicación se lo pide al servidor de su ambiente (007-T043).
   Cada carpeta tiene una sola aplicación, que abre en su raíz.
 - **Sin acceso entrante:** GitHub no entra a la máquina. El job `avisar` publica en el

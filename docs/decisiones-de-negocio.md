@@ -1361,3 +1361,12 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      que más adelante se cambia por uno pago. Cada ambiente corre con su propio usuario de
      Linux y su propio Docker, para que un error en uno no pueda tocar el otro. Las copias de la
      etapa 2 son solo de producción: lo de pruebas se puede perder.
+
+162. **Lo que distingue a la web de cada ambiente va en la CI de GitHub** (2026-10-25, specs/022,
+     RNF-67). La web de pruebas y la de producción son dos construcciones de la misma
+     aplicación, publicadas en dos carpetas del mismo sitio de GitHub Pages. Como depende de
+     GitHub Pages y no del servidor, lo que las distingue (la carpeta, la dirección de su
+     servidor, el nombre del ambiente y la versión) se fija al construirlas, en la CI, y no en
+     el `.env` de la máquina. Es la única excepción a «todo lo que cambia entre ambientes va
+     en el `.env`». No se deduce el ambiente de la carpeta: el código tendría que saber cuál
+     carpeta es producción.
