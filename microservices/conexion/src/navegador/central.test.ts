@@ -4,7 +4,7 @@ import { aperturas, centralDePrueba } from "../pruebas/central.js";
 import { crearCentral } from "./central.js";
 
 describe("central de avisos", () => {
-  it("una espera temporaria abre el canal; al dejarla, se cierra (025-E03, E05, E27)", async () => {
+  it("una espera temporaria abre el canal; al dejarla, se cierra (025-E03, 025-E05, 025-E27, 025-E29)", async () => {
     const { central, red } = centralDePrueba();
     const avisos: unknown[] = [];
     const dejar = central.vigilar({ tema: "entrada:1", temporaria: true, clave: "s", alAviso: (d) => avisos.push(d) });
@@ -19,7 +19,7 @@ describe("central de avisos", () => {
     expect(red.flujos[0]!.cerrado).toBe(true);
   });
 
-  it("una permanente nunca abre el canal, pero viaja gratis si otra lo abre (025-E08, E11, E28)", async () => {
+  it("una permanente nunca abre el canal, pero viaja gratis si otra lo abre (025-E08, 025-E11, 025-E28)", async () => {
     const { central, red } = centralDePrueba();
     const sesion: unknown[] = [];
     central.vigilar({ tema: "sesion:1", alAviso: (d) => sesion.push(d) });
@@ -41,7 +41,7 @@ describe("central de avisos", () => {
     expect(aperturas(red)).toHaveLength(2);
   });
 
-  it("lo que va a cuestas avisa solo cuando cambia; el primero queda de referencia (025-E09, E23)", async () => {
+  it("lo que va a cuestas avisa solo cuando cambia; el primero queda de referencia (025-E09, 025-E23)", async () => {
     const { central, red } = centralDePrueba();
     const versiones: unknown[] = [];
     central.vigilar({ tema: "version", alAviso: (v) => versiones.push(v) });
@@ -60,7 +60,7 @@ describe("central de avisos", () => {
     expect(versiones).toEqual(["v2", "v3"]);
   });
 
-  it("cuenta lo que pasa con la conexión, para los indicadores (025-E12, E13)", async () => {
+  it("cuenta lo que pasa con la conexión, para los indicadores (025-E12, 025-E13)", async () => {
     const { central, red, cambiarLaRed } = centralDePrueba();
     const sucesos: string[] = [];
     central.sucesos.escuchar((s) => sucesos.push(s));

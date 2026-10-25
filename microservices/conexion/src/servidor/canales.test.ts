@@ -6,7 +6,7 @@ import { relojDePrueba } from "../pruebas/reloj.js";
 const A = 'data: {"a":{}}';
 
 describe("canales", () => {
-  it("al abrir cuenta lo que va a cuestas y el estado de cada tema (025-E06, E11)", async () => {
+  it("al abrir cuenta lo que va a cuestas y el estado de cada tema (025-E06, 025-E11)", async () => {
     const canales = crearCanales({ cadaTanto: relojDePrueba().cadaTanto, aCuestas: () => ({ version: "v1" }) });
     const r = canales.abrir("d1", "g", [{ tema: "entrada:1", inicial: { listo: true } }, { tema: "otro" }]);
     expect(r.headers.get("Content-Type")).toBe("text/event-stream");
@@ -111,7 +111,7 @@ describe("canales", () => {
     expect(canales.abrir("d5", "i", [{ tema: "x" }]).status).toBe(503);
   });
 
-  it("el rechazo dice qué temas no da (025-E30, E31)", async () => {
+  it("el rechazo dice qué temas no da (025-E30, 025-E31)", async () => {
     const r = rechazar(403, ["vinculo:ajeno"]);
     expect(r.status).toBe(403);
     expect(await r.json()).toEqual({ rechazados: ["vinculo:ajeno"] });

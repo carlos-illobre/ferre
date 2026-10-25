@@ -16,7 +16,7 @@ function armar() {
 }
 
 describe("canal", () => {
-  it("sin temas no abre nada; con temas abre uno solo con todos, en una cabecera (025-E03, E07)", async () => {
+  it("sin temas no abre nada; con temas abre uno solo con todos, en una cabecera (025-E03, 025-E07)", async () => {
     const { canal, gets, visto } = armar();
     canal.poner([]);
     await soltar();
@@ -48,7 +48,7 @@ describe("canal", () => {
     expect(visto.slice(-1)).toEqual(["cerrado"]);
   });
 
-  it("con la página oculta se cierra; al volver a la vista se abre (025-E05, E24)", async () => {
+  it("con la página oculta se cierra; al volver a la vista se abre (025-E05, 025-E24)", async () => {
     const { red, vista, canal, gets } = armar();
     canal.poner([{ t: "a" }]);
     await soltar();

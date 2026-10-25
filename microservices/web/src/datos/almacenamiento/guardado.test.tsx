@@ -6,7 +6,7 @@ const apiFalsa = vi.hoisted(() => vi.fn<(...a: any[]) => Promise<any>>());
 vi.mock("../conexion", async (original) => ({ ...(await original<typeof import("../conexion")>()), api: (...a: unknown[]) => apiFalsa(...a) }));
 import { ErrorApi } from "../conexion";
 import { abrirBase, guardar, leerTodo, respetarElGuardado } from "./almacen";
-import { enviarOEncolar, pendientes } from "./cola";
+import { enviarOEncolar, enviarPendientes, pendientes } from "./cola";
 import { guardaEnElDispositivo } from "./guardado";
 import { cambiarPreferencia, preferencias, recargarPreferencias } from "./preferencias";
 import { Configuracion } from "../../pruebas/configuracion";
@@ -53,7 +53,7 @@ describe("Trabajar sin conexión en el celular", () => {
     expect(guardado).toBeLessThan(150_000);
   });
 
-  it("009-E09: deshabilitada y sin conexión, no se registra ni se guarda, y dice cómo habilitarlo", async () => {
+  it("009-E09 025-E20: deshabilitada y sin conexión, no se registra ni se guarda, dice cómo habilitarlo y al volver no hay nada que mandar", async () => {
     apiFalsa.mockRejectedValue(new TypeError("Failed to fetch"));
     const fallo = await enviarOEncolar("venta", "POST", "/ventas", venta).catch((e: unknown) => e);
     expect(fallo).toBeInstanceOf(ErrorApi);
@@ -61,6 +61,9 @@ describe("Trabajar sin conexión en el celular", () => {
     expect((fallo as Error).message).toContain("habilitalo en Más → Configuración");
     expect(await pendientes()).toEqual([]);
     expect(await hayBase()).toBe(false);
+    apiFalsa.mockClear();
+    await expect(enviarPendientes()).rejects.toThrow("deshabilitada"); // sin base, no hay qué mandar
+    expect(apiFalsa).not.toHaveBeenCalled();
   });
 
   it("009-E10: al habilitarla, el celular vuelve a guardar y a trabajar sin conexión como antes", async () => {

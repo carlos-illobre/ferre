@@ -51,7 +51,7 @@ test.beforeAll(() => {
 
 test.afterEach(cerrarLasOtrasVentanas);
 
-test("023-E16 023-E19: emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y desvincular", async ({ browser }) => {
+test("023-E16 023-E19 025-E26: emparejados y abiertos los dos, van juntos: la parte, la venta, la pausa y desvincular", async ({ browser }) => {
   // Es un recorrido largo, con tres ventanas: necesita más que los 30 segundos de siempre.
   test.setTimeout(90_000);
   const abrir = async (ancho: number, alto: number, token: string, ruta: string) => {

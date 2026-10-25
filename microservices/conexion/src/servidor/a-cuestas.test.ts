@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { crearACuestas } from "./index.js";
 
-describe("a cuestas (025-E09, E28)", () => {
+describe("a cuestas (025-E09, 025-E28)", () => {
   it("cada respuesta dice el valor de cada tema agregado, en una sola cabecera", () => {
     const aCuestas = crearACuestas();
     let version = "v1";

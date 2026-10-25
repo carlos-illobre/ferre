@@ -54,7 +54,7 @@ describe("enlace entre dos dispositivos", () => {
     expect(celu.recibido).toEqual(["sin canal"]);
   });
 
-  it("si el otro se va, se entera por la directa y vuelve al canal a esperarlo (025-E22, E23)", async () => {
+  it("si el otro se va, se entera por la directa y vuelve al canal a esperarlo (025-E22, 025-E23)", async () => {
     const rtc = redRTC();
     const t = dispositivos({ compu: rtc.Conexion, celu: rtc.Conexion });
     const compu = t.abrir("computadora"); const celu = t.abrir("celular");
