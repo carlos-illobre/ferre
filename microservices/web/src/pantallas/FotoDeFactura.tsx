@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { api, reducirImagen } from "../datos/conexion";
 import { useFoto } from "../negocio/tickets";
+import { porQueNoSeSubio, subirFotoDelComprobante } from "../negocio/compras";
 import { PedirFotoAlCelular } from "./PedirFoto";
 import "./foto-de-factura.css";
-import type { FotoDeComprobante } from "@servidor/compras";
 
 // La foto del comprobante reemplaza al número tipeado (RF-50, decisión 32): se le saca una
 // foto a la factura o al remito y, cuando hace falta el número o cualquier otro dato, se
@@ -12,62 +11,69 @@ import type { FotoDeComprobante } from "@servidor/compras";
 // celular para escanear).
 const rutaDe = (foto: string) => (foto.startsWith("/") ? foto : `/compras/fotos/${foto}`);
 
-export function FotoDeFactura({ foto, alCambiar, conCelular = false, nombre }: { foto: string | null; alCambiar: (foto: string | null) => void; conCelular?: boolean; nombre: "factura" | "remito" }) {
+function useSubirComprobante(alCambiar: (foto: string | null) => void) {
   const [subiendo, setSubiendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pidiendo, setPidiendo] = useState(false);
-  const [grande, setGrande] = useState(false);
-  const archivo = useRef<HTMLInputElement>(null);
-  const del = nombre === "remito" ? "del remito" : "de la factura";
-
   async function subir(f: File | undefined) {
     if (!f) return;
     if (!f.type.startsWith("image/")) { setError("Eso no es una foto. Elegí una imagen."); return; }
     setSubiendo(true); setError(null);
-    try {
-      const datos = new FormData();
-      datos.append("foto", await reducirImagen(f, 2000), "comprobante.jpg");
-      alCambiar((await api<FotoDeComprobante>("/compras/fotos", { method: "POST", body: datos })).foto);
-    } catch (e) { const err = e as { estado?: number; message: string }; setError(err.estado ? `${err.message}.` : "Sin conexión: la foto se sube cuando vuelva internet. Probá de nuevo."); }
+    try { alCambiar(await subirFotoDelComprobante(f)); }
+    catch (e) { setError(porQueNoSeSubio(e)); }
     finally { setSubiendo(false); }
   }
+  return { subiendo, error, setError, subir };
+}
+type Subida = ReturnType<typeof useSubirComprobante>;
 
-  const elegir = <input ref={archivo} type="file" accept="image/*" capture={conCelular ? undefined : "environment"} hidden onChange={(e) => { void subir(e.target.files?.[0]); e.target.value = ""; }} data-testid="archivo-comprobante" />;
-
-  if (foto) return (
-    <div className="ff" data-testid="foto-comprobante">
-      {elegir}
+function FotoCargada({ foto, del, subida, alElegir, alQuitar }: { foto: string; del: string; subida: Subida; alElegir: () => void; alQuitar: () => void }) {
+  const [grande, setGrande] = useState(false);
+  return (
+    <>
       <button type="button" className="ff-ver" onClick={() => setGrande(true)} aria-label={`Ver la foto ${del} en grande`} data-testid="ver-comprobante"><Imagen ruta={rutaDe(foto)} /></button>
       <div className="ff-texto">
         <strong>Foto {del} cargada</strong>
         <span>Tocá la foto para leer el número o cualquier otro dato.</span>
         <div className="ff-botones">
-          <button type="button" className="ff-boton" disabled={subiendo} onClick={() => archivo.current?.click()}>{subiendo ? "Subiendo…" : "Cambiar"}</button>
-          <button type="button" className="ff-boton" onClick={() => alCambiar(null)} data-testid="quitar-comprobante"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>Quitar</button>
+          <button type="button" className="ff-boton" disabled={subida.subiendo} onClick={alElegir}>{subida.subiendo ? "Subiendo…" : "Cambiar"}</button>
+          <button type="button" className="ff-boton" onClick={alQuitar} data-testid="quitar-comprobante"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>Quitar</button>
         </div>
-        {error && <span className="ff-error" role="alert">{error}</span>}
+        {subida.error && <span className="ff-error" role="alert">{subida.error}</span>}
       </div>
       {grande && <FotoGrande ruta={rutaDe(foto)} titulo={`Foto ${del}`} alCerrar={() => setGrande(false)} />}
+    </>
+  );
+}
+
+const textoDelArchivo = (subiendo: boolean, conCelular: boolean, del: string) => (subiendo ? "Subiendo la foto…" : conCelular ? "Elegir un archivo" : `Sacar foto ${del}`);
+
+function SinFoto({ del, conCelular, subida, alElegir, alPedir }: { del: string; conCelular: boolean; subida: Subida; alElegir: () => void; alPedir: () => void }) {
+  return (
+    <div className="ff-texto">
+      <span>El número no se escribe: se lee de la foto.</span>
+      <div className="ff-botones">
+        {conCelular && <button type="button" className="ff-boton fuerte" onClick={() => { subida.setError(null); alPedir(); }} data-testid="foto-con-celular"><Camara />Sacar la foto con el celular</button>}
+        <button type="button" className={`ff-boton ${conCelular ? "" : "fuerte"}`} disabled={subida.subiendo} onClick={alElegir} data-testid="sacar-comprobante">
+          {!conCelular && <Camara />}{textoDelArchivo(subida.subiendo, conCelular, del)}
+        </button>
+      </div>
+      {subida.error && <span className="ff-error" role="alert">{subida.error}</span>}
     </div>
   );
+}
 
+export function FotoDeFactura({ foto, alCambiar, conCelular = false, nombre }: { foto: string | null; alCambiar: (foto: string | null) => void; conCelular?: boolean; nombre: "factura" | "remito" }) {
+  const subida = useSubirComprobante(alCambiar);
+  const [pidiendo, setPidiendo] = useState(false);
+  const archivo = useRef<HTMLInputElement>(null);
+  const del = nombre === "remito" ? "del remito" : "de la factura";
+  const elegir = () => archivo.current?.click();
   return (
-    <div className="ff vacia" data-testid="foto-comprobante">
-      {elegir}
-      {pidiendo ? (
-        <PedirFotoAlCelular para={`la foto ${del}`} alCancelar={() => setPidiendo(false)} alRecibir={async (f) => { setPidiendo(false); await subir(f); }} />
-      ) : (
-        <div className="ff-texto">
-          <span>El número no se escribe: se lee de la foto.</span>
-          <div className="ff-botones">
-            {conCelular && <button type="button" className="ff-boton fuerte" onClick={() => { setError(null); setPidiendo(true); }} data-testid="foto-con-celular"><Camara />Sacar la foto con el celular</button>}
-            <button type="button" className={`ff-boton ${conCelular ? "" : "fuerte"}`} disabled={subiendo} onClick={() => archivo.current?.click()} data-testid="sacar-comprobante">
-              {!conCelular && <Camara />}{subiendo ? "Subiendo la foto…" : conCelular ? "Elegir un archivo" : `Sacar foto ${del}`}
-            </button>
-          </div>
-          {error && <span className="ff-error" role="alert">{error}</span>}
-        </div>
-      )}
+    <div className={`ff ${foto ? "" : "vacia"}`.trim()} data-testid="foto-comprobante">
+      <input ref={archivo} type="file" accept="image/*" capture={conCelular ? undefined : "environment"} hidden onChange={(e) => { void subida.subir(e.target.files?.[0]); e.target.value = ""; }} data-testid="archivo-comprobante" />
+      {foto ? <FotoCargada foto={foto} del={del} subida={subida} alElegir={elegir} alQuitar={() => alCambiar(null)} />
+        : pidiendo ? <PedirFotoAlCelular para={`la foto ${del}`} alCancelar={() => setPidiendo(false)} alRecibir={async (f) => { setPidiendo(false); await subida.subir(f); }} />
+        : <SinFoto del={del} conCelular={conCelular} subida={subida} alElegir={elegir} alPedir={() => setPidiendo(true)} />}
     </div>
   );
 }

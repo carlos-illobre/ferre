@@ -33,3 +33,4 @@ al final. Formato en la skill `microservicios-base`, `referencias/adr.md`.
 | [026](ADR-026-una-base-por-servicio-en-la-maquina.md) | La base corre en la máquina, una instancia por ambiente y una base por servicio; sale de Supabase | Aceptado | 2026-10-24 |
 | [027](ADR-027-conexion-directa-entre-dispositivos.md) | El celular y la computadora se hablan directo (WebRTC), con el servidor de respaldo; módulo propio sin dependencias | Aceptado | 2026-10-24 |
 | [028](ADR-028-el-front-por-capas-y-en-piezas-chicas.md) | El front en seis capas (app, plataforma, datos, ui, negocio, pantallas), con reglas de dependencia, límites de complejidad, tamaño y duplicación medidos en cada subida, y estilos con CSS Modules | Aceptado | 2026-10-24 |
+| [029](ADR-029-el-teclado-por-comandos.md) | El teclado aparte: las pantallas ofrecen acciones con nombre y el teclado, en su capa, tiene las tablas de qué tecla pide cada una | Aceptado | 2026-10-25 |

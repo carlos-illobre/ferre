@@ -1,48 +1,6 @@
 [
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/componentes/Foto.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../../../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/DineroInvertido.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/FotoDeFactura.tsx",
-    "to": "src/datos/conexion/index.ts",
-    "unresolvedTo": "../datos/conexion",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/sugeridos.ts",
     "to": "src/datos/almacenamiento/index.ts",
     "unresolvedTo": "../datos/almacenamiento",
@@ -239,76 +197,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/celular/componentes/Foto.tsx",
-    "to": "src/plataforma/navegacion/volver.ts",
-    "unresolvedTo": "../../../plataforma/navegacion/volver",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/celular/Lector.tsx",
-    "to": "src/plataforma/camara/Escaner.tsx",
-    "unresolvedTo": "../../plataforma/camara/Escaner",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/CodigoDeBarras.tsx",
-    "to": "src/negocio/catalogo/ficha.ts",
-    "unresolvedTo": "../negocio/catalogo/ficha",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/CodigoDeBarras.tsx",
-    "to": "src/plataforma/camara/Escaner.tsx",
-    "unresolvedTo": "../plataforma/camara/Escaner",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/CodigoDeBarras.tsx",
-    "to": "src/plataforma/portapapeles/copiar.ts",
-    "unresolvedTo": "../plataforma/portapapeles/copiar",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/compu/App.tsx",
     "to": "src/plataforma/animacion/animacion.css",
     "unresolvedTo": "../../plataforma/animacion/animacion.css",
@@ -342,21 +230,6 @@
     "unresolvedTo": "../negocio/catalogo/precio",
     "dependencyTypes": [
       "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/textos.ts",
-    "to": "src/negocio/deposito/ingreso.ts",
-    "unresolvedTo": "../negocio/deposito/ingreso",
-    "dependencyTypes": [
-      "local",
-      "type-only",
       "import"
     ],
     "rule": {

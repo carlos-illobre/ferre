@@ -146,6 +146,13 @@ Las pruebas no cuentan para el tamaño.
   cada interfaz, antes que los módulos de las pantallas.
 - Cada etapa se compara con la anterior, pantalla por pantalla y en varios estados, con capturas de
   las dos versiones lado a lado: tiene que dar igual.
+- Al partir un marco (el de cada interfaz, que importa todas las pantallas), las pantallas se
+  importan en el mismo orden que antes: el orden de las hojas decide cuál gana cuando dos reglas
+  pesan lo mismo, y cambiarlo cambió dos tamaños de letra hasta que se corrigió (specs/024, T011).
+- Lo que tiene que andar antes de la sesión (el espejo con el otro dispositivo) se arranca donde
+  se arrancaba, en la raíz de la interfaz, no en el marco que aparece al entrar.
+- Una tecnología con estado propio (la cola sin conexión, la base local) se arma como una clase cuyas
+  funciones son flechas: cada una se mide sola y se puede seguir usando suelta.
 
 ## Cuándo revisar esta decisión
 

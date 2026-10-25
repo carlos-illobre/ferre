@@ -1,0 +1,32 @@
+import { igual, type Texto } from "./base";
+
+export const vender = {
+  noLlevo: { largo: "Anotado como «No llevó»: qué pidió y a cuánto se le ofreció.", corto: "Anotado como «No llevó»." },
+  sinPrecio: { largo: "Hay productos sin precio: elegí un margen o poné el precio a mano en el renglón marcado.", corto: "Hay productos sin precio: elegí un margen o poné el precio a mano." },
+  elegiComoPaga: igual("Elegí cómo paga: efectivo, Mercado Pago, tarjeta o cuenta corriente."),
+  faltaElCliente: igual("Cuenta corriente: elegí el cliente."),
+  quienLleva: igual("¿Quién lleva a cuenta corriente?"),
+  stockNoAlcanza: { largo: "no alcanza: se vende igual, el stock queda en 0 y se anota una anomalía", corto: "no alcanza: se vende igual y queda anotado" },
+  // Vender en el celular (decisión 119); la computadora los toma cuando se rediseñe.
+  sinStock: igual("Sin stock"),
+  ventaVacia: igual("La venta está vacía"),
+  comoEmpezar: { largo: "Buscá por nombre o código, escaneá con el lector o con el celular.", corto: "Buscá o escaneá un producto para empezar." },
+  vaciaste: igual("Vaciaste la venta"),
+  quitaste: igual("Quitaste"),
+  sumado: igual("sumado a la venta"),
+  noEstaEnElCatalogo: { largo: "No está en el catálogo: buscá el producto y elegilo para asociarle el código.", corto: "No está en el catálogo" },
+  clienteOpcional: igual("Cliente (opcional)"),
+  elegiElCliente: igual("Elegí el cliente"),
+  deslizaParaCobrar: igual("Deslizá para cobrar"),
+  cobrar: igual("Cobrar"),
+  comoSeCobra: igual("Deslizá el botón hasta el final para cobrar"),
+  redondeo: igual("Todo se redondea para arriba a múltiplos de $1.000, para no dar vuelto."),
+  ventaRegistrada: igual("Venta registrada"),
+  guardadaEnElCelular: igual("Guardada en este celular"),
+  seEnviaSola: igual("Sin conexión: se envía sola cuando vuelva internet. El stock se descuenta al enviarse."),
+  enEspejo: igual("En espejo"),
+  enEspejoConLaCompu: igual("En espejo con la computadora"),
+  queEsElEspejo: igual("Lo que vendés en este celular se ve en la computadora, y al revés."),
+  usarComoLector: igual("Usar como lector de la computadora"),
+  queHaceElLector: igual("Cada código que leas entra en la venta de la computadora, no en la de este celular."),
+} satisfies Record<string, Texto>;

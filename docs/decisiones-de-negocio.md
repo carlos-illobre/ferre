@@ -1333,3 +1333,10 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      recuperar la conexión. Una pantalla abierta que nadie toca sigue mostrando lo que tenía
      hasta que se la usa. Precisa la decisión 97; lo demás de ella (lo hecho sin conexión queda
      apartado) sigue igual.
+
+159. **El teclado, aparte de las pantallas** (2026-10-25, specs/024). Carlos: las teclas se rehacen
+     todas más adelante (T147) y no van a ser las de ahora; lo que importa hoy es que el código de
+     los componentes quede limpio y reutilizable. Entre borrar todo lo del teclado y moverlo a su
+     carpeta con poco acoplamiento, eligió moverlo. Las pantallas no saben de teclas: ofrecen
+     acciones con nombre, y el teclado, en su carpeta, dice qué tecla dispara cada una. Mientras
+     tanto las teclas pueden cambiar; precisa el escenario E05 de specs/024.

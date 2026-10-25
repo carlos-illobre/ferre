@@ -1,42 +1,39 @@
-import { useEffect, useState } from "react";
-import { api } from "../datos/conexion";
+import { useDineroInvertido, type InvertidoDelProveedor } from "../negocio/deposito";
 import { pesos } from "../negocio/formato";
 import "./dinero-invertido.css";
-import type { Stock } from "@servidor/stock";
 
-// Dinero invertido en inventario (RF-53): lo que hay de cada producto por su costo vigente,
-// sin IVA, en total y por proveedor. Va en Cómo va el negocio → Inventario, con «Ver el dinero
+// Dinero invertido en inventario (RF-53). Va en Cómo va el negocio → Inventario, con «Ver el dinero
 // invertido» (decisión 95), y no en Depósito → Inventario, que solo muestra cantidades (decisión 31).
-type Datos = Pick<Stock, "valor_total" | "por_proveedor">;
 const enteros = (n: number) => pesos(Math.round(n)).replace(/,00$/, "");
 
+function PorProveedor({ proveedores }: { proveedores: InvertidoDelProveedor[] }) {
+  if (proveedores.length === 0) return null;
+  return (
+    <ul className="di-lista" aria-label="Dinero invertido por proveedor">
+      {proveedores.map((v) => (
+        <li key={v.nombre}>
+          <span className="di-nombre">{v.nombre}</span>
+          <span className="di-importe">{enteros(v.valor)}</span>
+          <span className="di-riel" aria-hidden="true"><i style={{ width: `${v.ancho}%` }} /></span>
+          <span className="di-detalle">{v.productos} {v.productos === 1 ? "producto" : "productos"}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function DineroInvertido() {
-  const [datos, setDatos] = useState<Datos | null>(null);
-  const [falla, setFalla] = useState(false);
-  useEffect(() => { api<Datos>("/stock").then(setDatos).catch(() => setFalla(true)); }, []);
-  const proveedores = Object.entries(datos?.por_proveedor ?? {}).filter(([, v]) => v.valor > 0).sort((a, b) => b[1].valor - a[1].valor);
-  const mayor = Math.max(1, proveedores[0]?.[1].valor ?? 1);
+  const { total, proveedores, falla } = useDineroInvertido();
   return (
     <section className="di" aria-labelledby="di-titulo" data-testid="dinero-invertido">
       <h2 id="di-titulo">Dinero invertido en inventario</h2>
       {falla && <p className="di-detalle">Sin conexión: se ve cuando vuelva internet.</p>}
-      {!datos && !falla && <p className="di-detalle" aria-busy="true">Calculando…</p>}
-      {datos && (
+      {total === null && !falla && <p className="di-detalle" aria-busy="true">Calculando…</p>}
+      {total !== null && (
         <>
-          <p className="di-total" data-testid="dinero-invertido-total">{enteros(datos.valor_total)}</p>
+          <p className="di-total" data-testid="dinero-invertido-total">{enteros(total)}</p>
           <p className="di-detalle">Lo que hay de cada producto por su costo vigente, sin IVA.</p>
-          {proveedores.length > 0 && (
-            <ul className="di-lista" aria-label="Dinero invertido por proveedor">
-              {proveedores.map(([nombre, v]) => (
-                <li key={nombre}>
-                  <span className="di-nombre">{nombre}</span>
-                  <span className="di-importe">{enteros(v.valor)}</span>
-                  <span className="di-riel" aria-hidden="true"><i style={{ width: `${Math.max(1, Math.round((v.valor / mayor) * 100))}%` }} /></span>
-                  <span className="di-detalle">{v.productos} {v.productos === 1 ? "producto" : "productos"}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <PorProveedor proveedores={proveedores} />
         </>
       )}
     </section>

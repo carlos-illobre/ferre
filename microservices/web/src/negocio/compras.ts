@@ -1,8 +1,8 @@
-import { api } from "../datos/conexion";
+import { api, reducirImagen } from "../datos/conexion";
 import { consultas } from "../datos/conexion";
 import { useDelServidor } from "./del-servidor";
 import { stockCambio } from "./deposito/inventario";
-import type { AnulacionDeCompra, CompraReciente, GastosDeLaSemana } from "@servidor/compras";
+import type { AnulacionDeCompra, CompraReciente, FotoDeComprobante, GastosDeLaSemana } from "@servidor/compras";
 import type { Pedido } from "@servidor/pedidos";
 
 // Las compras recientes y los gastos, una sola vez para el celular y la computadora (RNF-60).
@@ -77,4 +77,16 @@ export function pantallaDeCompras(puede: (...permisos: ("negocio.gastos" | "depo
 export function comoVieneElPedido(p: Pedido, cuantos: (n: number, uno: string, varios: string) => string, dia: (iso: string) => string): { aMedias: boolean; texto: string } {
   if (p.estado === "recibido_parcial") return { aMedias: true, texto: `Llegó a medias · ${faltanDe(p) === 1 ? "falta 1" : `faltan ${faltanDe(p)}`}` };
   return { aMedias: false, texto: `Enviado${p.enviado_en ? ` el ${dia(p.enviado_en)}` : ""} · ${cuantos(p.items.length, "renglón", "renglones")}` };
+}
+
+// La foto del comprobante (RF-50), achicada, al servidor. Devuelve cómo se la nombra en la compra.
+export async function subirFotoDelComprobante(f: File): Promise<string> {
+  const datos = new FormData();
+  datos.append("foto", await reducirImagen(f, 2000), "comprobante.jpg");
+  return (await api<FotoDeComprobante>("/compras/fotos", { method: "POST", body: datos })).foto;
+}
+// Por qué no se subió: lo que dijo el servidor o, si no contestó, que falta la conexión.
+export function porQueNoSeSubio(e: unknown): string {
+  const err = e as { estado?: number; message: string };
+  return err.estado ? `${err.message}.` : "Sin conexión: la foto se sube cuando vuelva internet. Probá de nuevo.";
 }

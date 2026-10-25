@@ -44,12 +44,12 @@ las mediciones del front no empeoran.
 2. **E02** **Given** cualquier capa, **When** se revisa de qué depende, **Then** solo usa las capas de abajo, por su puerta de entrada, y nunca hay un ciclo; las pantallas del celular y las de la computadora no se usan entre sí.
 3. **E03** **Given** el front ordenado, **When** se mide, **Then** ninguna función tiene más de 8 caminos, ningún archivo pasa de unas 150 líneas ni ningún componente de 40, y no hay código copiado.
 4. **E04** **Given** una pieza que el celular y la computadora dibujan igual, o una regla, **When** se busca, **Then** está escrita una sola vez.
-5. **E05** **Given** cada etapa terminada, **When** se usa la aplicación, **Then** se ve y hace lo mismo que antes, con las mismas teclas.
+5. **E05** **Given** cada etapa terminada, **When** se usa la aplicación, **Then** se ve y hace lo mismo que antes. Las teclas pueden cambiar hasta que se rehagan (T147, decisión 159); lo que cambia se anota en la especificación de la capacidad.
 
 ### Edge Cases
 
 - Una parte que otra funcionalidad está cambiando al mismo tiempo (lo guardado en el dispositivo, specs/022; la conexión entre dispositivos, specs/023): se ordena después de que esa termine, o esa funcionalidad la deja ya en su capa.
-- Las teclas se rehacen en T147: la capa del teclado se arma con esa tarea, no dos veces.
+- Las teclas se rehacen en T147. Antes, el teclado se separa de las pantallas (decisión 159, ADR-029): las pantallas ofrecen acciones con nombre y el teclado, en su capa, dice qué tecla dispara cada una; cambiar las teclas en T147 es cambiar las tablas.
 
 ## Requirements
 
