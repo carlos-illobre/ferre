@@ -202,20 +202,6 @@
   },
   {
     "type": "dependency",
-    "from": "src/pantallas/actualizacion.ts",
-    "to": "src/datos/almacenamiento/index.ts",
-    "unresolvedTo": "../datos/almacenamiento",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "las-pantallas-piden-los-datos-al-negocio"
-    }
-  },
-  {
-    "type": "dependency",
     "from": "src/pantallas/celular/App.tsx",
     "to": "src/datos/sesion/index.ts",
     "unresolvedTo": "../../datos/sesion",
@@ -1451,20 +1437,6 @@
     "from": "src/pantallas/actividad-en-palabras.ts",
     "to": "src/negocio/ventas/venta.ts",
     "unresolvedTo": "../negocio/ventas/venta",
-    "dependencyTypes": [
-      "local",
-      "import"
-    ],
-    "rule": {
-      "severity": "error",
-      "name": "por-la-puerta-de-entrada-desde-afuera"
-    }
-  },
-  {
-    "type": "dependency",
-    "from": "src/pantallas/actualizacion.ts",
-    "to": "src/plataforma/tiempo/mientras-se-ve.ts",
-    "unresolvedTo": "../plataforma/tiempo/mientras-se-ve",
     "dependencyTypes": [
       "local",
       "import"

@@ -14,6 +14,8 @@ if (origen === undefined) throw new Error("Falta VITE_API_URL al construir el cl
 // catálogo, el stock): quien lo tenga se entera y lo vuelve a pedir cuando haga falta.
 export const EVENTO_CAMBIO = "ferre:cambio-guardado";
 export const EVENTO_SESION_CERRADA = "sesion-cerrada";
+// La versión que dijo el servidor en una respuesta (la cabecera X-Version, decisión 157).
+export const EVENTO_VERSION_DEL_SERVIDOR = "ferre:version-del-servidor";
 
 const cliente = crearCliente({
   origen,
@@ -22,6 +24,10 @@ const cliente = crearCliente({
   // él se sube lo que la persona dejó sin mandar, si la desactivaron (cola.ts, ADR-021).
   alPerderLaSesion: (token) => window.dispatchEvent(new CustomEvent(EVENTO_SESION_CERRADA, { detail: { token } })),
   alGuardar: (ruta) => window.dispatchEvent(new CustomEvent(EVENTO_CAMBIO, { detail: ruta })),
+  alContestar: (respuesta) => {
+    const version = respuesta.headers?.get("X-Version");
+    if (version) window.dispatchEvent(new CustomEvent(EVENTO_VERSION_DEL_SERVIDOR, { detail: version }));
+  },
 });
 
 export { ErrorDelServidor as ErrorApi, esFaltaDeRed };

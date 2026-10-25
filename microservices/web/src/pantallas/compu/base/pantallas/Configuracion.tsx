@@ -1,10 +1,10 @@
 import { useCallback, type ReactNode } from "react";
-import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias } from "../../../../datos/almacenamiento";
+import { cambiarPreferencia, usePreferencias } from "../../../../datos/almacenamiento";
 import { guardaEnElDispositivo } from "../../../../datos/almacenamiento";
 import { useDescarga } from "../../../../datos/almacenamiento";
 import { fecha } from "../../../../formato";
 import { useTeclasGlobales } from "../../../../plataforma/teclado/teclas";
-import { cambiarSinConexion, NOMBRE_DEL_TIEMPO, useMiVinculo, useMisCelulares, useReducirMovimiento } from "../../../configuracion-comun";
+import { cambiarSinConexion, useMiVinculo, useMisCelulares, useReducirMovimiento } from "../../../configuracion-comun";
 
 import { haceCuanto } from "../../../../negocio/apartados";
 import { describirDispositivo } from "../dispositivo";
@@ -20,7 +20,7 @@ import { Icono, type NombreDeIcono } from "../../../../ui/iconos";
 const t = TEXTOS.configuracionV2;
 
 export function Configuracion({ alCambiarElGuardado }: { alCambiarElGuardado?: () => void } = {}) {
-  const { animaciones, versionCada, versionNunca } = usePreferencias();
+  const { animaciones } = usePreferencias();
   const reducir = useReducirMovimiento();
   const sinConexion = guardaEnElDispositivo();
   const v = useMiVinculo();
@@ -28,10 +28,9 @@ export function Configuracion({ alCambiarElGuardado }: { alCambiarElGuardado?: (
     if (!e.altKey || e.ctrlKey || e.metaKey) return;
     const k = e.key.toLowerCase();
     if (k === "a") { e.preventDefault(); cambiarPreferencia("animaciones", !animaciones); }
-    else if (k === "b") { e.preventDefault(); cambiarPreferencia("versionNunca", !versionNunca); }
     else if (k === "o" && v.emparejado) { e.preventDefault(); v.alternarPausa(); }
     else if (k === "u" && v.emparejado) { e.preventDefault(); v.desvincular(); }
-  }, [animaciones, versionNunca, v]);
+  }, [animaciones, v]);
   useTeclasGlobales(teclas);
 
   return (
@@ -45,14 +44,6 @@ export function Configuracion({ alCambiarElGuardado }: { alCambiarElGuardado?: (
               detalle={animaciones ? t.animacionesSi.largo : t.animacionesNo.largo}>
               {reducir && animaciones && <p className="mv-aviso urgente" data-testid="cfg-reducir-movimiento">{t.reducirMovimiento.largo}</p>}
               <div className="cfgv-muestra"><span className={`cfgv-mueve ${animaciones ? "" : "quieto"}`} aria-hidden="true"><i /><b /></span><span className="mv-detalle">{animaciones ? t.asiSeMueve.largo : t.asiAparece.largo}</span></div>
-            </Renglon>
-            <Renglon icono="repetir" titulo={t.buscarVersion.largo} id="cfg-version" tecla="Alt B" encendida={!versionNunca} alCambiar={() => cambiarPreferencia("versionNunca", !versionNunca)} testId="cfg-version-llave" filaTestId="cfg-version"
-              detalle={versionNunca ? t.versionNo.largo : t.versionSi.largo}>
-              {!versionNunca && (
-                <div className="cfgv-tramos" role="radiogroup" aria-labelledby="cfg-version">
-                  {TIEMPOS_DE_VERSION.map((x) => <button key={x} type="button" role="radio" aria-checked={versionCada === x} className={versionCada === x ? "elegido" : ""} onClick={() => cambiarPreferencia("versionCada", x)} data-testid={`cfg-version-${x}`}>{NOMBRE_DEL_TIEMPO[x]}</button>)}
-                </div>
-              )}
             </Renglon>
             <Renglon icono={sinConexion ? "disco" : "sin-senal"} titulo={t.sinConexion.largo} id="cfg-sin-conexion" encendida={sinConexion} alCambiar={() => void cambiarSinConexion("esta computadora", alCambiarElGuardado)} testId="cfg-sin-conexion"
               detalle={sinConexion ? t.sinConexionSi.largo : t.sinConexionNo.largo} />

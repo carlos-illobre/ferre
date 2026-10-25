@@ -27,9 +27,6 @@
 .cfgv-mueve.quieto i, .cfgv-mueve.quieto b { animation: none; }
 @keyframes cfgv-sube { 0%, 15% { transform: translateY(10px); opacity: 0; } 35%, 100% { transform: none; opacity: 1; } }
 @keyframes cfgv-entra { 0%, 40% { transform: translateY(20px); } 60%, 100% { transform: none; } }
-.cfgv-tramos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; max-width: 420px; padding: 3px; border-radius: 12px; background: var(--v-hundido); }
-.cfgv-tramos button { min-height: 40px; border: 0; border-radius: 9px; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--v-texto-2); cursor: pointer; }
-.cfgv-tramos button.elegido { background: #fff; color: var(--v-tinta); box-shadow: var(--v-sombra-1); }
 .cfgv-guarda { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 18px 20px; border-radius: 16px; background: var(--v-hundido); }
 .cfgv-guarda .mv-barra { display: block; margin: 4px 0 8px; }
 .cfgv-error { color: var(--v-error-texto); font-weight: 600; }

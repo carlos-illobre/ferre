@@ -145,3 +145,19 @@ Lo que este ADR cuenta en «Lo que ya había para hacerlo con eventos» cambió 
 espejo y los códigos ya no van por dos flujos de eventos con el servidor, sino por la conexión
 entre los dos dispositivos, con un solo flujo por dispositivo emparejado para presentarlos y de
 respaldo. La decisión sobre la versión nueva no cambia.
+
+## Enmienda (2026-10-25): sin timer, con la versión en cada respuesta
+
+Carlos no quiere timers (decisión 157). Se saca el 4 (el timer con la app a la vista) y, con él,
+su elección en Configuración y la llave de la enmienda del 2026-10-16. En su lugar va lo que
+la decisión 91 había dejado para más adelante: **la API dice su versión en cada respuesta**,
+en la cabecera `X-Version` (expuesta por CORS), y la aplicación busca la versión nueva cuando
+esa cabecera cambia respecto de la respuesta anterior. Queda 1 + 2 + la cabecera, más la
+vuelta de la conexión.
+
+- No suma pedidos: aprovecha los que la aplicación ya hace.
+- Una aplicación a la vista que no hace ningún pedido no se entera hasta que se vuelve a ella
+  o hace uno. Se aceptó: es lo que cuesta no tener timer.
+- La primera respuesta desde que se abrió no dispara nada: al abrir ya se buscó.
+- La versión de la API y la de la aplicación salen del mismo commit, pero no se comparan entre
+  sí: solo importa que la del servidor cambió, así no depende de cómo se escribe cada una.

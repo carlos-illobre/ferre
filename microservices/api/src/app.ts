@@ -30,7 +30,14 @@ import { sistema } from "./rutas/sistema.js";
 export const app = new Hono();
 
 // El cliente web vive en otro origen (ADR-010): solo ese origen puede llamar desde el navegador.
-app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders: ["Authorization", "Content-Type"] }));
+app.use("/*", cors({ origin: config.origenWeb, credentials: false, allowHeaders: ["Authorization", "Content-Type"], exposeHeaders: ["X-Version"] }));
+
+// Cada respuesta dice qué versión es: cuando cambia, la aplicación busca la suya nueva, sin timer
+// (decisión 157, ADR-020).
+app.use("/*", async (c, next) => {
+  await next();
+  c.header("X-Version", config.version);
+});
 
 // Dice si el proceso anda, si la base responde y qué versión es (022-E05): el compose no da por
 // sano al servidor mientras la base no responda. La base está en la misma máquina: consultarla

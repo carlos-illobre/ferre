@@ -674,14 +674,14 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
     vuelve con «Más» del menú de la izquierda, que siempre está a la vista. En el celular el
     botón se queda (decisión 64).
 
-91. **El timer que busca versión nueva corre solo con la app a la vista** (2026-10-16). Carlos
+91. **El timer que busca versión nueva corre solo con la app a la vista** (2026-10-16; reemplazada por la 157: ya no hay timer). Carlos
     preguntó si el timer se podía reemplazar por un aviso que mande GitHub al publicar. Se
     compararon las opciones (ADR-020) y eligió quedarse con el timer, sin eventos: se busca al
     abrir, al volver a primer plano, al volver la conexión y cada media hora, pero el timer se
     para mientras la app está oculta. Que la API avise su versión en cada respuesta queda para
     más adelante. Precisa la decisión 54.
 
-92. **Cada dispositivo elige cada cuánto busca versión nueva** (2026-10-16). En Configuración,
+92. **Cada dispositivo elige cada cuánto busca versión nueva** (2026-10-16; reemplazada por la 157: sale de Configuración). En Configuración,
     cuatro botones (5 min, 15 min, 1 hora y 24 horas) y una llave, como la de «Animaciones» y al
     costado de la descripción. Prendida, busca; apagada, no busca mientras la aplicación está
     abierta (ni con el timer, ni al volver a ella, ni al volver la conexión) y los botones no se
@@ -1314,3 +1314,14 @@ decidido está en [specs/preguntas-abiertas.md](../specs/preguntas-abiertas.md).
      por dos personas a la vez». Queda como está: de cada trabajo en curso vale el que cambió
      último, y en empate el de la computadora (specs/023). Probó la conexión entre el celular y la
      computadora en el local y anda.
+
+157. **La versión nueva se busca sin timer** (2026-10-25). Carlos: «elimina cualquier
+     temporizador, no quiero temporizadores. Si no se puede hacer orientado a eventos entonces
+     elimina esa lógica y agrega un botón». Se puede: la aplicación busca al abrirse, al volver a
+     la vista, al volver la conexión y cuando el servidor contesta con una versión distinta de la
+     que dijo antes (cada respuesta de la API dice su versión en una cabecera). Sin timer, no hace
+     falta botón. Sale de Configuración «Buscar versión nueva» (los cuatro tiempos y la llave).
+     Una aplicación a la vista que no hace ningún pedido se entera al volver a ella, o con el
+     primer pedido que haga. Reemplaza a las decisiones 91 y 92; lo de la decisión 54 (recién
+     abierta se actualiza sola; si no, el aviso) sigue igual. El control de la sesión cada 30
+     segundos (RF-74) no es de esto y queda como está.

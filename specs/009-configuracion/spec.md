@@ -99,29 +99,24 @@ catálogo se busca siempre en el servidor, y «Cómo buscar productos» se sacó
 - Sin conexión y sin guardado, arriba dice «Sin conexión · no se puede registrar nada», y al intentar registrar: «Sin conexión: no se registró. Este celular no guarda nada; para trabajar sin conexión, habilitalo en Más → Configuración.»
 - Mientras consulta: «Buscando en el servidor…».
 
-### User Story 3 - Elegir cada cuánto se busca una versión nueva (Priority: P3)
+### User Story 3 - La versión nueva se busca sin timer (Priority: P3)
 
-La aplicación busca sola si hay una versión nueva al abrirse, al volver a la vista y, mientras
-está a la vista, cada tanto (decisión 91, ADR-020). Cada persona elige en Configuración ese
-«cada tanto» para su dispositivo: más seguido se entera antes y gasta un poco más de datos.
-Pedido de Carlos del 2026-10-16.
+La aplicación se entera de una versión nueva por lo que pasa, nunca con un timer (decisión 157,
+ADR-020): al abrirse, al volver a la vista, al volver la conexión y cuando el servidor, en
+cualquier respuesta, dice una versión distinta de la que dijo antes. Configuración ya no tiene
+nada para elegir sobre esto. Pedido de Carlos del 2026-10-25: «elimina cualquier temporizador».
 
 **Acceptance Scenarios**:
 
-- **E19** **Given** un dispositivo donde nunca se cambió, **When** se abre Configuración, en el celular o en la computadora, **Then** «Buscar versión nueva» muestra cuatro botones (5 min, 15 min, 1 hora y 24 horas) con 15 min elegido, y su llave prendida, al costado de la descripción, como la de «Animaciones».
-- **E20** **Given** elegido otro botón, **When** pasa ese tiempo con la aplicación a la vista, **Then** busca si hay una versión nueva; vale desde que se elige, sin recargar.
-- **E21** **Given** la llave apagada («nunca»), **When** pasa cualquier tiempo, se vuelve a la aplicación o vuelve la conexión, **Then** no busca versiones nuevas. Los botones no se muestran. La versión nueva llega solo al cerrar la aplicación del todo y volver a abrirla: eso lo hace el navegador y no se puede apagar.
-- **E22** **Given** la llave apagada, **When** se la prende, **Then** vuelven los botones, con el que estaba elegido antes de apagarla, y busca cada ese tiempo.
-- **E23** **Given** un botón elegido o la llave apagada, **When** se cierra la aplicación y se la vuelve a abrir, o se sale de la sesión y se vuelve a entrar, **Then** sigue igual en ese dispositivo y no cambia en los demás.
-- **E24** **Given** un valor guardado que no es ninguno de los cuatro (de otra versión, o tocado a mano), **When** se abre la aplicación, **Then** vale 15 min.
+- **E19** **Given** cualquier dispositivo, **When** se abre Configuración, en el celular o en la computadora, **Then** no está «Buscar versión nueva»: ni botones de tiempo ni llave.
+- **E20** **Given** la aplicación a la vista, **When** pasa cualquier tiempo sin que pase nada (ni se vuelve a ella, ni vuelve la conexión, ni contesta el servidor), **Then** no busca versión nueva: no hay timer.
+- **E21** **Given** la aplicación abierta, **When** se vuelve a ella (estaba oculta) o vuelve la conexión, **Then** busca si hay una versión nueva.
+- **E22** **Given** la aplicación abierta, **When** el servidor contesta un pedido diciendo una versión distinta de la que dijo en la respuesta anterior, **Then** busca si hay una versión nueva, una sola vez por cada versión distinta.
+- **E23** **Given** el servidor contesta siempre la misma versión, o la primera respuesta desde que se abrió, **When** llega, **Then** no busca: la búsqueda al abrir ya se hizo.
+- **E24** **Given** un dispositivo que tenía guardado un tiempo o la llave apagada (de la versión anterior), **When** se abre la aplicación, **Then** no cuenta: busca igual que cualquier otro.
 
-**Los textos de la pantalla, que son regla:** en el celular, «Cada cuánto, con la app
-abierta. Más seguido gasta un poco más de datos.» y, con la llave apagada, «No busca. La
-versión nueva llega al cerrar la app y volver a abrirla.»; en la computadora, «Mientras la
-aplicación está a la vista, cada cuánto se fija si hay una versión nueva. También se fija al
-abrirla y cada vez que se vuelve a ella. Más seguido se entera antes y gasta un poco más de
-datos.» y, apagada, «No busca versiones nuevas mientras está abierta. La versión nueva llega
-recién al cerrarla y volver a abrirla.»
+Si la encuentra, vale lo de siempre (decisión 54): recién abierta se actualiza sola; si ya se
+estaba usando, avisa «Hay una versión nueva» con «Actualizar ahora».
 Las opciones las fijó Carlos el 2026-10-16 (decisión 92); el arranque en 15 min lo eligió el
 agente, por ser lo más parecido a la media hora de antes.
 Maqueta: `maquetas/version-nueva.html`, aprobada por Carlos el 2026-10-16 junto con la regla.
@@ -136,14 +131,14 @@ Maqueta: `maquetas/version-nueva.html`, aprobada por Carlos el 2026-10-16 junto 
 
 - **RF-84**: Guardar datos del negocio en el dispositivo para trabajar sin conexión es una preferencia de cada persona (RF-83), en el celular (arranca deshabilitada) y en la computadora (arranca habilitada; specs/018, decisión 136). Deshabilitada, el celular guarda solo lo mínimo para mantener la sesión y el vínculo (menos de 150 KB, sin contar los archivos de la aplicación), y sin conexión no registra ni guarda nada. Habilitada, guarda lo que falta enviar y deja bajar a mano los datos para buscar sin conexión (specs/018, historia 5); el catálogo ya no se guarda solo.
 
-- **RF-96**: En Configuración, cada persona elige en su dispositivo cada cuánto se busca una versión nueva mientras la aplicación está a la vista: 5 min, 15 min (de arranque), 1 hora o 24 horas. Con su llave apagada la aplicación no busca versiones nuevas mientras está abierta (ni con el timer, ni al volver a ella, ni al volver la conexión); la toma al cerrarla y volver a abrirla. Al abrir y al volver a la aplicación se busca siempre, elija lo que elija (decisión 91, ADR-020). Está en el celular y en la computadora.
+- **RF-96**: La aplicación busca una versión nueva solo cuando pasa algo, nunca con un timer: al abrirse, al volver a la vista, al volver la conexión y cuando el servidor contesta un pedido con una versión distinta de la que dijo antes (cada respuesta dice su versión). Configuración no tiene nada para elegir sobre esto (decisión 157, ADR-020; reemplaza a las decisiones 91 y 92). En el celular y en la computadora.
 
 - **RF-106**: En Configuración está también lo que cada persona decide para sí misma y no es una preferencia guardada en el dispositivo (decisión 99): **sus celulares con huella** (verlos, vincular el que tiene en la mano y quitar uno; RF-70b) y **su vínculo entre celular y computadora** (con qué dispositivo está vinculado y «Desvincular»; RF-77). Se ven en el celular y en la computadora; vincular con la huella aparece solo en el dispositivo que puede leerla. Nada de esto figura en Más → Usuarios, donde quien tiene «Administrar usuarios» ve en la tarjeta de cada persona sus sesiones y sus celulares con huella, y al final cuántos días dura el vínculo, que Configuración no muestra (decisión 100).
 
 ### Key Entities
 
 - **Lo propio que está en el servidor**: los celulares con huella y el vínculo entre celular y computadora de la persona (RF-106). Se guardan en el servidor, son de esa persona y los cambia ella; no son una preferencia del dispositivo.
-- **Preferencia del dispositivo**: un valor que se guarda en el dispositivo (no en el servidor) y no se borra al salir de la sesión. Hoy: `animaciones` (sí o no), `sinConexion` (RF-84) y cada cuánto se busca una versión nueva (RF-96).
+- **Preferencia del dispositivo**: un valor que se guarda en el dispositivo (no en el servidor) y no se borra al salir de la sesión. Hoy: `animaciones` (sí o no), y `sinConexion` (RF-84).
 
 ## Success Criteria
 

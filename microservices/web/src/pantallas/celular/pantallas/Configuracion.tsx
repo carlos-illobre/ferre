@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
-import { cambiarPreferencia, TIEMPOS_DE_VERSION, usePreferencias } from "../../../datos/almacenamiento";
+import { cambiarPreferencia, usePreferencias } from "../../../datos/almacenamiento";
 import { guardaEnElDispositivo } from "../../../datos/almacenamiento";
 import { useDescarga } from "../../../datos/almacenamiento";
 import { fecha } from "../../../formato";
-import { cambiarSinConexion, NOMBRE_DEL_TIEMPO, useMiVinculo, useMisCelulares, useReducirMovimiento } from "../../configuracion-comun";
+import { cambiarSinConexion, useMiVinculo, useMisCelulares, useReducirMovimiento } from "../../configuracion-comun";
 
 import { haceCuanto } from "../../../negocio/apartados";
 import { describirDispositivo } from "./Login";
@@ -20,7 +20,7 @@ import { Icono, type NombreDeIcono } from "../../../ui/iconos";
 const t = TEXTOS.configuracionV2;
 
 export function ConfiguracionCelu({ alCambiarElGuardado }: { alCambiarElGuardado?: () => void } = {}) {
-  const { animaciones, versionCada, versionNunca } = usePreferencias();
+  const { animaciones } = usePreferencias();
   const reducir = useReducirMovimiento();
   const sinConexion = guardaEnElDispositivo();
   const v = useMiVinculo();
@@ -44,17 +44,6 @@ export function ConfiguracionCelu({ alCambiarElGuardado }: { alCambiarElGuardado
       </div>
       {sinConexion && <DatosSinConexion />}
 
-      <h2 className="cfgvc-sub">{t.versionNueva.corto}</h2>
-      <div className="mv-tarjeta-2 cfgvc-tarjeta">
-        <Renglon icono="repetir" titulo={t.buscarVersion.corto} id="cfg-version" encendida={!versionNunca} alCambiar={() => cambiarPreferencia("versionNunca", !versionNunca)} testId="cfg-version-llave" filaTestId="cfg-version"
-          detalle={versionNunca ? t.versionNo.corto : t.versionSi.corto}>
-          {!versionNunca && (
-            <div className="cfgvc-tramos" role="radiogroup" aria-labelledby="cfg-version">
-              {TIEMPOS_DE_VERSION.map((x) => <button key={x} type="button" role="radio" aria-checked={versionCada === x} className={versionCada === x ? "elegido" : ""} onClick={() => cambiarPreferencia("versionCada", x)} data-testid={`cfg-version-${x}`}>{NOMBRE_DEL_TIEMPO[x]}</button>)}
-            </div>
-          )}
-        </Renglon>
-      </div>
 
       <h2 className="cfgvc-sub">{t.misCelulares.corto}{c.filas && <span className="mv-pastilla">{c.filas.length}</span>}</h2>
       <div className="mv-tarjeta-2 cfgvc-celulares" data-testid="celulares">

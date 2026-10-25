@@ -28,9 +28,6 @@
 .cfgvc-mueve.quieto i, .cfgvc-mueve.quieto b { animation: none; }
 @keyframes cfgv-sube { 0%, 15% { transform: translateY(10px); opacity: 0; } 35%, 100% { transform: none; opacity: 1; } }
 @keyframes cfgv-entra { 0%, 40% { transform: translateY(20px); } 60%, 100% { transform: none; } }
-.cfgvc-tramos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; max-width: 420px; padding: 3px; border-radius: 12px; background: var(--v-hundido); }
-.cfgvc-tramos button { min-height: 40px; border: 0; border-radius: 9px; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: var(--v-texto-2); cursor: pointer; }
-.cfgvc-tramos button.elegido { background: #fff; color: var(--v-tinta); box-shadow: var(--v-sombra-1); }
 .cfgvc-guarda { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 18px 20px; border-radius: 16px; background: var(--v-hundido); }
 .cfgvc-guarda .mv-barra { display: block; margin: 4px 0 8px; }
 .cfgvc-error { color: var(--v-error-texto); font-weight: 600; }
@@ -49,7 +46,6 @@
 .cfgvc-botones { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .cfgvc-renglon { grid-template-columns: 40px minmax(0, 1fr) auto; padding: 16px; align-items: center; }
 .cfgvc-extra { grid-column: 1 / -1; }
-.cfgvc-tramos { max-width: none; }
 .cfgvc-sub { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; color: var(--v-texto-2); font-size: 16px; font-weight: 650; }
 .cfgvc-sub .mv-pastilla { height: 26px; }
 .cfgvc-guardado { display: grid; grid-template-columns: 52px 1fr; gap: 14px; align-items: center; padding: 16px 20px; }
@@ -60,5 +56,4 @@
 .cfgvc-guarda .mv-btn { grid-column: 1 / -1; }
 .cfgvc-botones .mv-btn { flex: 1; min-height: 48px; }
 .cfgvc-vincular { margin: 12px 16px; width: calc(100% - 32px); }
-.cfgvc-tramos button { min-height: 44px; }
 .cfgvc-celular .mv-btn { min-height: 44px; }

@@ -6,11 +6,9 @@ import { guardaEnElDispositivo } from "../datos/almacenamiento";
 import { EVENTO_CREDENCIALES, hayHuella, listarCredenciales, quitarCredencial, vincularEsteDispositivo, type Credencial } from "../datos/credenciales";
 import { pausarEspejo, useEspejo } from "../espejo";
 import { puestoLocal, puestoRemoto, soltarEmparejamiento } from "../puesto";
-import type { TiempoDeVersion } from "../datos/almacenamiento";
 
 // Configuración como la v2 (specs/009, decisión 148): lo que hacen las dos interfaces, una sola vez.
 // Cada interfaz dibuja su pantalla con esto.
-export const NOMBRE_DEL_TIEMPO: Record<TiempoDeVersion, string> = { 5: "5 min", 15: "15 min", 60: "1 hora", 1440: "24 horas" };
 
 export function useReducirMovimiento(): boolean {
   const consulta = typeof matchMedia === "function" ? matchMedia("(prefers-reduced-motion: reduce)") : null;

@@ -1,14 +1,10 @@
 import { registerSW } from "virtual:pwa-register";
-import { repetirMientrasSeVe } from "../plataforma/tiempo/mientras-se-ve";
-import { alCambiarPreferencias, buscaVersionSola, cadaCuantoBuscarVersion, preferencias } from "../datos/almacenamiento";
+import { buscarVersionAlPasarAlgo } from "../negocio/buscar-version";
 import { EVENTO_VERSION_NUEVA } from "./VersionNueva";
 
-// Cómo se actualiza la app instalada (decisiones 54, 91 y 92, ADR-020). El navegador solo busca
-// una versión nueva cuando la app se carga, y un celular puede tenerla abierta en segundo plano
-// durante días: por eso se busca también cada vez que vuelve a primer plano, al volver la
-// conexión y, mientras está a la vista, cada el tiempo elegido en Configuración (RF-96). Con la
-// llave de Configuración apagada no se busca nada de esto: queda solo lo que hace el navegador
-// al abrir la app. Oculta no gasta nada.
+// Cómo se actualiza la app instalada (decisiones 54 y 157, ADR-020). El navegador solo busca una
+// versión nueva cuando la app se carga, y un celular puede tenerla abierta en segundo plano
+// durante días: por eso se busca también cuando pasa algo (negocio/buscar-version.ts), sin timer.
 // Cuando aparece una versión nueva: si la app se acaba de abrir, se actualiza sola (todavía
 // no hay nada a medio hacer); si ya se estaba usando, se avisa y la persona elige cuándo.
 const RECIEN_ABIERTA_MS = 15_000;
@@ -22,17 +18,7 @@ export function mantenerActualizada(): void {
       window.dispatchEvent(new CustomEvent(EVENTO_VERSION_NUEVA, { detail: { actualizar: () => void actualizar(true) } }));
     },
     onRegisteredSW(_url, registro) {
-      if (!registro) return;
-      const buscar = () => { if (navigator.onLine && buscaVersionSola(preferencias())) registro.update().catch(() => undefined); };
-      // Al volver a la vista busca en el momento y el timer cuenta desde cero.
-      const timer = repetirMientrasSeVe(buscar, () => cadaCuantoBuscarVersion(preferencias()));
-      // Un tiempo nuevo vale desde que se elige: la cuenta arranca de nuevo con él.
-      let elegido = cadaCuantoBuscarVersion(preferencias());
-      alCambiarPreferencias(() => {
-        const ahora = cadaCuantoBuscarVersion(preferencias());
-        if (ahora !== elegido) { elegido = ahora; timer.reiniciar(); }
-      });
-      window.addEventListener("online", buscar);
+      if (registro) buscarVersionAlPasarAlgo(() => void registro.update().catch(() => undefined));
     },
   });
 }

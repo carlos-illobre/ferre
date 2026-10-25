@@ -161,7 +161,7 @@ servidor en [docs/operacion](../docs/operacion/) y lo que falta hacer en
 | RF-93 | Cada proceso tiene un vigente y un borrador; al marcar vigente el borrador, la versión anterior queda en el historial | [011-procesos](011-procesos/spec.md) |
 | RF-94 | Exportar un proceso como imagen PNG o en BPMN 2.0 estándar, e importar un BPMN 2.0 de otro programa | [011-procesos](011-procesos/spec.md) |
 | RF-95 | Dos permisos: «Ver procesos» deja mirarlos; «Dibujar procesos» deja además cambiarlos, importarlos y exportarlos. Sin ninguno, «Procesos» no aparece en Más | [011-procesos](011-procesos/spec.md) |
-| RF-96 | En Configuración, elegir cada cuánto se busca una versión nueva mientras la aplicación está a la vista: 5 min, 15 min, 1 hora o 24 horas, o apagarlo | [009-configuracion](009-configuracion/spec.md) |
+| RF-96 | La versión nueva se busca sin timer: al abrir, al volver a la vista, al volver la conexión y cuando el servidor dice otra versión; nada que elegir en Configuración | [009-configuracion](009-configuracion/spec.md) |
 | RF-106 | En Configuración, lo que cada persona decide para sí: sus celulares con huella y su vínculo entre celular y computadora, sin repetirse en Sesiones | [009-configuracion](009-configuracion/spec.md) |
 | RF-97 | En la entrada de la computadora, «Ver tutorial» abre el manual de uso: un capítulo por pantalla principal, con texto, pasos, capturas y un clip | [012-manual-de-uso](012-manual-de-uso/spec.md) |
 

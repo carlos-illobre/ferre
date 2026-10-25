@@ -21,6 +21,8 @@ export type OpcionesDeCliente = {
   alPerderLaSesion?: (tokenPerdido: string) => void;
   // Un pedido que no era de lectura salió bien: algo cambió en el servidor.
   alGuardar?: (ruta: string) => void;
+  // Llegó una respuesta del servidor, cualquiera: para mirar sus cabeceras.
+  alContestar?: (respuesta: Response) => void;
 };
 
 export function crearCliente(opciones: OpcionesDeCliente) {
@@ -46,6 +48,7 @@ export function crearCliente(opciones: OpcionesDeCliente) {
     const token = leerToken();
     if (token) cabeceras.set("Authorization", `Bearer ${token}`);
     const respuesta = await fetch(url(ruta), { ...opcionesDelPedido, headers: cabeceras });
+    opciones.alContestar?.(respuesta);
     if (respuesta.status === 401 && token) {
       borrarToken();
       opciones.alPerderLaSesion?.(token);
@@ -62,6 +65,7 @@ export function crearCliente(opciones: OpcionesDeCliente) {
     const token = leerToken();
     if (token) cabeceras.set("Authorization", `Bearer ${token}`);
     const respuesta = await fetch(url(ruta), { headers: cabeceras });
+    opciones.alContestar?.(respuesta);
     if (!respuesta.ok) await fallar(respuesta);
     const direccion = URL.createObjectURL(await respuesta.blob());
     const a = document.createElement("a");

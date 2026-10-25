@@ -1027,7 +1027,7 @@ RNF-13:
     - tests/integration/migraciones.sh
     - microservices/api/src/persistencia/migrar.test.ts
     - microservices/listas/tests/test_health.py
-    - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
+    - microservices/web/src/negocio/buscar-version.test.ts
   defectos:
     - "Sin prueba: la vuelta atrás automática cuando la versión nueva no queda sana"
     - "Sin prueba: que el cliente tome solo la versión nueva y conserve lo guardado en el dispositivo"
@@ -1282,10 +1282,11 @@ RF-95:
   defectos: []
 
 RF-96:
-  estado: "Hecho (009-T005): cuatro tiempos y una llave en Configuración, en el celular y en la computadora; el timer corre solo con la app a la vista"
+  estado: "Hecho (009-T008): sin timer; se busca al abrir, al volver a la vista, al volver la conexión y cuando la API contesta otra versión en X-Version; nada en Configuración"
   pruebas:
-    - microservices/web/src/version-nueva-cada.test.tsx
-    - microservices/web/src/plataforma/tiempo/mientras-se-ve.test.ts
+    - microservices/web/src/negocio/buscar-version.test.ts
+    - microservices/web/src/version-nueva-sin-timer.test.tsx
+    - microservices/api/src/salud.test.ts
   defectos: []
 RF-106:
   estado: "Hecho (009-T006): en Configuración, mis celulares con huella y mi vínculo, en el celular y en la computadora; sin pestaña Sesiones"
