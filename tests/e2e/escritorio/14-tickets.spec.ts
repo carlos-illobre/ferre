@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("escritorio");
+const { psql, psqlTickets } = stack("escritorio");
 
 // Mejoras y errores (RF-80 y RF-81): quien usa la app avisa de un error con una captura,
 // todos lo ven en la lista, y se marca resuelto con una nota y se reabre.
@@ -14,8 +14,9 @@ const FOTO = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQV
 
 test.beforeAll(() => {
   const delUsuario = `(SELECT id FROM usuario WHERE email = '${EMAIL}')`;
-  psql(`DELETE FROM ticket_foto WHERE ticket_id IN (SELECT id FROM ticket WHERE usuario_id IN ${delUsuario})`);
-  psql(`DELETE FROM ticket WHERE usuario_id IN ${delUsuario}`);
+  // Los tickets están en la base de Tickets, con el nombre de quien los cargó (specs/028).
+  psqlTickets(`DELETE FROM tickets.ticket_foto WHERE ticket_id IN (SELECT id FROM tickets.ticket WHERE usuario_nombre = 'Tickets E2E')`);
+  psqlTickets(`DELETE FROM tickets.ticket WHERE usuario_nombre = 'Tickets E2E'`);
   psql(`DELETE FROM sesion WHERE usuario_id IN ${delUsuario}`);
   psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Tickets E2E', 'mostrador')`);
@@ -43,7 +44,7 @@ test("avisar de un error con una captura, verlo en la lista, marcarlo resuelto y
   await expect(page.getByTestId("mensaje")).toContainText("Ticket enviado");
 
   // Quedó en la base con su foto, a nombre de quien lo escribió.
-  await expect.poll(() => psql(`SELECT count(*) FROM ticket t JOIN ticket_foto f ON f.ticket_id = t.id WHERE t.descripcion = '${TEXTO}' AND t.estado = 'abierto'`)).toBe("1");
+  await expect.poll(() => psqlTickets(`SELECT count(*) FROM tickets.ticket t JOIN tickets.ticket_foto f ON f.ticket_id = t.id WHERE t.descripcion = '${TEXTO}' AND t.estado = 'abierto'`)).toBe("1");
   const ticket = page.getByTestId("ticket").filter({ hasText: TEXTO });
   await expect(ticket).toContainText("Tickets E2E");
   await expect(ticket).toContainText("Error");
@@ -61,10 +62,10 @@ test("avisar de un error con una captura, verlo en la lista, marcarlo resuelto y
   await resuelto.click();
   await expect(hoja).toContainText("Tickets E2E lo resolvió");
   await expect(hoja).toContainText("Corregido en la versión de hoy");
-  await expect.poll(() => psql(`SELECT estado FROM ticket WHERE descripcion = '${TEXTO}'`)).toBe("resuelto");
+  await expect.poll(() => psqlTickets(`SELECT estado FROM tickets.ticket WHERE descripcion = '${TEXTO}'`)).toBe("resuelto");
 
   // Reabrir lo devuelve a los abiertos.
   await hoja.getByTestId("reabrir").click();
   await expect(page.getByTestId("ticket").filter({ hasText: TEXTO })).toHaveCount(0);
-  await expect.poll(() => psql(`SELECT estado || ' ' || COALESCE(nota, 'sin nota') FROM ticket WHERE descripcion = '${TEXTO}'`)).toBe("abierto sin nota");
+  await expect.poll(() => psqlTickets(`SELECT estado || ' ' || COALESCE(nota, 'sin nota') FROM tickets.ticket WHERE descripcion = '${TEXTO}'`)).toBe("abierto sin nota");
 });

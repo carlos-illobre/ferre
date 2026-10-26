@@ -100,7 +100,7 @@ Dos archivos en cada usuario, reemplazando todos los marcadores `<...>`:
 
 | Archivo | Qué va |
 |---|---|
-| `~/ferre/produccion/.env` (de `ferre-produccion`) | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), las claves de la base (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`, `CLAVE_BASE_AUDITORIA`), un token de servicio |
+| `~/ferre/produccion/.env` (de `ferre-produccion`) | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), las claves de la base (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`, `CLAVE_BASE_AUDITORIA`, `CLAVE_BASE_TICKETS`), un token de servicio |
 | `~/ferre/pruebas/.env` (de `ferre-pruebas`) | lo mismo para pruebas, con **otras** claves y **otro** token |
 | `~/ferre/despliegue.env` (en los dos) | el canal de avisos (paso 7), el mismo en los dos: cada uno despliega solo su ambiente |
 

@@ -13,7 +13,7 @@ export type Interfaz = "escritorio" | "celular";
 const RAIZ = fileURLToPath(new URL("../../../", import.meta.url));
 const conexiones = new Map<string, (sql: string) => string>();
 
-export function stack(interfaz: Interfaz): { API: string; psql: (sql: string) => string; psqlProcesos: (sql: string) => string; psqlAuditoria: (sql: string) => string } {
+export function stack(interfaz: Interfaz): { API: string; psql: (sql: string) => string; psqlProcesos: (sql: string) => string; psqlAuditoria: (sql: string) => string; psqlTickets: (sql: string) => string } {
   const propio = interfaz === "celular" && process.env.E2E_CELULAR_COMPOSE;
   const compose = ["compose", ...(propio ? process.env.E2E_CELULAR_COMPOSE!.split(" ").filter(Boolean) : [])];
   const API = propio ? process.env.E2E_CELULAR_API! : (process.env.API_URL ?? "http://localhost");
@@ -22,7 +22,9 @@ export function stack(interfaz: Interfaz): { API: string; psql: (sql: string) =>
   // Quién hizo qué está en la base de Auditoría (specs/027). Le llega un momento después de la
   // acción: se consulta con expect.poll.
   const psqlAuditoria = (sql: string) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "auditoria", "-d", "auditoria", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
-  return { API, psql: (sql) => conexion(compose)(sql), psqlProcesos, psqlAuditoria };
+  // Los tickets están en la base de Tickets (specs/028).
+  const psqlTickets = (sql: string) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "tickets", "-d", "tickets", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
+  return { API, psql: (sql) => conexion(compose)(sql), psqlProcesos, psqlAuditoria, psqlTickets };
 }
 
 // Una consulta como `psql -tA`: filas con las columnas separadas por «|» y, en lo que no es

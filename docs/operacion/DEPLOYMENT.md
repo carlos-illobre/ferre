@@ -43,7 +43,7 @@ Guía completa en [deployment/oracle-single/ORACLE.md](../../deployment/oracle-s
   solo en `127.0.0.1` (5433 producción, 5434 pruebas)
   ([ADR-026](../adr/ADR-026-una-base-por-servicio-en-la-maquina.md)). Supabase ya no se usa.
 - **Las claves de la base** (`CLAVE_BASE_ADMIN` y una `CLAVE_BASE_<SERVICIO>` por servicio:
-  `MOSTRADOR`, `PROCESOS`, `AUDITORIA`): `db` crea la base y el usuario de cada servicio que
+  `MOSTRADOR`, `PROCESOS`, `AUDITORIA`, `TICKETS`): `db` crea la base y el usuario de cada servicio que
   falte, al arrancar y en cada control de salud (specs/027), con la clave que dice el `.env`. Un
   servicio nuevo aparece solo al agregar su clave. Cambiar después una clave en el `.env` no
   cambia la del usuario que ya existe, y el servicio deja de conectarse. Para cambiar una clave, o reponerlas todas, ver «Si se pierde el `.env`».
@@ -79,6 +79,17 @@ entrar), bajan el catálogo de nuevo y dejan de ver lo que tenían guardado ante
 cola de ventas sin enviar: conviene que no quede ninguna pendiente antes de actualizar. El
 vínculo entre celular y computadora se hace de nuevo. Pasa una sola vez.
 
+## Al pasar los tickets a su servicio (specs/028)
+
+Tickets arranca vacío (decisión de Carlos): la versión borra las tablas de tickets de la base del
+mostrador, pero las fotos viejas quedan en el volumen de archivos de Comercial
+(`/app/datos/listas/tickets`). Se borran a mano, una vez por ambiente, después de desplegar:
+
+```bash
+cd ~/ferre/<ambiente>
+docker compose exec -T comercial rm -rf /app/datos/listas/tickets
+```
+
 ## Si se pierde el `.env`, o hay que cambiar una clave de la base
 
 Los datos no se pierden: están en el volumen del ambiente, no dependen de las claves. Sin las
@@ -93,7 +104,7 @@ reponen desde la máquina, en la carpeta del ambiente:
 
    ```bash
    cd ~/ferre/<ambiente>
-   for par in mostrador:CLAVE_BASE_MOSTRADOR procesos:CLAVE_BASE_PROCESOS auditoria:CLAVE_BASE_AUDITORIA postgres:CLAVE_BASE_ADMIN; do
+   for par in mostrador:CLAVE_BASE_MOSTRADOR procesos:CLAVE_BASE_PROCESOS auditoria:CLAVE_BASE_AUDITORIA tickets:CLAVE_BASE_TICKETS postgres:CLAVE_BASE_ADMIN; do
      rol=${par%%:*}; clave=$(grep "^${par#*:}=" .env | cut -d= -f2-)
      echo "ALTER ROLE $rol PASSWORD :'clave';" | docker compose exec -T db psql -U postgres -q -v clave="$clave"
    done

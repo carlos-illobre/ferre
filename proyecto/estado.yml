@@ -759,7 +759,9 @@ RF-80:
     - tests/e2e/escritorio/14-tickets.spec.ts
     - tests/e2e/celular/14-tickets.spec.ts
     - microservices/web/src/pantallas/Tickets.test.tsx
-    - microservices/comercial/src/rutas/tickets.test.ts
+    - microservices/tickets/src/rutas.test.ts
+    - microservices/tickets/src/persistencia/tickets.test.ts
+    - tests/integration/tickets.sh
   defectos:
     - "La foto de un ticket por enviar se guarda en el dispositivo sin tope de espacio"
 
@@ -769,7 +771,9 @@ RF-81:
     - tests/e2e/escritorio/14-tickets.spec.ts
     - tests/e2e/celular/14-tickets.spec.ts
     - microservices/web/src/pantallas/Tickets.test.tsx
-    - microservices/comercial/src/rutas/tickets.test.ts
+    - microservices/tickets/src/rutas.test.ts
+    - microservices/tickets/src/persistencia/tickets.test.ts
+    - tests/integration/tickets.sh
   defectos:
     - "Cualquier usuario puede marcar resuelto o reabrir: no hay un permiso para eso"
 
@@ -1764,8 +1768,15 @@ RNF-74:
     - "La puerta y los servicios comparten el token: Auditoría no distingue quién le manda (#168)"
 
 RNF-75:
-  estado: "Nuevo (028): especificación aprobada"
-  pruebas: []
+  estado: "Hecho (028): los tickets y sus fotos viven en el servicio de Tickets, con su base y su volumen; la puerta los reparte y Comercial ya no tiene nada de tickets"
+  pruebas:
+    - microservices/tickets/src/rutas.test.ts
+    - microservices/tickets/src/persistencia/tickets.test.ts
+    - microservices/comercial/src/rutas/roles.test.ts
+    - tests/integration/tickets.sh
+    - tests/integration/base-propia.sh
+    - tests/e2e/escritorio/14-tickets.spec.ts
+    - tests/e2e/celular/14-tickets.spec.ts
   defectos: []
 
 RNF-76:

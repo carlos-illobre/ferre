@@ -11,8 +11,8 @@ admin() { docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STO
 como() { docker compose exec -T -e PGPASSWORD="$2" db psql -h 127.0.0.1 -U "$1" -d "$3" -v ON_ERROR_STOP=1 -tAc "$4"; }
 falla() { echo "$1"; exit 1; }
 
-# 022-E01: las bases del mostrador, de Procesos y de Auditoría, cada una con su usuario y su esquema al día.
-[[ "$(admin "SELECT string_agg(datname, ',' ORDER BY datname) FROM pg_database WHERE datname IN ('auditoria', 'mostrador', 'procesos')")" == "auditoria,mostrador,procesos" ]] || falla "faltan las bases auditoria, mostrador y procesos"
+# 022-E01: las bases del mostrador, de Procesos, de Auditoría y de Tickets, cada una con su usuario y su esquema al día.
+[[ "$(admin "SELECT string_agg(datname, ',' ORDER BY datname) FROM pg_database WHERE datname IN ('auditoria', 'mostrador', 'procesos', 'tickets')")" == "auditoria,mostrador,procesos,tickets" ]] || falla "faltan las bases auditoria, mostrador, procesos y tickets"
 [[ "$(como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "SELECT count(*) > 30 FROM kysely_migration")" == "t" ]] || falla "el esquema del mostrador no está al día"
 [[ "$(como procesos "$(valor CLAVE_BASE_PROCESOS)" procesos "SELECT count(*) FROM procesos.kysely_migration")" -ge 1 ]] || falla "el esquema de Procesos no está al día"
 
@@ -21,6 +21,7 @@ como procesos "$(valor CLAVE_BASE_PROCESOS)" mostrador "SELECT 1" >/dev/null 2>&
 como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" procesos "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base de Procesos"
 como auditoria "$(valor CLAVE_BASE_AUDITORIA)" mostrador "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Auditoría abrió la base del mostrador"
 como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" auditoria "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base de Auditoría"
+como tickets "$(valor CLAVE_BASE_TICKETS)" mostrador "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Tickets abrió la base del mostrador"
 for base in postgres template1; do
   como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base $base"
   como procesos "$(valor CLAVE_BASE_PROCESOS)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Procesos abrió la base $base"
