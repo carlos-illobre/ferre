@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { problemaDelEvento } from "./contrato.js";
 
@@ -40,5 +41,11 @@ describe("el contrato de auditoría", () => {
     for (const [cambio, campo] of mal) expect(problemaDelEvento({ ...bueno, ...cambio }), campo).toBe(`el campo «${campo}» no cumple el contrato`);
     expect(problemaDelEvento("venta")).toBe("el evento no es un objeto");
     expect(problemaDelEvento([bueno])).toBe("el evento no es un objeto");
+  });
+
+  it("027-E15: el documento del contrato dice cada campo, la entrega y cómo se reintenta", () => {
+    const doc = readFileSync(new URL("../../../docs/auditoria/contrato-v1.md", import.meta.url), "utf8");
+    for (const campo of ["id", "servicio", "tipo", "fecha", "quien", "dispositivo", "titulo", "detalle", "grupo", "importancia", "referencias", "contenido"]) expect(doc, campo).toContain(`| \`${campo}\` |`);
+    for (const parte of ["POST /v1/eventos", "X-Token-Servicio", "`400", "`401`", "`413", "Cómo se reintenta", "AUDITORIA_URL"]) expect(doc, parte).toContain(parte);
   });
 });
