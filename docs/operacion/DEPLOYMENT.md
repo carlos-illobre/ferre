@@ -83,12 +83,17 @@ vínculo entre celular y computadora se hace de nuevo. Pasa una sola vez.
 
 Tickets arranca vacío (decisión de Carlos): la versión borra las tablas de tickets de la base del
 mostrador, pero las fotos viejas quedan en el volumen de archivos de Comercial
-(`/app/datos/listas/tickets`). Se borran a mano, una vez por ambiente, después de desplegar:
+(`/app/datos/listas/tickets`), si las había. Una vez por ambiente, después de desplegar, se mira
+si la carpeta existe y, solo si existe, se borra:
 
 ```bash
 cd ~/ferre/<ambiente>
-docker compose exec -T comercial rm -rf /app/datos/listas/tickets
+docker compose exec -T comercial ls /app/datos/listas          # ¿está «tickets»?
+docker compose exec -T comercial rm -rf /app/datos/listas/tickets   # solo si estaba
 ```
+
+En pruebas no estaba (arrancó con base nueva en la etapa 1). No se confunde con el volumen
+`tickets-fotos`, que es donde guarda las fotos el servicio de Tickets y no se toca.
 
 ## Si se pierde el `.env`, o hay que cambiar una clave de la base
 
