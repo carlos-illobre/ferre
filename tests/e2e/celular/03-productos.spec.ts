@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("celular");
+const { psql, psqlAcceso } = stack("celular");
 
 // Happy path "buscar un producto y elegir su margen" (issues #13 y #14): con un catálogo
 // sembrado, el empleado escribe dos palabras en cualquier orden, encuentra el producto,
@@ -14,13 +14,13 @@ const EMAIL = "e2e-productos@ferre.test";
 const PROVEEDOR = "Proveedor productos (e2e)";
 
 test.beforeAll(() => {
-  psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Mostrador E2E', 'mostrador')`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Mostrador E2E', 'mostrador')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   // Catálogo mínimo: un proveedor con dos productos y su costo vigente. Sin '$' en los
   // textos: el SQL pasa por un shell con comillas dobles y $2 se expandiría. Las comillas
   // dobles del JSON van sin escapar: psql() las escapa una sola vez.

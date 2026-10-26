@@ -4,7 +4,7 @@ import { stack } from "../comun/stack";
 import { cerrarLasOtrasVentanas, otraVentana, otroContexto } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("celular");
+const { psql, psqlAcceso } = stack("celular");
 
 // El espejo entre el celular y la computadora emparejados (decisión 60): están en la misma
 // parte y comparten la venta en curso; «Desconectar» los separa un rato; cada emparejamiento es de
@@ -20,23 +20,21 @@ const hash = (t: string) => createHash("sha256").update(t).digest("hex");
 
 test.beforeAll(() => {
   const deEstos = `(SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email IN ('${EMAIL}', '${EMAIL_OTRA}')))`;
-  // La tabla de códigos quedó sin uso (specs/023), pero tiene filas viejas que apuntan a los puestos.
-  psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN ${deEstos} OR celular_sesion_id IN ${deEstos})`);
-  psql(`DELETE FROM puesto WHERE sesion_id IN ${deEstos} OR celular_sesion_id IN ${deEstos}`);
+  psqlAcceso(`DELETE FROM puesto WHERE sesion_id IN ${deEstos} OR celular_sesion_id IN ${deEstos}`);
   // El pedido borrador que deja la prueba apunta al usuario: se borra antes que él.
   psql(`DELETE FROM pedido WHERE proveedor_id = '${ID_PROV}'`);
   for (const e of [EMAIL, EMAIL_OTRA]) {
-    psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
-    psql(`DELETE FROM usuario WHERE email = '${e}'`);
+    psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
+    psqlAcceso(`DELETE FROM usuario WHERE email = '${e}'`);
   }
-  psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL}', 'Espejo E2E'), (gen_random_uuid(), '${EMAIL_OTRA}', 'Otra persona E2E')`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL}', 'Espejo E2E'), (gen_random_uuid(), '${EMAIL_OTRA}', 'Otra persona E2E')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email IN ('${EMAIL}', '${EMAIL_OTRA}')`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email IN ('${EMAIL}', '${EMAIL_OTRA}')`);
   for (const [token, email] of [[TOKEN_COMPU, EMAIL], [TOKEN_CELULAR, EMAIL], [TOKEN_OTRA, EMAIL_OTRA]]) {
-    psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(token!)}', 'e2e ${token}', now() + interval '1 day' FROM usuario WHERE email = '${email}'`);
+    psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(token!)}', 'e2e ${token}', now() + interval '1 day' FROM usuario WHERE email = '${email}'`);
   }
   // La computadora y el celular de la misma persona, ya emparejados.
-  psql(`INSERT INTO puesto (id, sesion_id, codigo_hash, nombre, vinculado_en, celular_sesion_id, expira_en) SELECT gen_random_uuid(), a.id, 'e2e-espejo', 'computadora e2e', now(), b.id, now() + interval '30 days' FROM sesion a, sesion b WHERE a.token_hash = '${hash(TOKEN_COMPU)}' AND b.token_hash = '${hash(TOKEN_CELULAR)}'`);
+  psqlAcceso(`INSERT INTO puesto (id, sesion_id, codigo_hash, nombre, vinculado_en, celular_sesion_id, expira_en) SELECT gen_random_uuid(), a.id, 'e2e-espejo', 'computadora e2e', now(), b.id, now() + interval '30 days' FROM sesion a, sesion b WHERE a.token_hash = '${hash(TOKEN_COMPU)}' AND b.token_hash = '${hash(TOKEN_CELULAR)}'`);
   psql(`DELETE FROM item_venta WHERE producto_id = '${ID_MECHA}'`);
   psql(`DELETE FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`);
   psql(`DELETE FROM precio_proveedor WHERE proveedor_id = '${ID_PROV}'`);
@@ -211,13 +209,13 @@ test("023-E16 023-E19: emparejados y abiertos los dos, van juntos: la parte, la 
   // computadora y vuelve a entrar ahí, sigue vinculada sin escanear nada.
   const dispositivo = await compu.evaluate(() => localStorage.getItem("ferre.dispositivo"));
   expect(dispositivo).toBeTruthy();
-  await expect.poll(() => psql(`SELECT dispositivo_id FROM sesion WHERE token_hash = '${hash(TOKEN_COMPU)}'`)).toBe(dispositivo);
-  psql(`UPDATE puesto SET usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}'), compu_dispositivo = '${dispositivo}' WHERE codigo_hash = 'e2e-espejo'`);
+  await expect.poll(() => psqlAcceso(`SELECT dispositivo_id FROM sesion WHERE token_hash = '${hash(TOKEN_COMPU)}'`)).toBe(dispositivo);
+  psqlAcceso(`UPDATE puesto SET usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}'), compu_dispositivo = '${dispositivo}' WHERE codigo_hash = 'e2e-espejo'`);
   await compu.context().close();
-  psql(`UPDATE sesion SET revocada_en = now() WHERE token_hash = '${hash(TOKEN_COMPU)}'`);
+  psqlAcceso(`UPDATE sesion SET revocada_en = now() WHERE token_hash = '${hash(TOKEN_COMPU)}'`);
   await expect(celular.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "solo", { timeout: 15000 });
   const TOKEN_COMPU_2 = `${TOKEN_COMPU}-de-nuevo`;
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(TOKEN_COMPU_2)}', 'e2e compu de nuevo', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(TOKEN_COMPU_2)}', 'e2e compu de nuevo', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   const enEsteDispositivo = async (token: string) => {
     const contexto = await otroContexto(browser, { viewport: { width: 1366, height: 768 } });
     await contexto.addInitScript(([t, d]) => { localStorage.setItem("ferre.sesion.desarrollo", t!); localStorage.setItem("ferre.dispositivo", d!); }, [token, dispositivo!]);
@@ -246,7 +244,7 @@ test("023-E16 023-E19: emparejados y abiertos los dos, van juntos: la parte, la 
   await expect(compu.getByTestId("emparejar-celular")).toBeVisible();
   await expect(celular.getByTestId("indicador-vinculo")).toHaveCount(0);
   // El servidor ya no tiene el vínculo activo: lo que haga el celular no le llega a la computadora.
-  await expect.poll(() => psql(`SELECT count(*) FROM puesto WHERE expira_en > now() AND (sesion_id IN (SELECT id FROM sesion WHERE usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')) OR celular_sesion_id IN (SELECT id FROM sesion WHERE usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')))`)).toBe("0");
+  await expect.poll(() => psqlAcceso(`SELECT count(*) FROM puesto WHERE expira_en > now() AND (sesion_id IN (SELECT id FROM sesion WHERE usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')) OR celular_sesion_id IN (SELECT id FROM sesion WHERE usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL}')))`)).toBe("0");
   await celular.getByTestId("menu-vender").click();
   await expect(celular.getByTestId("menu-vender")).toHaveAttribute("aria-current", "page");
   await expect(compu.getByTestId("configuracion")).toBeVisible();

@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql, psqlAuditoria } = stack("escritorio");
+const { API, psqlAcceso, psqlAuditoria } = stack("escritorio");
 
 const CELULAR = false;
 
@@ -23,17 +23,17 @@ const RUTAS = CELULAR
 
 test.beforeAll(() => {
   for (const e of [EMAIL_ADMIN, EMAIL_VENDEDOR]) {
-    psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
-    psql(`DELETE FROM usuario WHERE email = '${e}'`);
+    psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${e}')`);
+    psqlAcceso(`DELETE FROM usuario WHERE email = '${e}'`);
   }
-  psql(`DELETE FROM usuario_rol WHERE rol_id IN (SELECT id FROM rol WHERE nombre = '${ROL_NUEVO}')`);
-  psql(`DELETE FROM rol WHERE nombre = '${ROL_NUEVO}'`);
-  psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL_ADMIN}', 'Admin roles E2E'), (gen_random_uuid(), '${EMAIL_VENDEDOR}', 'Vendedor roles E2E')`);
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT id, '${ADMINISTRADOR}' FROM usuario WHERE email = '${EMAIL_ADMIN}'`);
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT id, '${VENDEDOR}' FROM usuario WHERE email = '${EMAIL_VENDEDOR}'`);
+  psqlAcceso(`DELETE FROM usuario_rol WHERE rol_id IN (SELECT id FROM rol WHERE nombre = '${ROL_NUEVO}')`);
+  psqlAcceso(`DELETE FROM rol WHERE nombre = '${ROL_NUEVO}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL_ADMIN}', 'Admin roles E2E'), (gen_random_uuid(), '${EMAIL_VENDEDOR}', 'Vendedor roles E2E')`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT id, '${ADMINISTRADOR}' FROM usuario WHERE email = '${EMAIL_ADMIN}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT id, '${VENDEDOR}' FROM usuario WHERE email = '${EMAIL_VENDEDOR}'`);
   for (const [token, email] of [[TOKEN_ADMIN, EMAIL_ADMIN], [TOKEN_VENDEDOR, EMAIL_VENDEDOR]]) {
     const hash = createHash("sha256").update(token!).digest("hex");
-    psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${email}'`);
+    psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${email}'`);
   }
 });
 
@@ -109,7 +109,7 @@ test("se arma un rol, se lo asigna y la persona gana ese acceso", async ({ page 
   await expect(page.getByRole("heading", { name: "Negocio", exact: true })).toBeVisible();
   await expect(page.locator("[data-testid^='seccion-']")).toHaveCount(0);
   await expect(page.getByTestId("sin-permiso")).toHaveCount(0);
-  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'rol.creado' AND quien_id = '${psql(`SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}'`)}'`)).toBe("1");
+  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'rol.creado' AND quien_id = '${psqlAcceso(`SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}'`)}'`)).toBe("1");
 });
 
 test("nadie se quita a sí mismo la administración, y un rol en uso no se borra", async ({ page }) => {
@@ -127,8 +127,8 @@ test("nadie se quita a sí mismo la administración, y un rol en uso no se borra
     return [await cambiar({ roles: [vendedor] }), await cambiar({ activo: false }), await cambiar({ roles: [] }), borrar];
   }, [TOKEN_ADMIN, EMAIL_ADMIN, API, VENDEDOR, ADMINISTRADOR] as const);
   for (const e of estados) expect(e).toBeGreaterThanOrEqual(400);
-  await expect.poll(() => psql(`SELECT count(*) FROM usuario_rol WHERE rol_id = '${ADMINISTRADOR}' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
-  await expect.poll(() => psql(`SELECT activo::text FROM usuario WHERE email = '${EMAIL_ADMIN}'`)).toBe("true");
+  await expect.poll(() => psqlAcceso(`SELECT count(*) FROM usuario_rol WHERE rol_id = '${ADMINISTRADOR}' AND usuario_id = (SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}')`)).toBe("1");
+  await expect.poll(() => psqlAcceso(`SELECT activo::text FROM usuario WHERE email = '${EMAIL_ADMIN}'`)).toBe("true");
 });
 
 // 013: Cómo va el negocio en tres secciones, cada una con su permiso de lectura (decisión 95).
@@ -139,20 +139,20 @@ const GERENTE = "00000000-0000-4000-8000-0000000000a5";
 
 test("013: las secciones de Cómo va el negocio siguen los permisos de cada rol", async ({ page }) => {
   // 013-E07: el permiso viejo ya no lo tiene nadie; el Gerente, que lo tenía, tiene los tres nuevos.
-  expect(psql(`SELECT count(*) FROM rol_permiso WHERE permiso = 'negocio.numeros'`)).toBe("0");
-  expect(psql(`SELECT count(*) FROM rol_permiso WHERE rol_id = '${GERENTE}' AND permiso IN ('negocio.ventas', 'negocio.gastos', 'negocio.invertido')`)).toBe("3");
+  expect(psqlAcceso(`SELECT count(*) FROM rol_permiso WHERE permiso = 'negocio.numeros'`)).toBe("0");
+  expect(psqlAcceso(`SELECT count(*) FROM rol_permiso WHERE rol_id = '${GERENTE}' AND permiso IN ('negocio.ventas', 'negocio.gastos', 'negocio.invertido')`)).toBe("3");
 
   // 013-E19: un rol con «Ver los gastos» y «Ver el dinero invertido», y nada de ventas.
-  psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL_GASTOS}')`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL_GASTOS}'`);
-  psql(`DELETE FROM usuario_rol WHERE rol_id IN (SELECT id FROM rol WHERE nombre = '${ROL_GASTOS}')`);
-  psql(`DELETE FROM rol WHERE nombre = '${ROL_GASTOS}'`);
-  psql(`INSERT INTO rol (id, nombre, descripcion) VALUES (gen_random_uuid(), '${ROL_GASTOS}', 'Prueba')`);
-  psql(`INSERT INTO rol_permiso (rol_id, permiso) SELECT id, p FROM rol, unnest(ARRAY['negocio.gastos', 'negocio.invertido']) AS p WHERE nombre = '${ROL_GASTOS}'`);
-  psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL_GASTOS}', 'Gastos E2E')`);
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u, rol r WHERE u.email = '${EMAIL_GASTOS}' AND r.nombre = '${ROL_GASTOS}'`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL_GASTOS}')`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL_GASTOS}'`);
+  psqlAcceso(`DELETE FROM usuario_rol WHERE rol_id IN (SELECT id FROM rol WHERE nombre = '${ROL_GASTOS}')`);
+  psqlAcceso(`DELETE FROM rol WHERE nombre = '${ROL_GASTOS}'`);
+  psqlAcceso(`INSERT INTO rol (id, nombre, descripcion) VALUES (gen_random_uuid(), '${ROL_GASTOS}', 'Prueba')`);
+  psqlAcceso(`INSERT INTO rol_permiso (rol_id, permiso) SELECT id, p FROM rol, unnest(ARRAY['negocio.gastos', 'negocio.invertido']) AS p WHERE nombre = '${ROL_GASTOS}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL_GASTOS}', 'Gastos E2E')`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u, rol r WHERE u.email = '${EMAIL_GASTOS}' AND r.nombre = '${ROL_GASTOS}'`);
   const hash = createHash("sha256").update(TOKEN_GASTOS).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL_GASTOS}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL_GASTOS}'`);
 
   // 013-E12: Negocio, en el menú, abre la primera sección que puede ver, Compras, con sus segmentos de dos (decisión 149).
   await entrarComo(page, TOKEN_GASTOS, RUTAS.mas);

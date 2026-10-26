@@ -9,6 +9,7 @@ cd "$(dirname "$0")/../.."
 
 API=http://localhost
 psql() { docker compose exec -T db psql -U mostrador -d mostrador -tAc "$1"; }
+psqlAcceso() { docker compose exec -T db psql -U acceso -d acceso -tAc "$1"; }
 psqlTickets() { docker compose exec -T db psql -U tickets -d tickets -tAc "$1"; }
 psqlAuditoria() { docker compose exec -T db psql -U auditoria -d auditoria -tAc "$1"; }
 codigo() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
@@ -19,11 +20,11 @@ verificar() { # descripción esperado real
 }
 
 # Una persona con sesión conocida.
-psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = 'tickets-ana@ferre.test')" >/dev/null
-psql "DELETE FROM usuario WHERE email = 'tickets-ana@ferre.test'" >/dev/null
-psql "INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), 'tickets-ana@ferre.test', 'Ana Tickets')" >/dev/null
+psqlAcceso "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = 'tickets-ana@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM usuario WHERE email = 'tickets-ana@ferre.test'" >/dev/null
+psqlAcceso "INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), 'tickets-ana@ferre.test', 'Ana Tickets')" >/dev/null
 ANA=token-tickets-ana
-psql "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$(printf '%s' "$ANA" | sha256sum | cut -d' ' -f1)', 'prueba', now() + interval '1 day' FROM usuario WHERE email = 'tickets-ana@ferre.test'" >/dev/null
+psqlAcceso "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$(printf '%s' "$ANA" | sha256sum | cut -d' ' -f1)', 'prueba', now() + interval '1 day' FROM usuario WHERE email = 'tickets-ana@ferre.test'" >/dev/null
 CON=(-H "Authorization: Bearer $ANA")
 
 # 028-E01: cargar con foto por la puerta; un reenvío no se guarda dos veces.
@@ -61,9 +62,9 @@ verificar "028-E06: sin Tickets, la puerta corta la conexión" si "$([[ $corte -
 # El proxy de adelante contesta 502 sin CORS: para el navegador es una falla de red, y el ticket
 # queda guardado en el dispositivo.
 verificar "028-E06: lo que llega al navegador no lleva CORS" 0 "$(curl -s -o /dev/null -D - "${CON[@]}" -H "Origin: $(grep -E '^ORIGEN_WEB=' .env | cut -d= -f2-)" $API/tickets | grep -ic '^access-control-allow-origin:')"
-verificar "028-E06: sin Tickets, Comercial sigue andando" 200 "$(codigo "${CON[@]}" $API/sesiones/actual)"
+verificar "028-E06: sin Tickets, Comercial sigue andando" 200 "$(codigo "${CON[@]}" "$API/productos?ids=")"
 docker compose up -d --wait tickets >/dev/null 2>&1
 
 rm -f "$FOTO"
-psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = 'tickets-ana@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = 'tickets-ana@ferre.test')" >/dev/null
 [[ $fallos -eq 0 ]]

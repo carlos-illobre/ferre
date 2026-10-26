@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql, psqlAuditoria } = stack("escritorio");
+const { API, psql, psqlAcceso, psqlAuditoria } = stack("escritorio");
 
 const CELULAR = false;
 
@@ -29,7 +29,7 @@ const hash = (t: string) => createHash("sha256").update(t).digest("hex");
 
 test.beforeAll(() => {
   const deEllos = `(SELECT id FROM usuario WHERE email IN ('${EMAIL_ADMIN}', '${EMAIL_ANA}'))`;
-  psql(`DELETE FROM cambio_apartado WHERE usuario_id IN ${deEllos}`);
+  psqlAcceso(`DELETE FROM cambio_apartado WHERE usuario_id IN ${deEllos}`);
   psql(`DELETE FROM item_venta WHERE venta_id = '${VENTA}' OR producto_id = '${CANDADO}'`);
   psql(`DELETE FROM venta WHERE id = '${VENTA}'`);
   psql(`DELETE FROM anomalia WHERE producto_id = '${CANDADO}'`);
@@ -38,14 +38,14 @@ test.beforeAll(() => {
   // Un candado con 10 en stock: la venta aceptada lo tiene que bajar.
   psql(`INSERT INTO producto (id, descripcion, marca, margen_elegido) VALUES ('${CANDADO}', 'CANDADO APARTADO (E2E)', 'MARCA E2E', 100)`);
   psql(`INSERT INTO movimiento_stock (id, producto_id, tipo, cantidad, referencia_tipo, fecha, nota) VALUES (gen_random_uuid(), '${CANDADO}', 'ajuste', 10, 'conteo', now(), 'stock inicial e2e')`);
-  psql(`DELETE FROM sesion WHERE usuario_id IN ${deEllos}`);
-  psql(`DELETE FROM usuario_rol WHERE usuario_id IN ${deEllos}`);
-  psql(`DELETE FROM usuario WHERE email IN ('${EMAIL_ADMIN}', '${EMAIL_ANA}')`);
-  psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL_ADMIN}', 'Admin apartados E2E'), (gen_random_uuid(), '${EMAIL_ANA}', 'Ana apartados E2E')`);
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u, rol r WHERE u.email = '${EMAIL_ADMIN}' AND r.id IN ('${ADMINISTRADOR}', '${GERENTE}')`);
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT id, '${VENDEDOR}' FROM usuario WHERE email = '${EMAIL_ANA}'`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN ${deEllos}`);
+  psqlAcceso(`DELETE FROM usuario_rol WHERE usuario_id IN ${deEllos}`);
+  psqlAcceso(`DELETE FROM usuario WHERE email IN ('${EMAIL_ADMIN}', '${EMAIL_ANA}')`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL_ADMIN}', 'Admin apartados E2E'), (gen_random_uuid(), '${EMAIL_ANA}', 'Ana apartados E2E')`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u, rol r WHERE u.email = '${EMAIL_ADMIN}' AND r.id IN ('${ADMINISTRADOR}', '${GERENTE}')`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT id, '${VENDEDOR}' FROM usuario WHERE email = '${EMAIL_ANA}'`);
   for (const [token, email] of [[TOKEN_ADMIN, EMAIL_ADMIN], [TOKEN_ANA, EMAIL_ANA]]) {
-    psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(token!)}', 'celular de Ana', now() + interval '1 day' FROM usuario WHERE email = '${email}'`);
+    psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(token!)}', 'celular de Ana', now() + interval '1 day' FROM usuario WHERE email = '${email}'`);
   }
 });
 
@@ -65,7 +65,7 @@ async function entrarComo(page: Page, token: string, ruta: string) {
 }
 
 test("014-E01 014-E06 014-E14 una venta sin mandar de Ana, desactivada, sube apartada y se acepta a su nombre, con la fecha en que la cobró", async ({ page }) => {
-  const ana = psql(`SELECT id FROM usuario WHERE email = '${EMAIL_ANA}'`);
+  const ana = psqlAcceso(`SELECT id FROM usuario WHERE email = '${EMAIL_ANA}'`);
   // Quien administra desactiva a Ana: su sesión se cierra (007).
   const desactivar = await page.request.patch(`${API}/usuarios/${ana}`, { headers: { Authorization: `Bearer ${TOKEN_ADMIN}` }, data: { activo: false } });
   expect(desactivar.ok()).toBe(true);
@@ -101,5 +101,5 @@ test("014-E01 014-E06 014-E14 una venta sin mandar de Ana, desactivada, sube apa
   await expect.poll(() => psql(`SELECT to_char(fecha AT TIME ZONE 'UTC', 'YYYY-MM-DD HH24:MI') FROM venta WHERE id = '${VENTA}'`)).toBe("2026-10-01 13:47");
   await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'venta.registrada' AND quien_id = '${ana}' AND contenido->>'id' = '${VENTA}'`)).toBe("1");
   expect(psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${CANDADO}'`)).toBe("8.000");
-  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'apartado.aceptado' AND quien_id = '${psql(`SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}'`)}'`)).toBe("1");
+  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'apartado.aceptado' AND quien_id = '${psqlAcceso(`SELECT id FROM usuario WHERE email = '${EMAIL_ADMIN}'`)}'`)).toBe("1");
 });

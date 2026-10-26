@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql, psqlProcesos } = stack("celular");
+const { API, psqlAcceso, psqlProcesos } = stack("celular");
 
 // Procesos (specs/011-procesos) en el celular: «Pasos» que se ordenan arrastrando y «Diagrama»
 // con la hoja de figuras, pasando por el servidor de Ferrebress y el servicio de Procesos.
@@ -15,13 +15,13 @@ const VENTA = readFileSync("../../microservices/procesos/web/src/modelo/ejemplos
 test.beforeAll(() => {
   psqlProcesos("DELETE FROM procesos.proceso WHERE nombre LIKE 'Venta celular E2E%'");
   const id = `(SELECT id FROM usuario WHERE email = '${EMAIL}')`;
-  psql(`DELETE FROM sesion WHERE usuario_id IN ${id}`);
-  psql(`DELETE FROM usuario_rol WHERE usuario_id IN ${id}`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Procesos celular E2E', 'mostrador')`);
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN ${id}`);
+  psqlAcceso(`DELETE FROM usuario_rol WHERE usuario_id IN ${id}`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Procesos celular E2E', 'mostrador')`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
 });
 
 async function abrirVenta(page: Page, nombre: string) {

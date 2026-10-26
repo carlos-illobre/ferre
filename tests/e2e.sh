@@ -15,10 +15,12 @@
 # interfaz no les robe el procesador.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-# Las pruebas consultan la base del mostrador con su usuario (comun/base.worker.mjs): la clave sale
-# del .env, como en cualquier ambiente. Solo esa: exportar todo el .env pisaría el del segundo stack.
+# Las pruebas consultan la base del mostrador y la de Acceso con sus usuarios (comun/base.worker.mjs):
+# las claves salen del .env, como en cualquier ambiente. Solo esas: exportar todo el .env pisaría el
+# del segundo stack.
 CLAVE_BASE_MOSTRADOR=$(grep '^CLAVE_BASE_MOSTRADOR=' .env | cut -d= -f2-)
-export CLAVE_BASE_MOSTRADOR
+CLAVE_BASE_ACCESO=$(grep '^CLAVE_BASE_ACCESO=' .env | cut -d= -f2-)
+export CLAVE_BASE_MOSTRADOR CLAVE_BASE_ACCESO
 
 # Corren contra la aplicación, que abre en la raíz.
 #

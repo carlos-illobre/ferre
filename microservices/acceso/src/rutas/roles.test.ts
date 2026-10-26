@@ -91,6 +91,15 @@ describe("roles", () => {
   });
 });
 
+// 013-E18: «Ver los números del negocio» ya no existe: no se le da a un rol.
+describe("los permisos que ya no existen", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
+  it("013-E18 a un rol no se le puede dar «Ver los números del negocio»", async () => {
+    const r = await pedir(app, "POST", "/roles", { rol: "admin", cuerpo: { nombre: "Viejo", permisos: ["negocio.numeros"] } });
+    expect(r.status).toBe(400);
+  });
+});
+
 // Cada operación pide su permiso (RF-72): quien solo vende no puede lo demás.
 describe("permisos por operación", () => {
   beforeEach(() => { base.actual = baseFalsa(); });

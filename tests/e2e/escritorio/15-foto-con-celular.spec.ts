@@ -4,7 +4,7 @@ import { stack } from "../comun/stack";
 import { cerrarLasOtrasVentanas, otraVentana } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("escritorio");
+const { psql, psqlAcceso, idsDe } = stack("escritorio");
 
 // La computadora no tiene cámara: en el ingreso le pide la foto de la factura a su celular
 // emparejado, que la saca y la manda por la conexión entre los dos; la foto aparece sola en la
@@ -19,19 +19,18 @@ const hash = (t: string) => createHash("sha256").update(t).digest("hex");
 test.beforeAll(() => {
   const delUsuario = `(SELECT id FROM usuario WHERE email = '${EMAIL}')`;
   const susSesiones = `(SELECT id FROM sesion WHERE usuario_id IN ${delUsuario})`;
-  psql(`DELETE FROM foto_comprobante WHERE usuario_id IN ${delUsuario}`);
-  psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN ${susSesiones} OR celular_sesion_id IN ${susSesiones})`);
-  psql(`DELETE FROM puesto WHERE sesion_id IN ${susSesiones} OR celular_sesion_id IN ${susSesiones}`);
-  psql(`DELETE FROM sesion WHERE usuario_id IN ${delUsuario}`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Foto QR E2E', 'mostrador')`);
+  psql(`DELETE FROM foto_comprobante WHERE usuario_id IN (${idsDe(EMAIL)})`);
+  psqlAcceso(`DELETE FROM puesto WHERE sesion_id IN ${susSesiones} OR celular_sesion_id IN ${susSesiones}`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN ${delUsuario}`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Foto QR E2E', 'mostrador')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   for (const t of [TOKEN, TOKEN_CELULAR, TOKEN_SOLA]) {
-    psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(t)}', 'e2e ${t}', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+    psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash(t)}', 'e2e ${t}', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   }
   // La computadora y el celular, ya emparejados. La tercera sesión es otra computadora, sin celular.
-  psql(`INSERT INTO puesto (id, sesion_id, codigo_hash, nombre, vinculado_en, celular_sesion_id, expira_en) SELECT gen_random_uuid(), a.id, 'e2e-foto', 'computadora e2e', now(), b.id, now() + interval '30 days' FROM sesion a, sesion b WHERE a.token_hash = '${hash(TOKEN)}' AND b.token_hash = '${hash(TOKEN_CELULAR)}'`);
+  psqlAcceso(`INSERT INTO puesto (id, sesion_id, codigo_hash, nombre, vinculado_en, celular_sesion_id, expira_en) SELECT gen_random_uuid(), a.id, 'e2e-foto', 'computadora e2e', now(), b.id, now() + interval '30 days' FROM sesion a, sesion b WHERE a.token_hash = '${hash(TOKEN)}' AND b.token_hash = '${hash(TOKEN_CELULAR)}'`);
 });
 
 test.afterEach(cerrarLasOtrasVentanas);
@@ -58,7 +57,7 @@ test("023-E17: la computadora le pide la foto de la factura al celular emparejad
   await expect(page.getByTestId("foto-comprobante")).toContainText("Foto de la factura cargada", { timeout: 15000 });
   await page.getByTestId("foto-comprobante").getByTestId("ver-comprobante").click();
   await expect(page.getByRole("dialog", { name: "Foto de la factura" })).toBeVisible();
-  await expect.poll(() => psql(`SELECT count(*) FROM foto_comprobante WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM foto_comprobante WHERE usuario_id IN (${idsDe(EMAIL)})`)).toBe("1");
 });
 
 test("023-E24: sin celular emparejado no hay código QR: se elige un archivo o se vincula el celular", async ({ page }) => {

@@ -120,6 +120,15 @@
 		}
 	}
 
+	# Lo que Comercial atiende sin sesión: su salud (la mira el monitor y la aplicación, para saber
+	# si hay conexión) y las fotos de los productos (las pide el navegador, sin el token).
+	@comercialSinSesion path /health /fotos/*
+	handle @comercialSinSesion {
+		reverse_proxy comercial:8080 {
+			header_up X-Token-Servicio {$TOKEN_SERVICIO}
+		}
+	}
+
 	# Lo demás es de Comercial: la puerta pregunta quién es y qué puede, como a los otros.
 	handle {
 		forward_auth acceso:8097 {

@@ -14,7 +14,7 @@ docker compose exec -T listas-de-proveedores python -c "import urllib.request,sy
   || { echo "listas-de-proveedores /health no respondió 200"; exit 1; }
 docker compose exec -T procesos node -e "fetch('http://127.0.0.1:8090/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" \
   || { echo "procesos /health no respondió 200"; exit 1; }
-for par in auditoria:8095 tickets:8096; do
+for par in auditoria:8095 tickets:8096 acceso:8097; do
   docker compose exec -T "${par%%:*}" node -e "fetch('http://127.0.0.1:${par#*:}/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" \
     || { echo "${par%%:*} /health no respondió 200"; exit 1; }
 done

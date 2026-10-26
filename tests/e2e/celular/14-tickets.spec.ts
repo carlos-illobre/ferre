@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql, psqlTickets } = stack("celular");
+const { psqlAcceso, psqlTickets } = stack("celular");
 
 // Mejoras y errores (RF-80 y RF-81): quien usa la app avisa de un error con una captura,
 // todos lo ven en la lista, y se marca resuelto con una nota y se reabre.
@@ -17,13 +17,13 @@ test.beforeAll(() => {
   // Los tickets están en la base de Tickets, con el nombre de quien los cargó (specs/028).
   psqlTickets(`DELETE FROM tickets.ticket_foto WHERE ticket_id IN (SELECT id FROM tickets.ticket WHERE usuario_nombre = 'Tickets E2E')`);
   psqlTickets(`DELETE FROM tickets.ticket WHERE usuario_nombre = 'Tickets E2E'`);
-  psql(`DELETE FROM sesion WHERE usuario_id IN ${delUsuario}`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Tickets E2E', 'mostrador')`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN ${delUsuario}`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Tickets E2E', 'mostrador')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
 });
 
 test("avisar de un error con una captura, verlo en la lista, marcarlo resuelto y reabrirlo", async ({ page }) => {

@@ -4,7 +4,7 @@ import path from "node:path";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("escritorio");
+const { psql, psqlAcceso, idsDe } = stack("escritorio");
 
 // Happy path "cargar una lista de precios y aplicarla" (issue #12): el dueño da de alta
 // un proveedor, arrastra la muestra anonimizada de Comodo, revisa el resumen, ve la
@@ -17,14 +17,14 @@ const PROVEEDOR_RE = new RegExp(PROVEEDOR.replace(/[()]/g, "\\$&"));
 const MUESTRA = path.resolve("../../microservices/listas/tests/muestras/LISTA GENERAL PRUEBA 11-8.xlsx");
 
 test.beforeAll(() => {
-  psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`UPDATE lista_importada SET cargada_por = NULL, aplicada_por = NULL WHERE cargada_por IN (SELECT id FROM usuario WHERE email = '${EMAIL}') OR aplicada_por IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Dueño listas E2E', 'dueño')`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psql(`UPDATE lista_importada SET cargada_por = NULL, aplicada_por = NULL WHERE cargada_por IN (${idsDe(EMAIL)}) OR aplicada_por IN (${idsDe(EMAIL)})`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Dueño listas E2E', 'dueño')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   // Proveedor de prueba limpio: sin listas ni precios de corridas anteriores.
   psql(`DELETE FROM equivalencia_sugerida WHERE producto_a IN (SELECT id FROM producto WHERE proveedor_preferido_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}')) OR producto_b IN (SELECT id FROM producto WHERE proveedor_preferido_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}'))`);
   psql(`DELETE FROM precio_proveedor WHERE proveedor_id IN (SELECT id FROM proveedor WHERE nombre = '${PROVEEDOR}')`);

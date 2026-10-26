@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql, psqlAuditoria } = stack("escritorio");
+const { psql, psqlAcceso, idsDe, psqlAuditoria } = stack("escritorio");
 
 const CELULAR = false;
 
@@ -21,20 +21,20 @@ const RUTA = CELULAR ? "deposito/pedidos" : "pedidos";
 test.beforeAll(() => {
   // Limpieza en orden de dependencias: compras y pedidos del proveedor, movimientos, precios, productos, usuario.
   psql(`DELETE FROM movimiento_stock WHERE producto_id IN ('${ID_MECHA}', '${ID_DISCO}')`);
-  psql(`DELETE FROM foto_comprobante WHERE compra_id IN (SELECT id FROM compra WHERE proveedor_id = '${ID_PROV}') OR usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psql(`DELETE FROM foto_comprobante WHERE compra_id IN (SELECT id FROM compra WHERE proveedor_id = '${ID_PROV}') OR usuario_id IN (${idsDe(EMAIL)})`);
   psql(`DELETE FROM item_compra WHERE compra_id IN (SELECT id FROM compra WHERE proveedor_id = '${ID_PROV}')`);
   psql(`DELETE FROM compra WHERE proveedor_id = '${ID_PROV}'`);
   psql(`DELETE FROM pedido WHERE proveedor_id = '${ID_PROV}'`);
   psql(`DELETE FROM precio_proveedor WHERE proveedor_id = '${ID_PROV}'`);
   psql(`DELETE FROM producto WHERE id IN ('${ID_MECHA}', '${ID_DISCO}')`);
   psql(`DELETE FROM proveedor WHERE id = '${ID_PROV}'`);
-  psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL}', 'Compradora E2E')`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), '${EMAIL}', 'Compradora E2E')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   psql(`INSERT INTO proveedor (id, nombre) VALUES ('${ID_PROV}', '${PROVEEDOR}')`);
   psql(`INSERT INTO producto (id, descripcion, marca, margen_elegido) VALUES ('${ID_MECHA}', 'MECHA PEDIDOS 6 MM (E2E)', 'MARCA E2E', 100), ('${ID_DISCO}', 'DISCO PEDIDOS 115 MM (E2E)', 'MARCA E2E', 100)`);
   psql(`INSERT INTO precio_proveedor (id, producto_id, proveedor_id, codigo_proveedor, precio_lista, descuentos, costo_neto, iva, fecha_lista) VALUES (gen_random_uuid(), '${ID_MECHA}', '${ID_PROV}', 'PE-MECHA', 2000, '[]', 2000, 0.21, '2026-08-01'), (gen_random_uuid(), '${ID_DISCO}', '${ID_PROV}', 'PE-DISCO', 1000, '[]', 1000, 0.21, '2026-08-01')`);
@@ -107,5 +107,5 @@ test("armar un pedido, mandarlo, recibirlo en parte desde el ingreso y cerrarlo 
   await expect(page.getByTestId("mensaje-pedidos")).toContainText("cerrado incompleto");
   await expect(page.getByTestId("cerrados").getByTestId("pedido").filter({ hasText: PROVEEDOR })).toContainText("Cerrado incompleto");
   await expect.poll(() => psql(`SELECT estado FROM pedido WHERE proveedor_id = '${ID_PROV}'`)).toBe("cerrado_incompleto");
-  await expect.poll(() => psqlAuditoria(`SELECT string_agg(tipo, ',' ORDER BY fecha) FROM auditoria.evento WHERE tipo LIKE 'pedido.%' AND quien_id = '${psql(`SELECT id FROM usuario WHERE email = '${EMAIL}'`)}'`)).toBe("pedido.enviado,pedido.recibido,pedido.cerrado");
+  await expect.poll(() => psqlAuditoria(`SELECT string_agg(tipo, ',' ORDER BY fecha) FROM auditoria.evento WHERE tipo LIKE 'pedido.%' AND quien_id = '${psqlAcceso(`SELECT id FROM usuario WHERE email = '${EMAIL}'`)}'`)).toBe("pedido.enviado,pedido.recibido,pedido.cerrado");
 });

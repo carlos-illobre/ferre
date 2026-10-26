@@ -11,8 +11,8 @@ admin() { docker compose exec -T db psql -U postgres -d postgres -v ON_ERROR_STO
 como() { docker compose exec -T -e PGPASSWORD="$2" db psql -h 127.0.0.1 -U "$1" -d "$3" -v ON_ERROR_STOP=1 -tAc "$4"; }
 falla() { echo "$1"; exit 1; }
 
-# 022-E01: las bases del mostrador, de Procesos, de Auditoría y de Tickets, cada una con su usuario y su esquema al día.
-[[ "$(admin "SELECT string_agg(datname, ',' ORDER BY datname) FROM pg_database WHERE datname IN ('auditoria', 'mostrador', 'procesos', 'tickets')")" == "auditoria,mostrador,procesos,tickets" ]] || falla "faltan las bases auditoria, mostrador, procesos y tickets"
+# 022-E01: las bases del mostrador, de Procesos, de Auditoría, de Tickets y de Acceso, cada una con su usuario y su esquema al día.
+[[ "$(admin "SELECT string_agg(datname, ',' ORDER BY datname) FROM pg_database WHERE datname IN ('acceso', 'auditoria', 'mostrador', 'procesos', 'tickets')")" == "acceso,auditoria,mostrador,procesos,tickets" ]] || falla "faltan las bases acceso, auditoria, mostrador, procesos y tickets"
 [[ "$(como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "SELECT count(*) > 30 FROM kysely_migration")" == "t" ]] || falla "el esquema del mostrador no está al día"
 [[ "$(como procesos "$(valor CLAVE_BASE_PROCESOS)" procesos "SELECT count(*) FROM procesos.kysely_migration")" -ge 1 ]] || falla "el esquema de Procesos no está al día"
 
@@ -22,6 +22,8 @@ como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" procesos "SELECT 1" >/dev/null 2>
 como auditoria "$(valor CLAVE_BASE_AUDITORIA)" mostrador "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Auditoría abrió la base del mostrador"
 como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" auditoria "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base de Auditoría"
 como tickets "$(valor CLAVE_BASE_TICKETS)" mostrador "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Tickets abrió la base del mostrador"
+como acceso "$(valor CLAVE_BASE_ACCESO)" mostrador "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Acceso abrió la base del mostrador"
+como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" acceso "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base de Acceso"
 for base in postgres template1; do
   como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario del mostrador abrió la base $base"
   como procesos "$(valor CLAVE_BASE_PROCESOS)" "$base" "SELECT 1" >/dev/null 2>&1 && falla "el usuario de Procesos abrió la base $base"
@@ -47,9 +49,10 @@ docker compose up -d --wait --force-recreate db >/dev/null 2>&1 || falla "la bas
 como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "DELETE FROM configuracion WHERE clave = 'prueba.volumen'" >/dev/null
 docker compose up -d --wait >/dev/null 2>&1
 
-# 022-E09: en una base sin nadie, la primera persona se da de alta con el comando y recibe todos los roles.
+# 022-E09 y 029-E09: en una base sin nadie, la primera persona se da de alta con el comando, ahora en
+# Acceso, y recibe todos los roles.
 correo="primera-$RANDOM@ferre.test"
-docker compose exec -T comercial node dist/crear-usuario.js "$correo" "Primera" >/dev/null || falla "el comando no dio de alta a la primera persona"
-[[ "$(como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "SELECT (SELECT count(*) FROM usuario_rol ur JOIN usuario u ON u.id = ur.usuario_id WHERE u.email = '$correo') = (SELECT count(*) FROM rol)")" == "t" ]] || falla "la primera persona no recibió todos los roles"
-como mostrador "$(valor CLAVE_BASE_MOSTRADOR)" mostrador "DELETE FROM auditoria_bandeja WHERE evento->'contenido'->>'email' = '$correo'; DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '$correo'); DELETE FROM usuario WHERE email = '$correo'" >/dev/null
+docker compose exec -T acceso node dist/crear-usuario.js "$correo" "Primera" >/dev/null || falla "el comando no dio de alta a la primera persona"
+[[ "$(como acceso "$(valor CLAVE_BASE_ACCESO)" acceso "SELECT (SELECT count(*) FROM usuario_rol ur JOIN usuario u ON u.id = ur.usuario_id WHERE u.email = '$correo') = (SELECT count(*) FROM rol)")" == "t" ]] || falla "la primera persona no recibió todos los roles"
+como acceso "$(valor CLAVE_BASE_ACCESO)" acceso "DELETE FROM auditoria_bandeja WHERE evento->'contenido'->>'email' = '$correo'; DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '$correo'); DELETE FROM usuario WHERE email = '$correo'" >/dev/null
 exit 0

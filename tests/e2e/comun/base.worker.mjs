@@ -3,9 +3,9 @@
 import { workerData } from "node:worker_threads";
 import pg from "pg";
 
-const { puerto, aviso, mensajes } = workerData;
+const { puerto, base, clave, aviso, mensajes } = workerData;
 // Todo como texto, igual que psql: sin convertir números, fechas ni booleanos.
-const cliente = new pg.Client({ host: "127.0.0.1", port: puerto, user: "mostrador", password: process.env.CLAVE_BASE_MOSTRADOR, database: "mostrador", types: { getTypeParser: () => (v) => v } });
+const cliente = new pg.Client({ host: "127.0.0.1", port: puerto, user: base, password: clave, database: base, types: { getTypeParser: () => (v) => v } });
 const conectado = cliente.connect();
 
 const CON_CANTIDAD = new Set(["UPDATE", "DELETE", "MERGE", "COPY", "FETCH", "MOVE", "SELECT"]);

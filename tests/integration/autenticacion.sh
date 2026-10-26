@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# La API exige sesión y respeta roles. Necesita el stack: con RAPIDO=1 se
+# La API exige sesión y respeta roles; quién es cada uno lo sabe Acceso (specs/029). Necesita el stack: con RAPIDO=1 se
 # saltea (código 3). Crea un dueño y un empleado con sesiones insertadas a mano (sin
 # pasar por Google) y verifica 401, 403 y 200 donde corresponde.
 set -uo pipefail
@@ -7,27 +7,27 @@ set -uo pipefail
 cd "$(dirname "$0")/../.."
 
 API=http://localhost
-psql() { docker compose exec -T db psql -U mostrador -d mostrador -tAc "$1"; }
+psqlAcceso() { docker compose exec -T db psql -U acceso -d acceso -tAc "$1"; }
 psqlAuditoria() { docker compose exec -T db psql -U auditoria -d auditoria -tAc "$1"; }
 # Lo que le llega a Auditoría tarda un momento: se espera hasta 15 s a que la consulta dé lo esperado.
 hasta() { local r; for _ in $(seq 30); do r=$(psqlAuditoria "$2"); [[ "$r" == "$1" ]] && break; sleep 0.5; done; echo "$r"; }
 codigo() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 
 # Limpieza de corridas anteriores (en orden de dependencias).
-psql "DELETE FROM vinculacion WHERE aprobada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test') OR sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test'))" >/dev/null
-psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
-psql "UPDATE lista_importada SET cargada_por = NULL, aplicada_por = NULL WHERE cargada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test') OR aplicada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
-psql "DELETE FROM usuario WHERE email LIKE 'prueba-%@ferre.test'" >/dev/null
+psqlAcceso "DELETE FROM vinculacion WHERE aprobada_por IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test') OR sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test'))" >/dev/null
+psqlAcceso "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'prueba-%@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM usuario WHERE email LIKE 'prueba-%@ferre.test'" >/dev/null
 
-docker compose exec -T comercial node dist/crear-usuario.js prueba-dueno@ferre.test "Dueño de prueba" dueño >/dev/null || { echo "no se pudo crear el dueño"; exit 1; }
-docker compose exec -T comercial node dist/crear-usuario.js prueba-empleado@ferre.test "Empleado de prueba" mostrador >/dev/null
+docker compose exec -T acceso node dist/crear-usuario.js prueba-dueno@ferre.test "Dueño de prueba" dueño >/dev/null || { echo "no se pudo crear el dueño"; exit 1; }
+docker compose exec -T acceso node dist/crear-usuario.js prueba-empleado@ferre.test "Empleado de prueba" mostrador >/dev/null
 
 # Token conocido, guardado hasheado como hace la API.
 TOKEN_DUENO=token-de-prueba-dueno; TOKEN_EMPLEADO=token-de-prueba-empleado
 for par in "$TOKEN_DUENO prueba-dueno@ferre.test" "$TOKEN_EMPLEADO prueba-empleado@ferre.test"; do
   set -- $par
   hash=$(printf '%s' "$1" | sha256sum | cut -d' ' -f1)
-  psql "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$hash', 'prueba', now() + interval '1 day' FROM usuario WHERE email = '$2'" >/dev/null
+  psqlAcceso "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$hash', 'prueba', now() + interval '1 day' FROM usuario WHERE email = '$2'" >/dev/null
 done
 
 fallos=0
@@ -43,12 +43,16 @@ verificar "empleado no puede ver auditoría (403)"    403 "$(codigo -H "Authoriz
 verificar "dueño lista usuarios"                     200 "$(codigo -H "Authorization: Bearer $TOKEN_DUENO" $API/usuarios)"
 verificar "dueño autoriza un usuario nuevo"          201 "$(codigo -H "Authorization: Bearer $TOKEN_DUENO" -H 'Content-Type: application/json' -d '{"email":"prueba-nuevo@ferre.test","nombre":"Nuevo","roles":["00000000-0000-4000-8000-0000000000a1"]}' $API/usuarios)"
 verificar "correo repetido da 409"                   409 "$(codigo -H "Authorization: Bearer $TOKEN_DUENO" -H 'Content-Type: application/json' -d '{"email":"prueba-nuevo@ferre.test","nombre":"Nuevo","roles":["00000000-0000-4000-8000-0000000000a1"]}' $API/usuarios)"
-verificar "la auditoría registra el alta"            1   "$(hasta 1 "SELECT count(*) FROM (SELECT 1 FROM auditoria.evento WHERE tipo = 'usuario.creado' AND contenido->>'email' = 'prueba-dueno@ferre.test' ORDER BY fecha DESC LIMIT 1) x")"
+verificar "la auditoría registra el alta, de Acceso"  acceso "$(hasta acceso "SELECT servicio FROM auditoria.evento WHERE tipo = 'usuario.creado' AND contenido->>'email' = 'prueba-dueno@ferre.test' ORDER BY fecha DESC LIMIT 1")"
 verificar "login con Google sin credencial da 400"   400 "$(codigo -H 'Content-Type: application/json' -d '{}' $API/sesiones/google)"
 verificar "credencial de Google inválida da 401"     401 "$(codigo -H 'Content-Type: application/json' -d '{"credencial":"basura"}' $API/sesiones/google)"
 
 # Cerrar la sesión propia la deja sin efecto.
 verificar "cerrar sesión da 204"                     204 "$(codigo -X DELETE -H "Authorization: Bearer $TOKEN_EMPLEADO" $API/sesiones/actual)"
 verificar "sesión cerrada ya no sirve"               401 "$(codigo -H "Authorization: Bearer $TOKEN_EMPLEADO" $API/sesiones/actual)"
+# 029-E03: cerrada en Acceso, Comercial la rechaza en el pedido siguiente.
+verificar "029-E03: el dueño entra a Comercial"      200 "$(codigo -H "Authorization: Bearer $TOKEN_DUENO" $API/sectores)"
+verificar "029-E03: el dueño cierra su sesión"       204 "$(codigo -X DELETE -H "Authorization: Bearer $TOKEN_DUENO" $API/sesiones/actual)"
+verificar "029-E03: cerrada, Comercial da 401"       401 "$(codigo -H "Authorization: Bearer $TOKEN_DUENO" $API/sectores)"
 
 exit $(( fallos > 0 ))

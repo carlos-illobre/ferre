@@ -9,7 +9,7 @@ cd "$(dirname "$0")/../.."
 API=http://localhost
 valor() { grep -E "^$1=" .env | cut -d= -f2-; }
 ORIGEN=$(valor ORIGEN_WEB)
-psql() { docker compose exec -T db psql -U mostrador -d mostrador -tAc "$1"; }
+psqlAcceso() { docker compose exec -T db psql -U acceso -d acceso -tAc "$1"; }
 psqlProcesos() { docker compose exec -T db psql -U procesos -d procesos -tAc "$1"; }
 psqlAuditoria() { docker compose exec -T db psql -U auditoria -d auditoria -tAc "$1"; }
 # Lo que le llega a Auditoría tarda un momento: se espera hasta 15 s a que la consulta dé lo esperado.
@@ -21,19 +21,20 @@ verificar() { # descripción esperado real
 }
 
 # Una persona con todos los permisos y otra que solo vende, con sesiones conocidas.
-psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'puerta-%@ferre.test')" >/dev/null
-psql "DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'puerta-%@ferre.test')" >/dev/null
-psql "DELETE FROM usuario WHERE email LIKE 'puerta-%@ferre.test'" >/dev/null
-docker compose exec -T comercial node dist/crear-usuario.js puerta-duena@ferre.test "Dueña Núñez" >/dev/null || { echo "no se pudo crear la persona"; exit 1; }
-psql "INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), 'puerta-vende@ferre.test', 'Vende')" >/dev/null
+psqlAcceso "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'puerta-%@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'puerta-%@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM usuario WHERE email LIKE 'puerta-%@ferre.test'" >/dev/null
+docker compose exec -T acceso node dist/crear-usuario.js puerta-duena@ferre.test "Dueña Núñez" >/dev/null || { echo "no se pudo crear la persona"; exit 1; }
+psqlAcceso "INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), 'puerta-vende@ferre.test', 'Vende')" >/dev/null
 DUENA=token-puerta-duena; VENDE=token-puerta-vende
 for par in "$DUENA puerta-duena@ferre.test" "$VENDE puerta-vende@ferre.test"; do
   set -- $par
-  psql "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$(printf '%s' "$1" | sha256sum | cut -d' ' -f1)', 'prueba', now() + interval '1 day' FROM usuario WHERE email = '$2'" >/dev/null
+  psqlAcceso "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$(printf '%s' "$1" | sha256sum | cut -d' ' -f1)', 'prueba', now() + interval '1 day' FROM usuario WHERE email = '$2'" >/dev/null
 done
 
-# 026-E01: lo de Comercial pasa por la puerta.
-verificar "026-E01: /sesiones/actual llega a Comercial" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sesiones/actual)"
+# 026-E01: lo de Comercial pasa por la puerta; lo de las sesiones, a Acceso (029).
+verificar "026-E01: /sectores llega a Comercial" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sectores)"
+verificar "029-E01: /sesiones/actual llega a Acceso" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sesiones/actual)"
 
 # 026-E02: Procesos recibe quién es y qué puede, y anota el cambio con el nombre de la persona.
 nombre="Puerta $RANDOM"
@@ -50,6 +51,10 @@ falsas=(-H "X-Usuario-Id: alguien" -H "X-Usuario-Nombre: Falso" -H "X-Permisos: 
 verificar "seguridad: sin sesión, las cabeceras falsas no alcanzan" 401 "$(codigo "${falsas[@]}" $API/procesos)"
 verificar "seguridad: con sesión sin permiso, los permisos falsos no alcanzan" 403 "$(codigo "${falsas[@]}" -H "Authorization: Bearer $VENDE" -H 'Content-Type: application/json' -d '{"nombre":"Falso"}' $API/procesos)"
 
+# 029: lo que Comercial atiende sin sesión pasa sin preguntarle a Acceso.
+verificar "029: la salud de Comercial, sin sesión" 200 "$(codigo $API/health)"
+verificar "029: una foto de producto, sin sesión (no existe: 404, no 401)" 404 "$(codigo $API/fotos/no-existe.webp)"
+
 # 026-E04: una ruta que nadie atiende.
 verificar "026-E04: ruta inexistente, 404" 404 "$(codigo -H "Authorization: Bearer $DUENA" $API/no-existe)"
 
@@ -61,10 +66,12 @@ verificar "026-E05: el contenedor de la puerta está sano" healthy "$(docker com
 publicado() { [[ "$(docker compose port "$1" "$2" 2>/dev/null)" =~ ^(|:0)$ ]] && echo no || echo sí; }
 verificar "026-E06: Comercial no se publica" no "$(publicado comercial 8080)"
 verificar "026-E06: Procesos no se publica" no "$(publicado procesos 8090)"
+verificar "029: Acceso no se publica" no "$(publicado acceso 8097)"
 verificar "026-E06: la puerta, solo en 127.0.0.1" 1 "$(docker compose port puerta 8080 | grep -c '^127\.0\.0\.1:')"
 
 # 026-E07: desde la red interna, sin el token entre servicios, los servicios rechazan.
-verificar "026-E07: Comercial sin token, 401" 401 "$(docker compose exec -T puerta wget -S -qO- http://comercial:8080/sesiones/actual 2>&1 | grep -o 'HTTP/1.1 [0-9]*' | head -1 | cut -d' ' -f2)"
+verificar "026-E07: Comercial sin token, 401" 401 "$(docker compose exec -T puerta wget -S -qO- http://comercial:8080/sectores 2>&1 | grep -o 'HTTP/1.1 [0-9]*' | head -1 | cut -d' ' -f2)"
+verificar "029: Acceso, /sesiones/quien sin token, 401" 401 "$(docker compose exec -T puerta wget -S -qO- http://acceso:8097/sesiones/quien 2>&1 | grep -o 'HTTP/1.1 [0-9]*' | head -1 | cut -d' ' -f2)"
 verificar "026-E07: Procesos sin token, 401" 401 "$(docker compose exec -T puerta wget -S -qO- http://procesos:8090/procesos 2>&1 | grep -o 'HTTP/1.1 [0-9]*' | head -1 | cut -d' ' -f2)"
 
 # 026-E09 y 025-E09: el CORS lo atiende la puerta, para el origen de la web.
@@ -80,18 +87,18 @@ verificar "025-E09: la respuesta lleva X-Avisos" 1 "$(printf '%s\n' "$respuesta"
 # 026-E08: Procesos sin responder: la puerta lo dice con palabras y lo demás sigue andando.
 docker compose stop procesos >/dev/null 2>&1
 verificar "026-E08: Procesos caído, 502 con el aviso" '{"error":"Procesos no responde ahora. Probá de nuevo en un rato"}' "$(curl -s -H "Authorization: Bearer $DUENA" $API/procesos)"
-verificar "026-E08: Comercial sigue andando" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sesiones/actual)"
+verificar "026-E08: Comercial sigue andando" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sectores)"
 docker compose start procesos >/dev/null 2>&1
 docker compose up -d --wait >/dev/null 2>&1
 
 # Comercial sin responder: la puerta corta la conexión, como si no hubiera red (la aplicación sigue
 # con lo que tiene en el dispositivo), en vez de contestar un error.
 docker compose stop comercial >/dev/null 2>&1
-curl -s -o /dev/null "http://127.0.0.1:$(valor PUERTO_API)/sesiones/actual"; corte=$?
+curl -s -o /dev/null -H "Authorization: Bearer $DUENA" "http://127.0.0.1:$(valor PUERTO_API)/sectores"; corte=$?
 verificar "026: Comercial caído, la puerta corta la conexión (sin respuesta)" si "$([[ $corte -eq 52 || $corte -eq 56 ]] && echo si || echo "no ($corte)")"
 # El proxy de adelante (el de la máquina, o el de desarrollo) contesta 502 sin CORS: para el
 # navegador es una falla de red.
-verificar "026: Comercial caído, lo que llega al navegador no lleva CORS" 0 "$(curl -s -o /dev/null -D - -H "Origin: $ORIGEN" $API/sesiones/actual | grep -ic '^access-control-allow-origin:')"
+verificar "026: Comercial caído, lo que llega al navegador no lleva CORS" 0 "$(curl -s -o /dev/null -D - -H "Authorization: Bearer $DUENA" -H "Origin: $ORIGEN" $API/sectores | grep -ic '^access-control-allow-origin:')"
 docker compose start comercial >/dev/null 2>&1
 docker compose up -d --wait >/dev/null 2>&1
 

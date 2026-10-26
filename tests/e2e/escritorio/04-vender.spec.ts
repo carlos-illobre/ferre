@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("escritorio");
+const { psql, psqlAcceso, idsDe } = stack("escritorio");
 
 // Happy path "buscar un producto y registrar una venta" (issue #15): el empleado busca,
 // agrega con Enter, cambia la cantidad, elige cómo paga y cobra. La venta queda con el
@@ -18,21 +18,21 @@ const ID_TORNILLO = "00000000-0000-0000-0000-00000000e2e7";
 test.beforeAll(() => {
   // Los cambios de una corrida anterior (019): su plata, sus renglones y ellos, antes que los renglones de la venta.
   psql(`WITH c AS (SELECT DISTINCT cambio_id FROM cambio_renglon WHERE producto_id IN ('${ID_MECHA}', '${ID_TORNILLO}')), m AS (DELETE FROM movimiento_dinero WHERE cambio_id IN (SELECT cambio_id FROM c)), r AS (DELETE FROM cambio_renglon WHERE cambio_id IN (SELECT cambio_id FROM c)) DELETE FROM cambio WHERE id IN (SELECT cambio_id FROM c)`);
-  psql(`DELETE FROM anomalia WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psql(`DELETE FROM anomalia WHERE usuario_id IN (${idsDe(EMAIL)})`);
   // La prueba del atajo abre «Vincular el celular», que deja un código pedido por esa sesión: se borra antes que ella.
-  psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
-  psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psqlAcceso(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
   // La corrección de la corrida anterior (019): su plata, la marca en los renglones quitados y ella.
-  const suyas = `SELECT id FROM correccion_venta WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`;
-  psql(`DELETE FROM movimiento_dinero WHERE correccion_id IN (${suyas}) OR usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  const suyas = `SELECT id FROM correccion_venta WHERE usuario_id IN (${idsDe(EMAIL)})`;
+  psql(`DELETE FROM movimiento_dinero WHERE correccion_id IN (${suyas}) OR usuario_id IN (${idsDe(EMAIL)})`);
   psql(`UPDATE item_venta SET quitado_por = NULL WHERE quitado_por IN (${suyas})`);
   psql(`DELETE FROM correccion_venta WHERE id IN (${suyas})`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Mostrador vender E2E', 'mostrador')`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Mostrador vender E2E', 'mostrador')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   psql(`DELETE FROM anomalia WHERE producto_id IN ('${ID_MECHA}', '${ID_TORNILLO}')`);
   psql(`DELETE FROM movimiento_stock WHERE producto_id IN ('${ID_MECHA}', '${ID_TORNILLO}')`);
   psql(`DELETE FROM item_venta WHERE producto_id IN ('${ID_MECHA}', '${ID_TORNILLO}')`);
@@ -125,8 +125,8 @@ test("buscar, agregar, cobrar en efectivo, ver la venta del día, corregirla y a
   await page.keyboard.press("Control+Enter");
   await expect(page.getByTestId("mensaje")).toContainText("Corrección guardada");
   await expect(ultima).toContainText("corregida");
-  await expect.poll(() => psql(`SELECT count(*) FROM correccion_venta WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
-  await expect.poll(() => psql(`SELECT count(*) FROM movimiento_dinero WHERE tipo = 'cobro_diferencia' AND medio_pago = 'efectivo' AND usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM correccion_venta WHERE usuario_id IN (${idsDe(EMAIL)})`)).toBe("1");
+  await expect.poll(() => psql(`SELECT count(*) FROM movimiento_dinero WHERE tipo = 'cobro_diferencia' AND medio_pago = 'efectivo' AND usuario_id IN (${idsDe(EMAIL)})`)).toBe("1");
   await expect.poll(() => psql(`SELECT sum(cantidad) FROM movimiento_stock WHERE producto_id = '${ID_MECHA}'`)).toBe("6.000");
   await panel.getByTestId("anular").click();
   await expect(page.getByTestId("confirmar-anular")).toContainText("−$");

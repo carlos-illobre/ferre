@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { API, psql, psqlProcesos, psqlAuditoria } = stack("escritorio");
+const { API, psqlAcceso, psqlProcesos, psqlAuditoria } = stack("escritorio");
 
 const VENTA = readFileSync("../../microservices/procesos/web/src/modelo/ejemplos/venta.bpmn", "utf8");
 
@@ -18,13 +18,13 @@ const ROL_LECTOR = "00000000-0000-4000-9000-0000000000e1";
 
 function crearUsuario(email: string, token: string, roles: string) {
   const id = `(SELECT id FROM usuario WHERE email = '${email}')`;
-  psql(`DELETE FROM sesion WHERE usuario_id IN ${id}`);
-  psql(`DELETE FROM usuario_rol WHERE usuario_id IN ${id}`);
-  psql(`DELETE FROM usuario WHERE email = '${email}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${email}', 'Procesos E2E', 'mostrador')`);
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE ${roles} AND u.email = '${email}'`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN ${id}`);
+  psqlAcceso(`DELETE FROM usuario_rol WHERE usuario_id IN ${id}`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${email}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${email}', 'Procesos E2E', 'mostrador')`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE ${roles} AND u.email = '${email}'`);
   const hash = createHash("sha256").update(token).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${email}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${email}'`);
 }
 
 test.beforeAll(() => {
@@ -32,9 +32,9 @@ test.beforeAll(() => {
   psqlProcesos("DELETE FROM procesos.proceso");
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
   crearUsuario(EMAIL, TOKEN, "r.id::text LIKE '00000000-0000-4000-8000-%'");
-  psql(`DELETE FROM rol_permiso WHERE rol_id = '${ROL_LECTOR}'`);
-  psql(`INSERT INTO rol (id, nombre, descripcion) VALUES ('${ROL_LECTOR}', 'Lector de procesos E2E', 'Solo mira procesos') ON CONFLICT (id) DO NOTHING`);
-  psql(`INSERT INTO rol_permiso (rol_id, permiso) VALUES ('${ROL_LECTOR}', 'procesos.ver') ON CONFLICT DO NOTHING`);
+  psqlAcceso(`DELETE FROM rol_permiso WHERE rol_id = '${ROL_LECTOR}'`);
+  psqlAcceso(`INSERT INTO rol (id, nombre, descripcion) VALUES ('${ROL_LECTOR}', 'Lector de procesos E2E', 'Solo mira procesos') ON CONFLICT (id) DO NOTHING`);
+  psqlAcceso(`INSERT INTO rol_permiso (rol_id, permiso) VALUES ('${ROL_LECTOR}', 'procesos.ver') ON CONFLICT DO NOTHING`);
   crearUsuario(EMAIL_LECTOR, TOKEN_LECTOR, `r.id = '${ROL_LECTOR}'`);
 });
 
@@ -127,7 +127,7 @@ test("011-E02 011-E04 011-E05 011-E09 011-E10 011-E13 011-E14 011-E15 011-E22 di
   await page.getByTestId("procesos-marcar-vigente").click();
   await expect(page.getByTestId("procesos-estado")).toHaveText("Vigente");
   // Lo anota Procesos en su base, con quién lo hizo (026-E10).
-  const quien = psql(`SELECT id FROM usuario WHERE email = '${EMAIL}'`);
+  const quien = psqlAcceso(`SELECT id FROM usuario WHERE email = '${EMAIL}'`);
   await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE quien_id = '${quien}' AND tipo = 'proceso.vigente'`)).toBe("1");
 });
 
@@ -181,8 +181,8 @@ test("011-E37 011-E38 quien solo puede ver mira el vigente sin poder cambiarlo; 
   for (const id of ["procesos-panel-figuras", "procesos-importar", "procesos-exportar", "procesos-nuevo"]) await expect(page.getByTestId(id)).toHaveCount(0);
   await expect(page.locator(".djs-context-pad")).toHaveCount(0);
 
-  psql(`DELETE FROM rol_permiso WHERE rol_id = '${ROL_LECTOR}' AND permiso = 'procesos.ver'`);
-  psql(`INSERT INTO rol_permiso (rol_id, permiso) VALUES ('${ROL_LECTOR}', 'ventas.ver')`);
+  psqlAcceso(`DELETE FROM rol_permiso WHERE rol_id = '${ROL_LECTOR}' AND permiso = 'procesos.ver'`);
+  psqlAcceso(`INSERT INTO rol_permiso (rol_id, permiso) VALUES ('${ROL_LECTOR}', 'ventas.ver')`);
   await page.goto("/#/mas");
   await page.reload();
   await expect(page.getByTestId("mas")).toBeVisible();

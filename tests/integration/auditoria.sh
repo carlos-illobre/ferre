@@ -9,6 +9,7 @@ cd "$(dirname "$0")/../.."
 
 API=http://localhost
 psql() { docker compose exec -T db psql -U mostrador -d mostrador -tAc "$1"; }
+psqlAcceso() { docker compose exec -T db psql -U acceso -d acceso -tAc "$1"; }
 psqlAuditoria() { docker compose exec -T db psql -U auditoria -d auditoria -tAc "$1"; }
 codigo() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
 # Lo que le llega a Auditoría tarda: se espera hasta $3 segundos (15 si no se dice) a que la consulta dé lo esperado.
@@ -21,17 +22,17 @@ verificar() { # descripción esperado real
 }
 
 # Una persona con todos los permisos y otra que solo vende, con sesiones conocidas.
-psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'auditoria-%@ferre.test')" >/dev/null
-psql "DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'auditoria-%@ferre.test')" >/dev/null
-psql "DELETE FROM usuario WHERE email LIKE 'auditoria-%@ferre.test'" >/dev/null
-docker compose exec -T comercial node dist/crear-usuario.js auditoria-duena@ferre.test "Dueña Auditoría" >/dev/null || { echo "no se pudo crear la persona"; exit 1; }
-psql "INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), 'auditoria-vende@ferre.test', 'Vende')" >/dev/null
+psqlAcceso "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'auditoria-%@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM usuario_rol WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'auditoria-%@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM usuario WHERE email LIKE 'auditoria-%@ferre.test'" >/dev/null
+docker compose exec -T acceso node dist/crear-usuario.js auditoria-duena@ferre.test "Dueña Auditoría" >/dev/null || { echo "no se pudo crear la persona"; exit 1; }
+psqlAcceso "INSERT INTO usuario (id, email, nombre) VALUES (gen_random_uuid(), 'auditoria-vende@ferre.test', 'Vende')" >/dev/null
 DUENA=token-auditoria-duena; VENDE=token-auditoria-vende
 for par in "$DUENA auditoria-duena@ferre.test" "$VENDE auditoria-vende@ferre.test"; do
   set -- $par
-  psql "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$(printf '%s' "$1" | sha256sum | cut -d' ' -f1)', 'prueba', now() + interval '1 day' FROM usuario WHERE email = '$2'" >/dev/null
+  psqlAcceso "INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '$(printf '%s' "$1" | sha256sum | cut -d' ' -f1)', 'prueba', now() + interval '1 day' FROM usuario WHERE email = '$2'" >/dev/null
 done
-QUIEN=$(psql "SELECT id FROM usuario WHERE email = 'auditoria-duena@ferre.test'")
+QUIEN=$(psqlAcceso "SELECT id FROM usuario WHERE email = 'auditoria-duena@ferre.test'")
 
 # 027-E06: con Auditoría caída se vende igual; el evento espera en la bandeja de Comercial y llega cuando vuelve.
 docker compose stop auditoria >/dev/null 2>&1
@@ -75,7 +76,7 @@ verificar "027-E03: ni los grupos" 403 "$(codigo -H "Authorization: Bearer $VEND
 # RNF-74: la puerta arranca y Comercial atiende aunque Auditoría no esté.
 docker compose stop auditoria >/dev/null 2>&1
 docker compose up -d --wait --force-recreate --no-deps puerta >/dev/null 2>&1
-verificar "RNF-74: sin Auditoría, la puerta arranca y Comercial atiende" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sesiones/actual)"
+verificar "RNF-74: sin Auditoría, la puerta arranca y Comercial atiende" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sectores)"
 
 # 027-E09: con AUDITORIA_URL vacía en el .env, Comercial funciona igual y no anota nada.
 AUDITORIA_URL= docker compose up -d --wait --force-recreate --no-deps comercial >/dev/null 2>&1
@@ -85,7 +86,7 @@ verificar "027-E09: apagada, no anota nada" 0 "$(psql "SELECT count(*) FROM audi
 docker compose up -d --wait auditoria >/dev/null 2>&1
 docker compose up -d --wait --force-recreate --no-deps comercial >/dev/null 2>&1
 
-psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'auditoria-%@ferre.test')" >/dev/null
+psqlAcceso "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'auditoria-%@ferre.test')" >/dev/null
 psql "DELETE FROM item_venta WHERE venta_id = '$APAGADA'; DELETE FROM venta WHERE id = '$APAGADA'" >/dev/null
 psql "DELETE FROM item_venta WHERE venta_id = '$VENTA'; DELETE FROM venta WHERE id = '$VENTA'" >/dev/null
 [[ $fallos -eq 0 ]]

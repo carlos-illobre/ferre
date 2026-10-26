@@ -4,7 +4,7 @@ import { stack } from "../comun/stack";
 import { cerrarLasOtrasVentanas, otraVentana } from "../comun/ventanas";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql, psqlAuditoria } = stack("celular");
+const { psql, psqlAcceso, idsDe, psqlAuditoria } = stack("celular");
 
 // Sin sesión se ve el login; con una sesión válida en el dispositivo, la app entra
 // directo y el dueño ve la administración. La sesión se siembra en la base sin pasar
@@ -14,19 +14,18 @@ const EMAIL = "e2e-dueno@ferre.test";
 
 test.beforeAll(() => {
   // Si una corrida anterior se cortó puede haber quedado una huella vinculada.
-  psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM vinculacion`);
+  psqlAcceso(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psqlAcceso(`DELETE FROM vinculacion`);
   // El emparejamiento que deja la entrada con el celular, y la foto que se manda con él.
-  psql(`DELETE FROM codigo_escaneado WHERE puesto_id IN (SELECT id FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')))`);
-  psql(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')) OR celular_sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
-  psql(`DELETE FROM foto_comprobante WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Dueño E2E', 'dueño')`);
+  psqlAcceso(`DELETE FROM puesto WHERE sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')) OR celular_sesion_id IN (SELECT id FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}'))`);
+  psql(`DELETE FROM foto_comprobante WHERE usuario_id IN (${idsDe(EMAIL)})`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Dueño E2E', 'dueño')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
 });
 
 test.afterEach(cerrarLasOtrasVentanas);
@@ -57,7 +56,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   const { authenticatorId } = await cdp.send("WebAuthn.addVirtualAuthenticator", {
     options: { protocol: "ctap2", transport: "internal", hasResidentKey: true, hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true },
   });
-  psql(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psqlAcceso(`DELETE FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
 
   // Recién entrado con Google (Google no se automatiza: se siembra la sesión y la marca),
   // la app ofrece usar la huella, como en el banco, solo en un celular: se simula el
@@ -85,7 +84,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await page.getByTestId("vincular-celular").click();
   await expect(page.getByTestId("mensaje-celular")).toContainText("«Celular E2E» entra con la huella");
   await expect(page.getByTestId("celular")).toContainText("Celular E2E");
-  await expect.poll(() => psql(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
+  await expect.poll(() => psqlAcceso(`SELECT count(*) FROM credencial WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}') AND revocada_en IS NULL`)).toBe("1");
 
   // Salir y entrar con la huella: sin Google.
   await page.getByRole("button", { name: "Más", exact: true }).click();
@@ -96,7 +95,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
   await expect(page.getByTestId("menu-catalogo")).toHaveAttribute("aria-current", "page");
   await page.getByRole("button", { name: "Más", exact: true }).click();
   await expect(page.getByTestId("usuario")).toContainText("Dueño E2E");
-  await expect.poll(() => psqlAuditoria(`SELECT contenido->>'medio' FROM auditoria.evento WHERE tipo = 'sesion.iniciada' AND quien_id = '${psql(`SELECT id FROM usuario WHERE email = '${EMAIL}'`)}' ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
+  await expect.poll(() => psqlAuditoria(`SELECT contenido->>'medio' FROM auditoria.evento WHERE tipo = 'sesion.iniciada' AND quien_id = '${psqlAcceso(`SELECT id FROM usuario WHERE email = '${EMAIL}'`)}' ORDER BY fecha DESC LIMIT 1`)).toBe("huella");
 
   // Quitar el celular: ya no entra con la huella.
   await page.goto("/#/mas/configuracion");
@@ -114,7 +113,7 @@ test("vincular el celular con la huella y volver a entrar con ella", async ({ pa
 test("entrar a la computadora leyendo su código con el celular", async ({ browser }) => {
   // Una sesión propia para el celular: las otras pruebas de este archivo cierran la suya.
   const TOKEN_CELULAR = "token-e2e-login-celular";
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}', 'e2e celular', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}', 'e2e celular', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   const compu = await otraVentana(browser, { viewport: { width: 1366, height: 768 } });
   await compu.goto("/");
   await expect(compu.getByRole("heading", { name: "Entrá con tu celular" })).toBeVisible();
@@ -140,10 +139,10 @@ test("entrar a la computadora leyendo su código con el celular", async ({ brows
   // El celular sigue a su pantalla de siempre y lo dice arriba un momento (pedido de Carlos del 2026-10-15).
   await expect(celular.getByTestId("espejo-aviso")).toContainText("Listo: la computadora entró como");
   await expect(compu.getByTestId("usuario")).toContainText("Dueño E2E", { timeout: 10000 });
-  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'sesion.iniciada' AND contenido->>'medio' = 'celular' AND quien_id = '${psql(`SELECT id FROM usuario WHERE email = '${EMAIL}'`)}'`)).toBe("1");
+  await expect.poll(() => psqlAuditoria(`SELECT count(*) FROM auditoria.evento WHERE tipo = 'sesion.iniciada' AND contenido->>'medio' = 'celular' AND quien_id = '${psqlAcceso(`SELECT id FROM usuario WHERE email = '${EMAIL}'`)}'`)).toBe("1");
 
   // Quedan emparejados (decisión 58): sin leer más códigos, la computadora ya tiene su celular…
-  await expect.poll(() => psql(`SELECT count(*) FROM puesto WHERE vinculado_en IS NOT NULL AND expira_en > now() + interval '29 days' AND celular_sesion_id = (SELECT id FROM sesion WHERE token_hash = '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}')`), { timeout: 15000 }).toBe("1");
+  await expect.poll(() => psqlAcceso(`SELECT count(*) FROM puesto WHERE vinculado_en IS NOT NULL AND expira_en > now() + interval '29 days' AND celular_sesion_id = (SELECT id FROM sesion WHERE token_hash = '${createHash("sha256").update(TOKEN_CELULAR).digest("hex")}')`), { timeout: 15000 }).toBe("1");
   // …y se espejan enseguida, sin recargar la computadora (antes quedaba «Conectando con el celular…», 007-T020).
   await expect(compu.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "directa", { timeout: 15000 });
   await compu.goto("/#/vender");

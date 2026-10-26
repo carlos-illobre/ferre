@@ -13,7 +13,9 @@ export type Interfaz = "escritorio" | "celular";
 const RAIZ = fileURLToPath(new URL("../../../", import.meta.url));
 const conexiones = new Map<string, (sql: string) => string>();
 
-export function stack(interfaz: Interfaz): { API: string; psql: (sql: string) => string; psqlProcesos: (sql: string) => string; psqlAuditoria: (sql: string) => string; psqlTickets: (sql: string) => string } {
+type Consulta = (sql: string) => string;
+
+export function stack(interfaz: Interfaz): { API: string; psql: Consulta; psqlAcceso: Consulta; idsDe: (email: string) => string; psqlProcesos: Consulta; psqlAuditoria: Consulta; psqlTickets: Consulta } {
   const propio = interfaz === "celular" && process.env.E2E_CELULAR_COMPOSE;
   const compose = ["compose", ...(propio ? process.env.E2E_CELULAR_COMPOSE!.split(" ").filter(Boolean) : [])];
   const API = propio ? process.env.E2E_CELULAR_API! : (process.env.API_URL ?? "http://localhost");
@@ -24,36 +26,41 @@ export function stack(interfaz: Interfaz): { API: string; psql: (sql: string) =>
   const psqlAuditoria = (sql: string) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "auditoria", "-d", "auditoria", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
   // Los tickets están en la base de Tickets (specs/028).
   const psqlTickets = (sql: string) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "tickets", "-d", "tickets", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
-  return { API, psql: (sql) => conexion(compose)(sql), psqlProcesos, psqlAuditoria, psqlTickets };
+  // Las personas y sus sesiones están en la base de Acceso (specs/029): ahí se siembran.
+  const psqlAcceso: Consulta = (sql) => conexion(compose, "acceso", process.env.CLAVE_BASE_ACCESO)(sql);
+  // Lo que Comercial guarda de una persona es solo su identificador: para buscar lo suyo por correo,
+  // la lista de sus identificadores (o NULL, que no encuentra nada).
+  const idsDe = (email: string) => psqlAcceso(`SELECT coalesce(string_agg(quote_literal(id::text), ','), 'NULL') FROM usuario WHERE email = '${email}'`);
+  return { API, psql: (sql) => conexion(compose, "mostrador", process.env.CLAVE_BASE_MOSTRADOR)(sql), psqlAcceso, idsDe, psqlProcesos, psqlAuditoria, psqlTickets };
 }
 
 // Una consulta como `psql -tA`: filas con las columnas separadas por «|» y, en lo que no es
 // SELECT, la etiqueta del comando. Va por una sola conexión abierta durante toda la corrida
 // (abrir `psql` en el contenedor por cada consulta costaba 0,2 s, y son cientos).
-function conexion(compose: string[]): (sql: string) => string {
-  const clave = compose.join(" ");
-  let consultar = conexiones.get(clave);
+function conexion(compose: string[], base: string, clave: string | undefined): Consulta {
+  const cual = `${compose.join(" ")} ${base}`;
+  let consultar = conexiones.get(cual);
   if (!consultar) {
-    consultar = conectar(compose);
-    conexiones.set(clave, consultar);
+    consultar = conectar(compose, base, clave);
+    conexiones.set(cual, consultar);
   }
   return consultar;
 }
 
-function conectar(compose: string[]): (sql: string) => string {
+function conectar(compose: string[], base: string, clave: string | undefined): Consulta {
   // El puerto en el que este compose publica su base: así se llega a esa base y no a otra
   // que esté escuchando en la máquina.
   let puerto = "";
   try { puerto = execFileSync("docker", [...compose, "port", "db", "5432"], { cwd: RAIZ, encoding: "utf8" }).trim().split("\n")[0]!.split(":").pop() ?? ""; } catch { /* sin puerto publicado */ }
   if (!puerto) {
     // La base no está publicada (sin puerto publicado): por el contenedor.
-    return (sql) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", "mostrador", "-d", "mostrador", "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
+    return (sql) => execFileSync("docker", [...compose, "exec", "-T", "db", "psql", "-U", base, "-d", base, "-tAc", sql], { cwd: RAIZ, encoding: "utf8" }).trim();
   }
   // El cliente de PostgreSQL es asíncrono y las pruebas consultan de forma sincrónica: la
   // consulta va a un hilo aparte y este espera su respuesta.
   const aviso = new Int32Array(new SharedArrayBuffer(4));
   const { port1: aca, port2: alla } = new MessageChannel();
-  const hilo = new Worker(new URL("./base.worker.mjs", import.meta.url), { workerData: { puerto: Number(puerto), aviso, mensajes: alla }, transferList: [alla] });
+  const hilo = new Worker(new URL("./base.worker.mjs", import.meta.url), { workerData: { puerto: Number(puerto), base, clave, aviso, mensajes: alla }, transferList: [alla] });
   hilo.unref();
   return (sql) => {
     Atomics.store(aviso, 0, 0);

@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { stack } from "../comun/stack";
 
 // La API y la base del stack de esta interfaz (comun/stack.ts).
-const { psql } = stack("celular");
+const { psql, psqlAcceso, idsDe } = stack("celular");
 
 // Un mismo artículo en dos proveedores (issue #29): dos productos con el mismo código de
 // barras aparecen como sugerencia, el dueño los une, y en Productos el producto muestra
@@ -16,14 +16,14 @@ const ID_A = "00000000-0000-0000-0000-00000000e2f7";
 const ID_B = "00000000-0000-0000-0000-00000000e2f8";
 
 test.beforeAll(() => {
-  psql(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`UPDATE equivalencia_sugerida SET resuelto_por = NULL WHERE resuelto_por IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
-  psql(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
-  psql(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Dueño duplicados E2E', 'dueño')`);
+  psqlAcceso(`DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email = '${EMAIL}')`);
+  psql(`UPDATE equivalencia_sugerida SET resuelto_por = NULL WHERE resuelto_por IN (${idsDe(EMAIL)})`);
+  psqlAcceso(`DELETE FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario (id, email, nombre, rol) VALUES (gen_random_uuid(), '${EMAIL}', 'Dueño duplicados E2E', 'dueño')`);
   // Los usuarios de prueba pueden todo: reciben los cinco roles de arranque (RF-72).
-  psql(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO usuario_rol (usuario_id, rol_id) SELECT u.id, r.id FROM usuario u CROSS JOIN rol r WHERE r.id::text LIKE '00000000-0000-4000-8000-%' AND u.email = '${EMAIL}'`);
   const hash = createHash("sha256").update(TOKEN).digest("hex");
-  psql(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
+  psqlAcceso(`INSERT INTO sesion (id, usuario_id, token_hash, dispositivo, expira_en) SELECT gen_random_uuid(), id, '${hash}', 'e2e', now() + interval '1 day' FROM usuario WHERE email = '${EMAIL}'`);
   psql(`DELETE FROM equivalencia_sugerida WHERE producto_a IN ('${ID_A}', '${ID_B}') OR producto_b IN ('${ID_A}', '${ID_B}')`);
   psql(`DELETE FROM movimiento_stock WHERE producto_id IN ('${ID_A}', '${ID_B}')`);
   psql(`DELETE FROM item_venta WHERE producto_id IN ('${ID_A}', '${ID_B}')`);
