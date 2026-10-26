@@ -7,4 +7,5 @@
 - [x] T005 La puerta reparte `/tickets` a Tickets; compose, `CLAVE_BASE_TICKETS`, CI y la web toma el contrato de Tickets (E06) (depende de T003)
 - [x] T006 Integración `tests/integration/tickets.sh` y e2e en Docker (depende de T004, T005)
 - [x] T007 Documentación y `proyecto/estado.yml` (depende de T006)
-- [ ] T008 Revisión independiente (paso 7) (depende de T007)
+- [x] T008 Revisión independiente (paso 7) (depende de T007)
+- [x] T009 [arreglo] Lo de la revisión: el error interno con palabras, resolver sin JSON como antes, la prueba de rutas a otras carpetas y el mensaje del tope

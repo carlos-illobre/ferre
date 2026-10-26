@@ -65,3 +65,11 @@ El mostrador sigue vendiendo sin conexión con el servidor caído.
 ## Referencias
 
 ADR-002, ADR-013, ADR-019, ADR-023, ADR-025. Decisiones 150 y 151.
+
+---
+
+## Enmienda (specs/027 y 028)
+
+Las bases ya no son solo `mostrador` y `procesos`: se suman `auditoria` (027) y `tickets` (028).
+Cada base y su usuario aparecen solos al agregar su `CLAVE_BASE_<SERVICIO>` al `.env`
+(`microservices/base-de-datos/asegurar.sh`), también en un ambiente que ya existe.

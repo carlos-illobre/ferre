@@ -31,14 +31,21 @@ en un volumen propio (`tickets-fotos`), y sus eventos por el kit de auditoría.
   Tickets no consulta a otro servicio.
 - **Los eventos** (`ticket.creado`, `ticket.resuelto`, `ticket.reabierto`) van por el kit, en la
   transacción de cada acción, con sus palabras en las reglas de Tickets (grupo «Mejoras y
-  errores»). Sale de Comercial lo de tickets en `en-palabras.ts`.
+  errores»): «Pedido de mejora o error» con el detalle «Error · 2 fotos» (o «Mejora»), «… resuelto»
+  con la nota de la resolución como detalle, y «… reabierto» sin detalle. La descripción no va
+  en el evento. Sale de Comercial lo de tickets en `en-palabras.ts`.
+- **Diferencias con Comercial que la web no ve:** un id que no es uuid al resolver o reabrir da
+  409 (antes, un error interno); un formulario que no se puede leer da 400. Un error inesperado se
+  dice con las mismas palabras que Comercial. Resolver con un cuerpo que no es JSON resuelve sin
+  nota, como antes.
 - **Las fotos** se guardan en el disco antes de confirmar la transacción del ticket; si la
   transacción falla, quedan sueltas sin que nadie las nombre (como hoy).
 - **Arranca vacío** (Carlos): Comercial borra `ticket` y `ticket_foto` y sus tipos; las fotos
   viejas de la carpeta de Comercial se borran a mano en la máquina (no hay SQL para eso).
 
 **La puerta** reparte `/tickets` y `/tickets/*` a Tickets, preguntando quién es, con un tope de
-60 MB por pedido (5 fotos de hasta 10 MB y el texto). Si Tickets no responde, la puerta corta la
+60 MB por pedido (5 fotos de hasta 10 MB y el texto); el servicio, además, corta a los 55 MB con
+«El ticket pesa demasiado: son hasta 5 fotos de 10 MB». Si Tickets no responde, la puerta corta la
 conexión, como con Comercial: la web lo toma como sin conexión y guarda el ticket para mandarlo
 después (E06).
 

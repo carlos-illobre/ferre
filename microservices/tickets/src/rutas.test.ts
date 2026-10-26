@@ -2,7 +2,7 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { sql } from "kysely";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { crearApp } from "./rutas.js";
 import { crearReglas } from "./reglas.js";
 import { crearBandeja } from "./persistencia/auditoria.js";
@@ -46,7 +46,8 @@ describe("los tickets por sus rutas", () => {
     const foto = await pedir(t.fotos[0]!);
     expect(foto.status).toBe(200);
     expect(foto.headers.get("Content-Type")).toBe("image/png");
-    expect((await pedir("/tickets/fotos/../../etc/passwd")).status).toBe(404);
+    // Una ruta a otra carpeta, codificada para que llegue tal cual: el nombre no pasa la validación.
+    expect((await pedir("/tickets/fotos/..%2F..%2Fetc%2Fpasswd")).status).toBe(404);
     expect((await pedir(`/tickets/fotos/${crypto.randomUUID()}.webp`)).status).toBe(404);
     expect((await eventos()).at(-1)).toMatchObject({ tipo: "ticket.creado", titulo: "Pedido de mejora o error", detalle: "Mejora · 1 foto", grupo: "Mejoras y errores", quien: { id: "u-ana", nombre: "Ana Núñez" }, referencias: [{ cosa: "ticket", id }] });
   });
@@ -78,7 +79,6 @@ describe("los tickets por sus rutas", () => {
     await pedir("/tickets", { method: "POST", body: formulario({ id, tipo: "error", descripcion: "Se cuelga" }) });
     const json = { "Content-Type": "application/json" };
     expect((await pedir(`/tickets/${id}/resolver`, { method: "POST", headers: json, body: JSON.stringify({ nota: 5 }) })).status).toBe(400);
-    expect((await pedir(`/tickets/${id}/resolver`, { method: "POST", headers: json, body: "no es json" })).status).toBe(400);
     expect((await pedir(`/tickets/${id}/resolver`, { method: "POST", headers: json, body: JSON.stringify({ nota: "  Listo  " }) })).status).toBe(204);
     expect((await pedir(`/tickets/${id}/resolver`, { method: "POST", headers: json, body: JSON.stringify({}) })).status).toBe(409);
     expect((await eventos()).at(-1)).toMatchObject({ tipo: "ticket.resuelto", detalle: "Listo" });
@@ -88,6 +88,17 @@ describe("los tickets por sus rutas", () => {
     expect((await pedir("/tickets/no-es-uuid/reabrir", { method: "POST" })).status).toBe(409);
     expect((await pedir("/tickets/no-es-uuid/resolver", { method: "POST", headers: json, body: "{}" })).status).toBe(409);
     expect((await eventos()).at(-1)).toMatchObject({ tipo: "ticket.reabierto", detalle: null });
+  });
+
+  it("resolver con un cuerpo que no es JSON resuelve sin nota, como antes; un error inesperado se dice con palabras", async () => {
+    const id = crypto.randomUUID();
+    await pedir("/tickets", { method: "POST", body: formulario({ id, tipo: "error", descripcion: "Se cuelga" }) });
+    expect((await pedir(`/tickets/${id}/resolver`, { method: "POST", body: "no es json" })).status).toBe(204);
+    expect((await (await pedir("/tickets")).json() as { id: string; nota: string | null }[]).find((t) => t.id === id)!.nota).toBeNull();
+    const roto = crearApp({ reglas: { ultimos: () => { throw new Error("se rompió"); } } as never, token: TOKEN });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const r = await roto.request("/tickets", { headers: persona });
+    expect([r.status, await r.json()]).toEqual([500, { error: "Algo falló en el servidor. Probá de nuevo; si sigue, avisale al dueño." }]);
   });
 
   it("028-E07: sin el token o sin quién es la persona, no atiende; la salud sí", async () => {
