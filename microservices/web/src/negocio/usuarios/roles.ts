@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../datos/conexion";
-import type { PermisoDelSistema, Rol, RolNuevo } from "@servidor/usuarios";
+import type { PermisoDelSistema, Rol, RolNuevo } from "@acceso/usuarios";
 
 // Roles (RF-75): cada rol es un nombre y un grupo de permisos. Los permisos son fijos y los trae
 // el servidor, cada uno con su explicación. Lo mismo en el celular y en la computadora.

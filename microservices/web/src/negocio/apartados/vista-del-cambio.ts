@@ -1,6 +1,6 @@
 import { productoEnMemoria } from "../catalogo";
 import { conUnidad } from "../catalogo";
-import type { CambioApartado } from "@servidor/apartados";
+import type { CambioApartado } from "@acceso/apartados";
 import { cantidadDe, conMinuscula, cuerpo, importeDe, medioDe, nombreCorto, productoDe, unidadDelProducto, unidadDelRecurso, type Ajuste, type UnidadDe, type Venta } from "./cuerpos";
 import { describir } from "./describir";
 import { diaCorto, hora, primerNombre } from "./fechas";

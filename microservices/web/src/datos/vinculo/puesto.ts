@@ -1,5 +1,5 @@
 import { api } from "../conexion";
-import type { VinculoDeLaSesion, VinculosDeLaSesion } from "@servidor/puestos";
+import type { VinculoDeLaSesion, VinculosDeLaSesion } from "@acceso/puestos";
 import { deEsteAmbiente } from "../../plataforma/ambiente";
 
 // Emparejamiento computadora–celular (issue #52, decisión 58). La computadora es un "puesto";

@@ -1,9 +1,9 @@
 import { api } from "../../datos/conexion";
 import { consultas } from "../../datos/conexion";
 import { useDelServidor } from "../del-servidor";
-import type { CambiosDeUsuario, RolDeUsuario, Usuario, UsuarioNuevo } from "@servidor/usuarios";
-import type { SesionAbierta } from "@servidor/sesiones";
-import type { CelularDeOtro } from "@servidor/credenciales";
+import type { CambiosDeUsuario, RolDeUsuario, Usuario, UsuarioNuevo } from "@acceso/usuarios";
+import type { SesionAbierta } from "@acceso/sesiones";
+import type { CelularDeOtro } from "@acceso/credenciales";
 
 // Usuarios y sesiones (Más → Usuarios), una sola vez para el celular y la computadora (RNF-60). Quién puede
 // entrar, con qué roles, y las sesiones abiertas de todos (decisiones 50 y 51).

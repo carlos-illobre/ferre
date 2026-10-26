@@ -6,7 +6,7 @@ export const EVENTO_SESION_ABIERTA = "ferre:sesion-abierta";
 export const EVENTO_SESION_TERMINADA = "ferre:sesion-terminada";
 const terminar = () => window.dispatchEvent(new Event(EVENTO_SESION_TERMINADA));
 import { api, avisos, borrarToken, guardarToken, leerToken, perderLaSesion } from "../conexion";
-import type { SesionActual, UsuarioDeLaSesion } from "@servidor/sesiones";
+import type { SesionActual, UsuarioDeLaSesion } from "@acceso/sesiones";
 import { deEsteAmbiente } from "../../plataforma/ambiente";
 
 // `roles` son los nombres de sus roles y `permisos` lo que esos roles le dejan hacer (RF-72).

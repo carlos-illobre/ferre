@@ -2,7 +2,7 @@ import { browserSupportsWebAuthn, startAuthentication, startRegistration } from 
 import { api } from "../conexion";
 import type { Usuario } from "../sesion";
 import type { PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/browser";
-import type { Credencial, DesafioDeHuella, EntradaConHuella, HuellaNueva, HuellaVinculada } from "@servidor/credenciales";
+import type { Credencial, DesafioDeHuella, EntradaConHuella, HuellaNueva, HuellaVinculada } from "@acceso/credenciales";
 
 // Passkeys (ADR-011, enmienda): vincular este celular con la huella, y entrar con ella.
 export const hayHuella = () => browserSupportsWebAuthn();

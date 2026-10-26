@@ -1,7 +1,7 @@
 import { productoEnMemoria } from "../catalogo";
 import { conUnidad } from "../catalogo";
 import { nombreDeMedio } from "../ventas";
-import type { CambioApartado } from "@servidor/apartados";
+import type { CambioApartado } from "@acceso/apartados";
 
 // Lo que trae cada cambio apartado, según su tipo, y lo que se saca de ahí.
 export type Venta = { medio_pago?: string; items?: { producto_id?: string | null; descripcion?: string; cantidad?: number; precio_unitario?: number }[] };

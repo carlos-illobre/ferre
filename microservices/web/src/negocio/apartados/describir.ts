@@ -1,6 +1,6 @@
 import { pesosCortos } from "../formato";
 import { conUnidad } from "../catalogo";
-import type { CambioApartado } from "@servidor/apartados";
+import type { CambioApartado } from "@acceso/apartados";
 import { cantidadDe, cuerpo, importeDe, medioDe, productoDe, unidadDelProducto, unidadDelRecurso, type Ajuste, type CambioDeProducto, type NoLlevo, type UnidadDe, type Venta } from "./cuerpos";
 import { diaYHora, hora, mismoDia } from "./fechas";
 

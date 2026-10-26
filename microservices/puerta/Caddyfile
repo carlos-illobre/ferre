@@ -1,6 +1,7 @@
 # La puerta del servidor (specs/026, ADR-031): lo único que se publica. Reparte cada pedido al
-# servicio que lo atiende según su ruta; a los que no saben de sesiones les pregunta antes quién
-# es la persona. No tiene reglas del negocio ni datos: sumar un servicio es sumar su ruta acá.
+# servicio que lo atiende según su ruta. Quién es la persona lo sabe Acceso (specs/029): a todos
+# los demás servicios la puerta le pregunta antes, en cada pedido, y les pasa quién es y qué puede.
+# No tiene reglas del negocio ni datos: sumar un servicio es sumar su ruta acá.
 {
 	admin off
 	auto_https off
@@ -39,10 +40,21 @@
 		respond "ok" 200
 	}
 
+	# Acceso (specs/029): entrar, las sesiones, usuarios y roles, las huellas, el vínculo, el canal de
+	# cada dispositivo, lo apartado y los ajustes. Atiende con o sin sesión y la busca él mismo. El
+	# canal queda abierto mientras se usa: lo que llega se manda en el momento.
+	@acceso path /sesiones /sesiones/* /usuarios /usuarios/* /roles /roles/* /permisos /permisos/* /credenciales /credenciales/* /puestos /puestos/* /canal /canal/* /apartados /apartados/* /sistema /sistema/*
+	handle @acceso {
+		reverse_proxy acceso:8097 {
+			header_up X-Token-Servicio {$TOKEN_SERVICIO}
+			flush_interval -1
+		}
+	}
+
 	# Procesos (ADR-019) no sabe de sesiones: la puerta pregunta quién es y qué puede.
 	@procesos path /procesos /procesos/*
 	handle @procesos {
-		forward_auth comercial:8080 {
+		forward_auth acceso:8097 {
 			uri /sesiones/quien
 			header_up X-Token-Servicio {$TOKEN_SERVICIO}
 			copy_headers X-Usuario-Id X-Usuario-Nombre X-Permisos
@@ -59,7 +71,7 @@
 	# puede. La entrada de eventos (/v1/eventos) no se publica: llega por la red interna.
 	@auditoria path /auditoria /auditoria/*
 	handle @auditoria {
-		forward_auth comercial:8080 {
+		forward_auth acceso:8097 {
 			uri /sesiones/quien
 			header_up X-Token-Servicio {$TOKEN_SERVICIO}
 			copy_headers X-Usuario-Id X-Usuario-Nombre X-Permisos
@@ -72,7 +84,7 @@
 	# Tickets (specs/028), como Procesos: la puerta pregunta quién es. Hasta 5 fotos de 10 MB.
 	@tickets path /tickets /tickets/*
 	handle @tickets {
-		forward_auth comercial:8080 {
+		forward_auth acceso:8097 {
 			uri /sesiones/quien
 			header_up X-Token-Servicio {$TOKEN_SERVICIO}
 			copy_headers X-Usuario-Id X-Usuario-Nombre X-Permisos
@@ -86,8 +98,8 @@
 	}
 
 	# Un servicio que no responde (026-E08, 027-E04, 028-E06). Si es Procesos o Auditoría, se dice con palabras, como cualquier
-	# otro error. Si es Comercial o Tickets, se corta la conexión: la aplicación lo toma como sin conexión y
-	# sigue con lo que tiene en el dispositivo, igual que antes de la puerta.
+	# otro error. Si es Comercial, Tickets o Acceso (que no puede decir quién es), se corta la
+	# conexión: la aplicación lo toma como sin conexión y sigue con lo que tiene en el dispositivo.
 	handle_errors 502 503 504 {
 		handle @procesos {
 			header Access-Control-Allow-Origin {$ORIGEN_WEB}
@@ -101,19 +113,22 @@
 			header Content-Type application/json
 			respond `{"error":"Quién hizo qué no está disponible ahora. Probá de nuevo en un rato"}` {err.status_code}
 		}
-		# Comercial o Tickets: se corta la conexión y la aplicación lo toma como sin conexión (un ticket
-		# queda guardado en el dispositivo para mandarlo después).
+		# Comercial, Tickets o Acceso: se corta la conexión y la aplicación lo toma como sin conexión
+		# (un ticket queda guardado en el dispositivo para mandarlo después).
 		handle {
 			abort
 		}
 	}
 
-	# Lo demás es de Comercial, que sabe de sesiones. Lo que queda abierto (el canal de avisos)
-	# se manda en el momento, sin juntarlo.
+	# Lo demás es de Comercial: la puerta pregunta quién es y qué puede, como a los otros.
 	handle {
+		forward_auth acceso:8097 {
+			uri /sesiones/quien
+			header_up X-Token-Servicio {$TOKEN_SERVICIO}
+			copy_headers X-Usuario-Id X-Usuario-Nombre X-Permisos
+		}
 		reverse_proxy comercial:8080 {
 			header_up X-Token-Servicio {$TOKEN_SERVICIO}
-			flush_interval -1
 		}
 	}
 }

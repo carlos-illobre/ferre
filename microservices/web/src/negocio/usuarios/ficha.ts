@@ -1,6 +1,6 @@
 import { ErrorApi } from "../../datos/conexion";
 import { textoDeError } from "../del-servidor";
-import type { CambiosDeUsuario } from "@servidor/usuarios";
+import type { CambiosDeUsuario } from "@acceso/usuarios";
 import type { CelularDeOtroFila } from "./usuarios";
 
 // Lo que muestra la ficha de cada persona en Más → Usuarios (decisiones 100 y 148), en el celular y

@@ -1,4 +1,4 @@
-import type { RolDeUsuario } from "@servidor/usuarios";
+import type { RolDeUsuario } from "@acceso/usuarios";
 
 // Buscar, filtrar y ordenar en Más → Usuarios (decisiones 98 y 102). Lo escrito se busca en
 // cualquier parte del correo o del nombre, sin importar mayúsculas ni tildes. Con varios roles

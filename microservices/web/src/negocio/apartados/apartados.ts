@@ -2,7 +2,7 @@ import { api } from "../../datos/conexion";
 import { consultas } from "../../datos/conexion";
 import { useDelServidor } from "../del-servidor";
 import { vistaDelCambio } from "./vista-del-cambio";
-import type { CambioApartado, CambiosParaRevisar } from "@servidor/apartados";
+import type { CambioApartado, CambiosParaRevisar } from "@acceso/apartados";
 
 // Lo apartado de alguien a quien desactivaron (specs/014-cambios-apartados): lo que hizo sin
 // conexión y no llegó al servidor. No cuenta para nada hasta que alguien con «Administrar

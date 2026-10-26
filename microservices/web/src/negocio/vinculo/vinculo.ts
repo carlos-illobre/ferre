@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { api, avisos, ErrorApi } from "../../datos/conexion";
 import { dispositivoId, guardarPuestoLocal, guardarPuestoRemoto } from "../../datos/vinculo";
-import type { ClienteDeGoogle, EntradaConGoogle, SesionNueva } from "@servidor/sesiones";
-import type { PuestoNuevo, PuestoParaVincular, Vinculacion, Vinculado } from "@servidor/puestos";
+import type { ClienteDeGoogle, EntradaConGoogle, SesionNueva } from "@acceso/sesiones";
+import type { PuestoNuevo, PuestoParaVincular, Vinculacion, Vinculado } from "@acceso/puestos";
 
 // El vínculo entre el celular y la computadora (decisiones 58 y 73) y la entrada con Google,
 // una sola vez para las dos interfaces (RNF-60). Las pantallas solo muestran.

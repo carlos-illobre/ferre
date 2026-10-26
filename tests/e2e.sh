@@ -76,16 +76,16 @@ servir() {
   echo "El cliente web no arrancó en :$puerto (ver /tmp/ferre-preview-$puerto.log)"; exit 1
 }
 
-# Las pruebas cambian la base a mano (crean sesiones, sacan permisos): el servidor no tiene que
-# recordar la sesión (specs/020, RF-133), o vería lo de antes hasta un minuto. Se apaga una vez y se
-# reinicia la API para que lo lea; con la base que ya lo tiene, no hace nada.
+# Las pruebas cambian la base a mano (crean sesiones, sacan permisos): Acceso no tiene que
+# recordar la sesión (specs/020, RF-133; specs/029), o vería lo de antes hasta un minuto. Se apaga una
+# vez y se reinicia Acceso para que lo lea; con la base que ya lo tiene, no hace nada.
 sin_recordar_la_sesion() {
   # shellcheck disable=SC2068
-  local psql=(docker compose $@ exec -T db psql -U mostrador -d mostrador -tAc)
+  local psql=(docker compose $@ exec -T db psql -U acceso -d acceso -tAc)
   [ "$("${psql[@]}" "SELECT valor FROM configuracion WHERE clave = 'sesion.recordar_segundos'")" = "0" ] && return
-  "${psql[@]}" "UPDATE configuracion SET valor = '0' WHERE clave = 'sesion.recordar_segundos'" >/dev/null
+  "${psql[@]}" "INSERT INTO configuracion (clave, valor) VALUES ('sesion.recordar_segundos', '0') ON CONFLICT (clave) DO UPDATE SET valor = '0'" >/dev/null
   # shellcheck disable=SC2068
-  docker compose $@ restart comercial >/dev/null && docker compose $@ up -d --wait >/dev/null
+  docker compose $@ restart acceso >/dev/null && docker compose $@ up -d --wait >/dev/null
 }
 
 # El stack del compose y el cliente contra su API: lo que usa el CI y la computadora.

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../datos/conexion";
 import { dispositivoId, sincronizarEmparejamiento } from "../../datos/vinculo";
 import { avisarEnEsteDispositivo } from "../espejo";
-import type { AprobacionDeCodigo } from "@servidor/sesiones";
+import type { AprobacionDeCodigo } from "@acceso/sesiones";
 
 // El celular leyó el código de una computadora y ya tiene sesión (RF-76): la deja entrar con su
 // usuario. Cuando entró, el celular sigue a su pantalla de siempre (`alSeguir`) con un aviso breve.

@@ -50,7 +50,8 @@ services:
         condition: service_healthy
       procesos:
         condition: service_healthy
-      # Auditoría y Tickets no: la puerta funciona sin ellos (specs/027, RNF-74; specs/028, E06).
+      # Auditoría, Tickets y Acceso no: la puerta arranca sin ellos (specs/027, RNF-74; 028-E06); sin
+      # Acceso corta la conexión y la aplicación sigue sin conexión (029-E05).
     environment:
       ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
@@ -78,8 +79,6 @@ services:
     environment:
       DATABASE_URL: postgres://mostrador:${CLAVE_BASE_MOSTRADOR:?falta CLAVE_BASE_MOSTRADOR en el .env}@db:5432/mostrador
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
-      ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?falta GOOGLE_CLIENT_ID en el .env}
       # No cambia entre ambientes: el otro servicio siempre vive en la misma red del compose.
       LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
       # Adónde manda sus eventos (specs/027). Vacía en el .env, funciona igual y no los manda.
@@ -166,6 +165,35 @@ services:
       retries: 9
       start_period: 30s
 
+  # Acceso (specs/029): quién es cada uno y qué puede. La puerta le reparte sus rutas y le pregunta
+  # quién es la persona en cada pedido a los demás servicios. Sin puertos.
+  acceso:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/acceso:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build:
+      context: .
+      dockerfile: microservices/acceso/Dockerfile
+    restart: unless-stopped
+    logging: *logs
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://acceso:${CLAVE_BASE_ACCESO:?falta CLAVE_BASE_ACCESO en el .env}@db:5432/acceso
+      TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
+      ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?falta GOOGLE_CLIENT_ID en el .env}
+      AUDITORIA_URL: ${AUDITORIA_URL?falta AUDITORIA_URL en el .env (vacía la apaga)}
+      # Lo apartado se repite en Comercial, por la red interna. No cambia entre ambientes.
+      DESTINO_APARTADOS: http://comercial:8080
+      VERSION: ${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+      PORT: "8097"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8097/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 9
+      start_period: 30s
+
   # Tickets (specs/028): los errores y mejoras que reporta la gente, con su base y sus fotos.
   # Solo lo alcanza la puerta, por la red interna: no publica puertos.
   tickets:
@@ -205,6 +233,7 @@ services:
       CLAVE_BASE_PROCESOS: ${CLAVE_BASE_PROCESOS:?falta CLAVE_BASE_PROCESOS en el .env}
       CLAVE_BASE_AUDITORIA: ${CLAVE_BASE_AUDITORIA:?falta CLAVE_BASE_AUDITORIA en el .env}
       CLAVE_BASE_TICKETS: ${CLAVE_BASE_TICKETS:?falta CLAVE_BASE_TICKETS en el .env}
+      CLAVE_BASE_ACCESO: ${CLAVE_BASE_ACCESO:?falta CLAVE_BASE_ACCESO en el .env}
     ports:
       - "127.0.0.1:${PUERTO_BASE:?falta PUERTO_BASE en el .env}:5432"
     volumes:

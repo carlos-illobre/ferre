@@ -4,7 +4,7 @@ import { api, avisos, ErrorApi } from "../../datos/conexion";
 import { useSesion } from "../../datos/sesion";
 import { dispositivoId, guardarPuestoLocal } from "../../datos/vinculo";
 import { describirDispositivo } from "../../plataforma/dispositivo";
-import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@servidor/sesiones";
+import type { CodigoDeEntrada, ConsultaDeCodigo, EstadoDelCodigo, PedidoDeCodigo } from "@acceso/sesiones";
 
 // El código para entrar lleva el isotipo en el centro (decisión 118). El isotipo tapa cerca del 5 % del
 // código; con la corrección de errores más alta, que recupera hasta el 30 %, queda margen para una
