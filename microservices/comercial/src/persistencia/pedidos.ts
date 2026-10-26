@@ -10,14 +10,13 @@ export type Pedido = Enviable<PedidoDelContrato>;
 
 const seleccion = (donde: ReturnType<Sql["raw"]> | ReturnType<typeof sql>) => sql<Pedido>`
   SELECT pe.id, pe.estado, pe.proveedor_id, pr.nombre AS proveedor, pr.whatsapp, pe.creado_en, pe.enviado_en, pe.cerrado_en,
-         ue.nombre AS enviado_por, uc.nombre AS cerrado_por,
+         pe.enviado_por_nombre AS enviado_por, pe.cerrado_por_nombre AS cerrado_por,
          COALESCE((SELECT json_agg(json_build_object(
                      'producto_id', i.producto_id, 'descripcion', p.descripcion, 'marca', p.marca, 'unidad', p.unidad,
                      'codigo_proveedor', (SELECT pp.codigo_proveedor FROM precio_proveedor pp WHERE pp.producto_id = i.producto_id AND pp.proveedor_id = pe.proveedor_id ORDER BY pp.fecha_lista DESC, pp.creado_en DESC LIMIT 1),
                      'cantidad', i.cantidad, 'costo_estimado', i.costo_estimado, 'recibido', i.recibido) ORDER BY i.orden)
                      FROM item_pedido i JOIN producto p ON p.id = i.producto_id WHERE i.pedido_id = pe.id), '[]'::json) AS items
-    FROM pedido pe JOIN proveedor pr ON pr.id = pe.proveedor_id
-    LEFT JOIN usuario ue ON ue.id = pe.enviado_por LEFT JOIN usuario uc ON uc.id = pe.cerrado_por ${donde}`;
+    FROM pedido pe JOIN proveedor pr ON pr.id = pe.proveedor_id ${donde}`;
 
 // Todos, o solo los que están en esos estados; los últimos 100.
 export const lista = (e: Ejecutor, estados: string[] | null) =>
@@ -54,9 +53,10 @@ export async function paraMandar(e: Ejecutor, id: string) {
       FROM pedido pe JOIN proveedor pr ON pr.id = pe.proveedor_id WHERE pe.id = ${id} FOR UPDATE OF pe`.execute(e);
   return rows[0] ?? null;
 }
-export const marcarEnviado = (e: Ejecutor, id: string, usuarioId: string) => sql`UPDATE pedido SET estado = 'enviado', enviado_por = ${usuarioId}, enviado_en = now() WHERE id = ${id}`.execute(e);
+// Quién lo envió o lo cerró va con su nombre del momento (specs/029).
+export const marcarEnviado = (e: Ejecutor, id: string, usuarioId: string, nombre: string | null) => sql`UPDATE pedido SET estado = 'enviado', enviado_por = ${usuarioId}, enviado_por_nombre = ${nombre}, enviado_en = now() WHERE id = ${id}`.execute(e);
 export const guardarWhatsapp = (e: Ejecutor, proveedorId: string, numero: string) => sql`UPDATE proveedor SET whatsapp = ${numero} WHERE id = ${proveedorId}`.execute(e);
 
-export async function pasarDeEstado(e: Ejecutor, id: string, desde: string, hasta: string, usuarioId: string): Promise<boolean> {
-  return Number((await sql`UPDATE pedido SET estado = ${hasta}, cerrado_por = ${usuarioId}, cerrado_en = now() WHERE id = ${id} AND estado = ${desde}`.execute(e)).numAffectedRows) > 0;
+export async function pasarDeEstado(e: Ejecutor, id: string, desde: string, hasta: string, usuarioId: string, nombre: string | null): Promise<boolean> {
+  return Number((await sql`UPDATE pedido SET estado = ${hasta}, cerrado_por = ${usuarioId}, cerrado_por_nombre = ${nombre}, cerrado_en = now() WHERE id = ${id} AND estado = ${desde}`.execute(e)).numAffectedRows) > 0;
 }

@@ -1,13 +1,13 @@
 import type { Hono } from "hono";
 import { vi } from "vitest";
-import { olvidarSesiones, type Usuario } from "../acceso/sesiones.js";
+import type { Usuario } from "../autenticacion.js";
 import { PERMISOS } from "../permisos.js";
 
 // 022-E14: las rutas y las reglas se prueban como antes de separar la capa de datos: solo cambió
 // de dónde se simula la base (el pool de `persistencia/`). Base de datos simulada para probar las
 // rutas sin Postgres: cada consulta se anota y se
 // contesta con lo que la prueba programó (por expresión regular sobre el SQL). Lo que no
-// se programó devuelve cero filas. La sesión del que llama se contesta acá también.
+// se programó devuelve cero filas. Quién llama lo dice la puerta en sus cabeceras (specs/029).
 export type Consulta = { sql: string; params: unknown[] };
 export type EventoAnotado = { tipo: string; titulo: string; detalle: string | null; grupo: string; importancia: string; quien: { id: string; nombre: string } | null; dispositivo: string | null; contenido: Record<string, unknown> };
 export type Respuesta = { rows?: Record<string, unknown>[]; rowCount?: number } | ((params: unknown[]) => { rows?: Record<string, unknown>[]; rowCount?: number });
@@ -16,7 +16,7 @@ export type Respuesta = { rows?: Record<string, unknown>[]; rowCount?: number } 
 // «recepcion» lo de quien recibe mercadería; y «soloVende» nada más que vender, para probar que una ruta rechaza a quien no tiene su permiso.
 const TODOS = PERMISOS.map((p) => p.clave as string);
 const SIN_ADMINISTRAR = TODOS.filter((p) => !p.startsWith("admin.") && p !== "negocio.actividad");
-export const usuarios: Record<string, Usuario & { rol: string }> = {
+export const usuarios: Record<string, Usuario & { rol: string; email: string; roles: string[] }> = {
   dueño: { id: "u-dueño", email: "dueno@ferre.test", nombre: "Dueño", rol: "dueño", roles: ["Todos"], permisos: TODOS },
   admin: { id: "u-admin", email: "admin@ferre.test", nombre: "Admin", rol: "admin", roles: ["Todos"], permisos: TODOS },
   mostrador: { id: "u-mostrador", email: "mostrador@ferre.test", nombre: "Mostrador", rol: "mostrador", roles: ["Operación"], permisos: SIN_ADMINISTRAR },
@@ -35,23 +35,10 @@ export const usuarios: Record<string, Usuario & { rol: string }> = {
 const comando = (sql: string) => sql.trim().split(/\s/)[0]!.toUpperCase();
 
 export function baseFalsa() {
-  // Cada base de mentira empieza como un servidor recién arrancado: sin sesiones recordadas.
-  olvidarSesiones();
   const consultas: Consulta[] = [];
-  // De arranque hay alguien que administra el sistema (specs/020); una prueba lo cambia programándolo.
-  const programadas: { patron: RegExp; respuesta: Respuesta }[] = [{ patron: /AS n FROM usuario u\s+JOIN usuario_rol/, respuesta: { rows: [{ n: 1 }] } }];
-  // Una fila de sesión fija para cualquier token (para probar el vencimiento y la renovación), o
-  // null para no encontrar ninguna; sin fijar, la del usuario de prueba de cada token.
-  let sesionFija: Record<string, unknown> | null | undefined;
+  const programadas: { patron: RegExp; respuesta: Respuesta }[] = [];
   const query = vi.fn(async (sql: string, params: unknown[] = []) => {
     consultas.push({ sql, params });
-    if (sesionFija !== undefined && /FROM sesion s JOIN usuario u/.test(sql)) return { rows: sesionFija ? [sesionFija] : [], rowCount: sesionFija ? 1 : 0 };
-    if (/FROM sesion s JOIN usuario u/.test(sql)) {
-      const token = String(params[0]);
-      const rol = Object.keys(usuarios).find((r) => token === hashDe(`token-${r}`));
-      const u = rol ? usuarios[rol]! : null;
-      return { rows: u ? [{ id: `sesion-${u.rol}`, ultimo_uso_en: new Date(), expira_en: new Date(Date.now() + 86_400_000), usuario_id: u.id, email: u.email, nombre: u.nombre, roles: u.roles, permisos: u.permisos }] : [], rowCount: u ? 1 : 0 };
-    }
     for (const p of programadas) {
       if (p.patron.test(sql)) {
         const r = typeof p.respuesta === "function" ? p.respuesta(params) : p.respuesta;
@@ -65,7 +52,6 @@ export function baseFalsa() {
   return {
     pool, consultas,
     programar: (patron: RegExp, respuesta: Respuesta) => { programadas.unshift({ patron, respuesta }); },
-    fijarSesion: (fila: Record<string, unknown> | null) => { sesionFija = fila; },
     sqlDe: (patron: RegExp) => consultas.filter((c) => patron.test(c.sql)),
     // Los eventos que quedaron en la bandeja de auditoría (specs/027), como se van a mandar.
     eventos: () => consultas.filter((c) => /INSERT INTO auditoria_bandeja/.test(c.sql)).map((c) => JSON.parse(String(c.params[1])) as EventoAnotado),
@@ -73,14 +59,17 @@ export function baseFalsa() {
   };
 }
 
-import { createHash } from "node:crypto";
-const hashDe = (token: string) => createHash("sha256").update(token).digest("hex");
-
 // Pedido a la app con la sesión del rol indicado (o sin sesión).
 export function pedir(app: Hono, metodo: string, ruta: string, opciones: { rol?: keyof typeof usuarios | null; cuerpo?: unknown; formulario?: FormData; cabeceras?: Record<string, string> } = {}) {
   const cabeceras = new Headers(opciones.cabeceras);
   cabeceras.set("X-Token-Servicio", process.env.TOKEN_SERVICIO!); // como lo manda la puerta (026)
-  if (opciones.rol !== null) cabeceras.set("Authorization", `Bearer token-${opciones.rol ?? "dueño"}`);
+  // Quién es y qué puede, como lo pone la puerta después de preguntarle a Acceso (specs/029).
+  if (opciones.rol !== null) {
+    const u = usuarios[opciones.rol ?? "dueño"]!;
+    cabeceras.set("X-Usuario-Id", u.id);
+    cabeceras.set("X-Usuario-Nombre", encodeURIComponent(u.nombre));
+    cabeceras.set("X-Permisos", u.permisos.join(","));
+  }
   let body: BodyInit | undefined;
   if (opciones.formulario) body = opciones.formulario;
   else if (opciones.cuerpo !== undefined) { body = JSON.stringify(opciones.cuerpo); cabeceras.set("Content-Type", "application/json"); }

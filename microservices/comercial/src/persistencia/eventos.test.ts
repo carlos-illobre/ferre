@@ -1,9 +1,8 @@
 import { sql } from "kysely";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { base } from "./conexion.js";
-import { anotar, bandeja, nombres } from "./eventos.js";
+import { anotar, bandeja } from "./eventos.js";
 import { Deshacer, enTransaccion } from "./transaccion.js";
-import { usuario } from "./pruebas/datos.js";
 
 const evento = { tipo: "prueba.hecha", titulo: "Prueba", grupo: "Pruebas", importancia: "normal" as const };
 const enLaBandeja = () => sql<{ evento: { tipo: string; servicio: string } }>`SELECT evento FROM auditoria_bandeja WHERE evento->>'tipo' LIKE 'prueba.%'`.execute(base).then((r) => r.rows.map((f) => f.evento));
@@ -19,9 +18,4 @@ describe("los eventos de Comercial", () => {
     expect(await enLaBandeja()).toEqual([expect.objectContaining({ tipo: "prueba.hecha", servicio: "comercial" })]);
   });
 
-  it("el nombre de cada persona, en este momento", async () => {
-    const ana = await usuario({ nombre: "Ana" });
-    expect(await nombres(base, [ana, crypto.randomUUID()])).toEqual(new Map([[ana, "Ana"]]));
-    expect(await nombres(base, [])).toEqual(new Map());
-  });
 });

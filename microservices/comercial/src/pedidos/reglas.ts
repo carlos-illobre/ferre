@@ -1,3 +1,4 @@
+import { nombreDe } from "../autenticacion.js";
 import { base } from "../persistencia/conexion.js";
 import { Deshacer, enTransaccion } from "../persistencia/transaccion.js";
 import { anotarEvento } from "../eventos/anotar.js";
@@ -50,7 +51,7 @@ export async function mandar(id: string, whatsapp: string | undefined, usuarioId
     if (!p) throw new Deshacer(mal(404, "No existe ese pedido"));
     if (p.estado !== "borrador") throw new Deshacer(mal(409, "Ese pedido ya se mandó"));
     if (Number(p.renglones) === 0) throw new Deshacer(mal(400, "El pedido no tiene productos"));
-    await datos.marcarEnviado(trx, id, usuarioId);
+    await datos.marcarEnviado(trx, id, usuarioId, nombreDe(usuarioId));
     if (numero) await datos.guardarWhatsapp(trx, p.proveedor_id, numero);
     await anotarEvento(trx, { tipo: "pedido.enviado", usuarioId, contenido: { id, proveedor: p.proveedor, renglones: Number(p.renglones) } });
     return { ok: true } as Resultado;
@@ -60,7 +61,7 @@ export async function mandar(id: string, whatsapp: string | undefined, usuarioId
 // Cancelar el que se mandó y no va a llegar; cerrar el que llegó incompleto y cuyo resto no va a llegar.
 export function terminar(id: string, desde: string, hasta: string, evento: string, rechazo: string, usuarioId: string): Promise<Resultado> {
   return enTransaccion(async (trx) => {
-    if (!(await datos.pasarDeEstado(trx, id, desde, hasta, usuarioId))) throw new Deshacer(mal(409, rechazo));
+    if (!(await datos.pasarDeEstado(trx, id, desde, hasta, usuarioId, nombreDe(usuarioId)))) throw new Deshacer(mal(409, rechazo));
     await anotarEvento(trx, { tipo: evento, usuarioId, contenido: { id } });
     return { ok: true } as Resultado;
   });

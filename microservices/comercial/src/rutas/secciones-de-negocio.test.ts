@@ -47,8 +47,4 @@ describe("secciones de Cómo va el negocio", () => {
       .toEqual([["Negocio", "Ver las ventas del negocio"], ["Negocio", "Ver los gastos"], ["Negocio", "Ver el dinero invertido"]]);
   });
 
-  it("013-E18 a un rol no se le puede dar «Ver los números del negocio»", async () => {
-    const r = await pedir(app, "POST", "/roles", { rol: "admin", cuerpo: { nombre: "Viejo", permisos: ["negocio.numeros"] } });
-    expect(r.status).toBe(400);
-  });
 });

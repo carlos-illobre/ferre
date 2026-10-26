@@ -49,8 +49,8 @@ describe("POST /ventas", () => {
     expect(r.status).toBe(201);
     expect(base.actual.sqlDe(/insert into "movimiento_stock"/)).toHaveLength(0);
     const anomalia = base.actual.sqlDe(/insert into "anomalia"/)[0]!;
-    expect(anomalia.params.slice(1, 5)).toEqual(["p1", "u-mostrador", venta.id, 3]);
-    expect(String(anomalia.params[5])).toContain("faltaban 3 un.");
+    expect(anomalia.params.slice(1, 6)).toEqual(["p1", "u-mostrador", "Mostrador", venta.id, 3]);
+    expect(String(anomalia.params[6])).toContain("faltaban 3 un.");
     expect(base.actual.eventos()[0]!.contenido).toHaveProperty("anomalias");
   });
 
@@ -58,12 +58,12 @@ describe("POST /ventas", () => {
     base.actual.programar(/SUM\(cantidad\), 0\) as "stock" from "movimiento_stock"/, { rows: [{ stock: "2" }] });
     await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
     expect(base.actual.sqlDe(/insert into "movimiento_stock"/)[0]!.params).toContain(-2);
-    expect(base.actual.sqlDe(/insert into "anomalia"/)[0]!.params[4]).toBe(1);
+    expect(base.actual.sqlDe(/insert into "anomalia"/)[0]!.params[5]).toBe(1);
     base.actual = baseFalsa();
     base.actual.programar(/SUM\(cantidad\), 0\) as "stock" from "movimiento_stock"/, { rows: [{ stock: "-4" }] });
     await pedir(app, "POST", "/ventas", { rol: "mostrador", cuerpo: venta });
     expect(base.actual.sqlDe(/insert into "movimiento_stock"/)).toHaveLength(0);
-    expect(base.actual.sqlDe(/insert into "anomalia"/)[0]!.params[4]).toBe(3);
+    expect(base.actual.sqlDe(/insert into "anomalia"/)[0]!.params[5]).toBe(3);
   });
 
   it("anular devuelve al stock lo que la venta descontó, no lo que se vendió", async () => {

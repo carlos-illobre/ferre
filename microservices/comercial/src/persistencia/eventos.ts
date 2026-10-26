@@ -9,10 +9,3 @@ import type { Ejecutor } from "./transaccion.js";
 export const bandeja = bandejaDeAuditoria({ base, conexion: config.databaseUrl, servicio: "comercial", auditoria: config.auditoriaUrl, token: config.tokenServicio });
 
 export const anotar = (e: Ejecutor, evento: EventoDeAuditoria) => bandeja.anotar(e, evento);
-
-// Cómo se llama cada persona en este momento: el evento guarda el nombre de entonces.
-export async function nombres(e: Ejecutor, ids: string[]): Promise<Map<string, string>> {
-  if (ids.length === 0) return new Map();
-  const filas = await e.selectFrom("usuario").select(["id", "nombre"]).where("id", "in", ids).execute();
-  return new Map(filas.map((f) => [f.id, f.nombre]));
-}

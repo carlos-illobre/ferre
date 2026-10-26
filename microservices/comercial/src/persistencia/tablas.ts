@@ -5,8 +5,6 @@
 
 import type { ColumnType } from "kysely";
 
-export type DecisionDeApartado = "aceptado" | "descartado";
-
 export type EstadoDeConteo = "abierto" | "cerrado";
 
 export type EstadoDeDocumento = "anulada" | "confirmada";
@@ -20,8 +18,6 @@ export type EstadoDePedido = "borrador" | "cancelado" | "cerrado_incompleto" | "
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
-
-export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
 
 export type Json = JsonValue;
 
@@ -38,8 +34,6 @@ export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 export type LadoDeCambio = "se_lleva" | "vuelve";
 
 export type MedioPago = "cuenta_corriente" | "efectivo" | "mercado_pago" | "tarjeta";
-
-export type MetodoApartado = "DELETE" | "PATCH" | "POST" | "PUT";
 
 export type MotivoDeEquivalencia = "codigo_barras" | "descripcion";
 
@@ -67,6 +61,7 @@ export interface Anomalia {
   producto_id: string;
   tipo: TipoDeAnomalia;
   usuario_id: string | null;
+  usuario_nombre: string | null;
   venta_id: string | null;
 }
 
@@ -79,23 +74,6 @@ export interface Cambio {
   resuelto: ResolucionDeCambio;
   usuario_id: string | null;
   venta_id: string;
-}
-
-export interface CambioApartado {
-  cuerpo: Json | null;
-  decidido_en: Timestamp | null;
-  decidido_por: string | null;
-  decision: DecisionDeApartado | null;
-  error: string | null;
-  hecho_en: Timestamp;
-  id: string;
-  llegado_en: Generated<Timestamp>;
-  metodo: MetodoApartado;
-  orden: Int8;
-  ruta: string;
-  sesion_id: string;
-  tipo: string;
-  usuario_id: string;
 }
 
 export interface CambioDeProducto {
@@ -124,14 +102,6 @@ export interface Cliente {
   modificado_en: Generated<Timestamp>;
   nombre: string;
   telefono: string | null;
-}
-
-export interface CodigoEscaneado {
-  codigo: string;
-  creado_en: Generated<Timestamp>;
-  entregado_en: Timestamp | null;
-  id: string;
-  puesto_id: string;
 }
 
 export interface Compra {
@@ -187,18 +157,6 @@ export interface CorreccionVenta {
   resuelta: ResolucionDeCorreccion;
   usuario_id: string | null;
   venta_id: string;
-}
-
-export interface Credencial {
-  clave_publica: Buffer;
-  contador: Generated<Int8>;
-  creada_en: Generated<Timestamp>;
-  dispositivo: string | null;
-  id: string;
-  revocada_en: Timestamp | null;
-  transportes: Generated<string[]>;
-  ultimo_uso_en: Timestamp | null;
-  usuario_id: string;
 }
 
 export interface EquivalenciaSugerida {
@@ -302,10 +260,12 @@ export interface MovimientoStock {
 export interface Pedido {
   cerrado_en: Timestamp | null;
   cerrado_por: string | null;
+  cerrado_por_nombre: string | null;
   creado_en: Generated<Timestamp>;
   creado_por: string | null;
   enviado_en: Timestamp | null;
   enviado_por: string | null;
+  enviado_por_nombre: string | null;
   estado: Generated<EstadoDePedido>;
   id: string;
   modificado_en: Generated<Timestamp>;
@@ -359,20 +319,6 @@ export interface Proveedor {
   whatsapp: string | null;
 }
 
-export interface Puesto {
-  celular_dispositivo: string | null;
-  celular_sesion_id: string | null;
-  codigo_hash: string;
-  compu_dispositivo: string | null;
-  creado_en: Generated<Timestamp>;
-  expira_en: Timestamp;
-  id: string;
-  nombre: string | null;
-  sesion_id: string;
-  usuario_id: string | null;
-  vinculado_en: Timestamp | null;
-}
-
 export interface RenglonConteo {
   cantidad_contada: Numeric;
   contado_en: Generated<Timestamp>;
@@ -380,18 +326,6 @@ export interface RenglonConteo {
   conteo_id: string;
   id: string;
   producto_id: string;
-}
-
-export interface Rol {
-  creado_en: Generated<Timestamp>;
-  descripcion: string | null;
-  id: string;
-  nombre: string;
-}
-
-export interface RolPermiso {
-  permiso: string;
-  rol_id: string;
 }
 
 export interface Sector {
@@ -403,39 +337,12 @@ export interface Sector {
   orden: Generated<number>;
 }
 
-export interface Sesion {
-  creada_en: Generated<Timestamp>;
-  dispositivo: string | null;
-  dispositivo_id: string | null;
-  expira_en: Timestamp;
-  id: string;
-  revocada_en: Timestamp | null;
-  token_hash: string;
-  ultimo_uso_en: Generated<Timestamp>;
-  usuario_id: string;
-}
-
 export interface UnionDeProductos {
   absorbido: string;
   conservar: string;
   hecha_en: Generated<Timestamp>;
   id: string;
   registro: Json;
-}
-
-export interface Usuario {
-  activo: Generated<boolean>;
-  creado_en: Generated<Timestamp>;
-  email: string;
-  id: string;
-  modificado_en: Generated<Timestamp>;
-  nombre: string;
-  rol: string | null;
-}
-
-export interface UsuarioRol {
-  rol_id: string;
-  usuario_id: string;
 }
 
 export interface Venta {
@@ -451,34 +358,17 @@ export interface Venta {
   total: Numeric;
 }
 
-export interface Vinculacion {
-  aprobada_en: Timestamp | null;
-  aprobada_por: string | null;
-  celular_sesion_id: string | null;
-  clave_hash: string | null;
-  codigo_hash: string;
-  creada_en: Generated<Timestamp>;
-  dispositivo: string | null;
-  expira_en: Timestamp;
-  id: string;
-  retirada_en: Timestamp | null;
-  sesion_id: string | null;
-}
-
 export interface DB {
   anomalia: Anomalia;
   cambio: Cambio;
-  cambio_apartado: CambioApartado;
   cambio_de_producto: CambioDeProducto;
   cambio_renglon: CambioRenglon;
   cliente: Cliente;
-  codigo_escaneado: CodigoEscaneado;
   compra: Compra;
   configuracion: Configuracion;
   consulta: Consulta;
   conteo: Conteo;
   correccion_venta: CorreccionVenta;
-  credencial: Credencial;
   equivalencia_sugerida: EquivalenciaSugerida;
   foto_comprobante: FotoComprobante;
   item_compra: ItemCompra;
@@ -491,15 +381,8 @@ export interface DB {
   precio_proveedor: PrecioProveedor;
   producto: Producto;
   proveedor: Proveedor;
-  puesto: Puesto;
   renglon_conteo: RenglonConteo;
-  rol: Rol;
-  rol_permiso: RolPermiso;
   sector: Sector;
-  sesion: Sesion;
   union_de_productos: UnionDeProductos;
-  usuario: Usuario;
-  usuario_rol: UsuarioRol;
   venta: Venta;
-  vinculacion: Vinculacion;
 }

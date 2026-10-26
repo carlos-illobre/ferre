@@ -14,11 +14,6 @@ export const config = {
   databaseUrl: obligatoria("DATABASE_URL"),
   tokenServicio: obligatoria("TOKEN_SERVICIO"),
   listasDeProveedoresUrl: obligatoria("LISTAS_DE_PROVEEDORES_URL"),
-  // Origen del cliente web (GitHub Pages en producción). Es el único al que la API le
-  // responde desde el navegador (CORS).
-  origenWeb: obligatoria("ORIGEN_WEB"),
-  // ID de cliente OAuth de Google (docs/operacion/google-cloud.md). No es secreto; identifica la app.
-  googleClientId: obligatoria("GOOGLE_CLIENT_ID"),
   // Dónde se guardan los archivos originales de las listas cargadas (volumen del compose).
   carpetaListas: obligatoria("CARPETA_LISTAS"),
   // Qué versión corre (la imagen); la salud la dice. No cambia el comportamiento.

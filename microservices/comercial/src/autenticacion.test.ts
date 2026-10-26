@@ -1,64 +1,35 @@
-import { generateKeyPairSync, sign } from "node:crypto";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { OAuth2Client } from "google-auth-library";
-import { emailVerificadoPorGoogle } from "./autenticacion.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { baseFalsa, pedir } from "./pruebas/base-falsa.js";
 
-// La verificación de la credencial de Google de verdad (RF-70), sin Google: las credenciales se
-// firman acá con una clave de prueba, y la biblioteca de Google la recibe como si fuera una de
-// las claves públicas que publica Google. Se prueba lo que hace la biblioteca con la firma, a
-// quién va dirigida, quién la emitió y cuándo vence; la pantalla de Google queda a mano.
-const clave = generateKeyPairSync("rsa", { modulusLength: 2048 });
-const otra = generateKeyPairSync("rsa", { modulusLength: 2048 });
-const pem = (k: typeof clave) => k.publicKey.export({ type: "spki", format: "pem" }).toString();
-const b64 = (o: unknown) => Buffer.from(JSON.stringify(o)).toString("base64url");
+const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof import("./pruebas/base-falsa.js")["baseFalsa"]> }));
+vi.mock("./persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
+const { app } = await import("./app.js");
 
-function credencial(datos: Record<string, unknown> = {}, firma = clave) {
-  const ahora = Math.floor(Date.now() / 1000);
-  const cuerpo = { iss: "https://accounts.google.com", aud: process.env.GOOGLE_CLIENT_ID, sub: "1", email: "Carlos@Ferre.test", email_verified: true, iat: ahora, exp: ahora + 3600, ...datos };
-  const sinFirma = `${b64({ alg: "RS256", kid: "prueba", typ: "JWT" })}.${b64(cuerpo)}`;
-  return `${sinFirma}.${sign("RSA-SHA256", Buffer.from(sinFirma), firma.privateKey).toString("base64url")}`;
-}
+const conToken = (cabeceras: Record<string, string>) => ({ headers: { "X-Token-Servicio": process.env.TOKEN_SERVICIO!, ...cabeceras } });
 
-beforeEach(() => {
-  // Las claves públicas de Google, que la biblioteca baja de internet: acá, solo la de prueba.
-  vi.spyOn(OAuth2Client.prototype, "getFederatedSignonCertsAsync").mockResolvedValue({ certs: { prueba: pem(clave) }, format: "PEM" } as never);
-});
-afterEach(() => { vi.restoreAllMocks(); });
+// Quién llama lo dice la puerta, que le preguntó a Acceso (specs/029): Comercial no busca sesiones.
+describe("la persona que llega de la puerta", () => {
+  beforeEach(() => { base.actual = baseFalsa(); });
 
-describe("la credencial que devuelve el botón de Google", () => {
-  it("firmada por Google, para esta aplicación, vigente y con el correo verificado: da el correo, en minúsculas", async () => {
-    expect(await emailVerificadoPorGoogle(credencial())).toBe("carlos@ferre.test");
+  it("029-E02: con quién es y sus permisos en las cabeceras, atiende; sin persona, 401", async () => {
+    expect((await pedir(app, "GET", "/ventas", { rol: "cajero" })).status).toBe(200);
+    const sin = await app.request("/ventas", conToken({}));
+    expect([sin.status, await sin.json()]).toEqual([401, { error: "Hay que iniciar sesión" }]);
+    // Un nombre mal codificado no es una persona.
+    expect((await app.request("/ventas", conToken({ "X-Usuario-Id": "u1", "X-Usuario-Nombre": "%E0%A4%A", "X-Permisos": "ventas.ver" }))).status).toBe(401);
   });
 
-  it("no vale si la firmó otro", async () => {
-    expect(await emailVerificadoPorGoogle(credencial({}, otra))).toBeNull();
+  it("029-E02: los permisos son los de X-Permisos: sin el que hace falta, 403 diciendo cuál", async () => {
+    const r = await app.request("/ventas", conToken({ "X-Usuario-Id": "u1", "X-Usuario-Nombre": "Ana", "X-Permisos": " negocio.ventas , ,ventas.registrar" }));
+    expect(r.status).toBe(200);
+    const no = await app.request("/ventas", conToken({ "X-Usuario-Id": "u1", "X-Permisos": "ventas.registrar" }));
+    expect(no.status).toBe(403);
+    expect(((await no.json()) as { error: string }).error).toContain("Ver las ventas del día");
   });
 
-  it("no vale si es para otra aplicación", async () => {
-    expect(await emailVerificadoPorGoogle(credencial({ aud: "otra-app.apps.googleusercontent.com" }))).toBeNull();
-  });
-
-  it("no vale si no la emitió Google", async () => {
-    expect(await emailVerificadoPorGoogle(credencial({ iss: "https://otro.example" }))).toBeNull();
-  });
-
-  it("no vale si venció", async () => {
-    const hace = Math.floor(Date.now() / 1000) - 7200;
-    expect(await emailVerificadoPorGoogle(credencial({ iat: hace, exp: hace + 3600 }))).toBeNull();
-  });
-
-  it("no vale si se le cambió el correo después de firmarla", async () => {
-    const [cabeza, , firma] = credencial().split(".");
-    const otroCuerpo = b64({ iss: "https://accounts.google.com", aud: process.env.GOOGLE_CLIENT_ID, email: "intruso@ferre.test", email_verified: true, exp: Math.floor(Date.now() / 1000) + 3600 });
-    expect(await emailVerificadoPorGoogle(`${cabeza}.${otroCuerpo}.${firma}`)).toBeNull();
-  });
-
-  it("no da el correo si Google no lo verificó, ni si no trae correo", async () => {
-    expect(await emailVerificadoPorGoogle(credencial({ email_verified: false }))).toBeNull();
-    expect(await emailVerificadoPorGoogle(credencial({ email: undefined }))).toBeNull();
-  });
-
-  it("no vale cualquier texto", async () => {
-    expect(await emailVerificadoPorGoogle("no-es-una-credencial")).toBeNull();
+  it("029-E10: el evento de una acción va con el nombre que trae el pedido; sin nombre, con el identificador", async () => {
+    await app.request("/clientes", { method: "POST", ...conToken({ "X-Usuario-Id": "u-ana", "X-Usuario-Nombre": encodeURIComponent("Ana Núñez"), "X-Permisos": "ventas.registrar", "Content-Type": "application/json" }), body: JSON.stringify({ nombre: "Juan" }) });
+    await app.request("/clientes", { method: "POST", ...conToken({ "X-Usuario-Id": "u-beto", "X-Permisos": "ventas.registrar", "Content-Type": "application/json" }), body: JSON.stringify({ nombre: "Pedro" }) });
+    expect(base.actual.eventos().map((e) => e.quien)).toEqual([{ id: "u-ana", nombre: "Ana Núñez" }, { id: "u-beto", nombre: "u-beto" }]);
   });
 });

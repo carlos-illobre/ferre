@@ -76,7 +76,7 @@ describe("pedidos a proveedores", () => {
     base.actual.programar(/SELECT pe\.estado, pe\.proveedor_id/, { rows: [{ estado: "borrador", proveedor_id: PROVEEDOR, proveedor: "Tresge", renglones: "2" }] });
     const r = await pedir(app, "POST", `/pedidos/${PEDIDO}/enviar`, { rol: "mostrador", cuerpo: { whatsapp: "+54 9 11 5555-0101" } });
     expect(r.status).toBe(204);
-    expect(base.actual.sqlDe(/UPDATE pedido SET estado = 'enviado'/)[0]!.params).toEqual(["u-mostrador", PEDIDO]);
+    expect(base.actual.sqlDe(/UPDATE pedido SET estado = 'enviado'/)[0]!.params).toEqual(["u-mostrador", "Mostrador", PEDIDO]);
     expect(base.actual.sqlDe(/UPDATE proveedor SET whatsapp/)[0]!.params).toEqual(["5491155550101", PROVEEDOR]);
     expect(tipos()).toEqual(["pedido.enviado"]);
   });
@@ -96,9 +96,9 @@ describe("pedidos a proveedores", () => {
     expect((await pedir(app, "POST", `/pedidos/${PEDIDO}/cancelar`)).status).toBe(409);
     base.actual.programar(/UPDATE pedido SET estado = \$1, cerrado_por/, { rowCount: 1 });
     expect((await pedir(app, "POST", `/pedidos/${PEDIDO}/cancelar`, { rol: "mostrador" })).status).toBe(204);
-    expect(base.actual.sqlDe(/UPDATE pedido SET estado = \$1, cerrado_por/).at(-1)!.params).toEqual(["cancelado", "u-mostrador", PEDIDO, "enviado"]);
+    expect(base.actual.sqlDe(/UPDATE pedido SET estado = \$1, cerrado_por/).at(-1)!.params).toEqual(["cancelado", "u-mostrador", "Mostrador", PEDIDO, "enviado"]);
     expect((await pedir(app, "POST", `/pedidos/${PEDIDO}/cerrar`, { rol: "mostrador" })).status).toBe(204);
-    expect(base.actual.sqlDe(/UPDATE pedido SET estado = \$1, cerrado_por/).at(-1)!.params).toEqual(["cerrado_incompleto", "u-mostrador", PEDIDO, "recibido_parcial"]);
+    expect(base.actual.sqlDe(/UPDATE pedido SET estado = \$1, cerrado_por/).at(-1)!.params).toEqual(["cerrado_incompleto", "u-mostrador", "Mostrador", PEDIDO, "recibido_parcial"]);
     expect(tipos()).toEqual(["pedido.cancelado", "pedido.cerrado"]);
     expect((await pedir(app, "DELETE", `/pedidos/${PEDIDO}`)).status).toBe(409);
     base.actual.programar(/DELETE FROM pedido WHERE id/, { rowCount: 1 });

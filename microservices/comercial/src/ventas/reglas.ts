@@ -1,3 +1,4 @@
+import { nombreDe } from "../autenticacion.js";
 import { randomUUID } from "node:crypto";
 import { base } from "../persistencia/conexion.js";
 import { anotarEvento } from "../eventos/anotar.js";
@@ -50,7 +51,7 @@ export async function registrar(v: VentaEntrada, usuarioId: string): Promise<Reg
       if (falta > 0) {
         const u = await datos.unidadDe(trx, it.producto_id);
         const detalle = `${it.cantidad === 1 && u === "unidad" ? "Se vendió 1 un." : `Se vendieron ${conUnidad(it.cantidad, u)}`} y el sistema tenía ${conUnidad(enStock, u)} en stock: ${falta === 1 && u === "unidad" ? "faltaba 1 un." : `faltaban ${conUnidad(falta, u)}`}`;
-        await datos.anotarFaltante(trx, { producto_id: it.producto_id, usuario_id: usuarioId, venta_id: id, cantidad: falta, detalle });
+        await datos.anotarFaltante(trx, { producto_id: it.producto_id, usuario_id: usuarioId, usuario_nombre: nombreDe(usuarioId), venta_id: id, cantidad: falta, detalle });
         anomalias++;
       }
     }
@@ -125,7 +126,7 @@ async function sacarDelStock(trx: Ejecutor, productoId: string, cantidad: number
   const falta = Math.round((cantidad - sale) * 1000) / 1000;
   if (falta > 0) {
     const u = await datos.unidadDe(trx, productoId);
-    await datos.anotarFaltante(trx, { producto_id: productoId, usuario_id: usuarioId, venta_id: ventaId, cantidad: falta, detalle: `Se sumaron ${conUnidad(cantidad, u)} y el sistema tenía ${conUnidad(enStock, u)} en stock: faltaba ${conUnidad(falta, u)}` });
+    await datos.anotarFaltante(trx, { producto_id: productoId, usuario_id: usuarioId, usuario_nombre: nombreDe(usuarioId), venta_id: ventaId, cantidad: falta, detalle: `Se sumaron ${conUnidad(cantidad, u)} y el sistema tenía ${conUnidad(enStock, u)} en stock: faltaba ${conUnidad(falta, u)}` });
   }
 }
 
@@ -253,7 +254,7 @@ export async function cambiar(id: string, c: CambioEntrada, usuarioId: string): 
       await datos.insertarRenglonDeCambio(trx, { cambio_id: cambioId, lado: "vuelve", item_venta_id: r.id, producto_id: r.producto_id, descripcion: r.descripcion, cantidad: v.cantidad, precio_unitario: pagadoPorUnidad(r), margen_aplicado: null, fallado: v.fallado });
       await datos.sumarDevuelto(trx, r.id, v.cantidad);
       if (!r.producto_id) continue;
-      if (v.fallado) await datos.anotarDevueltoFallado(trx, { producto_id: r.producto_id, usuario_id: usuarioId, venta_id: id, cantidad: v.cantidad, detalle: `Volvió fallado: ${conUnidad(v.cantidad, await datos.unidadDe(trx, r.producto_id))} de ${r.descripcion}; no vuelve al stock` });
+      if (v.fallado) await datos.anotarDevueltoFallado(trx, { producto_id: r.producto_id, usuario_id: usuarioId, usuario_nombre: nombreDe(usuarioId), venta_id: id, cantidad: v.cantidad, detalle: `Volvió fallado: ${conUnidad(v.cantidad, await datos.unidadDe(trx, r.producto_id))} de ${r.descripcion}; no vuelve al stock` });
       else await datos.moverStock(trx, { producto_id: r.producto_id, cantidad: v.cantidad, tipo: "cambio", venta_id: id, nota: "cambio de producto: vuelve" });
     }
     for (const it of c.se_lleva) {

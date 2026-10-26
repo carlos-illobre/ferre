@@ -13,9 +13,7 @@ export type EnPalabras = { titulo: string; detalle: string | null; grupo: string
 const GRUPOS: Record<string, string> = {
   venta: "Ventas", compra: "Compras", pedido: "Compras", producto: "Productos", equivalencia: "Productos",
   lista: "Listas de precios", stock: "Ajustes de stock", conteo: "Conteos", sector: "Conteos",
-  usuario: "Usuarios", rol: "Usuarios", apartado: "Usuarios", sesion: "Entradas y salidas de la app",
-  credencial: "Celulares con huella", puesto: "Celulares vinculados", vinculo: "Celulares vinculados",
-  cliente: "Clientes", proveedor: "Proveedores", sistema: "Ajustes del sistema"
+  cliente: "Clientes", proveedor: "Proveedores",
 };
 
 type Que = { titulo: string; importancia?: Importancia };
@@ -43,22 +41,6 @@ const QUE: Record<string, Que> = {
   "sector.creado": { titulo: "Sector nuevo" },
   "conteo.abierto": { titulo: "Conteo empezado" },
   "conteo.cerrado": { titulo: "Conteo cerrado" },
-  "usuario.creado": { titulo: "Usuario autorizado" },
-  "usuario.modificado": { titulo: "Cambio en un usuario" },
-  "rol.creado": { titulo: "Rol nuevo" },
-  "rol.modificado": { titulo: "Cambio en un rol" },
-  "rol.borrado": { titulo: "Rol borrado" },
-  "apartado.aceptado": { titulo: "Cambio apartado aceptado" },
-  "apartado.descartado": { titulo: "Cambio apartado descartado" },
-  "sesion.iniciada": { titulo: "Entró" },
-  "sesion.cerrada": { titulo: "Salió" },
-  "sesion.revocada": { titulo: "Sesión cerrada a distancia" },
-  "credencial.vinculada": { titulo: "Celular vinculado con huella" },
-  "credencial.quitada": { titulo: "Celular con huella quitado" },
-  "puesto.vinculado": { titulo: "Celular vinculado a la computadora" },
-  "puesto.desvinculado": { titulo: "Celular desvinculado de la computadora" },
-  "vinculo.dias_cambiados": { titulo: "Cambio en los días del vínculo" },
-  "sistema.ajustes_cambiados": { titulo: "Cambio en los ajustes del sistema" },
   "cliente.creado": { titulo: "Cliente nuevo" },
   "proveedor.creado": { titulo: "Proveedor nuevo" },
   "proveedor.modificado": { titulo: "Cambio en un proveedor" },
@@ -68,7 +50,6 @@ const QUE: Record<string, Que> = {
 const ESPECIALES: [(tipo: string, c: Contenido) => boolean, Que][] = [
   [(t, c) => t === "producto.precio_elegido" && "margen_elegido" in c, { titulo: "Cambio de margen", importancia: "revisar" }],
   [(t, c) => t === "venta.registrada" && c.medio_pago === "cuenta_corriente", { titulo: "Venta en cuenta corriente" }],
-  [(t, c) => t === "usuario.modificado" && (c.cambios as Contenido | undefined)?.activo === false, { titulo: "Usuario desactivado" }],
 ];
 
 const MEDIOS: Record<string, string> = { efectivo: "Efectivo", mercado_pago: "Mercado Pago", tarjeta: "Tarjeta", cuenta_corriente: "Cuenta corriente" };
@@ -96,22 +77,6 @@ const cambioEnUnProducto: Detalle = (c) => juntar(
   "foto_url" in c && "Cambió la foto",
 );
 
-const cambioEnUnUsuario: Detalle = (c, persona) => {
-  const cambios = (c.cambios ?? {}) as Contenido;
-  return juntar(cambios.activo === false && `Desactivó a ${persona(c.id)}`, cambios.activo === true && `Reactivó a ${persona(c.id)}`, Array.isArray(cambios.roles) && `Cambió los roles de ${persona(c.id)}`, typeof cambios.nombre === "string" && `Ahora se llama ${cambios.nombre}`);
-};
-
-// Qué ajuste, de cuánto a cuánto (specs/020).
-const tiempo = (s: unknown) => (s === 0 ? "no recordarla" : typeof s === "number" ? (s < 60 ? `${s} s` : `${s / 60} min`) : "");
-const cambioDeAjustes: Detalle = (c) => {
-  const antes = (c.antes ?? {}) as Contenido, despues = (c.despues ?? {}) as Contenido;
-  return juntar(
-    "sesion_segundos" in despues && `Sesión recordada: de ${tiempo(antes.sesion_segundos)} a ${tiempo(despues.sesion_segundos)}`,
-    "celular_segundos" in despues && `Pregunta del celular: de ${tiempo(antes.celular_segundos)} a ${tiempo(despues.celular_segundos)}`,
-    "vinculo_dias" in despues && `Días del vínculo: de ${texto(antes.vinculo_dias)} a ${texto(despues.vinculo_dias)}`,
-  );
-};
-
 const DETALLES: Record<string, Detalle> = {
   "venta.registrada": (c) => juntar(pesos(c.total), MEDIOS[texto(c.medio_pago)] ?? texto(c.medio_pago), cuantos(c.items, "producto", "productos")),
   "venta.anulada": motivo,
@@ -124,24 +89,8 @@ const DETALLES: Record<string, Detalle> = {
   "lista.cargada": (c) => juntar(texto(c.proveedor), texto(c.archivo), si(c.fechaLista, (v) => `lista del ${delDia(v)}`)),
   "lista.aplicada": (c) => juntar(si(c.fechaLista, (v) => `Lista del ${delDia(v)}`), cuantos(c.actualizados, "precio actualizado", "precios actualizados"), cuantos(c.nuevos, "producto nuevo", "productos nuevos")),
   "conteo.cerrado": (c) => juntar(texto(c.sector), cuantos(c.contados, "producto contado", "productos contados"), cuantos(c.ajustados, "ajustado", "ajustados")),
-  "usuario.creado": (c) => juntar(texto(c.email), Array.isArray(c.roles) ? `con ${c.roles.length} ${c.roles.length === 1 ? "rol" : "roles"}` : ""),
-  "usuario.modificado": cambioEnUnUsuario,
-  "apartado.aceptado": (c, persona) => `De ${persona(c.de)}`,
-  "apartado.descartado": (c, persona) => `De ${persona(c.de)}`,
-  "sesion.iniciada": (c) => juntar(c.medio === "huella" ? "Con la huella" : c.medio === "celular" ? "Con el celular" : "Con Google", texto(c.dispositivo)),
-  "credencial.vinculada": (c) => texto(c.dispositivo),
-  "vinculo.dias_cambiados": (c) => cuantos(c.dias, "día", "días"),
-  "sistema.ajustes_cambiados": cambioDeAjustes,
-  "rol.creado": nombre, "rol.borrado": nombre,
   "sector.creado": nombre, "cliente.creado": nombre, "proveedor.creado": nombre,
 };
-
-/** Las personas que nombra el detalle de un evento, además de quien lo hizo. */
-export function personasDelDetalle(tipo: string, c: Contenido): string[] {
-  if (tipo === "usuario.modificado") return typeof c.id === "string" ? [c.id] : [];
-  if (tipo.startsWith("apartado.")) return typeof c.de === "string" ? [c.de] : [];
-  return [];
-}
 
 export function enPalabras(tipo: string, c: Contenido, persona: Persona): EnPalabras {
   const que = ESPECIALES.find(([es]) => es(tipo, c))?.[1] ?? QUE[tipo] ?? { titulo: tipo.replace(/[._]/g, " ") };

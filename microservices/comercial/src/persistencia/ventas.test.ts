@@ -37,7 +37,7 @@ describe("las ventas", () => {
     await datos.descontarStock(base, { producto_id: p, cantidad: 2, venta_id: id, fecha: ahora() });
     expect(await datos.stockDe(base, p)).toBe(-1);
     const ana = await usuario();
-    await datos.anotarFaltante(base, { producto_id: p, usuario_id: ana, venta_id: id, cantidad: 1, detalle: "faltó 1" });
+    await datos.anotarFaltante(base, { producto_id: p, usuario_id: ana, usuario_nombre: "Ana", venta_id: id, cantidad: 1, detalle: "faltó 1" });
     expect((await base.selectFrom("anomalia").select("tipo").where("venta_id", "=", id).executeTakeFirstOrThrow()).tipo).toBe("venta_sin_stock");
     await ventaCon(p);
     expect((await datos.ultimosProductosVendidos(base, 10)).filter((x) => x === p)).toHaveLength(1);
@@ -116,7 +116,7 @@ describe("las ventas", () => {
     await datos.insertarCambio(base, { id: cambio, venta_id: id, usuario_id: ana, dispositivo_id: null, diferencia: 500, resuelto: "cobrado" });
     await datos.insertarMovimientoDeDinero(base, { tipo: "cobro_diferencia", medio_pago: "efectivo", cliente_id: null, importe: 500, venta_id: id, cambio_id: cambio, usuario_id: ana });
     expect((await datos.movimientosDelDia(base, null)).find((m) => m.cambio_id === cambio)).toMatchObject({ suma: true, correccion_id: null });
-    await datos.anotarDevueltoFallado(base, { producto_id: p, usuario_id: ana, venta_id: id, cantidad: 1, detalle: "fallado" });
+    await datos.anotarDevueltoFallado(base, { producto_id: p, usuario_id: ana, usuario_nombre: "Ana", venta_id: id, cantidad: 1, detalle: "fallado" });
     expect((await base.selectFrom("anomalia").select("tipo").where("detalle", "=", "fallado").executeTakeFirstOrThrow()).tipo).toBe("devuelto_fallado");
   });
 });

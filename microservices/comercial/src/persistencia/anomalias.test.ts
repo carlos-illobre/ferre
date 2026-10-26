@@ -9,7 +9,7 @@ describe("las anomalías", () => {
     const ana = await usuario({ nombre: "Ana" });
     const v = await venta();
     await base.insertInto("anomalia").values([
-      { id: crypto.randomUUID(), tipo: "venta_sin_stock", producto_id: p, usuario_id: ana, venta_id: v, cantidad: 2, detalle: "vieja", creado_en: new Date("2026-10-01") },
+      { id: crypto.randomUUID(), tipo: "venta_sin_stock", producto_id: p, usuario_id: ana, usuario_nombre: "Ana", venta_id: v, cantidad: 2, detalle: "vieja", creado_en: new Date("2026-10-01") },
       { id: crypto.randomUUID(), tipo: "devuelto_fallado", producto_id: p, usuario_id: null, venta_id: null, cantidad: 1, detalle: "nueva", creado_en: new Date("2026-10-02") },
     ]).execute();
     const filas = await pagina(base, 10, 0);

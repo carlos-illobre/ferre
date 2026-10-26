@@ -7,90 +7,6 @@ vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool
 const { app } = await import("../app.js");
 const { cargarParaPrueba } = await import("../productos/copia.js");
 
-const ROL = "0b0e1d6a-7c1f-4a55-9d0e-3f6c2a9b1c11";
-const administran = (...ids: string[]) => base.actual.programar(/FROM usuario u\s+WHERE u\.activo AND \(SELECT count\(DISTINCT rp\.permiso\)/, { rows: ids.map((id) => ({ id })) });
-
-// Los roles los arma el negocio con los permisos fijos del sistema (RF-75, ADR-017).
-describe("roles", () => {
-  beforeEach(() => { base.actual = baseFalsa(); administran("u-admin"); base.actual.programar(/UPDATE rol SET nombre/, { rowCount: 1 }); });
-
-  it("011-E40 la lista de permisos sale del servidor: veintidós (Administrar sesiones se unió a Administrar usuarios: decisión 100; Administrar el sistema, specs/020), con «Ver procesos» y «Dibujar procesos» en Negocio, cada uno con su parte, nombre y explicación", async () => {
-    const r = await pedir(app, "GET", "/permisos", { rol: "admin" });
-    const lista = (await r.json()) as { clave: string; parte: string; nombre: string; detalle: string }[];
-    expect(lista).toHaveLength(22);
-    expect(lista.filter((p) => p.clave.startsWith("procesos.")).map((p) => [p.parte, p.nombre])).toEqual([["Negocio", "Ver procesos"], ["Negocio", "Dibujar procesos"]]);
-    expect(lista.every((p) => p.clave && p.parte && p.nombre && p.detalle)).toBe(true);
-    expect(new Set(lista.map((p) => p.parte))).toEqual(new Set(["Vender", "Catálogo", "Depósito", "Negocio", "Administración"]));
-    expect((await pedir(app, "GET", "/permisos", { rol: "mostrador" })).status).toBe(403);
-  });
-
-  it("sin el permiso de administrar roles no se crean, cambian ni borran", async () => {
-    for (const [metodo, ruta] of [["POST", "/roles"], ["PATCH", `/roles/${ROL}`], ["DELETE", `/roles/${ROL}`]] as const) {
-      const r = await pedir(app, metodo, ruta, { rol: "mostrador", cuerpo: { nombre: "X", permisos: ["ventas.registrar"] } });
-      expect(r.status, `${metodo} ${ruta}`).toBe(403);
-      expect(((await r.json()) as { error: string }).error).toContain("Administrar roles");
-    }
-    expect((await pedir(app, "GET", "/roles", { rol: null })).status).toBe(401);
-  });
-
-  it("se crea un rol con su nombre y sus permisos, y queda en el registro", async () => {
-    const r = await pedir(app, "POST", "/roles", { rol: "admin", cuerpo: { nombre: " Encargado ", permisos: ["ventas.registrar", "deposito.ingresos", "ventas.registrar"] } });
-    expect(r.status).toBe(201);
-    expect(base.actual.sqlDe(/INSERT INTO rol \(/)[0]!.params[1]).toBe("Encargado");
-    expect(base.actual.sqlDe(/INSERT INTO rol_permiso/)[0]!.params[1]).toEqual(["ventas.registrar", "deposito.ingresos"]);
-    expect(base.actual.eventos()[0]!.tipo).toBe("rol.creado");
-  });
-
-  it("sin nombre, sin permisos o con un permiso que no existe, no se guarda; un nombre repetido, 409", async () => {
-    for (const [cuerpo, mensaje] of [[{ nombre: " ", permisos: ["ventas.registrar"] }, "nombre"], [{ nombre: "X", permisos: [] }, "al menos un permiso"], [{ nombre: "X", permisos: ["inventado"] }, "No existe el permiso"]] as const) {
-      const r = await pedir(app, "POST", "/roles", { rol: "admin", cuerpo });
-      expect(r.status).toBe(400);
-      expect(((await r.json()) as { error: string }).error).toContain(mensaje);
-    }
-    base.actual.programar(/INSERT INTO rol \(/, () => { throw Object.assign(new Error("duplicado"), { code: "23505" }); });
-    const r = await pedir(app, "POST", "/roles", { rol: "admin", cuerpo: { nombre: "Vendedor", permisos: ["ventas.registrar"] } });
-    expect(r.status).toBe(409);
-    expect(((await r.json()) as { error: string }).error).toContain("Ya hay un rol que se llama Vendedor");
-  });
-
-  it("cambiar los permisos de un rol los reemplaza", async () => {
-    const r = await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["ventas.ver"] } });
-    expect(r.status).toBe(204);
-    expect(base.actual.sqlDe(/DELETE FROM rol_permiso WHERE rol_id/)[0]!.params).toEqual([ROL]);
-    expect(base.actual.sqlDe(/INSERT INTO rol_permiso/)[0]!.params).toEqual([ROL, ["ventas.ver"]]);
-  });
-
-  it("020: un cambio no puede dejar al sistema sin nadie con «Administrar el sistema»; no hace falta que sea quien administra usuarios y roles", async () => {
-    base.actual.programar(/AS n FROM usuario u\s+JOIN usuario_rol/, { rows: [{ n: 0 }] });
-    const r = await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["admin.usuarios", "admin.roles"] } });
-    expect(r.status).toBe(409);
-    expect(((await r.json()) as { error: string }).error).toContain("sin nadie que pueda administrar el sistema");
-    // Quien administra usuarios y roles sin el permiso nuevo sigue pudiendo cambiar roles, si otro lo tiene.
-    base.actual.programar(/AS n FROM usuario u\s+JOIN usuario_rol/, { rows: [{ n: 1 }] });
-    expect((await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["admin.usuarios", "admin.roles"] } })).status).toBe(204);
-  });
-
-  it("un cambio de permisos no puede dejar al sistema sin quien administre, ni a quien lo hace", async () => {
-    administran();
-    const r = await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["ventas.ver"] } });
-    expect(r.status).toBe(409);
-    expect(((await r.json()) as { error: string }).error).toContain("sin nadie que pueda administrar");
-    administran("u-dueño");
-    expect((await pedir(app, "PATCH", `/roles/${ROL}`, { rol: "admin", cuerpo: { permisos: ["ventas.ver"] } })).status).toBe(400);
-    expect(base.actual.sqlDe(/^commit/)).toHaveLength(0);
-  });
-
-  it("un rol que alguien tiene no se borra; uno libre sí", async () => {
-    base.actual.programar(/SELECT r\.nombre, \(SELECT count/, { rows: [{ nombre: "Vendedor", usuarios: 2 }] });
-    const r = await pedir(app, "DELETE", `/roles/${ROL}`, { rol: "admin" });
-    expect(r.status).toBe(409);
-    expect(((await r.json()) as { error: string }).error).toContain("lo tienen 2 personas");
-    expect(base.actual.sqlDe(/DELETE FROM rol WHERE id/)).toHaveLength(0);
-    base.actual.programar(/SELECT r\.nombre, \(SELECT count/, { rows: [{ nombre: "Viejo", usuarios: 0 }] });
-    expect((await pedir(app, "DELETE", `/roles/${ROL}`, { rol: "admin" })).status).toBe(204);
-    expect(base.actual.sqlDe(/DELETE FROM rol WHERE id/)).toHaveLength(1);
-  });
-});
 
 // Cada operación pide su permiso (RF-72): quien solo vende no puede lo demás.
 describe("permisos por operación", () => {
@@ -102,9 +18,7 @@ describe("permisos por operación", () => {
     ["PUT", "/pedidos/x", "Encargar compras"], ["POST", "/compras", "Registrar ingresos"], ["GET", "/compras", "Ver las compras"], ["GET", "/compras/semana", "Ver los gastos"],
     ["POST", "/stock/p1/ajustes", "Contar y corregir stock"], ["GET", "/sectores", "Contar y corregir stock"],
     ["GET", "/anomalias", "Ver las anomalías"], ["GET", "/consultas", "Ver las ventas del negocio"],
-    ["GET", "/usuarios", "Administrar usuarios"], ["GET", "/sesiones", "Administrar usuarios"], ["GET", "/roles", "Administrar roles"],
     ["PATCH", "/productos/p1", "Fijar márgenes"],
-    ["GET", "/sistema/ajustes", "Administrar el sistema"], ["PUT", "/sistema/ajustes", "Administrar el sistema"], ["PUT", "/puestos/configuracion", "Administrar el sistema"],
   ];
   it("sin el permiso, 403 diciendo cuál hace falta, y la sesión sigue", async () => {
     for (const [metodo, ruta, permiso] of PROHIBIDO_AL_QUE_SOLO_VENDE) {
@@ -114,7 +28,7 @@ describe("permisos por operación", () => {
     }
   });
   it("lo que no pide permiso anda con cualquier sesión: catálogo, stock, clientes y proveedores", async () => {
-    for (const ruta of ["/productos", "/stock", "/clientes", "/proveedores", "/sesiones/actual"]) {
+    for (const ruta of ["/productos", "/stock", "/clientes", "/proveedores"]) {
       expect((await pedir(app, "GET", ruta, { rol: "soloVende" })).status, ruta).toBe(200);
     }
   });
@@ -137,8 +51,9 @@ describe("permisos por operación", () => {
     // «Anular ventas de cualquier día» se prueba con las ventas; «Ver costos» no lo exige ninguna
     // ruta: decide qué muestran las pantallas. Los de Procesos y «Ver quién hizo qué» los exigen
     // Procesos y Auditoría, que los leen de X-Permisos (specs/026 y 027); «Ver el dinero
-    // invertido», con el stock (secciones-de-negocio.test.ts).
-    const usados = new Set([...PROHIBIDO_AL_QUE_SOLO_VENDE.map(([, , nombre]) => nombre), "Vender", "Anular ventas de cualquier día", "Ver costos", "Ver procesos", "Dibujar procesos", "Ver quién hizo qué", "Ver el dinero invertido"]);
+    // invertido», con el stock (secciones-de-negocio.test.ts). Los de administrar usuarios, roles y el
+    // sistema los exige Acceso (specs/029, sus pruebas de roles).
+    const usados = new Set([...PROHIBIDO_AL_QUE_SOLO_VENDE.map(([, , nombre]) => nombre), "Vender", "Administrar usuarios", "Administrar roles", "Administrar el sistema", "Anular ventas de cualquier día", "Ver costos", "Ver procesos", "Dibujar procesos", "Ver quién hizo qué", "Ver el dinero invertido"]);
     expect(PERMISOS.filter((p) => !usados.has(p.nombre)).map((p) => p.nombre)).toEqual([]);
   });
 });

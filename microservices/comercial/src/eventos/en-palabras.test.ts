@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { problemaDelEvento } from "auditoria-kit";
-import { enPalabras, personasDelDetalle } from "./en-palabras.js";
+import { enPalabras } from "./en-palabras.js";
 
 const persona = (id: unknown) => (id === "u-ana" ? "Ana" : "un usuario");
 
@@ -21,18 +21,9 @@ describe("los eventos en palabras", () => {
     expect(enPalabras("stock.ajustado", { antes: 4, despues: 2.5, motivo: "rotura" }, persona)).toMatchObject({ detalle: "De 4 a 2,5 · rotura", importancia: "revisar", grupo: "Ajustes de stock" });
   });
 
-  it("nombra a la persona sobre la que se hizo el cambio", () => {
-    expect(personasDelDetalle("usuario.modificado", { id: "u-ana" })).toEqual(["u-ana"]);
-    expect(personasDelDetalle("apartado.aceptado", { de: "u-ana" })).toEqual(["u-ana"]);
-    expect(personasDelDetalle("venta.registrada", { id: "v1" })).toEqual([]);
-    expect(enPalabras("usuario.modificado", { id: "u-ana", cambios: { activo: false } }, persona)).toMatchObject({ titulo: "Usuario desactivado", detalle: "Desactivó a Ana", grupo: "Usuarios" });
-    expect(enPalabras("usuario.modificado", { id: "u-ana", cambios: { roles: ["r"], nombre: "Ana P." } }, persona)).toMatchObject({ titulo: "Cambio en un usuario", detalle: "Cambió los roles de Ana · Ahora se llama Ana P." });
-    expect(enPalabras("apartado.descartado", { de: "u-otro" }, persona).detalle).toBe("De un usuario");
-  });
 
-  it("las listas con la fecha del día; los ajustes, de cuánto a cuánto", () => {
+  it("las listas con la fecha del día", () => {
     expect(enPalabras("lista.cargada", { proveedor: "Bahco", archivo: "lista.xlsx", fechaLista: "2026-10-01" }, persona).detalle).toBe("Bahco · lista.xlsx · lista del 01/10/2026");
-    expect(enPalabras("sistema.ajustes_cambiados", { antes: { celular_segundos: 30 }, despues: { celular_segundos: 0 } }, persona).detalle).toBe("Pregunta del celular: de 30 s a no recordarla");
   });
 
   it("un tipo sin palabras propias se lee igual, y sin detalle", () => {
@@ -40,10 +31,7 @@ describe("los eventos en palabras", () => {
   });
 
   it("cada evento que anota Comercial cumple el contrato", () => {
-    const tipos = ["venta.registrada", "venta.pagada", "venta.corregida", "venta.cambio", "compra.registrada", "pedido.enviado", "pedido.recibido", "pedido.cancelado", "pedido.cerrado",
-      "producto.foto", "producto.unido", "producto.separado", "equivalencia.rechazada", "lista.aplicada", "lista.descartada", "sector.creado", "conteo.abierto", "conteo.cerrado",
-      "usuario.creado", "rol.creado", "rol.modificado", "rol.borrado", "sesion.iniciada", "sesion.cerrada", "sesion.revocada", "credencial.vinculada", "credencial.quitada",
-      "puesto.vinculado", "puesto.desvinculado", "vinculo.dias_cambiados", "cliente.creado", "proveedor.creado", "proveedor.modificado"];
+    const tipos = ["venta.registrada", "venta.pagada", "venta.corregida", "venta.cambio", "compra.registrada", "pedido.enviado", "pedido.recibido", "pedido.cancelado", "pedido.cerrado", "producto.foto", "producto.unido", "producto.separado", "equivalencia.rechazada", "lista.aplicada", "lista.descartada", "sector.creado", "conteo.abierto", "conteo.cerrado", "cliente.creado", "proveedor.creado", "proveedor.modificado"];
     for (const tipo of tipos) {
       const palabras = enPalabras(tipo, { nombre: "X", dias: 7 }, persona);
       expect(palabras.titulo, tipo).not.toBe(tipo.replace(/[._]/g, " "));

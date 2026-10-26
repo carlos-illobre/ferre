@@ -5,19 +5,17 @@ const base = vi.hoisted(() => ({ actual: null as unknown as ReturnType<typeof im
 vi.mock("../persistencia/pool.js", () => ({ get pool() { return base.actual.pool; } }));
 const { anotarEvento, contenidoQueEntra } = await import("./anotar.js");
 const { base: db } = await import("../persistencia/conexion.js");
+const { comoPersona } = await import("../autenticacion.js");
 
 // El evento sale con quién lo hizo, por su nombre de ese momento, y con sus palabras (specs/027).
 describe("anotar un evento", () => {
-  beforeEach(() => {
-    base.actual = baseFalsa();
-    base.actual.programar(/from "usuario"/, (params) => ({ rows: [{ id: "u-ana", nombre: "Ana" }, { id: "u-beto", nombre: "Beto" }].filter((u) => params.includes(u.id)) }));
-  });
+  beforeEach(() => { base.actual = baseFalsa(); });
 
-  it("con el nombre de quien lo hizo y de la persona que nombra el detalle", async () => {
-    await anotarEvento(db, { tipo: "usuario.modificado", usuarioId: "u-ana", dispositivoId: "celular-1", contenido: { id: "u-beto", cambios: { activo: false } } });
+  it("029-E10: con el nombre de quien hace el pedido, el que trae de la puerta", async () => {
+    await comoPersona({ id: "u-ana", nombre: "Ana", permisos: [] }, () => anotarEvento(db, { tipo: "venta.anulada", usuarioId: "u-ana", dispositivoId: "celular-1", contenido: { id: "v1", motivo: "error" } }));
     expect(base.actual.eventos()).toEqual([expect.objectContaining({
-      tipo: "usuario.modificado", quien: { id: "u-ana", nombre: "Ana" }, dispositivo: "celular-1",
-      titulo: "Usuario desactivado", detalle: "Desactivó a Beto", grupo: "Usuarios", importancia: "normal", servicio: "comercial",
+      tipo: "venta.anulada", quien: { id: "u-ana", nombre: "Ana" }, dispositivo: "celular-1",
+      titulo: "Venta anulada", detalle: "Motivo: error", grupo: "Ventas", importancia: "anulacion", servicio: "comercial",
     })]);
   });
 
@@ -38,8 +36,7 @@ describe("anotar un evento", () => {
   });
 
   it("un nombre o un dispositivo más largos que el contrato se cortan: la acción no falla", async () => {
-    base.actual.programar(/from "usuario"/, () => ({ rows: [{ id: "u-largo", nombre: "N".repeat(200) }] }));
-    await anotarEvento(db, { tipo: "venta.anulada", usuarioId: "u-largo", dispositivoId: "d".repeat(200), contenido: { id: "v1", motivo: "m".repeat(400) } });
+    await comoPersona({ id: "u-largo", nombre: "N".repeat(200), permisos: [] }, () => anotarEvento(db, { tipo: "venta.anulada", usuarioId: "u-largo", dispositivoId: "d".repeat(200), contenido: { id: "v1", motivo: "m".repeat(400) } }));
     const [e] = base.actual.eventos();
     expect([e!.quien!.nombre.length, e!.dispositivo!.length, e!.detalle!.length]).toEqual([120, 120, 300]);
   });

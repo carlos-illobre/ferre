@@ -1,9 +1,11 @@
 import * as datos from "../persistencia/eventos.js";
 import type { Ejecutor } from "../persistencia/transaccion.js";
-import { enPalabras, personasDelDetalle } from "./en-palabras.js";
+import { nombreDe } from "../autenticacion.js";
+import { enPalabras } from "./en-palabras.js";
 
 // Toda escritura de negocio anota qué pasó, quién, cuándo y desde dónde (constitución, principio V).
-// El evento va a Auditoría con sus palabras y el nombre de la persona en ese momento (specs/027).
+// El evento va a Auditoría con sus palabras y el nombre de la persona en ese momento (specs/027): el
+// que trae el pedido, que lo pone Acceso (specs/029).
 export type Evento = {
   tipo: string;
   contenido: Record<string, unknown>;
@@ -33,9 +35,7 @@ export function contenidoQueEntra(c: Record<string, unknown>): Record<string, un
 
 export async function anotarEvento(e: Ejecutor, evento: Evento): Promise<void> {
   if (!datos.bandeja.encendida) return;
-  const ids = [...new Set([evento.usuarioId, ...personasDelDetalle(evento.tipo, evento.contenido)].filter((id): id is string => Boolean(id)))];
-  const nombres = await datos.nombres(e, ids);
-  const persona = (id: unknown) => nombres.get(id as string) ?? "un usuario";
+  const persona = (id: unknown) => nombreDe(id as string) ?? "un usuario";
   const quien = evento.usuarioId ? { id: cortar(evento.usuarioId, 120), nombre: cortar(persona(evento.usuarioId), 120) } : null;
   const palabras = enPalabras(evento.tipo, evento.contenido, persona);
   await datos.anotar(e, {

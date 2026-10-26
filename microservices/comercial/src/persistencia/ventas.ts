@@ -29,8 +29,9 @@ export const descontarStock = (e: Ejecutor, m: { producto_id: string; cantidad: 
   e.insertInto("movimiento_stock").values({ id: randomUUID(), producto_id: m.producto_id, tipo: "venta", cantidad: -m.cantidad, referencia_tipo: "venta", referencia_id: m.venta_id, fecha: m.fecha }).execute();
 
 // La venta de algo que el sistema no tenía en stock (RF-59). La cantidad es el quinto valor.
-export const anotarFaltante = (e: Ejecutor, a: { producto_id: string; usuario_id: string; venta_id: string; cantidad: number; detalle: string }) =>
-  e.insertInto("anomalia").values({ id: randomUUID(), producto_id: a.producto_id, usuario_id: a.usuario_id, venta_id: a.venta_id, cantidad: a.cantidad, detalle: a.detalle, tipo: "venta_sin_stock" }).execute();
+// Quién la dejó va con su nombre del momento (specs/029).
+export const anotarFaltante = (e: Ejecutor, a: { producto_id: string; usuario_id: string; usuario_nombre: string | null; venta_id: string; cantidad: number; detalle: string }) =>
+  e.insertInto("anomalia").values({ id: randomUUID(), producto_id: a.producto_id, usuario_id: a.usuario_id, usuario_nombre: a.usuario_nombre, venta_id: a.venta_id, cantidad: a.cantidad, detalle: a.detalle, tipo: "venta_sin_stock" }).execute();
 
 export type FilaDelDia = { id: string; fecha: Date; medio_pago: MedioPago; total: string; estado: EstadoDeDocumento; pagada_en: Date | null; cliente: string | null; cliente_id: string | null; version: Date; correcciones: number; items: Omit<ItemDeVenta, "subtotal">[] };
 
@@ -156,7 +157,7 @@ export const unidadDe = async (e: Ejecutor, productoId: string): Promise<string>
 export const moverStock = (e: Ejecutor, m: { producto_id: string; cantidad: number; tipo: "correccion" | "cambio"; venta_id: string; nota: string }) =>
   e.insertInto("movimiento_stock").values({ id: randomUUID(), producto_id: m.producto_id, tipo: m.tipo, cantidad: m.cantidad, referencia_tipo: "venta", referencia_id: m.venta_id, fecha: sql<Date>`now()`, nota: m.nota }).execute();
 
-export const anotarDevueltoFallado = (e: Ejecutor, a: { producto_id: string; usuario_id: string; venta_id: string; cantidad: number; detalle: string }) =>
+export const anotarDevueltoFallado = (e: Ejecutor, a: { producto_id: string; usuario_id: string; usuario_nombre: string | null; venta_id: string; cantidad: number; detalle: string }) =>
   e.insertInto("anomalia").values({ id: randomUUID(), tipo: "devuelto_fallado", ...a }).execute();
 
 export const insertarMovimientoDeDinero = (e: Ejecutor, m: { tipo: TipoDeMovimientoDeDinero; medio_pago: MedioPago; cliente_id: string | null; importe: number; venta_id: string; correccion_id?: string; cambio_id?: string; usuario_id: string }) =>

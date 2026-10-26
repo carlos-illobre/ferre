@@ -23,7 +23,7 @@ module.exports = {
       comment: "Una ruta (src/rutas) solo llama a reglas.",
       severity: "error",
       from: { path: "^src/rutas/", pathNot: PRUEBAS },
-      to: { path: "^src/persistencia/|^src/acceso/(sesiones|vinculo)\\.ts$" },
+      to: { path: "^src/persistencia/" },
     },
     {
       name: "la-persistencia-no-depende-del-negocio",

@@ -34,13 +34,13 @@ describe("los pedidos", () => {
     await datos.reemplazarRenglones(base, id, prov, [{ producto_id: await producto(), cantidad: 1 }]);
     expect(await datos.paraMandar(base, id)).toEqual({ estado: "borrador", proveedor_id: prov, proveedor: "ZZ Ixnova", renglones: "1" });
     expect(await datos.paraMandar(base, crypto.randomUUID())).toBeNull();
-    await datos.marcarEnviado(base, id, ana);
+    await datos.marcarEnviado(base, id, ana, "Ana");
     await datos.guardarWhatsapp(base, prov, "1155");
     expect(await datos.uno(base, id)).toMatchObject({ estado: "enviado", enviado_por: "Ana", whatsapp: "1155", items: [{ costo_estimado: null }] });
     expect((await datos.lista(base, ["enviado"])).map((x) => x.id)).toContain(id);
     expect((await datos.lista(base, ["cancelado"])).map((x) => x.id)).not.toContain(id);
-    expect(await datos.pasarDeEstado(base, id, "borrador", "cancelado", ana)).toBe(false);
-    expect(await datos.pasarDeEstado(base, id, "enviado", "cancelado", ana)).toBe(true);
+    expect(await datos.pasarDeEstado(base, id, "borrador", "cancelado", ana, "Ana")).toBe(false);
+    expect(await datos.pasarDeEstado(base, id, "enviado", "cancelado", ana, "Ana")).toBe(true);
     expect((await datos.lista(base, null)).find((x) => x.id === id)).toMatchObject({ estado: "cancelado", cerrado_por: "Ana" });
   });
 });
