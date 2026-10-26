@@ -12,4 +12,5 @@ packages:
   - microservices/auditoria-kit
   - microservices/auditoria
   - microservices/tickets
+  - microservices/acceso
   - tests/e2e

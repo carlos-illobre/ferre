@@ -1,0 +1,38 @@
+// Los permisos del sistema (RF-72, ADR-017). Son fijos: cada uno corresponde a un control real
+// de alguna ruta. Los roles, que los agrupan, los arma el negocio desde la aplicación. Esta
+// lista es la única fuente: la pantalla la pide al servidor. Sumar un permiso es agregarlo
+// acá y exigirlo en la ruta; ningún rol lo tiene hasta que alguien se lo dé.
+export const PERMISOS = [
+  { clave: "ventas.registrar", parte: "Vender", nombre: "Vender", detalle: "Armar una venta, cobrar, anotar «No llevó», elegir el cliente y cambiar el margen dentro de esa venta" },
+  { clave: "ventas.ver", parte: "Vender", nombre: "Ver las ventas del día", detalle: "Abrir «Ventas de hoy»" },
+  { clave: "ventas.anular", parte: "Vender", nombre: "Anular ventas del día", detalle: "Anular una venta registrada hoy" },
+  { clave: "ventas.anular_cualquiera", parte: "Vender", nombre: "Anular ventas de cualquier día", detalle: "Anular una venta de hoy o de un día anterior" },
+  { clave: "catalogo.costos", parte: "Catálogo", nombre: "Ver costos", detalle: "Ver lo que cobra cada proveedor por un producto y de dónde sale cada precio" },
+  { clave: "catalogo.margenes", parte: "Catálogo", nombre: "Fijar márgenes", detalle: "Elegir el margen de un producto en el catálogo, que queda guardado" },
+  { clave: "catalogo.listas", parte: "Catálogo", nombre: "Cargar listas de precios", detalle: "Cargar y aplicar la lista de un proveedor; dar de alta proveedores" },
+  { clave: "catalogo.duplicados", parte: "Catálogo", nombre: "Unir duplicados", detalle: "Unir y separar productos repetidos" },
+  { clave: "deposito.pedidos", parte: "Depósito", nombre: "Encargar compras", detalle: "Armar pedidos a proveedores, mandarlos, cancelarlos y cerrarlos" },
+  { clave: "deposito.ingresos", parte: "Depósito", nombre: "Registrar ingresos", detalle: "Registrar la mercadería que llega y anular un ingreso" },
+  { clave: "deposito.compras", parte: "Depósito", nombre: "Ver las compras", detalle: "Ver las compras recientes y sus comprobantes" },
+  { clave: "deposito.stock", parte: "Depósito", nombre: "Contar y corregir stock", detalle: "Contar estanterías y corregir el stock a mano" },
+  // Cómo va el negocio, en tres secciones con su permiso cada una (decisión 95, 013).
+  { clave: "negocio.ventas", parte: "Negocio", nombre: "Ver las ventas del negocio", detalle: "Cómo va el negocio → Ventas: lo vendido, cómo se cobró y lo que preguntaron y no llevaron" },
+  { clave: "negocio.gastos", parte: "Negocio", nombre: "Ver los gastos", detalle: "Cómo va el negocio → Compras: los gastos de la semana por proveedor" },
+  { clave: "negocio.invertido", parte: "Negocio", nombre: "Ver el dinero invertido", detalle: "Cómo va el negocio → Inventario, y el valor en pesos del stock en cualquier pantalla" },
+  { clave: "negocio.anomalias", parte: "Negocio", nombre: "Ver las anomalías", detalle: "Abrir «Anomalías»" },
+  { clave: "negocio.actividad", parte: "Negocio", nombre: "Ver quién hizo qué", detalle: "Abrir el registro de acciones" },
+  { clave: "procesos.ver", parte: "Negocio", nombre: "Ver procesos", detalle: "Abrir «Procesos» y mirar los procesos vigentes, sus pasos y su historial" },
+  { clave: "procesos.dibujar", parte: "Negocio", nombre: "Dibujar procesos", detalle: "Todo lo de «Ver procesos», más crear, cambiar, marcar vigentes, importar, exportar y borrar los procesos" },
+  // «Administrar sesiones» se unió a este (decisión 100).
+  { clave: "admin.usuarios", parte: "Administración", nombre: "Administrar usuarios", detalle: "Autorizar personas, asignarles roles, desactivarlas, cerrarles las sesiones y quitarles los celulares con huella" },
+  { clave: "admin.roles", parte: "Administración", nombre: "Administrar roles", detalle: "Crear roles, cambiarles el nombre y los permisos, borrarlos" },
+  // Lo que vale para todos los dispositivos, en Más → Sistema (specs/020).
+  { clave: "admin.sistema", parte: "Administración", nombre: "Administrar el sistema", detalle: "Más → Sistema: cuánto recuerda la sesión el servidor, cada cuánto pregunta el celular emparejado y cuántos días dura el vínculo, para todos" },
+] as const;
+export type Permiso = (typeof PERMISOS)[number]["clave"];
+export const CLAVES_DE_PERMISO: readonly string[] = PERMISOS.map((p) => p.clave);
+export const nombreDePermiso = (clave: string) => PERMISOS.find((p) => p.clave === clave)?.nombre ?? clave;
+// Sin estos dos nadie podría volver a dar permisos: siempre tiene que quedar alguien que los tenga.
+export const PARA_ADMINISTRAR: Permiso[] = ["admin.usuarios", "admin.roles"];
+// Y alguien que pueda fijar los ajustes del sistema (specs/020), no necesariamente la misma persona.
+export const PARA_EL_SISTEMA: Permiso = "admin.sistema";
