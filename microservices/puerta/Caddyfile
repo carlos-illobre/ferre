@@ -19,6 +19,8 @@
 	request_header -X-Usuario-Nombre
 	request_header -X-Permisos
 	request_header -X-Token-Servicio
+	# Que un pedido repite lo apartado (specs/029) lo dice solo Acceso, por la red interna.
+	request_header -X-Apartado
 
 	# La aplicación vive en otro origen (ADR-010): solo ese origen puede llamar desde el
 	# navegador, y puede leer lo que va a cuestas en cada respuesta (X-Avisos, decisión 157).

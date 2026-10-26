@@ -29,10 +29,6 @@ export const exigirTokenDeServicio: MiddlewareHandler = async (c, next) => {
 };
 
 export const exigirSesion: MiddlewareHandler = async (c, next) => {
-  // Un pedido que el servidor se hace a sí mismo para aceptar lo apartado (ADR-021) trae en su
-  // entorno la sesión de quien lo hizo. Ese entorno lo arma solo el servidor: desde la red no se llena.
-  const interna = (c.env as { sesionInterna?: SesionActiva } | undefined)?.sesionInterna;
-  if (interna) { c.set("sesion", interna); await next(); return; }
   const token = tokenDe(c);
   const sesion = token ? await buscarSesion(base, token) : null;
   if (!sesion) return c.json({ error: "Hay que iniciar sesión" }, 401);

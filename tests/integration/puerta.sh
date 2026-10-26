@@ -47,8 +47,10 @@ verificar "026-E03: sin sesión, 401" '{"error":"Hay que iniciar sesión"}' "$(c
 verificar "026-E03: con la sesión cerrada, 401" 401 "$(codigo -H 'Authorization: Bearer cualquiera' $API/procesos)"
 
 # Seguridad (plan de 026): las cabeceras de identidad que manda el navegador no valen.
-falsas=(-H "X-Usuario-Id: alguien" -H "X-Usuario-Nombre: Falso" -H "X-Permisos: procesos.ver,procesos.dibujar" -H "X-Token-Servicio: inventado")
+falsas=(-H "X-Usuario-Id: alguien" -H "X-Usuario-Nombre: Falso" -H "X-Permisos: procesos.ver,procesos.dibujar,deposito.stock" -H "X-Token-Servicio: inventado")
 verificar "seguridad: sin sesión, las cabeceras falsas no alcanzan" 401 "$(codigo "${falsas[@]}" $API/procesos)"
+verificar "seguridad: sin sesión, las cabeceras falsas no alcanzan a Comercial" 401 "$(codigo "${falsas[@]}" $API/sectores)"
+verificar "seguridad: con sesión sin permiso, Comercial no cree los permisos falsos" 403 "$(codigo "${falsas[@]}" -H "Authorization: Bearer $VENDE" $API/sectores)"
 verificar "seguridad: con sesión sin permiso, los permisos falsos no alcanzan" 403 "$(codigo "${falsas[@]}" -H "Authorization: Bearer $VENDE" -H 'Content-Type: application/json' -d '{"nombre":"Falso"}' $API/procesos)"
 
 # 029: lo que Comercial atiende sin sesión pasa sin preguntarle a Acceso.

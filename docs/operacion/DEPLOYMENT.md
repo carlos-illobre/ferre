@@ -108,6 +108,16 @@ tener `CLAVE_BASE_ACCESO` (`openssl rand -hex 24`), o el compose no arranca. Des
 3. Las tablas de personas se borran de la base del mostrador con la misma versión; lo que se hizo
    antes conserva el nombre de quien lo hizo.
 
+**Antes de desplegar**, en la aplicación vieja: quien administra decide (acepta o descarta) todo lo
+apartado, porque lo pendiente se borra y no pasa a Acceso, y anota los ajustes del sistema (cuánto
+recuerda la sesión, cuántos días dura el vínculo), que en Acceso arrancan con los de siempre (1
+minuto y 30 días) y se vuelven a poner desde la aplicación. Para ver si hay algo pendiente:
+
+```bash
+docker compose exec -T db psql -U mostrador -d mostrador -tAc "SELECT count(*) FROM cambio_apartado WHERE decision IS NULL"
+docker compose exec -T db psql -U mostrador -d mostrador -tAc "SELECT clave, valor FROM configuracion"
+```
+
 ## Si se pierde el `.env`, o hay que cambiar una clave de la base
 
 Los datos no se pierden: están en el volumen del ambiente, no dependen de las claves. Sin las
