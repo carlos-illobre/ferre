@@ -15,7 +15,7 @@ const GRUPOS: Record<string, string> = {
   lista: "Listas de precios", stock: "Ajustes de stock", conteo: "Conteos", sector: "Conteos",
   usuario: "Usuarios", rol: "Usuarios", apartado: "Usuarios", sesion: "Entradas y salidas de la app",
   credencial: "Celulares con huella", puesto: "Celulares vinculados", vinculo: "Celulares vinculados",
-  cliente: "Clientes", proveedor: "Proveedores", sistema: "Ajustes del sistema", ticket: "Mejoras y errores",
+  cliente: "Clientes", proveedor: "Proveedores", sistema: "Ajustes del sistema"
 };
 
 type Que = { titulo: string; importancia?: Importancia };
@@ -62,9 +62,6 @@ const QUE: Record<string, Que> = {
   "cliente.creado": { titulo: "Cliente nuevo" },
   "proveedor.creado": { titulo: "Proveedor nuevo" },
   "proveedor.modificado": { titulo: "Cambio en un proveedor" },
-  "ticket.creado": { titulo: "Pedido de mejora o error" },
-  "ticket.resuelto": { titulo: "Pedido de mejora o error resuelto" },
-  "ticket.reabierto": { titulo: "Pedido de mejora o error reabierto" },
 };
 
 // Algunas acciones se nombran por lo que tienen adentro: el margen, la cuenta corriente, desactivar.

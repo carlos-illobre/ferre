@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api } from "../../datos/conexion";
-import type { ResolucionDeTicket } from "@servidor/tickets";
+import type { ResolucionDeTicket } from "@tickets/tickets";
 
 // Marcar resuelto un ticket, con una nota para quien avisó, o reabrirlo.
 export function useResolverTicket(id: string, alCambiar: () => Promise<void>) {

@@ -50,7 +50,7 @@ services:
         condition: service_healthy
       procesos:
         condition: service_healthy
-      # Auditoría no: la puerta funciona sin ella y dice que no está disponible (specs/027, RNF-74).
+      # Auditoría y Tickets no: la puerta funciona sin ellos (specs/027, RNF-74; specs/028, E06).
     environment:
       ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
@@ -166,6 +166,33 @@ services:
       retries: 9
       start_period: 30s
 
+  # Tickets (specs/028): los errores y mejoras que reporta la gente, con su base y sus fotos.
+  # Solo lo alcanza la puerta, por la red interna: no publica puertos.
+  tickets:
+    image: ${REGISTRO:?falta REGISTRO en el .env}/tickets:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
+    build:
+      context: .
+      dockerfile: microservices/tickets/Dockerfile
+    restart: unless-stopped
+    logging: *logs
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://tickets:${CLAVE_BASE_TICKETS:?falta CLAVE_BASE_TICKETS en el .env}@db:5432/tickets
+      TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
+      AUDITORIA_URL: ${AUDITORIA_URL?falta AUDITORIA_URL en el .env (vacía la apaga)}
+      CARPETA_FOTOS: /app/datos/fotos
+      PORT: "8096"
+    volumes:
+      - tickets-fotos:/app/datos/fotos
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8096/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 9
+      start_period: 30s
+
   # La base de datos (ADR-026). Publicada solo en la interfaz local: desde internet no se llega.
   db:
     image: ${REGISTRO:?falta REGISTRO en el .env}/base-de-datos:${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
@@ -177,6 +204,7 @@ services:
       CLAVE_BASE_MOSTRADOR: ${CLAVE_BASE_MOSTRADOR:?falta CLAVE_BASE_MOSTRADOR en el .env}
       CLAVE_BASE_PROCESOS: ${CLAVE_BASE_PROCESOS:?falta CLAVE_BASE_PROCESOS en el .env}
       CLAVE_BASE_AUDITORIA: ${CLAVE_BASE_AUDITORIA:?falta CLAVE_BASE_AUDITORIA en el .env}
+      CLAVE_BASE_TICKETS: ${CLAVE_BASE_TICKETS:?falta CLAVE_BASE_TICKETS en el .env}
     ports:
       - "127.0.0.1:${PUERTO_BASE:?falta PUERTO_BASE en el .env}:5432"
     volumes:
@@ -192,4 +220,5 @@ volumes:
   caddy-data:
   db-data:
   listas-data:
+  tickets-fotos:
 

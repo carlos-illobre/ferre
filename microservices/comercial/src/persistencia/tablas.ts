@@ -17,8 +17,6 @@ export type EstadoDeLista = "aplicada" | "aplicando" | "descartada" | "pendiente
 
 export type EstadoDePedido = "borrador" | "cancelado" | "cerrado_incompleto" | "enviado" | "recibido" | "recibido_parcial";
 
-export type EstadoDeTicket = "abierto" | "resuelto";
-
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
@@ -60,8 +58,6 @@ export type TipoDeComprobante = "factura" | "remito" | "sin_comprobante";
 export type TipoDeMovimientoDeDinero = "cobro_diferencia" | "devolucion";
 
 export type TipoDeMovimientoDeStock = "ajuste" | "cambio" | "compra" | "correccion" | "venta";
-
-export type TipoDeTicket = "error" | "mejora";
 
 export interface Anomalia {
   cantidad: Numeric;
@@ -419,26 +415,6 @@ export interface Sesion {
   usuario_id: string;
 }
 
-export interface Ticket {
-  creado_en: Generated<Timestamp>;
-  descripcion: string;
-  dispositivo: string | null;
-  estado: Generated<EstadoDeTicket>;
-  id: string;
-  nota: string | null;
-  resuelto_en: Timestamp | null;
-  resuelto_por: string | null;
-  tipo: TipoDeTicket;
-  usuario_id: string;
-  version: string | null;
-}
-
-export interface TicketFoto {
-  archivo: string;
-  orden: number;
-  ticket_id: string;
-}
-
 export interface UnionDeProductos {
   absorbido: string;
   conservar: string;
@@ -521,8 +497,6 @@ export interface DB {
   rol_permiso: RolPermiso;
   sector: Sector;
   sesion: Sesion;
-  ticket: Ticket;
-  ticket_foto: TicketFoto;
   union_de_productos: UnionDeProductos;
   usuario: Usuario;
   usuario_rol: UsuarioRol;

@@ -113,9 +113,14 @@ describe("permisos por operación", () => {
       expect(((await r.json()) as { error: string }).error, `${metodo} ${ruta}`).toContain(permiso);
     }
   });
-  it("lo que no pide permiso anda con cualquier sesión: catálogo, stock, clientes, proveedores y tickets", async () => {
-    for (const ruta of ["/productos", "/stock", "/clientes", "/proveedores", "/tickets", "/sesiones/actual"]) {
+  it("lo que no pide permiso anda con cualquier sesión: catálogo, stock, clientes y proveedores", async () => {
+    for (const ruta of ["/productos", "/stock", "/clientes", "/proveedores", "/sesiones/actual"]) {
       expect((await pedir(app, "GET", ruta, { rol: "soloVende" })).status, ruta).toBe(200);
+    }
+  });
+  it("028-E08: los tickets ya no son de Comercial: sus rutas no existen", async () => {
+    for (const [metodo, ruta] of [["GET", "/tickets"], ["POST", "/tickets"], ["GET", "/tickets/fotos/a.png"]] as const) {
+      expect((await pedir(app, metodo, ruta, { rol: "dueño" })).status, ruta).toBe(404);
     }
   });
   it("el inventario no lleva dinero para quien no ve el dinero invertido", async () => {

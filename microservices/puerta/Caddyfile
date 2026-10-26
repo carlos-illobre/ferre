@@ -69,8 +69,24 @@
 		}
 	}
 
-	# Un servicio que no responde (026-E08, 027-E04). Si es Procesos o Auditoría, se dice con palabras, como cualquier
-	# otro error. Si es Comercial, se corta la conexión: la aplicación lo toma como sin conexión y
+	# Tickets (specs/028), como Procesos: la puerta pregunta quién es. Hasta 5 fotos de 10 MB.
+	@tickets path /tickets /tickets/*
+	handle @tickets {
+		forward_auth comercial:8080 {
+			uri /sesiones/quien
+			header_up X-Token-Servicio {$TOKEN_SERVICIO}
+			copy_headers X-Usuario-Id X-Usuario-Nombre X-Permisos
+		}
+		request_body {
+			max_size 60MB
+		}
+		reverse_proxy tickets:8096 {
+			header_up X-Token-Servicio {$TOKEN_SERVICIO}
+		}
+	}
+
+	# Un servicio que no responde (026-E08, 027-E04, 028-E06). Si es Procesos o Auditoría, se dice con palabras, como cualquier
+	# otro error. Si es Comercial o Tickets, se corta la conexión: la aplicación lo toma como sin conexión y
 	# sigue con lo que tiene en el dispositivo, igual que antes de la puerta.
 	handle_errors 502 503 504 {
 		handle @procesos {
@@ -85,6 +101,8 @@
 			header Content-Type application/json
 			respond `{"error":"Quién hizo qué no está disponible ahora. Probá de nuevo en un rato"}` {err.status_code}
 		}
+		# Comercial o Tickets: se corta la conexión y la aplicación lo toma como sin conexión (un ticket
+		# queda guardado en el dispositivo para mandarlo después).
 		handle {
 			abort
 		}

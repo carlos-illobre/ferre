@@ -2,7 +2,7 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { config } from "../config.js";
 
-// Los archivos que guarda el servidor (fotos de productos, de comprobantes y de tickets, las
+// Los archivos que guarda el servidor (fotos de productos y de comprobantes, las
 // listas originales, la copia del catálogo), en una carpeta por tipo dentro del volumen de datos.
 // La única forma de guardarlos y leerlos.
 export const ruta = (carpeta: string, nombre: string) => path.join(config.carpetaListas, carpeta, nombre);

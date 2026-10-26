@@ -43,7 +43,7 @@ describe("los eventos en palabras", () => {
     const tipos = ["venta.registrada", "venta.pagada", "venta.corregida", "venta.cambio", "compra.registrada", "pedido.enviado", "pedido.recibido", "pedido.cancelado", "pedido.cerrado",
       "producto.foto", "producto.unido", "producto.separado", "equivalencia.rechazada", "lista.aplicada", "lista.descartada", "sector.creado", "conteo.abierto", "conteo.cerrado",
       "usuario.creado", "rol.creado", "rol.modificado", "rol.borrado", "sesion.iniciada", "sesion.cerrada", "sesion.revocada", "credencial.vinculada", "credencial.quitada",
-      "puesto.vinculado", "puesto.desvinculado", "vinculo.dias_cambiados", "cliente.creado", "proveedor.creado", "proveedor.modificado", "ticket.creado", "ticket.resuelto", "ticket.reabierto"];
+      "puesto.vinculado", "puesto.desvinculado", "vinculo.dias_cambiados", "cliente.creado", "proveedor.creado", "proveedor.modificado"];
     for (const tipo of tipos) {
       const palabras = enPalabras(tipo, { nombre: "X", dias: 7 }, persona);
       expect(palabras.titulo, tipo).not.toBe(tipo.replace(/[._]/g, " "));
