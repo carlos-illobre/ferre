@@ -6,7 +6,8 @@ import type { Reglas } from "./reglas.js";
 // Las rutas solo traducen (specs/027). Todo pedido trae el token entre servicios: las entregas, de
 // los servicios por la red interna; los reportes, de la puerta, que dice quién es y qué permisos
 // tiene (X-Permisos). Qué permiso deja ver los reportes lo dice el .env (PERMISO_REPORTES).
-const igual = (a: string, b: string) => a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
+// Se comparan los bytes: un token con letras que no son ASCII tiene otro largo en bytes que en letras.
+const igual = (a: string, b: string) => { const x = Buffer.from(a), y = Buffer.from(b); return x.length === y.length && timingSafeEqual(x, y); };
 
 export function crearApp({ reglas, token, permisoReportes }: { reglas: Reglas; token: string; permisoReportes: string }) {
   const app = new Hono();

@@ -53,6 +53,14 @@ verificar "027-E07: mandado otra vez, no se guarda dos veces" 1 "$(adentro "$EVE
 verificar "027-E12: sale en «Quién hizo qué» por la puerta" sí "$(curl -s -H "Authorization: Bearer $DUENA" "$API/auditoria?pagina=1&grupo=Turnos%20de%20prueba" | grep -q '"titulo":"Turno dado"' && echo sí || echo no)"
 verificar "027-E12: su grupo aparece en el filtro «qué»" sí "$(curl -s -H "Authorization: Bearer $DUENA" "$API/auditoria/grupos" | grep -q '"Turnos de prueba"' && echo sí || echo no)"
 
+# 027-E01: lo de Comercial y lo de Procesos, en la misma lista, lo más nuevo primero.
+PROCESO="Auditoría $RANDOM"
+codigo -H "Authorization: Bearer $DUENA" -H 'Content-Type: application/json' -d "{\"nombre\":\"$PROCESO\"}" $API/procesos >/dev/null
+hasta 1 "SELECT count(*) FROM auditoria.evento WHERE tipo = 'proceso.creado' AND contenido->>'nombre' = '$PROCESO'" >/dev/null
+lista=$(curl -s -H "Authorization: Bearer $DUENA" "$API/auditoria?pagina=1&usuario=$QUIEN")
+verificar "027-E01: el proceso y la venta, en la misma lista y el proceso primero" "procesos,comercial" \
+  "$(node -e 'const e = JSON.parse(process.argv[1]).eventos; const p = e.findIndex((x) => x.tipo === "proceso.creado"), v = e.findIndex((x) => x.tipo === "venta.registrada"); console.log(p >= 0 && v > p ? `${e[p].servicio},${e[v].servicio}` : JSON.stringify(e.map((x) => x.tipo)))' "$lista")"
+
 # 027-E13: un evento que no cumple el contrato se rechaza diciendo qué está mal.
 verificar "027-E13: una importancia que no existe se rechaza" "400" "$(adentro "${EVENTO/\"normal\"/\"alta\"}" true | cut -d' ' -f1)"
 
@@ -64,6 +72,20 @@ verificar "027-E14: la entrada de eventos no se alcanza desde afuera" 404 "$(cod
 verificar "027-E03: sin el permiso, 403" 403 "$(codigo -H "Authorization: Bearer $VENDE" "$API/auditoria?pagina=1")"
 verificar "027-E03: ni los grupos" 403 "$(codigo -H "Authorization: Bearer $VENDE" "$API/auditoria/grupos")"
 
+# RNF-74: la puerta arranca y Comercial atiende aunque Auditoría no esté.
+docker compose stop auditoria >/dev/null 2>&1
+docker compose up -d --wait --force-recreate --no-deps puerta >/dev/null 2>&1
+verificar "RNF-74: sin Auditoría, la puerta arranca y Comercial atiende" 200 "$(codigo -H "Authorization: Bearer $DUENA" $API/sesiones/actual)"
+
+# 027-E09: con AUDITORIA_URL vacía en el .env, Comercial funciona igual y no anota nada.
+AUDITORIA_URL= docker compose up -d --wait --force-recreate --no-deps comercial >/dev/null 2>&1
+APAGADA=$(cat /proc/sys/kernel/random/uuid)
+verificar "027-E09: apagada, la venta se registra" 201 "$(codigo -H "Authorization: Bearer $DUENA" -H 'Content-Type: application/json' -d "{\"id\":\"$APAGADA\",\"medio_pago\":\"efectivo\",\"items\":[{\"descripcion\":\"Tarugo apagado\",\"cantidad\":1,\"precio_unitario\":10}]}" $API/ventas)"
+verificar "027-E09: apagada, no anota nada" 0 "$(psql "SELECT count(*) FROM auditoria_bandeja WHERE evento->'contenido'->>'id' = '$APAGADA'")"
+docker compose up -d --wait auditoria >/dev/null 2>&1
+docker compose up -d --wait --force-recreate --no-deps comercial >/dev/null 2>&1
+
 psql "DELETE FROM sesion WHERE usuario_id IN (SELECT id FROM usuario WHERE email LIKE 'auditoria-%@ferre.test')" >/dev/null
+psql "DELETE FROM item_venta WHERE venta_id = '$APAGADA'; DELETE FROM venta WHERE id = '$APAGADA'" >/dev/null
 psql "DELETE FROM item_venta WHERE venta_id = '$VENTA'; DELETE FROM venta WHERE id = '$VENTA'" >/dev/null
 [[ $fallos -eq 0 ]]

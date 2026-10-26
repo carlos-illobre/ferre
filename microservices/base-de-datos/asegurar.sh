@@ -5,13 +5,14 @@
 # un servicio nuevo con base aparece solo, también en un ambiente que ya existe. Cambiar después
 # una clave en el .env no cambia la del usuario (ver DEPLOYMENT.md, «Si se pierde el .env»).
 #
-# Corre en el control de salud del contenedor: la base no figura sana hasta que todo está. Una
-# vez que salió bien no vuelve a hacer nada hasta que el contenedor se recrea (por ejemplo,
-# porque cambió el entorno al sumar un servicio).
+# Corre en el control de salud del contenedor: la base no figura sana hasta que todo está. Siempre
+# mira que PostgreSQL responda; las bases y los usuarios, una vez que salieron bien, no los vuelve
+# a mirar hasta que el contenedor se recrea (por ejemplo, porque cambió el entorno al sumar un
+# servicio).
 set -eu
 HECHO=/tmp/bases-aseguradas
-[ -f "$HECHO" ] && exit 0
 pg_isready -q -U postgres -d postgres
+[ -f "$HECHO" ] && exit 0
 
 consulta() { psql -v ON_ERROR_STOP=1 -X -q -U postgres -d postgres "$@"; }
 

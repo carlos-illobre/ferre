@@ -61,5 +61,6 @@ describe("los eventos en la base de Auditoría", () => {
     await guardar(base, [uno]);
     await expect(sql`UPDATE auditoria.evento SET titulo = 'otro' WHERE id = ${uno.id}`.execute(base)).rejects.toThrow("Los eventos de auditoría no se cambian ni se borran");
     await expect(sql`DELETE FROM auditoria.evento WHERE id = ${uno.id}`.execute(base)).rejects.toThrow("Los eventos de auditoría no se cambian ni se borran");
+    await expect(sql`TRUNCATE auditoria.evento`.execute(base)).rejects.toThrow("Los eventos de auditoría no se cambian ni se borran");
   });
 });

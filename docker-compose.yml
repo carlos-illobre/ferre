@@ -50,8 +50,7 @@ services:
         condition: service_healthy
       procesos:
         condition: service_healthy
-      auditoria:
-        condition: service_healthy
+      # Auditoría no: la puerta funciona sin ella y dice que no está disponible (specs/027, RNF-74).
     environment:
       ORIGEN_WEB: ${ORIGEN_WEB:?falta ORIGEN_WEB en el .env}
       TOKEN_SERVICIO: ${TOKEN_SERVICIO:?falta TOKEN_SERVICIO en el .env}
@@ -83,8 +82,8 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?falta GOOGLE_CLIENT_ID en el .env}
       # No cambia entre ambientes: el otro servicio siempre vive en la misma red del compose.
       LISTAS_DE_PROVEEDORES_URL: http://listas-de-proveedores:8000
-      # Adónde manda sus eventos (specs/027). Sin ella, funciona igual y no los manda.
-      AUDITORIA_URL: http://auditoria:8095
+      # Adónde manda sus eventos (specs/027). Vacía en el .env, funciona igual y no los manda.
+      AUDITORIA_URL: ${AUDITORIA_URL?falta AUDITORIA_URL en el .env (vacía la apaga)}
       CARPETA_LISTAS: /app/datos/listas
       # Solo informativa: /health la devuelve para saber qué corre. No cambia el comportamiento.
       VERSION: ${IMAGEN_TAG:?falta IMAGEN_TAG en el .env}
@@ -133,7 +132,7 @@ services:
       # Los nombres que Ferrebress les da a los dos permisos de Procesos (026): no cambian entre ambientes.
       PERMISO_VER: procesos.ver
       PERMISO_DIBUJAR: procesos.dibujar
-      AUDITORIA_URL: http://auditoria:8095
+      AUDITORIA_URL: ${AUDITORIA_URL?falta AUDITORIA_URL en el .env (vacía la apaga)}
       PORT: "8090"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8090/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]

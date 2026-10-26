@@ -18,7 +18,7 @@ Un objeto JSON:
 |---|---|---|---|
 | `id` | sí | uuid | Lo pone el servicio. Auditoría no guarda dos veces el mismo |
 | `servicio` | sí | texto, 1 a 40 | Quién lo manda: `comercial`, `procesos`… |
-| `tipo` | sí | texto `cosa.accion`, 3 a 80 | Qué pasó: `venta.registrada` |
+| `tipo` | sí | texto `cosa.accion`, 3 a 80: minúsculas y guion bajo, con al menos un punto | Qué pasó: `venta.registrada`, `proceso.borrador_cambiado` |
 | `fecha` | sí | ISO 8601 con zona | Cuándo, con la hora de la base del servicio |
 | `quien` | no | `{ id, nombre }`, textos de 1 a 120 | Quién, con su nombre en ese momento. Sin quién: «el sistema» |
 | `dispositivo` | no | texto, hasta 120 | Desde dónde |
@@ -44,14 +44,27 @@ Content-Type: application/json
 - `400 { "error": "…" }`: el lote no cumple el contrato; dice qué evento y qué campo. No se guarda
   ninguno de ese lote: se corrige y se vuelve a mandar.
 - `401`: sin el token, o con otro.
-- Cualquier otra respuesta, o ninguna: se reintenta más tarde con el mismo lote. Como el `id` no
-  se duplica, reintentar nunca guarda dos veces.
+- `413 { "error": "El lote es demasiado grande" }`: el lote pasa los 2 MB. Se manda de a menos.
+- Cualquier otra respuesta, o ninguna en 10 segundos: se reintenta más tarde con el mismo lote.
+  Como el `id` no se duplica, reintentar nunca guarda dos veces.
+
+**Cómo se reintenta.** La primera espera es de un segundo y cada una dobla la anterior, hasta un
+minuto como mucho; mientras hay un reintento esperando, lo nuevo espera con él. Al llegar, la
+espera vuelve a empezar de un segundo. Un lote rechazado (400 o 413) se manda de a un evento,
+para que solo quede aparte el que no cumple.
 
 ## Para no perder ninguno
 
 El servicio anota el evento en su propia base, en la misma transacción que la acción, y lo
 entrega después. Si la transacción se deshace, el evento no queda. Lo entregado se puede borrar
 de su base una semana después: queda en Auditoría.
+
+Un evento que no cumple el contrato no deshace la acción: queda en la base del servicio, aparte y
+con el motivo, y no se manda. Lo mismo uno que Auditoría rechazó. Los apartados no se borran
+solos: son para que alguien los mire. Para que no pase, el servicio corta lo que pasa los topes
+(en Comercial: el nombre, el dispositivo, el título y el detalle se cortan; del contenido de más
+de 16 KB las listas quedan como cuántas eran y los textos largos se cortan, y se marca
+`recortado: true`).
 
 ## Versiones
 

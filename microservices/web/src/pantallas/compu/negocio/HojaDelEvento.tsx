@@ -12,7 +12,6 @@ export function HojaDelEvento({ evento: e, alCerrar }: { evento: Evento; alCerra
       <dl className="actividad-datos">
         <div><dt>Cuándo</dt><dd>{fechaCompleta(e.fecha)}</dd></div>
         <div><dt>Quién</dt><dd>{nombreDe(e) ?? "El sistema"}</dd></div>
-        {e.dispositivo && <div><dt>Desde</dt><dd>{e.dispositivo}</dd></div>}
         {aplanar(e.contenido).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
       </dl>
     </Hoja>

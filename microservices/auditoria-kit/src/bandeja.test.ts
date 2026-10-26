@@ -61,11 +61,16 @@ describe("la bandeja de auditoría", () => {
     await vi.waitFor(async () => expect((await filas())[0]!.entregado_en).not.toBeNull());
   });
 
-  it("un evento que no cumple el contrato no se anota: es un error del servicio", async () => {
-    const b = nueva(auditoriaDeMentira().entregar);
+  it("un evento que no cumple el contrato no deshace la acción: queda aparte con el motivo y no se manda", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const aud = auditoriaDeMentira();
+    const b = nueva(aud.entregar);
     await b.iniciar();
-    await expect(b.anotar(base, { ...evento(), titulo: "" })).rejects.toThrow("Evento de auditoría venta.registrada: el campo «titulo» no cumple el contrato");
-    expect(await filas()).toEqual([]);
+    await b.anotar(base, { ...evento(), titulo: "" });
+    expect((await filas()).map((f) => f.rechazo)).toEqual(["No cumple el contrato: el campo «titulo» no cumple el contrato"]);
+    expect(error).toHaveBeenCalledWith(expect.stringContaining("el evento venta.registrada de comercial no cumple el contrato"));
+    await b.mandar();
+    expect(aud.entregar).not.toHaveBeenCalled();
   });
 
   it("027-E06 027-E07: si Auditoría no responde, el evento espera y se reintenta con el mismo id hasta que llega", async () => {
@@ -112,11 +117,49 @@ describe("la bandeja de auditoría", () => {
     const b = nueva(aud.entregar);
     await b.iniciar();
     await b.anotar(base, evento("$1"));
-    await vi.waitFor(async () => expect((await filas())[0]!.rechazo).toBe("Auditoría los rechazó: no cumplen el contrato"));
-    expect(error).toHaveBeenCalledWith("auditoría: rechazó 1 evento(s) de comercial; quedan en su bandeja con el motivo");
+    await vi.waitFor(async () => expect((await filas())[0]!.rechazo).toBe("Auditoría lo rechazó: no cumple el contrato"));
+    expect(error).toHaveBeenCalledWith(expect.stringMatching(/^auditoría: rechazó el evento .+ de comercial; queda en su bandeja con el motivo$/));
     aud.responder("entregado");
     await b.anotar(base, evento("$2"));
     await vi.waitFor(() => expect(aud.recibidos.map((e) => e.detalle)).toEqual(["$2"]));
+  });
+
+  it("un lote rechazado se manda de a uno: solo se aparta el malo y los demás llegan", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const recibidos: string[] = [];
+    let caida = false;
+    const entregar = vi.fn(async (eventos: EventoMandado[]): Promise<ResultadoDeEntrega> => {
+      if (caida) return "fallo";
+      if (eventos.some((e) => e.detalle === "malo")) return "rechazado";
+      recibidos.push(...eventos.map((e) => e.detalle!));
+      return "entregado";
+    });
+    const b = nueva(entregar);
+    await b.iniciar();
+    await base.transaction().execute(async (trx) => { await b.anotar(trx, evento("bueno 1")); await b.anotar(trx, evento("malo")); await b.anotar(trx, evento("bueno 2")); });
+    await vi.waitFor(() => expect(recibidos.sort()).toEqual(["bueno 1", "bueno 2"]));
+    expect((await filas()).filter((f) => f.rechazo).length).toBe(1);
+    // Si mientras se manda de a uno Auditoría deja de responder, no se marca nada y se reintenta.
+    caida = true;
+    await base.transaction().execute(async (trx) => { await b.anotar(trx, evento("malo")); await b.anotar(trx, evento("bueno 3")); });
+    entregar.mockImplementationOnce(async () => "rechazado");
+    await vi.waitFor(() => expect(entregar.mock.calls.length).toBeGreaterThan(5));
+    caida = false;
+    await vi.waitFor(() => expect(recibidos).toContain("bueno 3"));
+  });
+
+  it("con Auditoría caída, los avisos nuevos no suman reintentos: espera el que está programado", async () => {
+    const aud = auditoriaDeMentira();
+    aud.responder("fallo");
+    const b = nueva(aud.entregar, { esperaMaximaMs: 300 });
+    await b.iniciar();
+    await b.anotar(base, evento("$1"));
+    await vi.waitFor(() => expect(aud.entregar).toHaveBeenCalledTimes(1));
+    for (let i = 0; i < 5; i++) await b.anotar(base, evento(`$${i + 2}`));
+    await b.mandar();
+    expect(aud.entregar).toHaveBeenCalledTimes(1);
+    aud.responder("entregado");
+    await vi.waitFor(() => expect(new Set(aud.recibidos.map((e) => e.detalle)).size).toBe(6));
   });
 
   it("de a lotes de 100, y dos copias del servicio a la vez no mandan el mismo evento", async () => {
@@ -136,8 +179,8 @@ describe("la bandeja de auditoría", () => {
     const aud = auditoriaDeMentira();
     const b = nueva(aud.entregar);
     await b.iniciar();
-    await sql`SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE query = 'LISTEN auditoria_bandeja'`.execute(base);
-    await vi.waitFor(async () => expect((await sql<{ n: string }>`SELECT count(*) AS n FROM pg_stat_activity WHERE query = 'LISTEN auditoria_bandeja'`.execute(base)).rows[0]!.n).toBe("1"), { timeout: 5000 });
+    await sql`SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND query = 'LISTEN auditoria_bandeja'`.execute(base);
+    await vi.waitFor(async () => expect((await sql<{ n: string }>`SELECT count(*) AS n FROM pg_stat_activity WHERE datname = current_database() AND query = 'LISTEN auditoria_bandeja'`.execute(base)).rows[0]!.n).toBe("1"), { timeout: 5000 });
     await b.anotar(base, evento());
     await vi.waitFor(() => expect(aud.recibidos).toHaveLength(1));
   });
@@ -187,6 +230,8 @@ describe("la entrega por HTTP", () => {
     const lote = [{ ...evento(), id: "i", servicio: "s", fecha: "f" }];
     expect(await entregar(lote)).toBe("entregado");
     estado = 400;
+    expect(await entregar(lote)).toBe("rechazado");
+    estado = 413;
     expect(await entregar(lote)).toBe("rechazado");
     estado = 503;
     expect(await entregar(lote)).toBe("fallo");

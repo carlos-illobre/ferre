@@ -1,5 +1,7 @@
 -- Los eventos de todos los servicios (specs/027, contrato v1: docs/auditoria/contrato-v1.md).
--- Solo suman filas (RNF-30): un evento no se cambia ni se borra, ni siquiera desde la base.
+-- Solo suman filas (RNF-30): ninguna consulta cambia, borra ni vacía un evento (UPDATE, DELETE y
+-- TRUNCATE los frena la base). Sacar estos frenos pide cambiar el esquema a propósito, con el
+-- usuario dueño de la base: un usuario aparte para migrar está pendiente (T166).
 
 CREATE TABLE auditoria.evento (
   id uuid PRIMARY KEY,
@@ -27,3 +29,5 @@ BEGIN
 END $$;
 CREATE TRIGGER evento_solo_suma BEFORE UPDATE OR DELETE ON auditoria.evento
   FOR EACH ROW EXECUTE FUNCTION auditoria.solo_suma();
+CREATE TRIGGER evento_no_se_vacia BEFORE TRUNCATE ON auditoria.evento
+  FOR EACH STATEMENT EXECUTE FUNCTION auditoria.solo_suma();

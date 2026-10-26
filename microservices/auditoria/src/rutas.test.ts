@@ -48,6 +48,8 @@ describe("la entrada de eventos", () => {
   it("027-E14: sin el token entre servicios, no entra nada", async () => {
     const r = await mandar({ eventos: [evento()] }, "otro");
     expect(r.status).toBe(401);
+    // Del mismo largo en letras pero no en bytes: igual se rechaza, sin romperse.
+    expect((await mandar({ eventos: [evento()] }, "ñ".repeat(TOKEN.length))).status).toBe(401);
     expect(await r.json()).toEqual({ error: "Auditoría solo atiende a los servicios y a la puerta" });
   });
 

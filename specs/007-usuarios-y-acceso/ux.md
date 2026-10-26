@@ -606,8 +606,7 @@ fecha o rango de fechas y por tipo de acción, solos o combinados; quitar los fi
 - «Qué» lista los grupos que hay (Ventas, Compras, Productos, Procesos…): un servicio nuevo suma
   los suyos solo. Tocar una barra de «Qué pasó» filtra por ese tipo, como antes, y «Qué» lo
   muestra elegido.
-- Quién va con el nombre que tenía la persona cuando lo hizo; el detalle completo dice desde qué
-  dispositivo, y ya no el correo.
+- Quién va con el nombre que tenía la persona cuando lo hizo, sin el correo.
 - Si Auditoría no responde, dice que «Quién hizo qué» no está disponible ahora.
 - El ícono de cada tipo es gris, salvo lo que el dueño revisa: una venta anulada en rojo, un
   cambio de margen o un ajuste de stock en ámbar.

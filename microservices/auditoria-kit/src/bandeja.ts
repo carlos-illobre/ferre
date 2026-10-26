@@ -30,12 +30,13 @@ export type Opciones = {
 const CANAL = "auditoria_bandeja";
 const ESPERA_INICIAL_MS = 1000;
 
-/** El POST /v1/eventos del contrato: 200 entregado, 400 rechazado; lo demás, falló y se reintenta. */
-export function entregaPorHttp(url: string, token: string) {
+/** El POST /v1/eventos del contrato: 200 entregado, 400 o 413 rechazado; lo demás (o sin
+ * respuesta en 10 s), falló y se reintenta. */
+export function entregaPorHttp(url: string, token: string, esperaMs = 10_000) {
   return async (eventos: EventoMandado[]): Promise<ResultadoDeEntrega> => {
     try {
-      const r = await fetch(`${url}/v1/eventos`, { method: "POST", headers: { "Content-Type": "application/json", "X-Token-Servicio": token }, body: JSON.stringify({ eventos }) });
-      return r.ok ? "entregado" : r.status === 400 ? "rechazado" : "fallo";
+      const r = await fetch(`${url}/v1/eventos`, { method: "POST", headers: { "Content-Type": "application/json", "X-Token-Servicio": token }, body: JSON.stringify({ eventos }), signal: AbortSignal.timeout(esperaMs) });
+      return r.ok ? "entregado" : r.status === 400 || r.status === 413 ? "rechazado" : "fallo";
     } catch {
       return "fallo";
     }
@@ -51,6 +52,7 @@ export function bandejaDeAuditoria(o: Opciones) {
   let parada = false;
   let ocupado = false;
   let otraVez = false;
+  let reintento = false;
   const esperaInicial = Math.min(ESPERA_INICIAL_MS, esperaMaxima);
   let espera = esperaInicial;
   // Lo que queda programado (un reintento, volver a escuchar). Parado, no se programa nada más.
@@ -61,15 +63,16 @@ export function bandejaDeAuditoria(o: Opciones) {
     esperas.add(t);
   };
 
-  /** Anota el evento en la transacción de la acción. Apagado, no hace nada. */
+  /** Anota el evento en la transacción de la acción. Apagado, no hace nada. Un evento que no
+   * cumple el contrato no deshace la acción: queda en la bandeja, aparte, con el motivo. */
   async function anotar(e: Kysely<any>, evento: EventoDeAuditoria): Promise<void> { // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!encendida) return;
     const completo = { ...evento, id: randomUUID(), servicio: o.servicio };
     // La fecha la pone la base al guardar; acá se valida con una cualquiera.
     const problema = problemaDelEvento({ ...completo, fecha: new Date().toISOString() });
-    if (problema) throw new Error(`Evento de auditoría ${evento.tipo}: ${problema}`);
-    await sql`INSERT INTO auditoria_bandeja (id, evento) VALUES (${completo.id}, ${JSON.stringify(completo)})`.execute(e);
-    await sql`SELECT pg_notify(${CANAL}, '')`.execute(e);
+    if (problema) console.error(`auditoría: el evento ${evento.tipo} de ${o.servicio} no cumple el contrato (${problema}); queda en su bandeja con el motivo`);
+    await sql`INSERT INTO auditoria_bandeja (id, evento, rechazo) VALUES (${completo.id}, ${JSON.stringify(completo)}, ${problema && `No cumple el contrato: ${problema}`})`.execute(e);
+    if (!problema) await sql`SELECT pg_notify(${CANAL}, '')`.execute(e);
   }
 
   // Un lote: lo bloquea (otra copia del servicio saltea lo que este manda), lo entrega y lo marca.
@@ -81,18 +84,28 @@ export function bandejaDeAuditoria(o: Opciones) {
     if (rows.length === 0) return false;
     const resultado = await entregar(rows.map((r) => ({ ...r.evento, fecha: r.anotado_en.toISOString() })));
     if (resultado === "fallo") throw new Error("Auditoría no respondió");
-    const ids = rows.map((r) => r.id);
-    if (resultado === "entregado") await sql`UPDATE auditoria_bandeja SET entregado_en = now() WHERE id = ANY(${ids}::uuid[])`.execute(trx);
-    // Auditoría dijo que no cumplen el contrato: se apartan con el motivo y no traban a los demás.
-    else {
-      await sql`UPDATE auditoria_bandeja SET rechazo = 'Auditoría los rechazó: no cumplen el contrato' WHERE id = ANY(${ids}::uuid[])`.execute(trx);
-      console.error(`auditoría: rechazó ${ids.length} evento(s) de ${o.servicio}; quedan en su bandeja con el motivo`);
+    const marcar = async (ids: string[], r: ResultadoDeEntrega) => {
+      if (r === "entregado") await sql`UPDATE auditoria_bandeja SET entregado_en = now() WHERE id = ANY(${ids}::uuid[])`.execute(trx);
+      // Auditoría dijo que no cumple el contrato: se aparta con el motivo y no traba a los demás.
+      else {
+        await sql`UPDATE auditoria_bandeja SET rechazo = 'Auditoría lo rechazó: no cumple el contrato' WHERE id = ANY(${ids}::uuid[])`.execute(trx);
+        console.error(`auditoría: rechazó el evento ${ids[0]} de ${o.servicio}; queda en su bandeja con el motivo`);
+      }
+    };
+    if (resultado === "entregado" || rows.length === 1) await marcar(rows.map((r) => r.id), resultado);
+    // Un lote rechazado entero puede tener uno solo malo: se manda de a uno, para apartar solo ese.
+    else for (const r of rows) {
+      const uno = await entregar([{ ...r.evento, fecha: r.anotado_en.toISOString() }]);
+      if (uno === "fallo") throw new Error("Auditoría no respondió");
+      await marcar([r.id], uno);
     }
     return true;
   });
 
   /** Manda todo lo pendiente y borra lo entregado hace más de una semana. */
   async function mandar(): Promise<void> {
+    // Con un reintento ya programado, un aviso nuevo no suma otro: lo manda ese reintento.
+    if (reintento) return;
     if (ocupado) { otraVez = true; return; }
     ocupado = true;
     try {
@@ -100,7 +113,8 @@ export function bandejaDeAuditoria(o: Opciones) {
       espera = esperaInicial;
       await sql`DELETE FROM auditoria_bandeja WHERE entregado_en < now() - interval '7 days'`.execute(o.base);
     } catch {
-      despues(espera, mandar);
+      reintento = true;
+      despues(espera, () => { reintento = false; return mandar(); });
       espera = Math.min(espera * 2, esperaMaxima);
     } finally {
       ocupado = false;

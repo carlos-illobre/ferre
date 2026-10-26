@@ -151,7 +151,7 @@ export function enPalabras(tipo: string, c: Contenido, persona: Persona): EnPala
   const detalle = DETALLES[tipo]?.(c, persona) ?? "";
   return {
     titulo: que.titulo,
-    detalle: detalle ? detalle.slice(0, 300) : null,
+    detalle: detalle || null,
     grupo: GRUPOS[tipo.split(".")[0]!] ?? "Otras",
     importancia: que.importancia ?? "normal",
   };

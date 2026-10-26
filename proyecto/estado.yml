@@ -1750,7 +1750,7 @@ RNF-73:
   defectos: []
 
 RNF-74:
-  estado: "Hecho (027): el contrato v1 y el kit con la bandeja en la base de cada servicio; sin AUDITORIA_URL el servicio funciona igual; Auditoría caída no frena nada y lo pendiente se entrega al volver"
+  estado: "Hecho en parte (027): el contrato v1 y el kit con la bandeja en la base de cada servicio; sin AUDITORIA_URL el servicio funciona igual; Auditoría caída no frena nada y lo pendiente se entrega al volver"
   pruebas:
     - microservices/auditoria-kit/src/contrato.test.ts
     - microservices/auditoria-kit/src/bandeja.test.ts
@@ -1758,7 +1758,10 @@ RNF-74:
     - microservices/procesos/servidor/src/persistencia/procesos.test.ts
     - tests/integration/auditoria.sh
     - tests/integration/base-propia.sh
-  defectos: []
+  defectos:
+    - "Unas 25 acciones de Comercial anotan su evento después de guardarse, no en su transacción: si el proceso se cae entre las dos cosas, el evento se pierde (#167)"
+    - "El usuario de la base de Auditoría es su dueño: podría sacar los frenos que no dejan cambiar ni borrar eventos (#166)"
+    - "La puerta y los servicios comparten el token: Auditoría no distingue quién le manda (#168)"
 
 RNF-75:
   estado: "Nuevo (028): especificación aprobada"

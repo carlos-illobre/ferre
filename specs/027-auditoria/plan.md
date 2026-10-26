@@ -42,15 +42,21 @@ y por qué. Solo se le agregan campos opcionales; un cambio que rompa es `v2`.
 **El kit** (`microservices/auditoria-kit`, paquete del workspace, sin nada de Ferrebress, como el
 módulo de conexión): lo usan Comercial y Procesos desde su capa de datos.
 
-- `bandejaDeAuditoria({ base, url, token, servicio })` devuelve `{ anotar, iniciar, parar }`.
-  Sin `url` (la variable `AUDITORIA_URL` vacía o ausente en el `.env`), `anotar` no hace nada e
-  `iniciar` no crea la bandeja ni manda: el servicio funciona igual (E09).
+- `bandejaDeAuditoria({ base, conexion, servicio, auditoria, token })` devuelve
+  `{ encendida, anotar, iniciar, mandar, parar }`. Sin `auditoria` (la variable `AUDITORIA_URL`
+  vacía en el `.env`), `anotar` no hace nada e `iniciar` no crea la bandeja ni manda: el servicio
+  funciona igual (E09). `AUDITORIA_URL` va en el `.env` de cada ambiente; el compose la exige
+  presente, vacía o no.
 - `anotar(trx, evento)` inserta en `auditoria_bandeja` de la base del servicio, en la
-  transacción de la acción, y avisa con `pg_notify` al confirmarse (E05).
+  transacción de la acción, y avisa con `pg_notify` al confirmarse (E05). Un evento que no
+  cumple el contrato **no deshace la acción**: queda en la bandeja con `rechazo` (el motivo) y no
+  se manda; lo mismo uno que Auditoría rechazó. Un lote rechazado se manda de a uno, para apartar
+  solo el malo. Los apartados no se borran solos.
 - El mandador escucha ese aviso (y manda lo pendiente al arrancar, E08): toma pendientes en lotes
   con `FOR UPDATE SKIP LOCKED` (dos copias del servicio no mandan el mismo, borde), los entrega,
-  y marca `entregado_en` al confirmar. Si Auditoría no responde, reintenta con esperas crecientes
-  hasta un minuto (E06), sin frenar al servicio. Borra lo entregado hace más de 7 días (E10, E11).
+  y marca `entregado_en` al confirmar. Si Auditoría no responde (o no contesta en 10 s), reintenta
+  con esperas crecientes hasta un minuto (E06), sin frenar al servicio; con un reintento
+  esperando, los avisos nuevos no suman otros. Borra lo entregado hace más de 7 días (E10, E11).
 - La bandeja la crea el kit al iniciar (`CREATE TABLE IF NOT EXISTS`): un servicio apagado no la
   tiene.
 - Pruebas contra PostgreSQL al 100 %, como la capa de datos (RNF-66).
@@ -74,16 +80,20 @@ los que ya están. Se agrega `CLAVE_BASE_AUDITORIA`.
 
 - `anotarEvento` pasa a ser el kit: cada evento lleva su título, detalle, grupo e importancia,
   armados en Comercial con las mismas palabras que hoy arma la web (`eventos/en-palabras.ts`,
-  una vez, en sus reglas).
+  una vez, en sus reglas). El grupo sale del comienzo del tipo; uno que no está en la tabla va
+  en «Otras». Lo que pasa los topes del contrato se corta antes de anotar (ver el contrato,
+  «Para no perder ninguno»), para que la acción nunca falle por su evento.
 - Las uniones de productos pasan a su propia tabla (`union_de_productos`), y deshacer una unión
   lee de ahí.
 - Salen `GET /auditoria`, `persistencia/actividad.ts` y la tabla `evento` (Auditoría arranca
   vacía, decisión de Carlos).
 
-**Procesos:** su `anotar` pasa a ser el kit; sale `procesos.evento`.
+**Procesos:** su `anotar` pasa a ser el kit; sale `procesos.evento`. Borrar un proceso es una
+anulación (rojo), como ya se veía en la web.
 
-**La web:** cada acción se muestra con el título, el detalle y la importancia que trae (ícono por
-importancia: rojo la anulación, ámbar lo que se revisa); el filtro «qué» lo arma con
+**La web:** cada acción se muestra con el título, el detalle y la importancia que trae (el color
+por importancia: rojo la anulación, ámbar lo que se revisa; el ícono por grupo, con uno de
+siempre para un grupo que la web no conoce); el filtro «qué» lo arma con
 `/auditoria/grupos`. Salen las tablas de tipos (`QUE`, `ESPECIALES`, `TIPOS`, el detalle por
 tipo). El resumen de arriba (cuántas ventas, entradas, precios, ajustes y anulaciones) es del
 negocio de Comercial y se queda en la web, contando por tipo.
@@ -111,5 +121,11 @@ negocio de Comercial y se queda en la web, contando por tipo.
   título 120, detalle 300, contenido 16 KB) y se guardan como parámetros, nunca armando SQL. La
   web no alcanza `/v1/eventos`: la puerta no lo publica.
 - **Secretos:** `CLAVE_BASE_AUDITORIA` nueva en el `.env`; el token entre servicios ya existe.
-- **Quién hizo qué:** es lo que se construye. El usuario de la base de Auditoría solo inserta y
-  lee eventos.
+- **Quién hizo qué:** es lo que se construye. Ninguna consulta cambia, borra ni vacía un evento:
+  la base frena `UPDATE`, `DELETE` y `TRUNCATE` en la tabla. El usuario de Auditoría es dueño de
+  su base y corre sus migraciones, así que podría sacar esos frenos cambiando el esquema a
+  propósito; un usuario aparte para migrar queda pendiente (T166 de `proyecto/tasks.md`).
+- **El token entre servicios** es uno solo para la puerta y los servicios: Auditoría no distingue
+  quién le manda. Separarlos queda pendiente con 029 (T168).
+- **Auditoría no es necesaria para arrancar:** la puerta no la espera; si no responde, dice que
+  no está disponible.

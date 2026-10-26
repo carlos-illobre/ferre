@@ -1,3 +1,4 @@
+import { enPalabras } from "../../../microservices/comercial/src/eventos/en-palabras.ts";
 // Datos de mentira para las pantallas de Más: Cómo va el negocio, Usuarios (con las sesiones y los
 // celulares de cada persona),
 // Quién hizo qué. Mismas formas que el servidor real (microservices/comercial/src/rutas).
@@ -60,9 +61,11 @@ const moldes = [
   ["c", a(4, 12, 0), "usuario.creado", { id: "u-4", email: "ramiro.deposito@ferre.test", rol: "mostrador" }],
   ["s", a(40, 12, 0), "usuario.creado", { id: "u-1", email: "carlos@ferre.test", rol: "dueño", medio: "comando" }],
 ];
+// Como los arma Auditoría (specs/027): cada evento con las palabras que le pone Comercial.
+const nombreDe = (id) => Object.values(U).find(([uid]) => uid === id)?.[2] ?? "un usuario";
 const eventos = moldes.map(([q, fecha, tipo, contenido], i) => {
-  const [uid, email, nombre] = U[q];
-  return { id: `e-${i}`, tipo, fecha, dispositivo_id: null, contenido, email, nombre, _uid: uid };
+  const [uid, , nombre] = U[q];
+  return { id: `e-${i}`, servicio: "comercial", tipo, fecha, dispositivo: null, quien: uid ? { id: uid, nombre } : null, referencias: [], contenido, ...enPalabras(tipo, contenido, nombreDe), _uid: uid };
 });
 
 export default {
@@ -111,8 +114,9 @@ export default {
 
   "GET /auditoria": ({ query }) => {
     const pagina = Math.max(1, Number(query.get("pagina")) || 1);
-    const [usuario, tipo, desde, hasta] = ["usuario", "tipo", "desde", "hasta"].map((k) => query.get(k));
-    const filtrados = eventos.filter((e) => (!usuario || e._uid === usuario) && (!tipo || e.tipo.startsWith(tipo)) && (!desde || e.fecha >= desde) && (!hasta || e.fecha < hasta));
+    const [usuario, grupo, tipo, desde, hasta] = ["usuario", "grupo", "tipo", "desde", "hasta"].map((k) => query.get(k));
+    const filtrados = eventos.filter((e) => (!usuario || e._uid === usuario) && (!grupo || e.grupo === grupo) && (!tipo || e.tipo.startsWith(tipo)) && (!desde || e.fecha >= desde) && (!hasta || e.fecha < hasta));
     return { eventos: filtrados.slice((pagina - 1) * 10, pagina * 10).map(({ _uid, ...e }) => e), total: filtrados.length, pagina, por_pagina: 10 };
   },
+  "GET /auditoria/grupos": () => ({ grupos: [...new Set(eventos.map((e) => e.grupo))].sort() }),
 };

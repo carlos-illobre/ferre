@@ -21,7 +21,8 @@ export function tokenDe(c: Context): string | null {
 
 // Solo atiende a la puerta y a los otros servicios (026, RNF-72): todo pedido trae el token entre
 // servicios, que la puerta agrega y el navegador no conoce.
-const igual = (a: string, b: string) => a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
+// Se comparan los bytes: un token con letras que no son ASCII tiene otro largo en bytes que en letras.
+const igual = (a: string, b: string) => { const x = Buffer.from(a), y = Buffer.from(b); return x.length === y.length && timingSafeEqual(x, y); };
 export const exigirTokenDeServicio: MiddlewareHandler = async (c, next) => {
   if (!igual(c.req.header("X-Token-Servicio") ?? "", config.tokenServicio)) return c.json({ error: "Este servicio solo atiende pedidos que pasan por la puerta" }, 401);
   await next();

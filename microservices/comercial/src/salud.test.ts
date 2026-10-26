@@ -48,6 +48,7 @@ describe("el token entre servicios", () => {
     expect(sin.status).toBe(401);
     expect(await sin.json()).toEqual({ error: "Este servicio solo atiende pedidos que pasan por la puerta" });
     expect((await app.request("/sesiones/actual", { headers: { Authorization: "Bearer token-dueño", "X-Token-Servicio": "otro" } })).status).toBe(401);
+    expect((await app.request("/sesiones/actual", { headers: { Authorization: "Bearer token-dueño", "X-Token-Servicio": "ñ".repeat(process.env.TOKEN_SERVICIO!.length) } })).status).toBe(401);
     expect((await app.request("/health")).status).toBe(200);
   });
 });

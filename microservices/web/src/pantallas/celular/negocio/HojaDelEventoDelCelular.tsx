@@ -14,7 +14,6 @@ export function HojaDelEventoDelCelular({ evento: e, alCerrar }: { evento: Event
       <dl className={css.kv}>
         <dt>Cuándo</dt><dd>{fechaCompleta(e.fecha)}</dd>
         <dt>Quién</dt><dd>{nombreDe(e) ?? "El sistema"}</dd>
-        {e.dispositivo && <><dt>Desde</dt><dd>{e.dispositivo}</dd></>}
         {aplanar(e.contenido).map(([k, v]) => <div key={k} style={{ display: "contents" }}><dt>{k}</dt><dd>{v}</dd></div>)}
       </dl>
     </Hoja>
