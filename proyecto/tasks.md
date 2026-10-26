@@ -285,7 +285,7 @@ final.
 - [ ] T166 [agente] Auditoría con un usuario de base aparte para migrar, y el del servicio que solo inserta y lee eventos: hoy el dueño de la base podría sacar los frenos de UPDATE, DELETE y TRUNCATE (revisión de 027, S1) (depende de T157)
 - [ ] T167 [agente] Las acciones de Comercial que anotan su evento después de guardarse (unas 25: ajustes de stock, listas, entradas y salidas, tickets, clientes, ajustes del sistema, cobro de cuenta corriente…) pasan a anotarlo en su misma transacción (027-E05; revisión de 027, 1.3) (depende de T157)
 - [ ] T168 [agente] Un token por servicio en vez de uno compartido por la puerta y los servicios, para que cada uno sepa quién le habla (revisión de 027, S6); con 029 (depende de T144)
-- [ ] T155 [agente] Etapa 4: Tickets en su propio servicio, con su base y sus eventos, que le entrega a Auditoría (decisión 164) (depende de T157)
+- [x] T155 [agente] Etapa 4: Tickets en su propio servicio, con su base y sus eventos, que le entrega a Auditoría (decisión 164) (depende de T157)
 - [ ] T144 [agente] Etapa 5: Acceso en su propio servicio, con su base y sus eventos, que le entrega a Auditoría: usuarios, roles, permisos, sesiones, huellas, vincular el celular y sus ajustes; el gateway le pregunta a Acceso quién es cada uno (decisión 164) (depende de T155)
 - [ ] T141 [agente] Etapa 6: el dispositivo guarda todos los cambios del mostrador, con tope por espacio y sin borrar lo no confirmado; pide al navegador no borrar los datos; sin almacenamiento local no trabaja sin conexión (depende de T139)
 - [ ] T143 [agente] Etapa 7: usuarios de la base con lo mínimo, los históricos no se pueden modificar desde la base, unir duplicados sin reescribir filas (depende de T144)
