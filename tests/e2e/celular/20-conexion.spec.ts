@@ -72,7 +72,7 @@ async function mandarCodigo(celular: Page, codigo: string) {
   await expect(celular.getByTestId("lector-resultado")).toHaveText("Ya está en la computadora", { timeout: 10000 });
 }
 
-test("023-E07 023-E08: si un navegador no tiene la conexión directa, van por el servidor enseguida y el lector anda igual", async ({ browser }) => {
+test("023-E07 023-E08 029-E06: si un navegador no tiene la conexión directa, van por el servidor enseguida y el lector anda igual", async ({ browser }) => {
   const { compu, celular } = await abrirLosDos(browser, SIN_DIRECTA);
   for (const p of [compu, celular]) await expect(p.getByTestId("espejo-estado")).toHaveAttribute("data-conexion", "servidor", { timeout: 4000 });
   await compu.getByTestId("indicador-vinculo").click();
