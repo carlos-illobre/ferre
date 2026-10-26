@@ -190,8 +190,15 @@ describe("la bandeja de auditoría", () => {
     const aud = auditoriaDeMentira();
     const b = nueva(aud.entregar);
     await b.iniciar();
-    await sql`SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND query = 'LISTEN auditoria_bandeja'`.execute(base);
-    await vi.waitFor(async () => expect((await sql<{ n: string }>`SELECT count(*) AS n FROM pg_stat_activity WHERE datname = current_database() AND query = 'LISTEN auditoria_bandeja'`.execute(base)).rows[0]!.n).toBe("1"), { timeout: 5000 });
+    const escuchan = async () => (await sql<{ pid: number }>`SELECT pid FROM pg_stat_activity WHERE datname = current_database() AND query = 'LISTEN auditoria_bandeja'`.execute(base)).rows.map((r) => r.pid);
+    const [vieja] = await escuchan();
+    await sql`SELECT pg_terminate_backend(${vieja}::int)`.execute(base);
+    // Hasta que escucha una conexión nueva: la vieja puede figurar un momento mientras se cierra.
+    await vi.waitFor(async () => {
+      const ahora = await escuchan();
+      expect(ahora).toHaveLength(1);
+      expect(ahora[0]).not.toBe(vieja);
+    }, { timeout: 5000 });
     await b.anotar(base, evento());
     await vi.waitFor(() => expect(aud.recibidos).toHaveLength(1));
   });

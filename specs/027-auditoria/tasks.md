@@ -15,3 +15,4 @@
 - [x] T013 Revisión independiente (paso 7) (depende de T012)
 - [x] T014 [arreglo] El filtro «Qué» de la computadora pasa la regla de complejidad de la web (la CI la frenó)
 - [x] T015 [arreglo] La prueba de la bandeja con tres copias a la vez no exige un lote de 100 (la CI la vio con 96); el lote de 100 se prueba con una sola copia
+- [x] T016 [arreglo] La prueba de volver a escuchar espera una conexión nueva, no cualquiera: la vieja podía figurar mientras se cerraba (la CI la vio fallar)
