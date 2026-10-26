@@ -172,7 +172,18 @@ describe("la bandeja de auditoría", () => {
     await Promise.all([otra.mandar(), nueva(aud.entregar).mandar(), otra.mandar()]);
     expect(aud.recibidos).toHaveLength(150);
     expect(new Set(aud.recibidos.map((e) => e.id)).size).toBe(150);
-    expect(Math.max(...aud.entregar.mock.calls.map(([lote]) => lote.length))).toBe(100);
+    // A la vez, cada copia toma lo que las otras no tomaron: ningún lote pasa de 100.
+    expect(Math.max(...aud.entregar.mock.calls.map(([lote]) => lote.length))).toBeLessThanOrEqual(100);
+  });
+
+  it("una sola copia manda de a lotes de 100", async () => {
+    const aud = auditoriaDeMentira();
+    const una = nueva(aud.entregar);
+    await una.iniciar();
+    await una.parar();
+    for (let i = 0; i < 150; i++) await una.anotar(base, evento(`$${i}`));
+    await una.mandar();
+    expect(aud.entregar.mock.calls.map(([lote]) => lote.length)).toEqual([100, 50]);
   });
 
   it("si se corta la conexión que escucha, vuelve a escuchar", async () => {
