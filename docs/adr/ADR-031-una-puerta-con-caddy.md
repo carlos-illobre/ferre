@@ -37,3 +37,15 @@ Node (código propio para algo que Caddy resuelve).
   (`tests/integration/puerta.sh`).
 - Procesos recibe los permisos de la persona y su configuración le dice cuáles son los suyos:
   sigue sin saber nada de Ferrebress (RNF-61).
+
+## Enmienda (specs/029): la puerta le pregunta a Acceso
+
+Con Acceso en su servicio, la puerta reparte a Acceso las rutas de entrar, las sesiones, los
+usuarios, los roles, las huellas, el vínculo, el canal, lo apartado y los ajustes, **sin preguntar
+antes**: Acceso las atiende con o sin sesión y busca la sesión él mismo. Todo lo demás, Comercial
+incluido, pasa por `forward_auth` a `acceso:8097/sesiones/quien`, y cada servicio recibe la persona
+hecha en `X-Usuario-Id`, `X-Usuario-Nombre` y `X-Permisos`. Si Acceso no responde, la puerta corta
+la conexión a Comercial, a Tickets y a lo de Acceso (la aplicación sigue sin conexión); Procesos y
+Auditoría lo dicen con palabras, como antes. La puerta no espera a Acceso para arrancar. Lo que
+Comercial atiende sin sesión (`/health`, que miran el monitor y la aplicación, y `/fotos/*`, que el
+navegador pide sin el token) pasa directo, sin preguntar.

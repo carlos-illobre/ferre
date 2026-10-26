@@ -100,7 +100,7 @@ Dos archivos en cada usuario, reemplazando todos los marcadores `<...>`:
 
 | Archivo | Qué va |
 |---|---|
-| `~/ferre/produccion/.env` (de `ferre-produccion`) | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), las claves de la base (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`, `CLAVE_BASE_AUDITORIA`, `CLAVE_BASE_TICKETS`), un token de servicio |
+| `~/ferre/produccion/.env` (de `ferre-produccion`) | ID de Google ([docs/operacion/google-cloud.md](../../docs/operacion/google-cloud.md)), las claves de la base (`CLAVE_BASE_ADMIN`, `CLAVE_BASE_MOSTRADOR`, `CLAVE_BASE_PROCESOS`, `CLAVE_BASE_AUDITORIA`, `CLAVE_BASE_TICKETS`, `CLAVE_BASE_ACCESO`), un token de servicio |
 | `~/ferre/pruebas/.env` (de `ferre-pruebas`) | lo mismo para pruebas, con **otras** claves y **otro** token |
 | `~/ferre/despliegue.env` (en los dos) | el canal de avisos (paso 7), el mismo en los dos: cada uno despliega solo su ambiente |
 
@@ -163,8 +163,8 @@ la había.
 Una vez por ambiente, con su usuario:
 
 ```bash
-cd ~/ferre/produccion && docker compose exec comercial node dist/crear-usuario.js tu@gmail.com "Tu nombre"   # ferre-produccion
-cd ~/ferre/pruebas && docker compose exec comercial node dist/crear-usuario.js tu@gmail.com "Tu nombre"      # ferre-pruebas
+cd ~/ferre/produccion && docker compose exec acceso node dist/crear-usuario.js tu@gmail.com "Tu nombre"   # ferre-produccion
+cd ~/ferre/pruebas && docker compose exec acceso node dist/crear-usuario.js tu@gmail.com "Tu nombre"      # ferre-pruebas
 ```
 
 Después se entra con Google y se da de alta al empleado desde la app (roles: `dueño`, `admin`, `mostrador`):

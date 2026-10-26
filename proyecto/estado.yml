@@ -93,7 +93,7 @@ RF-08:
     - tests/e2e/escritorio/10-escaner.spec.ts
     - tests/e2e/celular/10-escaner.spec.ts
     - microservices/web/src/pantallas/CodigoDeBarras.test.tsx
-    - microservices/comercial/src/rutas/puestos.test.ts
+    - microservices/acceso/src/rutas/puestos.test.ts
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
@@ -601,10 +601,10 @@ RF-70:
     - tests/e2e/celular/08-sin-conexion.spec.ts
     - tests/e2e/escritorio/08-sin-conexion.spec.ts
     - tests/integration/autenticacion.sh
-    - microservices/comercial/src/rutas/sesiones.test.ts
-    - microservices/comercial/src/rutas/usuarios.test.ts
-    - microservices/comercial/src/rutas/credenciales.test.ts
-    - microservices/comercial/src/rutas/entrar-con-google.test.ts
+    - microservices/acceso/src/rutas/sesiones.test.ts
+    - microservices/acceso/src/rutas/usuarios.test.ts
+    - microservices/acceso/src/rutas/credenciales.test.ts
+    - microservices/acceso/src/rutas/entrar-con-google.test.ts
     - microservices/comercial/src/autenticacion.test.ts
     - microservices/web/src/pantallas/entrar-simulado.test.tsx
     - microservices/web/src/datos/sesion/sesion.test.tsx
@@ -617,7 +617,7 @@ RF-70b:
   pruebas:
     - tests/e2e/celular/01-login.spec.ts
     - tests/e2e/escritorio/01-login.spec.ts
-    - microservices/comercial/src/rutas/credenciales.test.ts
+    - microservices/acceso/src/rutas/credenciales.test.ts
     - microservices/web/src/pantallas/entrar-simulado.test.tsx
   defectos:
     - "En la computadora, la lista de celulares vinculados está dentro de la administración: quien no administra no tiene desde dónde ver ni quitar los suyos"
@@ -631,7 +631,7 @@ RF-71:
     - microservices/auditoria/src/rutas.test.ts
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - tests/integration/autenticacion.sh
-    - microservices/comercial/src/rutas/credenciales.test.ts
+    - microservices/acceso/src/rutas/credenciales.test.ts
     - tests/e2e/celular/01-login.spec.ts
   defectos:
     - "Los filtros por usuario, fecha y tipo existen en la API pero ninguna pantalla los ofrece (#58)"
@@ -641,7 +641,7 @@ RF-72:
   estado: "Hecho (#59, #64): permisos fijos, varios roles por usuario, y la aplicación muestra solo lo que cada uno puede usar"
   pruebas:
     - microservices/comercial/src/rutas/roles.test.ts
-    - microservices/comercial/src/rutas/usuarios.test.ts
+    - microservices/acceso/src/rutas/usuarios.test.ts
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - microservices/web/src/pantallas/celular/catalogo/Catalogo.test.tsx
     - microservices/web/src/pantallas/celular/deposito/Deposito.test.tsx
@@ -659,7 +659,7 @@ RF-72:
 RF-76:
   estado: "Hecho (#72): la computadora entra leyendo su código con el celular, sin paso de confirmar"
   pruebas:
-    - microservices/comercial/src/rutas/sesiones.test.ts
+    - microservices/acceso/src/rutas/sesiones.test.ts
     - microservices/web/src/pantallas/celular/entrada/EntrarEnLaCompu.test.tsx
     - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
     - tests/e2e/celular/01-login.spec.ts
@@ -674,7 +674,7 @@ RF-76:
 RF-77:
   estado: "Hecho (#75, #101): navegación, venta, ingreso y pedido en espejo, con presencia, separar y juntar, y avisos; el vínculo es de los dispositivos y sobrevive al cierre de sesión"
   pruebas:
-    - microservices/comercial/src/rutas/puestos.test.ts
+    - microservices/acceso/src/rutas/puestos.test.ts
     - microservices/web/src/negocio/ventas/venta-en-espejo.test.ts
     - microservices/web/src/negocio/deposito/ingreso-en-espejo.test.ts
     - tests/e2e/celular/17-espejo.spec.ts
@@ -732,7 +732,7 @@ RF-75:
 RF-73:
   estado: "Hecho (#41), fuera de esta etapa: reemplazado por RF-72"
   pruebas:
-    - microservices/comercial/src/rutas/usuarios.test.ts
+    - microservices/acceso/src/rutas/usuarios.test.ts
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - tests/integration/autenticacion.sh
   defectos:
@@ -746,8 +746,8 @@ RF-74:
     - tests/integration/autenticacion.sh
     - microservices/web/src/pantallas/celular/negocio/Negocio.test.tsx
     - microservices/web/src/pantallas/acceso-de-usuarios.test.tsx
-    - microservices/comercial/src/rutas/sesiones.test.ts
-    - microservices/comercial/src/rutas/usuarios.test.ts
+    - microservices/acceso/src/rutas/sesiones.test.ts
+    - microservices/acceso/src/rutas/usuarios.test.ts
     - microservices/web/src/datos/sesion/sesion.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
   defectos:
@@ -1355,7 +1355,7 @@ RF-101:
 RF-102:
   estado: "Hecho (014)"
   pruebas:
-    - microservices/comercial/src/rutas/apartados.test.ts
+    - microservices/acceso/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
@@ -1364,7 +1364,7 @@ RF-102:
 RF-103:
   estado: "Hecho (014)"
   pruebas:
-    - microservices/comercial/src/rutas/apartados.test.ts
+    - microservices/acceso/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
@@ -1373,7 +1373,7 @@ RF-103:
 RF-104:
   estado: "Hecho (014)"
   pruebas:
-    - microservices/comercial/src/rutas/apartados.test.ts
+    - microservices/acceso/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
@@ -1382,7 +1382,7 @@ RF-104:
 RF-105:
   estado: "Hecho (014)"
   pruebas:
-    - microservices/comercial/src/rutas/apartados.test.ts
+    - microservices/acceso/src/rutas/apartados.test.ts
     - microservices/web/src/pantallas/para-revisar.test.tsx
     - microservices/web/src/datos/almacenamiento/cola.test.ts
     - tests/e2e/escritorio/19-para-revisar.spec.ts
@@ -1493,15 +1493,15 @@ RNF-62:
 RF-133:
   estado: "A validar (020): programado; falta que Carlos lo pruebe en el ambiente de pruebas"
   pruebas:
-    - microservices/comercial/src/acceso/sesion-recordada.test.ts
-    - microservices/comercial/src/rutas/sistema.test.ts
+    - microservices/acceso/src/acceso/sesion-recordada.test.ts
+    - microservices/acceso/src/rutas/sistema.test.ts
   defectos: []
 
 RF-134:
   estado: "Reemplazado por RF-138 (023): ya no hay pregunta del celular ni su ajuste"
   pruebas:
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
-    - microservices/comercial/src/rutas/sistema.test.ts
+    - microservices/acceso/src/rutas/sistema.test.ts
   defectos: []
 
 RF-135:
@@ -1509,7 +1509,7 @@ RF-135:
   pruebas:
     - microservices/web/src/pantallas/Sistema.test.tsx
     - microservices/web/src/pantallas/compu/negocio/Actividad.test.tsx
-    - microservices/comercial/src/rutas/sistema.test.ts
+    - microservices/acceso/src/rutas/sistema.test.ts
     - microservices/comercial/src/rutas/roles.test.ts
   defectos:
     - "Guardar varios ajustes en un mismo pedido no es todo o nada: si fallan los días, los tiempos ya quedaron (la pantalla manda uno por vez; revisión de 020, D5)"
@@ -1559,7 +1559,7 @@ RNF-66:
   pruebas:
     - microservices/comercial/vitest.config.ts
     - microservices/procesos/servidor/vitest.config.ts
-    - microservices/comercial/src/persistencia/acceso.test.ts
+    - microservices/acceso/src/persistencia/acceso.test.ts
     - microservices/comercial/src/persistencia/ventas.test.ts
     - microservices/procesos/servidor/src/persistencia/procesos.test.ts
   defectos: []
@@ -1596,7 +1596,7 @@ RF-137:
     - microservices/conexion/src/servidor/canales.test.ts
     - tests/e2e/escritorio/20-conexion.spec.ts
     - tests/e2e/celular/20-conexion.spec.ts
-    - microservices/comercial/src/rutas/canal.test.ts
+    - microservices/acceso/src/rutas/canal.test.ts
   defectos:
     - "Un dato recibido y todavía no confirmado antes de que la página recargue puede llegar dos veces (revisión 1.6)"
     - "Si falla un POST al servidor, las señales de la directa, «sin directa» y «probar» que iban en él no se reenvían (revisión 3.5)"
@@ -1610,7 +1610,7 @@ RF-138:
   pruebas:
     - microservices/conexion/src/navegador/enlace.test.ts
     - microservices/web/src/pantallas/PedidosDeLaCompu.test.tsx
-    - microservices/comercial/src/rutas/sistema.test.ts
+    - microservices/acceso/src/rutas/sistema.test.ts
     - microservices/web/src/pantallas/Sistema.test.tsx
   defectos:
     - "Cada pedido a la sala comprueba la sesión y el vínculo en la base (la sesión, con lo que recuerda el servidor, RF-133)"
@@ -1669,7 +1669,7 @@ RF-141:
     - tests/e2e/celular/10-escaner.spec.ts
     - microservices/web/src/pantallas/compu/entrada/Entrar.test.tsx
     - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
-    - microservices/comercial/src/rutas/canal.test.ts
+    - microservices/acceso/src/rutas/canal.test.ts
     - microservices/conexion/src/navegador/central.test.ts
     - microservices/conexion/src/navegador/canal.test.ts
   defectos: []
@@ -1680,7 +1680,7 @@ RF-142:
     - microservices/web/src/negocio/avisos-sin-consultas.test.tsx
     - microservices/web/src/datos/sesion/sesion.test.tsx
     - microservices/comercial/src/salud.test.ts
-    - microservices/comercial/src/rutas/canal.test.ts
+    - microservices/acceso/src/rutas/canal.test.ts
   defectos: []
 
 RF-143:
@@ -1705,7 +1705,7 @@ RF-145:
     - tests/e2e/celular/20-conexion.spec.ts
     - microservices/conexion/src/navegador/enlace.test.ts
     - microservices/conexion/src/servidor/canales.test.ts
-    - microservices/comercial/src/rutas/canal.test.ts
+    - microservices/acceso/src/rutas/canal.test.ts
   defectos: []
 
 RNF-70:
@@ -1740,7 +1740,7 @@ RNF-72:
   estado: "Hecho (026): la puerta (Caddy) reparte por ruta, pregunta quién es la persona a Comercial, borra las cabeceras de identidad del navegador, atiende el CORS y es lo único que se publica; Comercial y Procesos exigen el token entre servicios"
   pruebas:
     - tests/integration/puerta.sh
-    - microservices/comercial/src/rutas/sesiones.test.ts
+    - microservices/acceso/src/rutas/sesiones.test.ts
     - microservices/comercial/src/salud.test.ts
     - microservices/procesos/servidor/src/rutas.test.ts
     - microservices/procesos/servidor/src/reglas.test.ts
@@ -1780,6 +1780,15 @@ RNF-75:
   defectos: []
 
 RNF-76:
-  estado: "Nuevo (029): especificación aprobada"
-  pruebas: []
-  defectos: []
+  estado: "Hecho (029): usuarios, roles, sesiones, huellas, el vínculo, la conexión entre dispositivos, lo apartado y sus ajustes viven en el servicio de Acceso, con su base; la puerta le pregunta en cada pedido y Comercial recibe a la persona hecha y guarda el nombre del momento"
+  pruebas:
+    - microservices/acceso/src/rutas/sesiones.test.ts
+    - microservices/acceso/src/rutas/apartados.test.ts
+    - microservices/acceso/src/persistencia/acceso.test.ts
+    - microservices/comercial/src/autenticacion.test.ts
+    - microservices/comercial/src/rutas/apartados-repetidos.test.ts
+    - tests/integration/acceso.sh
+    - tests/integration/puerta.sh
+    - tests/integration/base-propia.sh
+  defectos:
+    - "Con el token entre servicios, cualquiera en la red interna puede decirle a un servicio quién es la persona (#168)"

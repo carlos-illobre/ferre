@@ -59,3 +59,11 @@ Hay dos problemas técnicos:
   nuevo no duplica una venta (tiene su id), pero sí podría repetir un «no llevó».
 - Antes de repetir, se mira que ningún producto del cambio se haya unido con otro o dado de baja:
   la ruta original no lo controla, y una venta vieja no debe quedar en un producto que ya no se usa.
+
+## Enmienda (specs/029): lo apartado vive en Acceso
+
+Lo apartado se sube, se revisa y se decide en Acceso. Aceptar repite el pedido original **directo
+al servicio que lo atiende** (hoy, Comercial: `DESTINO_APARTADOS`) por la red interna, con el token
+entre servicios, la identidad de quien lo hizo en las cabeceras y `X-Apartado: 1`. La revisión de
+productos unidos o dados de baja la hace Comercial, que es donde están los productos: ante un pedido
+apartado, contesta 409 con el mismo motivo de antes.

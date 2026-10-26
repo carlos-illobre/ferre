@@ -95,6 +95,19 @@ docker compose exec -T comercial rm -rf /app/datos/listas/tickets   # solo si es
 En pruebas no estaba (arrancó con base nueva en la etapa 1). No se confunde con el volumen
 `tickets-fotos`, que es donde guarda las fotos el servicio de Tickets y no se toca.
 
+## Al pasar Acceso a su servicio (specs/029)
+
+Acceso arranca con su base nueva (decisión de Carlos): las personas, los roles armados a mano, las
+sesiones y las huellas de antes no se copian. Antes de desplegar, el `.env` del ambiente tiene que
+tener `CLAVE_BASE_ACCESO` (`openssl rand -hex 24`), o el compose no arranca. Después de desplegar:
+
+1. La primera persona se crea con el comando, ahora en el contenedor de Acceso (ver «Primer
+   usuario»); recibe todos los roles.
+2. Todos vuelven a entrar (con Google y, en el celular, la huella de nuevo), y quien administra
+   autoriza al resto y les da sus roles desde la aplicación.
+3. Las tablas de personas se borran de la base del mostrador con la misma versión; lo que se hizo
+   antes conserva el nombre de quien lo hizo.
+
 ## Si se pierde el `.env`, o hay que cambiar una clave de la base
 
 Los datos no se pierden: están en el volumen del ambiente, no dependen de las claves. Sin las
@@ -109,7 +122,7 @@ reponen desde la máquina, en la carpeta del ambiente:
 
    ```bash
    cd ~/ferre/<ambiente>
-   for par in mostrador:CLAVE_BASE_MOSTRADOR procesos:CLAVE_BASE_PROCESOS auditoria:CLAVE_BASE_AUDITORIA tickets:CLAVE_BASE_TICKETS postgres:CLAVE_BASE_ADMIN; do
+   for par in mostrador:CLAVE_BASE_MOSTRADOR procesos:CLAVE_BASE_PROCESOS auditoria:CLAVE_BASE_AUDITORIA tickets:CLAVE_BASE_TICKETS acceso:CLAVE_BASE_ACCESO postgres:CLAVE_BASE_ADMIN; do
      rol=${par%%:*}; clave=$(grep "^${par#*:}=" .env | cut -d= -f2-)
      echo "ALTER ROLE $rol PASSWORD :'clave';" | docker compose exec -T db psql -U postgres -q -v clave="$clave"
    done
@@ -124,10 +137,10 @@ Lo que sí pierde los datos es perder el disco de la máquina o borrar el volume
 ## Primer usuario
 
 El login es con Google ([docs/operacion/google-cloud.md](google-cloud.md)). El primer dueño se
-crea desde el contenedor; los siguientes usuarios, desde la app:
+crea desde el contenedor de Acceso (specs/029); los siguientes usuarios, desde la app:
 
 ```bash
-docker compose exec comercial node dist/crear-usuario.js correo@gmail.com "Nombre"
+docker compose exec acceso node dist/crear-usuario.js correo@gmail.com "Nombre"
 ```
 
 ## Monitor
