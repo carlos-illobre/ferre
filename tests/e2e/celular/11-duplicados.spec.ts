@@ -28,6 +28,8 @@ test.beforeAll(() => {
   psql(`DELETE FROM movimiento_stock WHERE producto_id IN ('${ID_A}', '${ID_B}')`);
   psql(`DELETE FROM item_venta WHERE producto_id IN ('${ID_A}', '${ID_B}')`);
   psql(`DELETE FROM precio_proveedor WHERE producto_id IN ('${ID_A}', '${ID_B}')`);
+  // Lo que se movió en la unión de la corrida anterior (027: las uniones tienen su tabla).
+  psql(`DELETE FROM union_de_productos WHERE conservar IN ('${ID_A}', '${ID_B}') OR absorbido IN ('${ID_A}', '${ID_B}')`);
   psql(`DELETE FROM producto WHERE id IN ('${ID_A}', '${ID_B}')`);
   psql(`DELETE FROM proveedor WHERE id IN ('${ID_PROV_A}', '${ID_PROV_B}')`);
   psql(`INSERT INTO proveedor (id, nombre) VALUES ('${ID_PROV_A}', 'Proveedor caro (e2e)'), ('${ID_PROV_B}', 'Proveedor barato (e2e)')`);

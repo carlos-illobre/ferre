@@ -13,3 +13,4 @@
 - [x] T011 Integración `tests/integration/auditoria.sh` y e2e en Docker (depende de T007–T010)
 - [x] T012 Documentación y `proyecto/estado.yml` (depende de T011)
 - [x] T013 Revisión independiente (paso 7) (depende de T012)
+- [x] T014 [arreglo] El filtro «Qué» de la computadora pasa la regla de complejidad de la web (la CI la frenó)

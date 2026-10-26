@@ -30,3 +30,7 @@ export const CATEGORIAS: { tipo: string; nombre: string; icono: NombreDeIcono; t
   { tipo: "stock.", nombre: "Ajustes de stock", icono: "package", tono: "urgente" },
   { tipo: "venta.anulada", nombre: "Ventas anuladas", icono: "ban", tono: "error" },
 ];
+
+// Lo elegido en «Qué» cuando viene de «Qué pasó» (un tipo, sin grupo): su nombre; si no, null.
+export const tipoElegido = (f: { grupo: string; tipo: string }): string | null =>
+  f.tipo && !f.grupo ? CATEGORIAS.find((c) => c.tipo === f.tipo)?.nombre ?? f.tipo : null;

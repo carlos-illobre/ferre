@@ -4,7 +4,7 @@ import { hoyLocal } from "../../../negocio/formato";
 // decisión 148): el nombre de cada acción con el ícono de su grupo, el detalle en una línea y
 // cada dato con su nombre legible.
 type Contenido = Record<string, unknown>;
-export { CATEGORIAS, detalleDe, queFue, type Que } from "./que-fue";
+export { CATEGORIAS, detalleDe, queFue, tipoElegido, type Que } from "./que-fue";
 
 // El período del registro: hoy, ayer, esta semana o los días que se elijan (sin días, todo).
 export type { Periodo } from "../../../negocio/actividad";
