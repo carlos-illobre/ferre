@@ -292,7 +292,7 @@ final.
 - [ ] T173 [agente] Los permisos en un solo lugar para Acceso y Comercial (hoy `permisos.ts` en los dos, sin prueba que los mantenga iguales), y sacar la tabla `configuracion` de Comercial, que quedó sin uso (revisión de 029, 9)
 - [ ] T174 [carlos] Antes de desplegar 029: lo apartado pendiente y los ajustes del sistema (cuánto recuerda la sesión, cuántos días dura el vínculo) no pasan a Acceso. Decidir todo lo apartado antes, y volver a poner los ajustes después (revisión de 029, 1)
 - [x] T155 [agente] Etapa 4: Tickets en su propio servicio, con su base y sus eventos, que le entrega a Auditoría (decisión 164) (depende de T157)
-- [ ] T144 [agente] Etapa 5: Acceso en su propio servicio, con su base y sus eventos, que le entrega a Auditoría: usuarios, roles, permisos, sesiones, huellas, vincular el celular y sus ajustes; el gateway le pregunta a Acceso quién es cada uno (decisión 164) (depende de T155)
+- [x] T144 [agente] Etapa 5: Acceso en su propio servicio, con su base y sus eventos, que le entrega a Auditoría: usuarios, roles, permisos, sesiones, huellas, vincular el celular y sus ajustes; el gateway le pregunta a Acceso quién es cada uno (decisión 164) (depende de T155)
 - [ ] T141 [agente] Etapa 6: el dispositivo guarda todos los cambios del mostrador, con tope por espacio y sin borrar lo no confirmado; pide al navegador no borrar los datos; sin almacenamiento local no trabaja sin conexión (depende de T139)
 - [ ] T143 [agente] Etapa 7: usuarios de la base con lo mínimo, los históricos no se pueden modificar desde la base, unir duplicados sin reescribir filas (depende de T144)
 - [ ] T145 [agente] Etapa 8: archivos para análisis (Parquet con DuckDB) (depende de T143)
