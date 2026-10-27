@@ -6,8 +6,8 @@
 #
 #   bash desinstalar.sh            # muestra lo que va a borrar y pide escribir «borrar»
 #
-# No toca el reverse proxy de la máquina (no es parte de ferre, ver ORACLE.md): al final dice
-# qué rutas sacarle. Sin vuelta atrás: los volúmenes se borran.
+# Del reverse proxy de la máquina solo saca el sitio de ferre (/etc/caddy/sitios/ferre.caddy) y
+# lo recarga; el resto del proxy no se toca. Sin vuelta atrás: los volúmenes se borran.
 set -euo pipefail
 
 USUARIOS=(ferre-produccion ferre-pruebas)
@@ -61,17 +61,25 @@ for u in "${existentes[@]}"; do
     ok "usuario, su carpeta y sus rangos de subuid/subgid borrados"
 done
 
+paso "El reverse proxy de la máquina"
+if [ -f /etc/caddy/sitios/ferre.caddy ]; then
+    sudo rm /etc/caddy/sitios/ferre.caddy
+    sudo caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null && sudo systemctl reload caddy
+    ok "sitio de ferre borrado y Caddy recargado"
+else
+    ok "no había sitio de ferre"
+fi
+
 paso "Comprobación"
 for u in "${USUARIOS[@]}"; do
     ! id "$u" >/dev/null 2>&1 && ok "$u ya no existe" || echo "  ✗ $u sigue existiendo"
 done
-! ss -ltn | grep -qE '127\.0\.0\.1:(8081|8082) ' && ok "nada escucha en 8081 ni en 8082" || echo "  ✗ algo sigue escuchando en 8081 u 8082"
+! ss -ltn | grep -qE '127\.0\.0\.1:(8081|8082|5433|5434) ' && ok "nada escucha en 8081, 8082, 5433 ni 5434" || echo "  ✗ algo sigue escuchando en 8081, 8082, 5433 o 5434"
 
 cat <<'FIN'
 
 Listo. Fuera de esta máquina, a mano:
-  1. El reverse proxy de la máquina: sacar las rutas de ferre-api.duckdns.org (8081) y
-     ferre-api-pruebas.duckdns.org (8082).
+  1. /etc/caddy/sitios/README.md: sacar la fila de ferre de la tabla.
   2. DuckDNS: borrar ferre-api y ferre-api-pruebas, si no se van a usar.
   3. GitHub (opcional): las imágenes de ferre en GHCR y el canal de ntfy de sus avisos.
 FIN

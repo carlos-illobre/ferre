@@ -243,8 +243,9 @@ Muestra lo que va a borrar y pide escribir «borrar». Con cada usuario: detiene
 servicio de despliegue, baja los dos ambientes con sus volúmenes, borra imágenes y redes y
 desinstala su Docker rootless; después borra los usuarios `ferre-produccion` y `ferre-pruebas`,
 sus carpetas y sus rangos de `/etc/subuid` y `/etc/subgid`. Comprueba que no quede nada en los
-puertos 8081 y 8082. No toca el reverse proxy: al terminar dice qué rutas sacarle, y qué borrar
-en DuckDNS y en GitHub.
+puertos 8081, 8082, 5433 y 5434. Del reverse proxy de la máquina solo borra
+`/etc/caddy/sitios/ferre.caddy` y lo recarga; al terminar dice qué borrar a mano en el README de
+los sitios, en DuckDNS y en GitHub.
 
 ## Qué se pierde si se pierde cada volumen
 
