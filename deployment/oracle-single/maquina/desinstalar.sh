@@ -78,7 +78,7 @@ done
 
 cat <<'FIN'
 
-Listo. Fuera de esta máquina, a mano:
+Listo. Queda a mano:
   1. /etc/caddy/sitios/README.md: sacar la fila de ferre de la tabla.
   2. DuckDNS: borrar ferre-api y ferre-api-pruebas, si no se van a usar.
   3. GitHub (opcional): las imágenes de ferre en GHCR y el canal de ntfy de sus avisos.
