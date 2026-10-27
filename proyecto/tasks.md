@@ -27,7 +27,7 @@ Las reglas no van acá: van en `specs/`.
 - [x] T005 Principios de diseño de la interfaz (guía UX) (depende de T004) (#5)
 - [x] T051 [definir] Separar backend y cliente web en dos servicios; publicar el cliente en GitHub Pages (depende de T003) (#51)
 - [x] T053 Ambientes de prueba y producción en la misma máquina, con despliegue desde CI (#53)
-- [ ] T175 [carlos] Desinstalar ferre de la máquina de Oracle, producción incluida, con `deployment/oracle-single/maquina/desinstalar.sh` (ORACLE.md, paso 15): ferre se da de baja y no tiene datos válidos
+- [x] T175 [carlos] Desinstalar ferre de la máquina de Oracle, producción incluida, con `deployment/oracle-single/maquina/desinstalar.sh` (ORACLE.md, paso 15): ferre se da de baja y no tiene datos válidos
 - [x] T100 [agente] Poner al día la especificación con todo lo decidido el 12 y 13 de octubre (estimación 3h) (#100)
 
 ## Etapa 1 · MVP
