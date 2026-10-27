@@ -230,6 +230,22 @@ df -h / && docker system df
 cd ~/ferre/pruebas && docker compose down
 ```
 
+## 15. Desinstalar ferre de la máquina
+
+Ferre se da de baja (Carlos, 2026-10-27): no tiene datos válidos ni se usa en producción. Un
+administrador con sudo corre, desde la copia del repositorio:
+
+```bash
+bash deployment/oracle-single/maquina/desinstalar.sh
+```
+
+Muestra lo que va a borrar y pide escribir «borrar». Con cada usuario: detiene y borra el
+servicio de despliegue, baja los dos ambientes con sus volúmenes, borra imágenes y redes y
+desinstala su Docker rootless; después borra los usuarios `ferre-produccion` y `ferre-pruebas`,
+sus carpetas y sus rangos de `/etc/subuid` y `/etc/subgid`. Comprueba que no quede nada en los
+puertos 8081 y 8082. No toca el reverse proxy: al terminar dice qué rutas sacarle, y qué borrar
+en DuckDNS y en GitHub.
+
 ## Qué se pierde si se pierde cada volumen
 
 | Volumen | Qué guarda | Si se pierde |
